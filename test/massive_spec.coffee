@@ -1,5 +1,7 @@
-massive = require("../lib/massive.model");
+massive = require("../lib/massive");
+should = require("should");
 
+massive.connect("tcp://postgres@localhost/test");
 describe "initialization", ->
   m={}
   before ->
@@ -105,17 +107,14 @@ describe "queries", ->
       query.sql.should.equal("UPDATE products SET name=$1, price=$2 \nWHERE \"id\">12")
 
   describe "events", ->
+    beforeEach (done)->
+      done()
+
     it "fires something when new events are added", ->
       query = m.select();
       query.on "row", (row)->
         console.log(row.name)
         should.exist(row.name)
 
-  describe "results", ->
-    it "runs", (done) ->
-      query = m.select();
-      query.toArray (err,result) ->
-        result.length.should.equal(0)
-        done()
-
+  
  
