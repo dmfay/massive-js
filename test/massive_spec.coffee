@@ -1,7 +1,9 @@
 massive = require("../lib/massive");
 should = require("should");
+util = require("util");
 
-massive.connect("tcp://postgres@localhost/test");
+massive.connect("postgresql://postgres@localhost/test");
+console.log("My test says massive is " + util.inspect(massive));
 describe "initialization", ->
   m={}
   before ->

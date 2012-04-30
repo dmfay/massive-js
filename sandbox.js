@@ -1,4 +1,4 @@
-var massive = require ('./lib/massive');
+var massive = require ('massive');
 
 console.log(massive);
 
