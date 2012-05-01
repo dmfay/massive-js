@@ -93,10 +93,15 @@ describe "queries", ->
 
 
   describe "insert", ->
-    it "creates a basic insert", ->
+    it "creates a basic insert with returning", ->
       query = m.insert({name : "steve", price : 12.00})
-      query.sql.should.equal "INSERT INTO products(name, price) VALUES ($1, $2)"
+      query.sql.should.equal "INSERT INTO products(name, price) VALUES ($1, $2) RETURNING *"
+      query.params.length.should.equal(2)
 
+    it "creates a batch for item arrays", ->
+      items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
+      query = m.insertBatch(items)
+      console.log(query.sql)
 
   describe "updates", ->
     it "creates a basic update", ->
@@ -116,7 +121,7 @@ describe "queries", ->
     beforeEach (done)->
       done()
 
-    it "fires something when new events are added", ->
+    it "fires iterator when new events are added", ->
       query = m.select();
       query.on "row", (row)->
         should.exist(row.name)

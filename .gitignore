@@ -1,3 +1,9 @@
-*.DS_Store
-*.swp
-
+.DS_Store
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+node_modules
