@@ -3,16 +3,26 @@ massive.connect("postgresql://postgres@localhost/test");
 
 //drop the table
 console.log("dropping...")
-massive.dropTable("products").execute();
+var dropQuery = massive.dropTable("products");
 
 
 //create the table
 console.log("creating products table")
-massive.createTable("products", {
+var createQuery = massive.createTable("products", {
   name : "string",
   price : "money",
   timestamps : true
-}).execute();
+});
+
+
+dropQuery.on("executed", function(result){
+	console.log("Products dropped...");
+});
+
+createQuery.on("executed", function(result){
+	console.log("Products table created");
+})
+
 
 // //add some data - in a batch
 // console.log("Inserting 2 products...");
