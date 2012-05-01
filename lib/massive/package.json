@@ -6,6 +6,7 @@
       "mocha": "*"
     , "should": "*"
     , "pg" : "*"
+    , "underscore" : "*"
   }
   , "keywords": ["database", "query", "postgres", "sequel"]
   , "main": "./lib/massive.js"

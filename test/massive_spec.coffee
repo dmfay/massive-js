@@ -3,11 +3,10 @@ should = require("should");
 util = require("util");
 
 massive.connect("postgresql://postgres@localhost/test");
-console.log("My test says massive is " + util.inspect(massive));
 describe "initialization", ->
   m={}
   before ->
-    m = new massive.Model("products")
+    m = new massive.table("products")
     
   it "sets the table name", ->
     m.tableName.should.equal("products")
@@ -18,7 +17,7 @@ describe "initialization", ->
 describe "queries", ->
   m = {}
   beforeEach (done) ->
-    m = new massive.Model("products")
+    m = new massive.table("products")
     done()
 
   describe "select", ->
@@ -108,6 +107,11 @@ describe "queries", ->
       query = m.update({name:"pumpkin", price:1000}, {"id >": 12})
       query.sql.should.equal("UPDATE products SET name=$1, price=$2 \nWHERE \"id\">12")
 
+    it "throws if key not passed", ->
+      ( -> m.update({name:"pumpkin", price:1000}) ).should.throw()
+
+      
+
   describe "events", ->
     beforeEach (done)->
       done()
@@ -115,7 +119,6 @@ describe "queries", ->
     it "fires something when new events are added", ->
       query = m.select();
       query.on "row", (row)->
-        console.log(row.name)
         should.exist(row.name)
 
   
