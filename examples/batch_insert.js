@@ -25,30 +25,30 @@ products.insertBatch(items).execute(function(err,result){
   if(err) console.log("oops - " + err);
 });
 
-//pull back out
-console.log("Wanna see em?")
-var query = products.select();
-query.on("row", function(row){
-  console.log("Hi, I'm product " + row.name);
-})
+// //pull back out
+// console.log("Wanna see em?")
+// var query = products.select();
+// query.on("row", function(row){
+//   console.log("Hi, I'm product " + row.name);
+// })
 
-//we charge too little
-console.log("let's update our prices")
-query = products.update({price : 100.00}, {"id >" :  0}).execute(function(err,result){
-  if(err) console.log("Ohhhh mann! " + err);
-  console.log("All set!")
-});
+// //we charge too little
+// console.log("let's update our prices")
+// query = products.update({price : 100.00}, {"id >" :  0}).execute(function(err,result){
+//   if(err) console.log("Ohhhh mann! " + err);
+//   console.log("All set!")
+// });
 
-console.log("Updated pricing...")
-var query = products.select();
-query.on("row", function(row){
-  console.log(row.name + " is now priced at " + row.price);
-})
+// console.log("Updated pricing...")
+// var query = products.select();
+// query.on("row", function(row){
+//   console.log(row.name + " is now priced at " + row.price);
+// })
 
 
-//drop it all
-console.log("all done...")
-products.delete().execute(function(err,result){
-  if(err) console.log("Ohhhh mann! " + err);
-  console.log("See ya!")
-})
+// //drop it all
+// console.log("all done...")
+// products.delete().execute(function(err,result){
+//   if(err) console.log("Ohhhh mann! " + err);
+//   console.log("See ya!")
+// })
