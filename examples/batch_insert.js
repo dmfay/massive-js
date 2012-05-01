@@ -3,7 +3,7 @@ massive.connect("postgresql://postgres@localhost/test");
 
 //drop the table
 console.log("dropping...")
-massive.dropTable("products");
+massive.dropTable("products").execute();
 
 
 //create the table
@@ -12,7 +12,7 @@ massive.createTable("products", {
   name : "string",
   price : "money",
   timestamps : true
-});
+}).execute();
 
 //add some data - in a batch
 console.log("Inserting 2 products...");
