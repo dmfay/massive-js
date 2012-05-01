@@ -115,6 +115,10 @@ describe "queries", ->
     it "throws if key not passed", ->
       ( -> m.update({name:"pumpkin", price:1000}) ).should.throw()
 
+  describe "aggregates", ->
+    it "counts with SELECT COUNT", ->
+      query = m.count()
+      query.sql.should.equal("SELECT COUNT(1) FROM products");
       
 
   describe "events", ->

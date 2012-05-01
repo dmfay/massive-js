@@ -14,16 +14,16 @@ massive.createTable("products", {
   timestamps : true
 }).execute();
 
-//add some data - in a batch
-console.log("Inserting 2 products...");
-var products = new massive.Model("products", "id");
-var items = [
-  {name:"stuffy stuff", price: 12.00},
-  {name:"poofy poof", price: 24.00}
-];
-products.insertBatch(items).execute(function(err,result){
-  if(err) console.log("oops - " + err);
-});
+// //add some data - in a batch
+// console.log("Inserting 2 products...");
+// var products = new massive.Model("products", "id");
+// var items = [
+//   {name:"stuffy stuff", price: 12.00},
+//   {name:"poofy poof", price: 24.00}
+// ];
+// products.insertBatch(items).execute(function(err,result){
+//   if(err) console.log("oops - " + err);
+// });
 
 // //pull back out
 // console.log("Wanna see em?")
