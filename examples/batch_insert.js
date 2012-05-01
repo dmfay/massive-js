@@ -29,7 +29,7 @@ products.insertBatch(items).execute(function(err,result){
 console.log("Wanna see em?")
 var query = products.select();
 query.on("row", function(row){
-  console.log("Hi, I'm product " + row.title);
+  console.log("Hi, I'm product " + row.name);
 })
 
 //we charge too little
@@ -42,7 +42,7 @@ query = products.update({price : 100.00}, {"id >" :  0}).execute(function(err,re
 console.log("Updated pricing...")
 var query = products.select();
 query.on("row", function(row){
-  console.log(row.title + " is now priced at " + row.price);
+  console.log(row.name + " is now priced at " + row.price);
 })
 
 
