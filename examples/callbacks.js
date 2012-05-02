@@ -1,4 +1,4 @@
-var massive = require("../lib/massive");
+var massive = require("../lib/");
 var util = require("util");
 var _ = require("underscore")._;
 

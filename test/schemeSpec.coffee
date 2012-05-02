@@ -1,4 +1,4 @@
-massive = require "../lib/massive"
+massive = require "../lib"
 should = require "should"
 
 describe "schema", ->
