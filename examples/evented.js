@@ -3,16 +3,18 @@ var util = require("util");
 var _ = require("underscore")._;
 
 massive.connect("postgresql://postgres@localhost/test");
-var products = new massive.Model("products");
+
+var products = new massive.table("products");
+
 //this is a query
 var dropProducts = massive.dropTable("products");
+
 var createProducts = massive.createTable("products", {
     name : "string",
     price : "money",
     timestamps : true
 });
 
-var select = products.all();
 
 var items = [
   {name:"stuffy stuff", price: 12.00},
@@ -21,7 +23,41 @@ var items = [
 
 var batchInsert = products.insertBatch(items);
 var updatePrices = products.update({price : 100.00}, {"id >" :  0});
+var select = products.all();
 var destroyAll = products.destroy();
+
+destroyAll.once("executed", function(){
+  console.log("No more products!");
+});
+
+updatePrices.once("executed", function(){
+  select.on("row", function(product){
+    console.log(product);
+  });
+  select.on("end", function(){
+    destroyAll.execute();
+  })
+})
+batchInsert.once("executed", updatePrices.execute);
+createProducts.once("executed", batchInsert.execute);
+dropProducts.once("executed", createProducts.execute);
+
+
+dropProducts.execute();
+// var select = products.all();
+
+// var items = [
+//   {name:"stuffy stuff", price: 12.00},
+//   {name:"poofy poof", price: 24.00}
+// ];
+
+// var batchInsert = products.insertBatch(items);
+// var updatePrices = products.update({price : 100.00}, {"id >" :  0});
+// var destroyAll = products.destroy();
+
+// console.log(dropProducts);
+// console.log(createProducts);
+// dropProducts.once("executed", createProducts.execute);
 
 
 // destroyAll.on("executed", function(){
@@ -38,24 +74,15 @@ var destroyAll = products.destroy();
 //   });
 // })
 
-createProducts.on("executed", function(){
-  console.log("Added products table");
-  batchInsert.execute();
-});
+// createProducts.on("executed", function(){
+//   console.log("Added products table");
+//   batchInsert.execute();
+// });
 
-//start it off with dropping/creating
-dropProducts.on("executed", function(){
-  console.log("dropped products");
-  createProducts.execute();
-});
+// //start it off with dropping/creating
+// dropProducts.on("executed", function(){
+//   console.log("dropped products");
+//   createProducts.execute();
+// });
 
-createProducts.execute();
 
-var listProducts = function(){
-  console.log("Product list")
-  //you could also use products.all()
-  var inline = massive.run("SELECT * FROM products");
-  inline.on("row", function(r){
-    console.log(r);
-  });
-}
