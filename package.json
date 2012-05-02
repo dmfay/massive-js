@@ -3,10 +3,7 @@
   , "version": "0.1.0"
   , "author": "Rob Conery <rob@tekpub.com>"
   , "devDependencies": {
-      "mocha": "*"
-    , "should": "*"
-    , "pg" : "*"
-    , "underscore" : "*"
+      "massive": "*"
   }
   , "keywords": ["database", "query", "postgres", "sequel"]
   , "main": "./lib/massive.js"

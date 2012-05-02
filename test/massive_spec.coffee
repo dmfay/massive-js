@@ -22,71 +22,71 @@ describe "queries", ->
 
   describe "select", ->
     it "runs a select star", ->
-      query = m.select()
+      query = m.all()
       query.sql.should.equal("SELECT * FROM products")
       query.params.length.should.equal 0
 
     it "adds columns when specified",  ->
-      query =m.select {columns:"name,price"}
+      query =m.all {columns:"name,price"}
       query.sql.should.equal("SELECT name,price FROM products")
 
 
     it "adds a where when specified as an argument", ->
-      query = m.select({name : "steve"})
+      query = m.all({name : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1")
       query.params.length.should.equal 1
     
     it "adds a where when specified as a method", ->
-      query = m.select().where({name : "steve"})
+      query = m.all().where({name : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1")
       query.params.length.should.equal 1
 
     it "adds a where when id is a number", ->
-      query = m.select({id : 1})
+      query = m.all({id : 1})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"=1")
       query.params.length.should.equal 0
 
     it "tracks params when where specified", ->
-      query = m.select().where({name : "steve"})
+      query = m.all().where({name : "steve"})
       query.params.length.should.equal 1
 
     it "adds a LIMIT if specified", ->
-      query = m.select().where({name : "steve"}).limit(1);
+      query = m.all().where({name : "steve"}).limit(1);
       query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1 \nLIMIT 1")
       query.params.length.should.equal 1
 
     it "adds an ORDER if specified", ->
-      query = m.select().where({name : "steve"}).order("name").limit(1);
+      query = m.all().where({name : "steve"}).order("name").limit(1);
       query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1 \nORDER BY name \nLIMIT 1")
       query.params.length.should.equal 1
 
     it "handles greater than", ->
-      query = m.select().where({"id >" : "steve"})
+      query = m.all().where({"id >" : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\">$1")
       query.params.length.should.equal 1
 
     it "handles less than", ->
-      query = m.select({"id <" : "steve"})
+      query = m.all({"id <" : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<$1")      
       query.params.length.should.equal 1
 
     it "handles bang equal", ->
-      query = m.select({"id !=" : "steve"})
+      query = m.all({"id !=" : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<>$1")   
       query.params.length.should.equal 1
 
     it "handles ineqaulity", ->
-      query = m.select({"id <>" : "steve"})
+      query = m.all({"id <>" : "steve"})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<>$1") 
       query.params.length.should.equal 1
 
     it "handles IN", ->
-      query = m.select({id : ["steve","juice","pete"]})
+      query = m.all({id : ["steve","juice","pete"]})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" IN ($1, $2, $3)") 
       query.params.length.should.equal 3
 
     it "handles NOT IN", ->
-      query = m.select({"id != ": ["steve","juice","pete"]})
+      query = m.all({"id != ": ["steve","juice","pete"]})
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" NOT IN ($1, $2, $3)") 
       query.params.length.should.equal 3
 
@@ -95,19 +95,19 @@ describe "queries", ->
       query.sql.should.equal("select * from crazytown where id = $1") 
       query.params.length.should.equal 1
 
-  describe "delete", ->
+  describe "destroy", ->
     it "creates a delete everything", ->
-      query = m.delete()
+      query = m.destroy()
       query.sql.should.equal "DELETE FROM products"
       query.params.length.should.equal 0
 
     it "uses where when specified as an argument", ->
-      query = m.delete({id : 1})
+      query = m.destroy({id : 1})
       query.sql.should.equal "DELETE FROM products \nWHERE \"id\"=1"
       query.params.length.should.equal 0
 
     it "uses where when specified as a method", ->
-      query = m.delete().where({id : 1});
+      query = m.destroy().where({id : 1});
       query.sql.should.equal "DELETE FROM products \nWHERE \"id\"=1"
       query.params.length.should.equal 0
 
@@ -147,7 +147,7 @@ describe "queries", ->
       done()
 
     it "fires iterator when new events are added", ->
-      query = m.select();
+      query = m.all();
       query.on "row", (row)->
         should.exist(row.name)
 
