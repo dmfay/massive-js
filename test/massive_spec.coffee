@@ -129,6 +129,10 @@ describe "queries", ->
       query = m.insertBatch(items)
       query.params.length.should.equal 6
 
+    it "executes an error if no data was supplied", ->
+      m.insert().execute (err) ->
+        err.should.equal('insert should be called with data')
+
   describe "updates", ->
     it "creates a basic update", ->
       query = m.update({name:"pumpkin", price:1000}, 12)
@@ -141,7 +145,8 @@ describe "queries", ->
       query.params.length.should.equal 2
 
     it "throws if key not passed", ->
-      ( -> m.update({name:"pumpkin", price:1000}) ).should.throw()
+      m.update({name:"pumpkin", price:1000}).execute (err) ->
+        err.should.equal('Have to pass in the update criteria and a key')
 
   describe "aggregates", ->
     it "counts with SELECT COUNT", ->
@@ -157,6 +162,3 @@ describe "queries", ->
       query = m.select();
       query.on "row", (row)->
         should.exist(row.name)
-
-
-
