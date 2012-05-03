@@ -2,7 +2,8 @@ var massive = require("../lib/");
 var util = require("util");
 var _ = require("underscore")._;
 
-massive.connect("postgresql://postgres@localhost/test");
+//massive.connect("postgresql://postgres@localhost/test");
+massive.connect({user : "root", password : "", database : "test"});
 
 var products = new massive.table("products", "id");
 
@@ -39,6 +40,7 @@ var insertProducts = function() {
       updatePrices();
     });
   });
+
 }
 
 var showProducts = function(callback){
