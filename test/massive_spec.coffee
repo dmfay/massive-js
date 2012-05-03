@@ -59,6 +59,11 @@ describe "queries", ->
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"=1")
       query.params.length.should.equal 0
 
+    it "adds a where as a primary key", ->
+      query = m.all(5)
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"=5")
+      query.params.length.should.equal 0
+
     it "tracks params when where specified", ->
       query = m.all().where({name : "steve"})
       query.params.length.should.equal 1
@@ -122,6 +127,11 @@ describe "queries", ->
     it "uses where when specified as a method", ->
       query = m.destroy().where({id : 1});
       query.sql.should.equal "DELETE FROM products \nWHERE \"id\"=1"
+      query.params.length.should.equal 0
+
+    it "adds a where as a primary key", ->
+      query = m.destroy(6)
+      query.sql.should.equal("DELETE FROM products \nWHERE \"id\"=6")
       query.params.length.should.equal 0
 
   describe "insert", ->
