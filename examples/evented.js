@@ -34,7 +34,7 @@ updatePrices.once("executed", function(){
   select.on("row", function(product){
     console.log(product);
   });
-  select.on("end", function(){
+  select.on("executed", function(){
     destroyAll.execute();
   })
 })

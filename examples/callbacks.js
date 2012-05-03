@@ -71,7 +71,6 @@ var deleteAll = function() {
   var query = products.destroy();
   query.execute(function(err,results){
     console.log("Everything toast!");
-    query.emit("close");
   });
 }
 
