@@ -2,8 +2,10 @@ var massive = require("../lib/");
 var util = require("util");
 var _ = require("underscore")._;
 
-//massive.connect("postgresql://postgres@localhost/test");
-massive.connect({user : "root", password : "", database : "test"});
+massive.connect("postgresql://postgres@localhost/test");
+
+//for MySQL - set the require statement in lib/index to ./lib/mysql
+//massive.connect({user : "root", password : "", database : "test"});
 
 var products = new massive.table("products", "id");
 
@@ -66,8 +68,10 @@ var updatePrices = function(){
 
 var deleteAll = function() {
   console.log("Deleting everything, outta here!");
-  products.destroy().execute(function(err,results){
+  var query = products.destroy();
+  query.execute(function(err,results){
     console.log("Everything toast!");
+    query.emit("close");
   });
 }
 
