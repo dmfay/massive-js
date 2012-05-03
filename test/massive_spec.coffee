@@ -127,12 +127,13 @@ describe "queries", ->
   describe "insert", ->
     it "creates a basic insert with returning", ->
       query = m.insert({name : "steve", price : 12.00})
-      query.sql.should.equal "INSERT INTO products (name, price) VALUES ($1, $2) RETURNING *"
+      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2)"
       query.params.length.should.equal 2
 
     it "creates a batch for item arrays", ->
       items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
-      query = m.insertBatch(items)
+      query = m.insert(items)
+      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6)"
       query.params.length.should.equal 6
 
     it "executes an error if no data was supplied", ->
