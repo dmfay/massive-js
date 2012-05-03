@@ -23,7 +23,7 @@ describe "queries", ->
   describe "sanity", ->
     it "creates 2 separate query objects", ->
       query1 = m.all()
-      query2 = m.all(["name", "price"])
+      query2 = m.all("name > 1")
       query1.sql.should.not.equal(query2.sql)
 
   describe "select", ->
@@ -46,22 +46,22 @@ describe "queries", ->
 
     it "adds a where when specified as an argument", ->
       query = m.all({name : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\" = $1")
       query.params.length.should.equal 1
 
     it "adds a where when specified as a method", ->
       query = m.all().where({name : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\" = $1")
       query.params.length.should.equal 1
 
     it "adds a where when id is a number", ->
       query = m.all({id : 1})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"=1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 1")
       query.params.length.should.equal 0
 
     it "adds a where as a primary key", ->
       query = m.all(5)
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"=5")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 5")
       query.params.length.should.equal 0
 
     it "tracks params when where specified", ->
@@ -70,32 +70,32 @@ describe "queries", ->
 
     it "adds a LIMIT if specified", ->
       query = m.all().where({name : "steve"}).limit(1);
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1 \nLIMIT 1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\" = $1 \nLIMIT 1")
       query.params.length.should.equal 1
 
     it "adds an ORDER if specified", ->
       query = m.all().where({name : "steve"}).order("name").limit(1);
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\"=$1 \nORDER BY name \nLIMIT 1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"name\" = $1 \nORDER BY name \nLIMIT 1")
       query.params.length.should.equal 1
 
     it "handles greater than", ->
       query = m.all().where({"id >" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\">$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" > $1")
       query.params.length.should.equal 1
 
     it "handles less than", ->
       query = m.all({"id <" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" < $1")
       query.params.length.should.equal 1
 
     it "handles bang equal", ->
       query = m.all({"id !=" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<>$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> $1")
       query.params.length.should.equal 1
 
     it "handles ineqaulity", ->
       query = m.all({"id <>" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\"<>$1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> $1")
       query.params.length.should.equal 1
 
     it "handles IN", ->
@@ -121,17 +121,17 @@ describe "queries", ->
 
     it "uses where when specified as an argument", ->
       query = m.destroy({id : 1})
-      query.sql.should.equal "DELETE FROM products \nWHERE \"id\"=1"
+      query.sql.should.equal "DELETE FROM products \nWHERE \"id\" = 1"
       query.params.length.should.equal 0
 
     it "uses where when specified as a method", ->
       query = m.destroy().where({id : 1});
-      query.sql.should.equal "DELETE FROM products \nWHERE \"id\"=1"
+      query.sql.should.equal "DELETE FROM products \nWHERE \"id\" = 1"
       query.params.length.should.equal 0
 
     it "adds a where as a primary key", ->
       query = m.destroy(6)
-      query.sql.should.equal("DELETE FROM products \nWHERE \"id\"=6")
+      query.sql.should.equal("DELETE FROM products \nWHERE \"id\" = 6")
       query.params.length.should.equal 0
 
   describe "insert", ->
@@ -154,12 +154,12 @@ describe "queries", ->
   describe "updates", ->
     it "creates a basic update", ->
       query = m.update({name:"pumpkin", price:1000}, 12)
-      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\"=12")
+      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" = 12")
       query.params.length.should.equal 2
 
     it "creates a basic update with multi result", ->
       query = m.update({name:"pumpkin", price:1000}, {"id >": 12})
-      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\">12")
+      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" > 12")
       query.params.length.should.equal 2
 
     it "updates all rows", ->
