@@ -4,7 +4,7 @@ util = require("util");
 
 # db = null
 # before (done) ->
-#   massive.connect "postgresql://postgres@localhost/test", (err,_db) ->
+#   massive.connect "postgres://postgres@localhost/test", (err,_db) ->
 #     db = _db
 #     done()
 
@@ -13,7 +13,7 @@ util = require("util");
 
 #   it "has a single table named products", ->
 #     should.exist(db.products)
- 
+
 #   it "has a createTable method", ->
 #     should.exist(db.createTable)
 

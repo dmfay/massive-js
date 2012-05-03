@@ -2,7 +2,7 @@ massive = require("../lib/");
 should = require("should");
 util = require("util");
 
-massive.connect("postgresql://postgres@localhost/test");
+massive.connect("postgres://postgres@localhost/test");
 describe "initialization", ->
   m={}
   before ->

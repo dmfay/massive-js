@@ -2,7 +2,7 @@ var massive = require("../lib/");
 var util = require("util");
 var _ = require("underscore")._;
 
-massive.connect("postgresql://postgres@localhost/test");
+massive.connect("postgres://postgres@localhost/test");
 
 //for MySQL - set the require statement in lib/index to ./lib/mysql
 //massive.connect({user : "root", password : "", database : "test"});
