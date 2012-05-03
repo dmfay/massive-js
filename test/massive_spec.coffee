@@ -136,24 +136,31 @@ describe "queries", ->
       query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6)"
       query.params.length.should.equal 6
 
-    it "executes an error if no data was supplied", ->
+    it "executes an error if no data was supplied", (done) ->
       m.insert().execute (err) ->
         err.should.equal('insert should be called with data')
+        done()
 
   describe "updates", ->
     it "creates a basic update", ->
       query = m.update({name:"pumpkin", price:1000}, 12)
-      query.sql.should.equal("UPDATE products SET name=$1, price=$2 \nWHERE \"id\"=12")
+      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\"=12")
       query.params.length.should.equal 2
 
     it "creates a basic update with multi result", ->
       query = m.update({name:"pumpkin", price:1000}, {"id >": 12})
-      query.sql.should.equal("UPDATE products SET name=$1, price=$2 \nWHERE \"id\">12")
+      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\">12")
       query.params.length.should.equal 2
 
-    it "throws if key not passed", ->
-      m.update({name:"pumpkin", price:1000}).execute (err) ->
-        err.should.equal('Have to pass in the update criteria and a key')
+    it "updates all rows", ->
+      query = m.update({name:"leto", sand: true})
+      query.sql.should.equal("UPDATE products SET name = $1, sand = $2")
+      query.params.length.should.equal 2
+
+    it "throws if values are not passed", (done) ->
+      m.update().execute (err) ->
+        err.should.equal('Update requires a hash of fields=>values to update to')
+        done()
 
   describe "aggregates", ->
     it "counts with SELECT COUNT", ->
