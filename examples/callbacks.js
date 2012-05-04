@@ -1,78 +1,82 @@
-var massive = require("../lib/");
+var massive = require("../index");
 var util = require("util");
 var _ = require("underscore")._;
 
-massive.connect("postgres://postgres@localhost/test");
 
-//for MySQL - set the require statement in lib/index to ./lib/mysql
-//massive.connect({user : "root", password : "", database : "test"});
 
-var products = new massive.table("products", "id");
+massive.connect("postgres://postgres@localhost/test", function(err,db) {
+//massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
 
-var dropProducts = massive.dropTable("products");
-
-dropProducts.execute(function(err,data){
-  console.log("Products table dropped");
-  createProducts();
-});
-
-var createProducts = function(){
-  var createQuery = massive.createTable("products", {
-    name : "string",
-    price : "money",
-    timestamps : true
+  var dropProducts = db.dropTable("products").execute(function(err,data){
+    console.log("Products table dropped");
+    createProducts();
   });
-  createQuery.execute(function(err,data){
-    console.log("Products table created");
-    insertProducts();
-  });
-}
 
-var insertProducts = function() {
-
-
-  var items = [
-    {name:"stuffy stuff", price: 12.00},
-    {name:"poofy poof", price: 24.00}
-  ];
-  products.insertBatch(items).execute(function(err,newProducts){
-    console.log("HO")
-    console.log("Added " + newProducts.rowCount + " to db");
-    showProducts(function(){
-      updatePrices();
+  var createProducts = function(){
+    var createQuery = db.createTable("products", {
+      name : "string",
+      price : "money",
+      timestamps : true
     });
-  });
+    createQuery.execute(function(err,data){
+      console.log("Products table created");
+      db.loadTables(function(err,_db){
+        db = _db;
+        insertProducts();
+      });
+      
 
-}
+    });
+  }
 
-var showProducts = function(callback){
+  var insertProducts = function() {
 
-  products.all().execute(function(err, products){
-    _.each(products, function(p){
+
+    var items = [
+      {name:"stuffy stuff", price: 12.00},
+      {name:"poofy poof", price: 24.00}
+    ];
+    db.products.insert(items).execute(function(err,newProducts){
+      console.log("Added " + newProducts.length + " products to db - here they are");
+      showProducts(function(){
+        updatePrices();
+      });
+    });
+
+  }
+
+  var showProducts = function(callback){
+    var query = db.products.find();
+    query.on("row", function(p){
       console.log(p);
     });
-    if (callback) callback();
-  });
+    query.on("end", callback)
+  }
 
-}
-
-var updatePrices = function(){
-  console.log("Updating prices due to inflation");
-  products.update({price : 100.00}, {"id >" :  0}).execute(function(err,results){
-    console.log("Prices updated: " + results.rowCount);
-    showProducts(function(){
-      deleteAll();
+  var updatePrices = function(){
+    console.log("Updating prices due to inflation");
+    db.products.update({price : 100.00}, {"id >" :  0}).execute(function(err,results){
+      console.log("Prices updated: " + results.rowCount);
+      showProducts(function(){
+        deleteAll();
+      });
     });
-  });
-}
+  }
 
-var deleteAll = function() {
-  console.log("Deleting everything, outta here!");
-  var query = products.destroy();
-  query.execute(function(err,results){
-    console.log("Everything toast!");
-  });
-}
+  var deleteAll = function() {
+    console.log("Deleting everything, outta here!");
+    var query = db.products.destroy();
+    query.execute(function(err,results){
+      console.log("Everything toast!");
+    });
+  }
+
+
+
+});
+
+
+
 
 
 

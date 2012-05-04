@@ -116,13 +116,13 @@ describe "Postgres Queries", ->
   describe "insert", ->
     it "creates a basic insert with returning", ->
       query = db.products.insert({name : "steve", price : 12.00})
-      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2) \nRETURN *"
+      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2) \nRETURNING *"
       query.params.length.should.equal 2
 
     it "creates a batch for item arrays", ->
       items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
       query = db.products.insert(items)
-      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6) \nRETURN *"
+      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6) \nRETURNING *"
       query.params.length.should.equal 6
 
     it "throws an error if no data was supplied", ->
