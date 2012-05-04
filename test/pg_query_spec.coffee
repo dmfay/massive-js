@@ -1,4 +1,4 @@
-massive = require("../lib/");
+massive = require("../index");
 should = require("should");
 util = require("util");
 
@@ -116,13 +116,13 @@ describe "Postgres Queries", ->
   describe "insert", ->
     it "creates a basic insert with returning", ->
       query = db.products.insert({name : "steve", price : 12.00})
-      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2)"
+      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2) \nRETURN *"
       query.params.length.should.equal 2
 
     it "creates a batch for item arrays", ->
       items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
       query = db.products.insert(items)
-      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6)"
+      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6) \nRETURN *"
       query.params.length.should.equal 6
 
     it "throws an error if no data was supplied", ->
@@ -163,9 +163,60 @@ describe "Postgres Queries", ->
     it "fires iterator when new events are added", ->
       query = db.products.find ->
       query.on "row", (row)->
+        console.log(row)
         should.exist(row)
 
+  describe "iterators on tables and queries", ->
+    it "has an each method", ->
+      query = db.products.find()
+      should.exist query.each
+    
+    it "should iterate", ->
+      query = db.products.find()
+      query.each (err,result) ->
+        should.exist result
 
+    it "tables should have an each method", ->
+      should.exist db.products.each
 
+    #this is a stupid test
+    it "iterates on the table", ->
+      count = 0
+      db.products.each (err,result) ->
+        count++
+        count.should.be.greaterThan 0
 
+  describe "singles on queries and tables", ->
+    it "query has a first method", ->
+      query = db.products.find()
+      should.exist query.first
 
+    it "query returns a single item", (done)->
+      query = db.products.find()
+      query.first (err,result) ->
+        should.exist result
+        done()
+
+    it "table has a first method", ->
+      should.exist db.products.first
+
+    it "returns the first item in table", ->
+      db.products.first (err,result) ->
+        should.exist(result)
+
+    it "has a last method", ->
+      query = db.products.find()
+      should.exist query.last
+
+    it "returns a single item", (done)->
+      query = db.products.find()
+      query.last (err,result) ->
+        should.exist result
+        done()     
+
+    it "table has a first method", ->
+      should.exist db.products.last
+
+    it "returns the first item in table", ->
+      db.products.last (err,result) ->
+        should.exist(result)

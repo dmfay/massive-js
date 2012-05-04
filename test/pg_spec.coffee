@@ -1,4 +1,4 @@
-massive = require("../lib/");
+massive = require("../index");
 should = require("should");
 util = require("util");
 
@@ -9,10 +9,10 @@ describe "Connections", ->
       db = _db
       #console.log(db)
       done()
-	
+
   it "returns a new postgres db", ->
     should.exist db
-  
+
   it "has a tables array", ->
     should.exist db.tables
 

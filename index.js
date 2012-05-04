@@ -1,5 +1,4 @@
-var pg = require("./postgres_db");
-
+var pg = require("./lib/postgres_db");
 
 
 module.exports.connect = function(connection, callback) {
