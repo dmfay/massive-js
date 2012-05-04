@@ -28,3 +28,6 @@ describe "Connections", ->
   #this requires a products table in the test db
   it "grafts the tables onto the query", ->
     should.exist db.products
+
+  it "returns the pk", ->
+    db.products.pk.should.equal("id")
