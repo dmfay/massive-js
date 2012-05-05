@@ -8,7 +8,9 @@ Massive's goal is to **help** you get data from your database. This is not an OR
 
 Installation is the usual:
 
-  npm install massive
+```
+npm install massive
+```
 
 To work with Massive, create a connection do something interesting:
 
