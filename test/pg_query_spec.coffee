@@ -1,17 +1,18 @@
 massive = require("../index");
 should = require("should");
 util = require("util");
+helper = require('./pg_helper')
 
 describe "Postgres Queries", ->
   db = null
   before (done) ->
-    massive.connect "postgres://postgres@localhost/test", (err,_db) ->
+    massive.connect helper.connectionString(), (err,_db) ->
       db = _db
       done()
 
   describe "initialization", ->
 
-    it "sets the table name", -> 
+    it "sets the table name", ->
       db.products.name.should.equal("products")
 
     it "defaults the pk to id",  ->
@@ -128,7 +129,7 @@ describe "Postgres Queries", ->
       query = db.products.update({name:"pumpkin", price:1000}, 12)
       query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" = 12")
       query.params.length.should.equal 2
-    
+
     it "creates a basic update with a string key", ->
       query = db.products.update({name:"pumpkin", price:1000}, "12")
       query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" = $3")
@@ -165,7 +166,7 @@ describe "Postgres Queries", ->
     it "has an each method", ->
       query = db.products.find()
       should.exist query.each
-    
+
     it "should iterate", ->
       query = db.products.find()
       query.each (err,result) ->

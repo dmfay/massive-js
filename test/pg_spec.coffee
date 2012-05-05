@@ -1,13 +1,13 @@
 massive = require("../index");
 should = require("should");
 util = require("util");
+helper = require('./pg_helper')
 
 describe "Connections", ->
   db = null
   before (done) ->
-    massive.connect "postgres://postgres@localhost/test", (err,_db) ->
+    massive.connect helper.connectionString(), (err,_db) ->
       db = _db
-      #console.log(db)
       done()
 
   it "returns a new postgres db", ->

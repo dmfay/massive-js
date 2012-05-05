@@ -9,6 +9,7 @@
     , "pg" : "*"
     , "mysql" : "*"
     , "underscore" : "*"
+    , "coffee-script" : "*"
   }
   , "keywords": ["database", "query", "postgres", "sequel", "mysql"]
   , "main": "./lib/index.js"
