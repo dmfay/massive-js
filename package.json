@@ -4,8 +4,6 @@
   , "author": "Rob Conery <rob@tekpub.com>"
   , "contributors": [ "Karl Seguin <karl@openmymind.net>" ]
   , "devDependencies": {
-      "mocha": "*"
-    , "should": "*"
     , "pg" : "*"
     , "mysql" : "*"
     , "underscore" : "*"
