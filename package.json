@@ -2,13 +2,15 @@
   , "description": "Sequel-ish db utility for Node"
   , "version": "0.1.0"
   , "author": "Rob Conery <rob@tekpub.com>"
+  , "contributors": [ "Karl Seguin <karl@openmymind.net>" ]
   , "devDependencies": {
       "mocha": "*"
     , "should": "*"
     , "pg" : "*"
+    , "mysql" : "*"
     , "underscore" : "*"
   }
-  , "keywords": ["database", "query", "postgres", "sequel"]
+  , "keywords": ["database", "query", "postgres", "sequel", "mysql"]
   , "main": "./lib/index.js"
   , "engines": { "node": ">= 0.2.0" }
 }
