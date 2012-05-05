@@ -2,10 +2,10 @@ massive = require("../index");
 should = require("should");
 util = require("util");
 
-describe "Postgres Queries", ->
+describe "MySQL Queries", ->
   db = null
   before (done) ->
-    massive.connect "postgres://postgres@localhost/test", (err,_db) ->
+    massive.connect {user : "root", password : "", database : "test"}, (err,_db) ->
       db = _db
       done()
 
@@ -17,6 +17,7 @@ describe "Postgres Queries", ->
     it "defaults the pk to id",  ->
       db.products.pk.should.equal("id")
 
+
   describe "SELECT queries", ->
     it "runs a select *", ->
       query = db.products.find()
@@ -26,7 +27,7 @@ describe "Postgres Queries", ->
     it "adds columns when specified",  ->
       query = db.products.find ["name"]
       query.sql.should.equal "SELECT name FROM products"
-      query.params.length.should.equal 0
+
 
     it "adds columns when specified in criteria",  ->
       query = db.products.find {}, {columns : "name"}
@@ -58,37 +59,37 @@ describe "Postgres Queries", ->
 
     it "handles greater than", ->
       query = db.products.find({"id >" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" > $1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" > ?")
       query.params.length.should.equal 1
 
     it "handles less than", ->
       query = db.products.find({"id <" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" < $1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" < ?")
       query.params.length.should.equal 1
 
     it "handles bang equal", ->
       query = db.products.find({"id !=" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> $1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> ?")
       query.params.length.should.equal 1
 
     it "handles ineqaulity", ->
       query = db.products.find({"id <>" : "steve"})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> $1")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" <> ?")
       query.params.length.should.equal 1
 
     it "handles IN", ->
       query = db.products.find({id : ["steve","juice","pete"]})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" IN ($1, $2, $3)")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" IN (?, ?, ?)")
       query.params.length.should.equal 3
 
     it "handles NOT IN", ->
       query = db.products.find({"id != ": ["steve","juice","pete"]})
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" NOT IN ($1, $2, $3)")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" NOT IN (?, ?, ?)")
       query.params.length.should.equal 3
 
     it "handles inline goodness", ->
-      query = db.run("select * from crazytown where id = $1", [1]);
-      query.sql.should.equal("select * from crazytown where id = $1")
+      query = db.run("select * from crazytown where id = ?", [1]);
+      query.sql.should.equal("select * from crazytown where id = ?")
       query.params.length.should.equal 1
 
   describe "destroy", ->
@@ -111,37 +112,37 @@ describe "Postgres Queries", ->
   describe "insert", ->
     it "creates a basic insert with returning", ->
       query = db.products.insert({name : "steve", price : 12.00})
-      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n($1, $2) \nRETURNING *"
+      query.sql.should.equal "INSERT INTO products (name, price) VALUES\n(?, ?)"
       query.params.length.should.equal 2
 
     it "creates a batch for item arrays", ->
       items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
       query = db.products.insert(items)
-      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n($1, $2, $3),\n($4, $5, $6) \nRETURNING *"
+      query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n(?, ?, ?),\n(?, ?, ?)"
       query.params.length.should.equal 6
-
+ 
     it "throws an error if no data was supplied", ->
       (-> db.products.insert().execute()).should.throw
 
   describe "updates", ->
     it "creates a basic update", ->
       query = db.products.update({name:"pumpkin", price:1000}, 12)
-      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" = 12")
+      query.sql.should.equal("UPDATE products SET name = ?, price = ? \nWHERE \"id\" = 12")
       query.params.length.should.equal 2
     
     it "creates a basic update with a string key", ->
       query = db.products.update({name:"pumpkin", price:1000}, "12")
-      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" = $3")
+      query.sql.should.equal("UPDATE products SET name = ?, price = ? \nWHERE \"id\" = ?")
       query.params.length.should.equal 3
 
     it "creates a basic update with multi result", ->
       query = db.products.update({name:"pumpkin", price:1000}, {"id >": 12})
-      query.sql.should.equal("UPDATE products SET name = $1, price = $2 \nWHERE \"id\" > 12")
+      query.sql.should.equal("UPDATE products SET name = ?, price = ? \nWHERE \"id\" > 12")
       query.params.length.should.equal 2
 
     it "updates all rows", ->
       query = db.products.update({name:"leto", sand: true})
-      query.sql.should.equal("UPDATE products SET name = $1, sand = $2")
+      query.sql.should.equal("UPDATE products SET name = ?, sand = ?")
       query.params.length.should.equal 2
 
 
@@ -153,26 +154,4 @@ describe "Postgres Queries", ->
       query = db.products.count({"id > " : 1})
       query.sql.should.equal("SELECT COUNT(1) FROM products \nWHERE \"id\" > 1");
 
-  describe "events", ->
-
-    it "fires iterator when new events are added", ->
-      query = db.products.find ->
-      query.on "row", (row)->
-        console.log(row)
-        should.exist(row)
-
-  describe "iterators on tables and queries", ->
-    it "has an each method", ->
-      query = db.products.find()
-      should.exist query.each
-    
-    it "should iterate", ->
-      query = db.products.find()
-      query.each (err,result) ->
-        should.exist result
-
-    it "tables should have an each method", ->
-      should.exist db.products.each
-
-
-
+ 
