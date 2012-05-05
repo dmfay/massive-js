@@ -1,6 +1,6 @@
-massive = require("../index");
-should = require("should");
-util = require("util");
+massive = require("../index")
+should = require("should")
+util = require("util")
 helper = require('./pg_helper')
 
 describe "schema queries", ->
@@ -15,7 +15,7 @@ describe "schema queries", ->
 
   describe "dropTable", ->
     it "creates a drop statement", ->
-      db.dropTable("cheese").sql.should.equal("DROP TABLE IF EXISTS cheese;");
+      db.dropTable("cheese").sql.should.equal("DROP TABLE IF EXISTS cheese;")
 
   describe "create table", ->
 

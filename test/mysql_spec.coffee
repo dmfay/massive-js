@@ -1,6 +1,6 @@
-massive = require("../index");
-should = require("should");
-util = require("util");
+massive = require("../index")
+should = require("should")
+util = require("util")
 
 describe "Connections", ->
   db = null

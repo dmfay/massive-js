@@ -1,6 +1,6 @@
-massive = require("../index");
-should = require("should");
-util = require("util");
+massive = require("../index")
+should = require("should")
+util = require("util")
 helper = require('./pg_helper')
 
 describe "Connections", ->

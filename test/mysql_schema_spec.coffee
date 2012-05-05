@@ -1,6 +1,6 @@
-massive = require("../index");
-should = require("should");
-util = require("util");
+massive = require("../index")
+should = require("should")
+util = require("util")
 
 
 describe "schema queries", ->
@@ -9,13 +9,13 @@ describe "schema queries", ->
      massive.connect {user : "root", password : "", database : "test"}, (err,_db) ->
       db = _db
       done()
-  
+
   it "should exist", ->
     should.exist db
 
   describe "dropTable", ->
     it "creates a drop statement", ->
-      db.dropTable("cheese").sql.should.equal("DROP TABLE IF EXISTS cheese;");
+      db.dropTable("cheese").sql.should.equal("DROP TABLE IF EXISTS cheese;")
 
   describe "create table", ->
 

@@ -1,6 +1,6 @@
-massive = require("../index");
-should = require("should");
-util = require("util");
+massive = require("../index")
+should = require("should")
+util = require("util")
 
 describe "MySQL Queries", ->
   db = null
@@ -11,7 +11,7 @@ describe "MySQL Queries", ->
 
   describe "initialization", ->
 
-    it "sets the table name", -> 
+    it "sets the table name", ->
       db.products.name.should.equal("products")
 
     it "defaults the pk to id",  ->
@@ -46,11 +46,11 @@ describe "MySQL Queries", ->
 
 
     it "adds a LIMIT if specified", ->
-      query = db.products.find(5).limit(1);
+      query = db.products.find(5).limit(1)
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 5 \nLIMIT 1")
 
     it "adds a LIMIT with SKIP if specified", ->
-      query = db.products.find(5).limit(10,1);
+      query = db.products.find(5).limit(10,1)
       query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 5 \nLIMIT(10,1)")
 
     it "adds an ORDER if specified", ->
@@ -88,7 +88,7 @@ describe "MySQL Queries", ->
       query.params.length.should.equal 3
 
     it "handles inline goodness", ->
-      query = db.run("select * from crazytown where id = ?", [1]);
+      query = db.run("select * from crazytown where id = ?", [1])
       query.sql.should.equal("select * from crazytown where id = ?")
       query.params.length.should.equal 1
 
@@ -116,11 +116,11 @@ describe "MySQL Queries", ->
       query.params.length.should.equal 2
 
     it "creates a batch for item arrays", ->
-      items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}];
+      items = [{title:"stuffy stuff", price: 12.00, desc : "bubble"},{title:"poofy poof", price: 24.00, desc : "glurp"}]
       query = db.products.insert(items)
       query.sql.should.equal "INSERT INTO products (title, price, desc) VALUES\n(?, ?, ?),\n(?, ?, ?)"
       query.params.length.should.equal 6
- 
+
     it "throws an error if no data was supplied", ->
       (-> db.products.insert().execute()).should.throw
 
@@ -129,7 +129,7 @@ describe "MySQL Queries", ->
       query = db.products.update({name:"pumpkin", price:1000}, 12)
       query.sql.should.equal("UPDATE products SET name = ?, price = ? \nWHERE \"id\" = 12")
       query.params.length.should.equal 2
-    
+
     it "creates a basic update with a string key", ->
       query = db.products.update({name:"pumpkin", price:1000}, "12")
       query.sql.should.equal("UPDATE products SET name = ?, price = ? \nWHERE \"id\" = ?")
@@ -149,9 +149,8 @@ describe "MySQL Queries", ->
   describe "aggregates", ->
     it "counts with SELECT COUNT", ->
       query = db.products.count()
-      query.sql.should.equal("SELECT COUNT(1) FROM products");
+      query.sql.should.equal("SELECT COUNT(1) FROM products")
     it "counts with SELECT COUNT and a WHERE", ->
       query = db.products.count({"id > " : 1})
-      query.sql.should.equal("SELECT COUNT(1) FROM products \nWHERE \"id\" > 1");
+      query.sql.should.equal("SELECT COUNT(1) FROM products \nWHERE \"id\" > 1")
 
- 

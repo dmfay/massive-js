@@ -5,7 +5,7 @@ class Helper
     process.env.MASSIVE_PG_TEST || "postgres://postgres@localhost/test"
 
   @setup: ->
-    massive = require("../index");
+    massive = require("../index")
     massive.connect @connectionString(), (err, db) ->
       db.createTable('products', {name: 'string'}).execute () -> db.end()
 
