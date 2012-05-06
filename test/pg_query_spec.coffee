@@ -155,11 +155,9 @@ describe "Postgres Queries", ->
       query.sql.should.equal("SELECT COUNT(1) FROM products \nWHERE \"id\" > 1")
 
   describe "events", ->
-
     it "fires iterator when new events are added", ->
       query = db.products.find ->
       query.on "row", (row)->
-        console.log(row)
         should.exist(row)
 
   describe "iterators on tables and queries", ->
