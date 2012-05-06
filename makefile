@@ -12,6 +12,7 @@ test-mysql:
 setup-pg:
 	@coffee test/pg_helper.coffee setup
 
+setup-mysql:
+	@coffee test/mysql_helper.coffee setup
 
-
-.PHONY: test pg mysql
+.PHONY: test pg mysql setup-pg setup-mysql

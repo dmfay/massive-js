@@ -1,12 +1,12 @@
 massive = require("../index")
 should = require("should")
 util = require("util")
-
+helper = require('./mysql_helper')
 
 describe "schema queries", ->
   db = null
   before (done) ->
-     massive.connect {user : "root", password : "", database : "test"}, (err,_db) ->
+     massive.connect helper.connectionString(), (err,_db) ->
       db = _db
       done()
 
