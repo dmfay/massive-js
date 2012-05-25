@@ -1,9 +1,9 @@
 {   "name": "massive"
   , "description": "Sequel-ish db utility for Node"
-  , "version": "0.1.0"
+  , "version": "0.1.1"
   , "author": "Rob Conery <rob@tekpub.com>"
   , "contributors": [ "Karl Seguin <karl@openmymind.net>" ]
-  , "devDependencies": {
+  , "dependencies": {
     , "pg" : "*"
     , "mysql" : "*"
     , "underscore" : "*"
