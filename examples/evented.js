@@ -2,15 +2,16 @@ var massive = require("../index");
 var util = require("util");
 var _ = require("underscore")._;
 
-//massive.connect("postgres://postgres@localhost/test", function(err, db){
-massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
+massive.connect("postgres://postgres@localhost/test", function(err, db){
+//massive.connect({user : "rob", password : "", database : "test"}, function(err,db) {
+
   var dropProducts = db.dropTable("products");
 
   var createProducts = db.createTable("products", {
       name : "string",
       price : "money",
       timestamps : true
-  });
+  }).execute();
 
 
   var items = [

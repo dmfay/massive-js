@@ -4,8 +4,8 @@ var _ = require("underscore")._;
 
 
 
-//massive.connect("postgres://postgres@localhost/test", function(err,db) {
-massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
+massive.connect("postgres://postgres@localhost/test", function(err,db) {
+//massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
   console.log("err " + err)
   var dropProducts = db.dropTable("products").execute(function(err,data){
     console.log("Products table dropped");
