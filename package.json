@@ -1,7 +1,7 @@
 {   
   "name": "massive",
   "description": "Sequel-ish db utility for Node",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Rob Conery <rob@tekpub.com>",
   "contributors": [ "Karl Seguin <karl@openmymind.net>" ],
   "dependencies": {
