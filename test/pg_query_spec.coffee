@@ -51,7 +51,7 @@ describe "Postgres Queries", ->
 
     it "adds a LIMIT with SKIP if specified", ->
       query = db.products.find(5).limit(10,1)
-      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 5 \nLIMIT(10,1)")
+      query.sql.should.equal("SELECT * FROM products \nWHERE \"id\" = 5 \nLIMIT 10 OFFSET 1")
 
     it "adds an ORDER if specified", ->
       query = db.products.find(5).order("name")
