@@ -11,8 +11,7 @@ massive.connect("postgres://postgres@localhost/test", function(err, db){
       name : "string",
       price : "money",
       timestamps : true
-  }).execute();
-
+  });
 
   var items = [
     {name:"stuffy stuff", price: 12.00},
