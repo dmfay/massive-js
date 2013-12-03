@@ -7,3 +7,7 @@ lib-cov
 *.out
 *.pid
 node_modules
+.directory
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+Session.vim
