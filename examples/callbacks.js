@@ -3,9 +3,12 @@ var util = require("util");
 var _ = require("underscore")._;
 
 
-
+// posgres login:
 massive.connect("postgres://postgres@localhost/test", function(err,db) {
-//massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
+
+// mysql login:  
+// massive.connect({user : "root", password : "", database : "test"}, function(err,db) {
+
   console.log("err " + err)
   var dropProducts = db.dropTable("products").execute(function(err,data){
     console.log("Products table dropped");
@@ -24,15 +27,10 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
         db = _db;
         insertProducts();
       });
-      
-
     });
   };
 
-
   var insertProducts = function() {
-
-
     var items = [
       {name:"stuffy stuff", price: 12.00},
       {name:"poofy poof", price: 24.00}
@@ -43,8 +41,7 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
         updatePrices();
       });
     });
-
-  }
+  };
 
   var showProducts = function(callback){
     var query = db.products.find();
@@ -52,7 +49,7 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
       console.log(p);
     });
     query.on("end", callback)
-  }
+  };
 
   var updatePrices = function(){
     console.log("Updating prices due to inflation");
@@ -62,8 +59,7 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
         runQuery();
       });
     });
-  }
-
+  };
 
   var runQuery = function(callback) {
     console.log("Running arbitrary SQL: ");
@@ -79,8 +75,7 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
     query.execute(function(err,results){
       console.log("Everything toast!");
     });
-  }
-
+  };
 
 });
 
