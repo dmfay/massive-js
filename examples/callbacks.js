@@ -27,7 +27,8 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
       
 
     });
-  }
+  };
+
 
   var insertProducts = function() {
 
@@ -58,10 +59,19 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
     db.products.update({price : 100.00}, {"id >" :  0}).execute(function(err,results){
       console.log("Prices updated: " + results.rowCount);
       showProducts(function(){
-        deleteAll();
+        runQuery();
       });
     });
   }
+
+
+  var runQuery = function(callback) {
+    console.log("Running arbitrary SQL: ");
+    db.run("SELECT * FROM products", "", function(err, result) {
+      console.log(result);
+      deleteAll();
+    });
+  };
 
   var deleteAll = function() {
     console.log("Deleting everything, outta here!");
@@ -70,7 +80,6 @@ massive.connect("postgres://postgres@localhost/test", function(err,db) {
       console.log("Everything toast!");
     });
   }
-
 
 
 });
