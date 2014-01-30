@@ -4,7 +4,8 @@
   "version": "0.1.4",
   "author": "Rob Conery <rob@tekpub.com>",
   "contributors": [
-    "Karl Seguin <karl@openmymind.net>"
+    "Karl Seguin <karl@openmymind.net>",
+		"John Atten <xivsolutions@gmail.com>"
   ],
   "dependencies": {
     "pg": "0.6.17",
