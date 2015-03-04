@@ -80,6 +80,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     var self = this;
     this.db.executeSingle({sql : sql}, function(err,res){
       if(err){
+        console.log(err)
         next(err,null);
       }else{
        //add the table
@@ -88,6 +89,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
          name : collection,
          db : self.db
        });
+
        //call save again
        self.saveDoc(collection,doc,next);     
      }
@@ -101,7 +103,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
 Massive.prototype.documentTableSql = function(tableName){
   var docSqlFile = __dirname + "/lib/scripts/create_document_table.sql";
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
-  sql = util.format(sql, tableName);
+  sql = util.format(sql, tableName, tableName,tableName);
   return sql;
 };
 

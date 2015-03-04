@@ -3,4 +3,4 @@ create table %s(
   body jsonb not null,
   search tsvector
 );
-create index idx_%s on %s using GIN(body jsonb_path_opts); 
+create index idx_%s on %s using GIN(body jsonb_path_ops); 
