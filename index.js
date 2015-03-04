@@ -9,14 +9,17 @@ var assert = require("assert");
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
-  this.db = new Runner(args.connectionString);
+  
+  var runner = new Runner(args.connectionString);
+  _.extend(this,runner);
+
   this.tables = [];
   this.queries = [];
   //console.log("Massive online", this);
 }
 
 Massive.prototype.query = function(args,next){
-  this.db.query(args, next);
+  this.query(args, next);
 }
 
 Massive.prototype.loadQueries = function(next){
@@ -37,13 +40,13 @@ Massive.prototype.loadQueries = function(next){
           next = args;
         }
         if(next){
-          db.query({sql : sql, params : args}, next);
+          self.query({sql : sql, params : args}, next);
         }
       };
       self[propName] = q;
       //my god fix this I don't know what I'm doing
       self[propName].sql = sql;
-      self[propName].db = self.db;
+      self[propName].db = self;
       self.queries.push(self[propName]);
     }
   });
@@ -53,7 +56,7 @@ Massive.prototype.loadQueries = function(next){
 Massive.prototype.loadTables = function(next){
   var tableSql = __dirname + "/lib/scripts/tables.sql";
   var self = this;
-  this.db.executeSqlFile(tableSql, {}, function(err,tables){
+  this.executeSqlFile(tableSql, {}, function(err,tables){
     if(err){
       next(err,null);
     }else{
@@ -61,7 +64,7 @@ Massive.prototype.loadTables = function(next){
         var table = new Table({
           name : table.name,
           pk : table.pk,
-          db : self.db
+          db : self
         });
         //pin to namespace
         self[table.name] =table;
@@ -78,7 +81,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
   if(!this[collection]){
     var sql = this.documentTableSql(collection);
     var self = this;
-    this.db.executeSingle({sql : sql}, function(err,res){
+    this.executeSingle({sql : sql}, function(err,res){
       if(err){
         console.log(err)
         next(err,null);
@@ -87,7 +90,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
        self[collection] = new Table({
          pk : "id",
          name : collection,
-         db : self.db
+         db : self
        });
 
        //call save again
