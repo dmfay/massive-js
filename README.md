@@ -1,7 +1,11 @@
 
 ## Pre-Alpha!
 
-This is a rapidly changing branch for MassiveJS - not quite ready for prime time! 
+This is a rapidly changing branch for MassiveJS - not quite ready for prime time! I'm leaning on **open development** because ... why not :).
+
+*Why am I doing this?*. I've extracted a number of ideas here from a project I'm building, and I liked how it was coming together so I thought I would share.
+
+*Don't you hate ORMs Rob?*. Yes, I sure do. But I also like decent abstraction and encapsulation. My goal is to hit the sweet spot between that and the joy of SQL in Postgres.
 
 ## Massive 2.0: A Postgres-centric Data Access Tool
 
