@@ -64,4 +64,12 @@ describe('Tables', function () {
       });
     });
   });
+  describe('Limiting results', function () {
+    it('returns 1 result with limit of 1', function (done) {
+      db.products.find({_limit : 1}, function(err,res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+  });
 });
