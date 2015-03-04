@@ -56,6 +56,7 @@ massive.connect({
     //products is a results array
   });
 });
+```
 
 The SQL above is, of course, rather simplistic but hopefully you get the idea: *use SQL to its fullest, we'll execute it safely for you*.
 
