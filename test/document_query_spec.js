@@ -70,4 +70,15 @@ describe('Document queries', function () {
       });
     });
   });
+  describe('Full Text Search', function () {
+    it('works', function (done) {
+      db.docs.searchDoc({
+        keys : ["title", "description"],
+        term : "Starsky"
+      }, function(err, docs){
+        assert.equal(1, docs.length);
+        done();
+      });
+    });
+  });
 });

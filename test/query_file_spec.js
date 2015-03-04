@@ -36,4 +36,5 @@ describe('Queries built from files', function () {
       });
     });
   });
+
 });
