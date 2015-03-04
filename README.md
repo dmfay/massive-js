@@ -1,214 +1,169 @@
-## Some Light Abstraction for Accessing Data
 
-Massive is a data access tool for Node JS that works with relational data systems - currently Postgres and MySQL.
+## Pre-Alpha!
 
-Massive's goal is to **help** you get data from your database. This is not an ORM, it's a bit more than a query tool - our goal is to do just enough, then get out of your way. I happen to love Sequel (the Ruby data access tool) and I've emulated that tool ... sort of... with Massive.
+This is a rapidly changing branch for MassiveJS - not quite ready for prime time! 
 
-## The 5-Second Hi How Are Ya
+## Massive 2.0: A Postgres-centric Data Access Tool
 
-Installation is the usual:
+Massive's goal is to **help** you get data from your database. This is not an ORM, it's a bit more than a query tool - our goal is to do just enough, then get out of your way. [I'm a huge fan of Postgres](http://rob.conery.io/category/postgres/) and the inspired, creative way you can use it's modern SQL functionality to work with your data.
 
+ORMs abstract this away, and it's silly. Postgres is an amazing database with a rich ability to act as a document storage engine (using `jsonb`) as well as a cracking relational engine.
+
+Massive embraces SQL completely, and helps you out when you don't feel like writing another mundane `select * from` statement. Here's how...
+
+## SQL Files as Functions
+
+Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project, Massive will read each SQL file therein and create a query function with the same name:
+
+```sql
+/* this is in db/productsInStock.sql */
+
+select * from products
+where in_stock=true;
 ```
-npm install massive
-```
 
-To work with Massive, create a connection do something interesting:
+Now you can run massive and execute it easily:
 
 ```javascript
-var db = require("massive");
-db.connect("postgres://postgres@localhost/mydatabase", function(err, db){
-  db.myTable.each(function(thing){
-    console.log(thing);
+var massive = require("massive");
+
+massive.connect({
+  connectionString: "postgres://localhost/massive"
+}, function(err, db){
+  db.productsInStock(function(err,products){
+    //products is a results array
   });
 });
 ```
 
-You open a connection against a database (currently Postgres or MySQL) and Massive will snoop your tables using Information.Schema, and will magically "bind" those tables as properties to your db for querying:
+You can use arguments right inline:
 
-```javascript
-db.myTable.find({id : 1}).execute(function(err, thing) {
-  console.log(thing);
-});
+```sql
+/* this is in db/productsBySku.sql */
+
+select * from products
+where sku=$1;
 ```
 
-Sometimes having all your columns returned to you isn't optimal:
-
 ```javascript
-db.myTable.find({id : 1}, {columns : "name"}).execute(function(err, thing) {
-  console.log(thing.name);
-});
-```
+var massive = require("massive");
 
-If you pass a column list in to find, as an array, it works too:
-
-```javascript
-db.myTable.find(["name"]).execute(function(err, thing) {
-  console.log(thing.name);
-});
-```
-
-
-Massive is highly-evented, which means you can work with events rather than callbacks:
-
-```javascript
-var allMyStuff = db.myTable.find({"id > " : 0});
-allMyStuff.on("row", function(row){
-  console.log(row);
-});
-
-```
-
-By adding the "row" event, the query is triggered and you can then iterate over it. You could also use "each()" as above, and it would do the same thing. You can also listen for when the iteration is completed:
-
-```javascript
-var allMyStuff = db.myTable.find({"id > " : 0});
-allMyStuff.each(function(thing){
-  console.log(thing);
-});
-
-allMyStuff.on("end", function(){
-  console.log("Guess that's all!")
-});
-
-```
-
-One other event that is very handy is "executed" - this tells you when a query has completed. This works pretty nicely with the way inserts work:
-
-```javascript
-var newProduct = db.products.insert({name : "vanilla soda", price : 100});
-newProduct.on("executed", db.featuredProducts.insert);
-newProduct.execute();
-```
-
-Queries in Massive are independent of their execution and are little Event Vehicles (a word I made up). In this example I created a query and wired another query to go off when execution is completed. Massive "forwards" the data to any listeners on the event (in this case it's a new product record). Node then uses that bit of data as an argument to pass into the db.featuredProducts table.
-
-You can add, edit, and delete records - which I'll show in a second - but the ultimate thing to remember is you can **always use SQL** when you need to:
-
-```javascript
-db.run("select message from freakytable where id = $1", ["la la la"], function(err, result){
-  console.log("Freaky! " + result)
-});
-```
-
-I like SQL and I find that by staying true to SQL rather than muscling an ORM abstraction makes life much happier. Now, on to the rest of the stuff...
-
-## Inserts
-
-Inserting data into your database is pretty straightforward:
-
-```javascript
-db.myTable.insert({name:"rubber ducky", message : "You're the one"}).execute(function(err,result){
-  //if you're using Postgres, the new record is returned
-  console.log("The new id is " + result.id);
-});
-```
-
-Many times you need to insert a whole bunch of stuff:
-
-```javascript
-var items = [
-  {name:"stuffy stuff", price: 12.00},
-  {name:"poofy poof", price: 24.00}
-];
-db.myFluffyAnimals.insert(items).execute(function(err,newGuys){
-  _.each(newGuys, function(err,newGuy){
-    console.log("Hello there " + newGuy.name);
+massive.connect({
+  connectionString: "postgres://localhost/massive"
+}, function(err, db){
+  //just pass in the sku as an argument
+  db.productsBySku("XXXYYY", function(err,products){
+    //products is a results array
   });
 });
-```
 
-Here I'm using Underscore.js's "each" method to roll out an array of results - all of the critters are inserted as part of a single statement, rather than one at a time.
+The SQL above is, of course, rather simplistic but hopefully you get the idea: *use SQL to its fullest, we'll execute it safely for you*.
 
-## Updates
+## Full JSONB Document Support
 
-Updates follow the same pattern:
-
-```javascript
-db.myFluffyAnimals.update({name : "crunchy crunch"}, 2).execute(function(err,result){
-  console.log("Price updated!");
-});
-
-```
-
-This example used a single record, but you can also update more than one record:
+Another thing I love about Postgres is the `JSONB` functionality. The queries are simple enough to write - but if you just want to encapsulate it all - we've got your back!
 
 ```javascript
-db.myFluffyAnimals.update({name : "crunchy crunch"}, {"id <>" : 100}).execute(function(err,result){
-  console.log("Price updated!");
+//connect massive as above
+var newDoc = {
+  title : "Chicken Ate Nine",
+  description: "A book about chickens of Kauai",
+  price : 99.00,
+  tags : [
+    {name : "Simplicity", slug : "simple"},
+    {name : "Fun for All", slug : "fun-for-all"}
+  ]
+};
+
+db.saveDoc("my_documents", newDoc, function(err,res){
+  //the table my_documents was created on the fly
+  //res is the new document with an ID created for you
 });
 
+//you can now access the document right on the root
+db.my_documents.findDoc(1, function(err,doc){
+  //you now have access to the doc
+});
+
+//run a 'contains' query which flexes the index we created for you
+db.my_documents.findDoc({price : 99.00}, function(err,docs){
+  //1 or more documents returned
+});
+
+//run a deep match passing an array of objects
+//again flexing the index we created for you
+db.my_documents.findDoc({tags: [{slug : "simple"}]}, function(err,docs){
+  //1 or more documents returned
+});
+
+//full text search...
+db.my_documents.searchDoc({
+  keys : ["title", "description"],
+  term : "Kauai"
+}, function(err,docs){
+  //docs returned with an on-the-fly Full Text Search
+});
+
+//comparative queries - these don't use indexing
+db.my_documents.findDoc({"price >": 50.00}, function(err,docs){
+  //1 or more documents returned with a price > 50
+});
+
+//IN queries by passing arrays
+db.my_documents.findDoc({id : [1,3,9]}, function(err,docs){
+  //documents with ID 1, 3, and 9
+});
+
+//NOT IN
+db.my_documents.findDoc({"id <>": [3,5]}, function(err,docs){
+  //documents without ID 3 and 5
+});
 ```
 
-## Limits, Orders, etc
+### A Word About IDs
 
-You can order and limit your query using a bit of a fluent interface:
+We store IDs in their own column and treat them as a normal Primary Key. These values are **not** duplicated in the database - instead they are pulled off during writes and readded during reads.
+
+## Helpful Relational Bits
+
+The entire API above works the same with relational tables, just remove "Doc" from the function name (`find`, `search`, `save`);
+
+When you run `connect` massive executes a quick `INFORMATION_SCHEMA` query and attaches each table to the main namespace (called `db` in these examples). You can use this to query your tables with a bit less noise.
+
+The API is as close to Massive 1.0 as we could make it - but there's no need for `execute` - just run the query directly:
 
 ```javascript
-var moreThanAHundo = db.myFluffyAnimals.find({"price < ": 100}).order("name").limit(10);
-moreThanAHundo.each(function(critter){
-  console.log("Ahoy!")
+//connect massive, get db instance
+
+//find a single user by id
+db.users.findOne(1, function(err,user){
+  //returns user with id (or whatever your PK is) of 1
 });
 
-```
-
-This example uses a few new things: the `each` method on the query and the order/limit stuff in a fluent fashion. It also uses a nice readable criteria set where the operator is a string key that gets sent in.
-
-## Deletes
-
-Deletes are a sad thing, but often are required:
-
-```javascript
-db.myFluffyAnimals.destroy().execute(function(){
-  console.log("All gone :(")
+//find first match
+db.users.findOne({email : "test@test.com"}, function(err,user){
+  //returns the first match
 });
-```
 
-Of course, that's a bit drastic. Let's just delete a few:
-
-```javascript
-db.myFluffyAnimals.destroy({"price > " : 1000}).execute(function(){
-  console.log("Expensive stuff - OUTTA HERE");
+//simple query
+db.users.find({active: true}, function(err,users){
+  //all users who are active
 });
-```
 
-Or maybe just one?
+//include the PK in the criteria for an update
+db.users.save({id : 1, email : "test@example.com"}, function(err,updated){
+  //the updated record for the new user
+});
 
-```javascript
-db.myFluffyAnimals.destroy(1).execute(function(){
-  console.log("The first critter is toast");
+//no PK does an INSERT
+db.users.save({email : "new@example.com"}, function(err,inserted){
+  //the new record with the ID
 });
 ```
 
-## Schema
+##Want to help?
 
-No self-respecting data tool would leave you without the ability to create a table!
-
-```javascript
-//a query, just like the other stuff
-var sparklyCritters = db.createTable("sparkly_stuff", {
-    name : 'string not null',
-    price : 'money',
-    birthday : 'date',
-    ip : 'inet not null default '127.0.0.1'
-});
-
-sparklyCritters.execute();
-```
-
-No, "string", "money" and "date" aren't valid Postgres types (well date sorta is). These are transformed by Massive into "varchar(255)", "decimal(8,2)", and "timestamptz" for you.
-
-The last entry is an IP address - and notice you can send in whatever you like. Massive will try and digest it.
-
-## Examples
-
-There's an examples directory that shows more goodies, and our tests also give a nice indication of what's possible.
-
-## Want to help?
-
-This is my first Node module and I'm just getting my juices flowing with Javascript. It's highly-likely that I forgot a semi-colon or maybe did something dumb. If you spot something and want to help me - yay! Please be sure to let me know why what you're doing is better so we can all learn.
+If you want to contribute - I'd love it! Just open an issue to work against so you get full credit for your fork. You can open the issue first so we can discuss and you can work your fork as we go along.
 
 If you see a bug, please be so kind as to show how it's failing, and I'll do my best to get it fixed quickly.
-
-
-
 
