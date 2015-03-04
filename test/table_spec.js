@@ -38,4 +38,30 @@ describe('Tables', function () {
       });
     });
   });
+  describe('Simple comparative queries', function () {
+    it('returns product with id greater than 2', function (done) {
+      db.products.find({"id > " : 2}, function(err,res){
+        assert.equal(res[0].id, 3);
+        done();
+      });
+    });
+    it('returns product with id less than 2', function (done) {
+      db.products.find({"id < " : 2}, function(err,res){
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+    it('returns products IN 1 and 2', function (done) {
+      db.products.find({id : [1,2]}, function(err,res){
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+    it('returns product NOT IN 1 and 2', function (done) {
+      db.products.find({"id <>" : [1,2]}, function(err,res){
+        assert.equal(res[0].id, 3);
+        done();
+      });
+    });
+  });
 });
