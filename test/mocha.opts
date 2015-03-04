@@ -1,4 +1,0 @@
---require should
--R spec
--u bdd
---compilers coffee:coffee-script

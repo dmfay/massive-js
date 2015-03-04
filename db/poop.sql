@@ -1,0 +1,1 @@
+select * from actor where first_name=$1;
