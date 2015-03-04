@@ -10,6 +10,7 @@ program
   .option('-d, --database', 'The local db you want to connect to ')
   .option('-c, --connection', 'The full connection string')
   .parse(process.argv);
+
 var connectionString;
 if(program.database){
   connectionString = "postgres://localhost/" + program.args[0]; //assume local user has rights
@@ -22,7 +23,7 @@ if(program.database){
 }
 
 if(connectionString){
-  massive.connect(connectionString, function(err,db){ 
+  massive.connect({connectionString : connectionString}, function(err,db){ 
     var context = repl.start({
       prompt: "db > ",
     }).context;

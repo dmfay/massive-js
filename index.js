@@ -10,6 +10,8 @@ var assert = require("assert");
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
   this.db = new Runner(args.connectionString);
+  this.tables = [];
+  this.queries = [];
   //console.log("Massive online", this);
 }
 
@@ -27,7 +29,7 @@ Massive.prototype.loadQueries = function(next){
       var sql = fs.readFileSync(sqlFile, {encoding: 'utf-8'});
 
       var propName = file.replace(".sql", "");
-      self[propName] = function(args,next){
+      var q = function(args,next){
         //I have no idea why this works
         var sql = this[propName].sql;
         var db = this[propName].db;
@@ -37,10 +39,12 @@ Massive.prototype.loadQueries = function(next){
         if(next){
           db.query({sql : sql, params : args}, next);
         }
-      }
+      };
+      self[propName] = q;
       //my god fix this I don't know what I'm doing
       self[propName].sql = sql;
       self[propName].db = self.db;
+      self.queries.push(self[propName]);
     }
   });
   next(null,self);
@@ -54,11 +58,15 @@ Massive.prototype.loadTables = function(next){
       next(err,null);
     }else{
       _.each(tables, function(table){
-        self[table.name] = new Table({
+        var table = new Table({
           name : table.name,
           pk : table.pk,
           db : self.db
         });
+        //pin to namespace
+        self[table.name] =table;
+        //add to table collection
+        self.tables.push(table);
       });
       next(null,self);
     }

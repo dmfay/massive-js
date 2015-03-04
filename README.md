@@ -162,9 +162,49 @@ db.users.save({email : "new@example.com"}, function(err,inserted){
 });
 ```
 
+## REPL
+
+Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire it up to play with your DB in the console:
+
+```
+# connect to local server, database my_database 
+bin massive -d my_database
+db >
+```
+
+From here you can see your tables if you like:
+
+```
+db > db.tables
+[ { name: 'docs',
+    pk: 'id',
+    db: { connectionString: 'postgres://localhost/massive' } },
+  { name: 'products',
+    pk: 'id',
+    db: { connectionString: 'postgres://localhost/massive' } },
+  { name: 'users',
+    pk: 'id',
+    db: { connectionString: 'postgres://localhost/massive' } } ]
+db >
+```
+
+Or just list out your queries to be sure they're being loaded:
+
+```
+db > db.queries
+[ { [Function]
+    sql: 'select * from users where email=$1;',
+    db: { connectionString: 'postgres://localhost/massive' } } ]
+db >
+```
+
+There's more to do with the massive REPL - such as generating query files for you (if you're not accomplished at SQL just yet) as well as a better way to play with the results.
+
 ##Want to help?
 
 If you want to contribute - I'd love it! Just open an issue to work against so you get full credit for your fork. You can open the issue first so we can discuss and you can work your fork as we go along.
+
+The code is rather hideous - I wrote it in a fit of inspiration and if you see things that could be done better, yay!
 
 If you see a bug, please be so kind as to show how it's failing, and I'll do my best to get it fixed quickly.
 
