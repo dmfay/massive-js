@@ -17,7 +17,7 @@ Massive embraces SQL completely, and helps you out when you don't feel like writ
 
 ## SQL Files as Functions
 
-Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project, Massive will read each SQL file therein and create a query function with the same name:
+Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project (you can override this by passing in a `scripts` setting), Massive will read each SQL file therein and create a query function with the same name:
 
 ```sql
 /* this is in db/productsInStock.sql */
