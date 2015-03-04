@@ -6,6 +6,7 @@ var util = require("util");
 var glob = require("glob");
 var async = require("async");
 var assert = require("assert");
+var Document = require("./lib/document");
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
