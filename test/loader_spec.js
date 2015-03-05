@@ -13,8 +13,8 @@ describe('On spin up', function () {
   it('returns a valid db interface', function () {
     assert(db && db.tables && db.queries && db.connectionString);
   });
-  it('loads up 3 tables', function () {
-    assert.equal(db.tables.length, 3);
+  it('loads up 4 tables', function () {
+    assert.equal(db.tables.length, 4);
   });
 
   // including one nested in a deeper folder... total of 4 now.
