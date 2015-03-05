@@ -66,13 +66,13 @@ describe('Tables', function () {
   });
   describe('Limiting and Offsetting results', function () {
     it('returns 1 result with limit of 1', function (done) {
-      db.products.find({_limit : 1}, function(err,res){
+      db.products.find(null,{limit : 1}, function(err,res){
         assert.equal(res.length, 1);
         done();
       });
     });
     it('returns second result with limit of 1, offset of 1', function (done) {
-      db.products.find({_limit : 1, _offset: 1}, function(err,res){
+      db.products.find({},{limit : 1, offset: 1}, function(err,res){
         assert.equal(res[0].id, 2);
         done();
       });
@@ -81,7 +81,7 @@ describe('Tables', function () {
 
   describe('Ordering results', function () {
     it('returns ascending order of products by price', function (done) {
-      db.products.find({_order : "price"}, function(err,res){
+      db.products.find({}, {order : "price"}, function(err,res){
         assert.equal(res.length, 3);
         assert.equal(res[0].id, 1);
         assert.equal(res[2].id, 3);
@@ -89,7 +89,7 @@ describe('Tables', function () {
       });
     });
     it('returns descending order of products', function (done) {
-      db.products.find({_order : "id desc"}, function(err,res){
+      db.products.find({},{order : "id desc"}, function(err,res){
         assert.equal(res.length, 3);
         assert.equal(res[0].id, 3);
         assert.equal(res[2].id, 1);
