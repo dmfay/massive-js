@@ -1,5 +1,5 @@
 var massive = require("../../index");
-var connectionString = "postgres://localhost/massive";
+var connectionString = "postgres://postgres:password@localhost/massive";
 var assert = require("assert");
 var path = require("path");
 var scriptsDir = path.join(__dirname, "..", "db");
