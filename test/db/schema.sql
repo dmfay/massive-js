@@ -24,6 +24,9 @@ create table docs(
   search tsvector
 );
 
+insert into users(email)
+values('test@test.com');
+
 insert into products(name, price, description, in_stock)
 values ('Product 1', 12.00, 'Product 1 description', true),
 ('Product 2', 24.00, 'Product 2 description', true),

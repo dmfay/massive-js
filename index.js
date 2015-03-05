@@ -3,11 +3,11 @@ var _ = require("underscore")._;
 var fs = require("fs");
 var Table = require("./lib/table");
 var util = require("util");
-var async = require("async");
 var assert = require("assert");
 var Document = require("./lib/document");
 var ArgTypes = require("./lib/arg_types");
-var Walker = require("./lib/luke_file_walker");
+var path = require("path");
+var self;
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
@@ -16,7 +16,7 @@ var Massive = function(args){
   _.extend(this,runner);
 
   this.tables = [];
-  this.queries = [];
+  this.queryFiles = [];
   //console.log("Massive online", this);
 }
 
@@ -25,30 +25,8 @@ Massive.prototype.run = function(){
   this.query(args);
 }
  
-Massive.prototype.loadQueries = function(next) { 
-  var sqlFiles = {};
-  Walker.walkDirectory(sqlFiles,this.scriptsDir);
-  var self = this;
-  _.each(sqlFiles, function(walked){
-    var propName = walked.name;
-    var q = function(args, next){
-
-      //I have no idea why this works
-      var sql = this[propName].sql;
-      var db = this[propName].db;
-      var params = _.isObject(args) ? args : {params : args};
-
-      self.query(sql,params,{}, next);
-
-    };
-    self[propName] = q;
-    //my god fix this I don't know what I'm doing
-    self[propName].sql = walked.sql;
-    self[propName].db = self;
-    self.queries.push(self[propName]);
-
-  });
-  next(null,self);
+Massive.prototype.loadQueries = function() { 
+  walkSqlFiles(this,this.scriptsDir);
 };
 
 Massive.prototype.loadTables = function(next){
@@ -109,6 +87,44 @@ Massive.prototype.documentTableSql = function(tableName){
 };
 
 
+var walkSqlFiles = function(rootObject, rootDir){
+
+  var dirs = fs.readdirSync(rootDir);
+  _.each(dirs, function(item){
+    var parsed = path.parse(item);
+
+    if(parsed.ext === ".sql"){
+
+      var filePath = path.join(rootDir,item);
+      var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
+
+      rootObject[parsed.name] = function(args, next){
+        args || (args = {})
+        //I have no idea why this works
+        var sql = rootObject[parsed.name].sql;
+        var db = rootObject[parsed.name].db;
+        var params = _.isObject(args) ? args : {params : args};
+
+        db.query(sql,params,{}, next);
+
+      };
+      //my god fix this I don't know what I'm doing
+      rootObject[parsed.name].sql = sql;
+      rootObject[parsed.name].db = self;
+      rootObject[parsed.name].filePath = filePath;
+      self.queryFiles.push(rootObject[parsed.name]);
+
+    }else if(parsed.ext !== ''){
+      //ignore it
+    }else{
+      //walk it
+      rootObject[parsed.name] = {};
+      var pathToWalk = path.join(rootDir,item);
+      walkSqlFiles(rootObject[parsed.name],pathToWalk);
+    }
+  });
+}
+
 exports.connect = function(args, next){
   assert((args.connectionString || args.db), "Need a connectionString or db name at the very least.");
   //override if there's a db name passed in
@@ -119,7 +135,9 @@ exports.connect = function(args, next){
 
   //load up the tables, queries, and commands
   massive.loadTables(function(err,db){
+    self = db;
     assert(!err, err);
-    db.loadQueries(next);
+    db.loadQueries();
+    next(null,db);
   });
 };
