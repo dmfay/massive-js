@@ -7,6 +7,7 @@ var async = require("async");
 var assert = require("assert");
 var Document = require("./lib/document");
 var ArgumentParser = require("./arg_parser");
+var path = require("path");
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
@@ -23,35 +24,36 @@ Massive.prototype.query = function(args,next){
   this.query(args, next);
 }
 
-Massive.prototype.loadQueries = function(next){
-
-  var sqlFiles = fs.readdirSync(this.scriptsDir);
+// This works... I think...please review. 
+Massive.prototype.loadQueries = function(sourceDir, baseObject, next) { 
   var self = this;
-  _.each(sqlFiles, function(file){
-    if(file.indexOf("sql") > 0){
-      var sqlFile = self.scriptsDir + "/" + file;
-      var sql = fs.readFileSync(sqlFile, {encoding: 'utf-8'});
+  var dirContents = fs.readdirSync(sourceDir);
+  _.each(dirContents, function(item) { 
+    var fullPath = path.join(sourceDir, item);
+    var cleaned = fullPath.replace(sourceDir + "/", "");
 
-      var propName = file.replace(".sql", "");
-      var q = function(args,next){
-        //I have no idea why this works
-        var sql = this[propName].sql;
-        var db = this[propName].db;
-        if(_.isFunction(args)){
-          next = args;
-        }
-        if(next){
-          self.query({sql : sql, params : args}, next);
-        }
-      };
-      self[propName] = q;
-      //my god fix this I don't know what I'm doing
-      self[propName].sql = sql;
-      self[propName].db = self;
-      self.queries.push(self[propName]);
+    var stat = fs.statSync(fullPath);
+    if(stat.isDirectory()) { 
+      baseObject[cleaned] = {};
+      self.loadQueries(fullPath, baseObject[cleaned], function() { return next });
+    } else { 
+      if(path.extname(fullPath) === ".sql") {
+        var propName = cleaned.replace(".sql", "");
+        baseObject[propName] = function(args, cb) {
+          var sqlToExecute = this[propName].sql;
+          if(_.isFunction(args)) { 
+            cb = args;
+          }
+          if(cb) { 
+            self.query( { sql : sqlToExecute, params : args }, cb);
+          }
+        };       
+        baseObject[propName].sql = fs.readFileSync(fullPath, { encoding : 'utf-8' });
+        self.queries.push(self[propName]);
+      }
     }
   });
-  next(null,self);
+  next(null, self);
 };
 
 Massive.prototype.loadTables = function(next){
@@ -118,6 +120,6 @@ exports.connect = function(args, next){
   //load up the tables, queries, and commands
   massive.loadTables(function(err,db){
     assert(!err, err);
-    db.loadQueries(next);
+    db.loadQueries(massive.scriptsDir, massive, next);
   });
 };
