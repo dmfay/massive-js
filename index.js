@@ -3,10 +3,10 @@ var _ = require("underscore")._;
 var fs = require("fs");
 var Table = require("./lib/table");
 var util = require("util");
-var glob = require("glob");
 var async = require("async");
 var assert = require("assert");
 var Document = require("./lib/document");
+var ArgumentParser = require("./arg_parser");
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
