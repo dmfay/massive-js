@@ -18,8 +18,8 @@ describe('On spin up', function () {
   });
 
   // including one nested in a deeper folder... total of 4 now.
-  it('loads up 3 queries', function () {
-    assert.equal(db.queries.length, 3);
+  it('loads up 6 queries', function () {
+    assert.equal(db.queries.length, 6);
   });
 
 });

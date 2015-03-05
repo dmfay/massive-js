@@ -7,7 +7,7 @@ var async = require("async");
 var assert = require("assert");
 var Document = require("./lib/document");
 var ArgTypes = require("./lib/arg_types");
-var path = require("path");
+var Walker = require("./lib/luke_file_walker");
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
@@ -26,30 +26,27 @@ Massive.prototype.run = function(){
 }
  
 Massive.prototype.loadQueries = function(next) { 
-  var sqlFiles = fs.readdirSync(this.scriptsDir);
+  var sqlFiles = {};
+  Walker.walkDirectory(sqlFiles,this.scriptsDir);
   var self = this;
-  _.each(sqlFiles, function(file){
-    if(file.indexOf("sql") > 0){
-      var sqlFile = self.scriptsDir + "/" + file;
-      var sql = fs.readFileSync(sqlFile, {encoding: 'utf-8'});
+  _.each(sqlFiles, function(walked){
+    var propName = walked.name;
+    var q = function(args, next){
 
-      var propName = file.replace(".sql", "");
-      var q = function(args, next){
+      //I have no idea why this works
+      var sql = this[propName].sql;
+      var db = this[propName].db;
+      var params = _.isObject(args) ? args : {params : args};
 
-        //I have no idea why this works
-        var sql = this[propName].sql;
-        var db = this[propName].db;
-        var params = _.isObject(args) ? args : {params : args};
+      self.query(sql,params,{}, next);
 
-        self.query(sql,params,{}, next);
+    };
+    self[propName] = q;
+    //my god fix this I don't know what I'm doing
+    self[propName].sql = walked.sql;
+    self[propName].db = self;
+    self.queries.push(self[propName]);
 
-      };
-      self[propName] = q;
-      //my god fix this I don't know what I'm doing
-      self[propName].sql = sql;
-      self[propName].db = self;
-      self.queries.push(self[propName]);
-    }
   });
   next(null,self);
 };

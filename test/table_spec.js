@@ -7,7 +7,7 @@ describe('Tables', function () {
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
-      done()
+      done();
     });
   });
   describe('Simple queries with args', function () {
