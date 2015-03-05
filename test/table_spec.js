@@ -17,21 +17,9 @@ describe('Tables', function () {
         done();
       });
     });
-    it('returns CamelCase 1 with 1 as only arg', function (done) {
-      db.CamelCaseTable.find(1, function(err,res){
-        assert.equal(res.Id, 1); //camel cased column name
-        done();
-      });
-    });
     it('returns first record with findOne no args', function (done) {
       db.products.findOne(1, function(err,res){
         assert.equal(res.id, 1);
-        done();
-      });
-    });
-    it('returns first CamelCase record with findOne no args', function (done) {
-      db.CamelCaseTable.findOne(1, function(err,res){
-        assert.equal(res.Id, 1); //camel cased column name
         done();
       });
     });
@@ -43,21 +31,9 @@ describe('Tables', function () {
         done();
       });
     });
-    it('returns all records from a CamelCase table with no args', function (done) {
-      db.CamelCaseTable.find(function(err,res){
-        assert.equal(res.length, 2);
-        done();
-      });
-    });
     it('returns first record with findOne no args', function (done) {
       db.products.findOne(function(err,res){
         assert.equal(res.id, 1);
-        done();
-      });
-    });
-    it('returns first record with findOne on CamelCase no args', function (done) {
-      db.CamelCaseTable.findOne(function(err,res){
-        assert.equal(res.Id, 1); //camel cased column name
         done();
       });
     });
@@ -124,7 +100,37 @@ describe('Tables', function () {
 
   describe('Casing issues', function () {
     it('returns users because we delimit OK', function (done) {
-      db.Users.find({}, function(err,res){
+      db.Users.find({}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns the first user because we delimit OK', function (done) {
+      db.Users.findOne(function(err,res){
+        assert.equal(res.Id, 1);
+        done();
+      });
+    });
+    it('returns a subset of columns, when we delimit in the calling code', function (done) {
+      db.Users.find({},{columns: ['"Id"','"Email"']}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns a single column, when we delimit in the calling code', function (done) {
+      db.Users.find({},{columns: '"Email"'}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns users with a simple order by', function (done) {
+      db.Users.find({}, {order: '"Email"'}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns users with a compound order by', function (done) {
+      db.Users.find({}, {order: '"Email" asc, "Id" desc'}, function(err, res){
         assert.equal(res.length, 1);
         done();
       });

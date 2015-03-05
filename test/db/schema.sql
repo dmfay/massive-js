@@ -1,12 +1,10 @@
 drop table if exists "Users";
 drop table if exists products;
 drop table if exists docs;
-drop table if exists "CamelCaseTable";
-
 
 create table "Users"(
-  id serial primary key,
-  email varchar(50) not null,
+  "Id" serial primary key,
+  "Email" varchar(50) not null,
   search tsvector
 );
 
@@ -25,7 +23,7 @@ create table docs(
   search tsvector
 );
 
-insert into "Users"(email)
+insert into "Users"("Email")
 values('test@test.com');
 
 insert into products(name, price, description, in_stock)
