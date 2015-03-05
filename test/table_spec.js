@@ -100,7 +100,37 @@ describe('Tables', function () {
 
   describe('Casing issues', function () {
     it('returns users because we delimit OK', function (done) {
-      db.Users.find({}, function(err,res){
+      db.Users.find({}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns the first user because we delimit OK', function (done) {
+      db.Users.findOne(function(err,res){
+        assert.equal(res.Id, 1);
+        done();
+      });
+    });
+    it('returns a subset of columns, when we delimit in the calling code', function (done) {
+      db.Users.find({},{columns: ['"Id"','"Email"']}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns a single column, when we delimit in the calling code', function (done) {
+      db.Users.find({},{columns: '"Email"'}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns users with a simple order by', function (done) {
+      db.Users.find({}, {order: '"Email"'}, function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+    it('returns users with a compound order by', function (done) {
+      db.Users.find({}, {order: '"Email" asc, "Id" desc'}, function(err, res){
         assert.equal(res.length, 1);
         done();
       });
