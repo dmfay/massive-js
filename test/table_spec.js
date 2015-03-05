@@ -98,4 +98,12 @@ describe('Tables', function () {
     });
   });
 
+  describe('Casing issues', function () {
+    it('returns users because we delimit OK', function (done) {
+      db.Users.find({}, function(err,res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+  });
 });

@@ -28,7 +28,9 @@ if(connectionString){
       prompt: "db > ",
     }).context;
     context.db = db;
+    console.log("Massive loaded and listening");
   });
+
 }
 
 

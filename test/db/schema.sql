@@ -1,9 +1,9 @@
-drop table if exists users;
+drop table if exists "Users";
 drop table if exists products;
 drop table if exists docs;
 
 
-create table users(
+create table "Users"(
   id serial primary key,
   email varchar(50) not null,
   search tsvector
@@ -24,7 +24,7 @@ create table docs(
   search tsvector
 );
 
-insert into users(email)
+insert into "Users"(email)
 values('test@test.com');
 
 insert into products(name, price, description, in_stock)

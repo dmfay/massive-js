@@ -106,7 +106,6 @@ var walkSqlFiles = function(rootObject, rootDir){
         var params = _.isObject(args) ? args : {params : args};
 
         db.query(sql,params,{}, next);
-
       };
       //my god fix this I don't know what I'm doing
       rootObject[parsed.name].sql = sql;
