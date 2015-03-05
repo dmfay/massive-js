@@ -26,7 +26,7 @@ describe('Document saves', function () {
       assert.equal("Fido", newDoc.name);
     });
     after(function(done){
-      db.query({sql : "DROP TABLE doggies;"}, function(err,res){
+      db.query("DROP TABLE doggies;", function(err,res){
         done();
       });
     })

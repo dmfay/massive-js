@@ -6,7 +6,7 @@ var util = require("util");
 var async = require("async");
 var assert = require("assert");
 var Document = require("./lib/document");
-var ArgumentParser = require("./arg_parser");
+var ArgTypes = require("./lib/arg_types");
 var path = require("path");
 
 var Massive = function(args){
@@ -20,46 +20,44 @@ var Massive = function(args){
   //console.log("Massive online", this);
 }
 
-Massive.prototype.query = function(args,next){
-  this.query(args, next);
+Massive.prototype.run = function(){
+  var args = ArgTypes.defaultQuery(arguments);
+  this.query(args);
 }
-
-// This works... I think...please review. 
-Massive.prototype.loadQueries = function(sourceDir, baseObject, next) { 
+ 
+Massive.prototype.loadQueries = function(next) { 
+  var sqlFiles = fs.readdirSync(this.scriptsDir);
   var self = this;
-  var dirContents = fs.readdirSync(sourceDir);
-  _.each(dirContents, function(item) { 
-    var fullPath = path.join(sourceDir, item);
-    var cleaned = fullPath.replace(sourceDir + "/", "");
+  _.each(sqlFiles, function(file){
+    if(file.indexOf("sql") > 0){
+      var sqlFile = self.scriptsDir + "/" + file;
+      var sql = fs.readFileSync(sqlFile, {encoding: 'utf-8'});
 
-    var stat = fs.statSync(fullPath);
-    if(stat.isDirectory()) { 
-      baseObject[cleaned] = {};
-      self.loadQueries(fullPath, baseObject[cleaned], function() { return next });
-    } else { 
-      if(path.extname(fullPath) === ".sql") {
-        var propName = cleaned.replace(".sql", "");
-        baseObject[propName] = function(args, cb) {
-          var sqlToExecute = this[propName].sql;
-          if(_.isFunction(args)) { 
-            cb = args;
-          }
-          if(cb) { 
-            self.query( { sql : sqlToExecute, params : args }, cb);
-          }
-        };       
-        baseObject[propName].sql = fs.readFileSync(fullPath, { encoding : 'utf-8' });
-        self.queries.push(self[propName]);
-      }
+      var propName = file.replace(".sql", "");
+      var q = function(args, next){
+
+        //I have no idea why this works
+        var sql = this[propName].sql;
+        var db = this[propName].db;
+        var params = _.isObject(args) ? args : {params : args};
+
+        self.query(sql,params,{}, next);
+
+      };
+      self[propName] = q;
+      //my god fix this I don't know what I'm doing
+      self[propName].sql = sql;
+      self[propName].db = self;
+      self.queries.push(self[propName]);
     }
   });
-  next(null, self);
+  next(null,self);
 };
 
 Massive.prototype.loadTables = function(next){
   var tableSql = __dirname + "/lib/scripts/tables.sql";
   var self = this;
-  this.executeSqlFile(tableSql, {}, function(err,tables){
+  this.executeSqlFile({file : tableSql}, function(err,tables){
     if(err){
       next(err,null);
     }else{
@@ -84,7 +82,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
   if(!this[collection]){
     var sql = this.documentTableSql(collection);
     var self = this;
-    this.executeSingle({sql : sql}, function(err,res){
+    this.query(sql, function(err,res){
       if(err){
         console.log(err)
         next(err,null);
@@ -115,11 +113,16 @@ Massive.prototype.documentTableSql = function(tableName){
 
 
 exports.connect = function(args, next){
-  assert(args.connectionString, "Need a connectionString at the very least.");
+  assert((args.connectionString || args.db), "Need a connectionString or db name at the very least.");
+  //override if there's a db name passed in
+  if(args.db){
+    args.connectionString = "postgres://localhost/"+args.db;
+  }
   var massive = new  Massive(args);
+
   //load up the tables, queries, and commands
   massive.loadTables(function(err,db){
     assert(!err, err);
-    db.loadQueries(massive.scriptsDir, massive, next);
+    db.loadQueries(next);
   });
 };

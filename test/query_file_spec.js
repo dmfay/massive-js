@@ -35,13 +35,7 @@ describe('Queries built from files', function () {
         done();
       });
     });
-    it('executes productById query nested in db/special directory', function (done) {
-      db.special.productById(1, function(err,products){
-        var product = products[0];
-        assert.equal("Product 1", product.name);
-        done();
-      });
-    });
+
   });
 
 });
