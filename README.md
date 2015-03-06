@@ -1,62 +1,57 @@
-
-## Pre-Alpha!
-
-This is a rapidly changing branch for MassiveJS - not quite ready for prime time! I'm leaning on **open development** because ... why not :).
-
-*Why am I doing this?*. I've extracted a number of ideas here from a project I'm building, and I liked how it was coming together so I thought I would share.
-
-*Don't you hate ORMs Rob?*. Yes, I sure do. But I also like decent abstraction and encapsulation. My goal is to hit the sweet spot between that and the joy of SQL in Postgres.
-
 ## Massive 2.0: A Postgres-centric Data Access Tool
+
+* This is the repository for MassiveJS 2.0. If you're looking for < 2, [you can find it here](https://github.com/robconery/massive-js/releases/tag/1.0)*
 
 Massive's goal is to **help** you get data from your database. This is not an ORM, it's a bit more than a query tool - our goal is to do just enough, then get out of your way. [I'm a huge fan of Postgres](http://rob.conery.io/category/postgres/) and the inspired, creative way you can use it's modern SQL functionality to work with your data.
 
 ORMs abstract this away, and it's silly. Postgres is an amazing database with a rich ability to act as a document storage engine (using `jsonb`) as well as a cracking relational engine.
 
-Massive embraces SQL completely, and helps you out when you don't feel like writing another mundane `select * from` statement. Here's how...
+Massive embraces SQL completely, and helps you out when you don't feel like writing another mundane `select * from` statement.
+
+## Installation
+
+```
+npm install massive --save
+```
+
+Once Massive is installed, you can use it by calling `connect` and passing in a callback which will give you your database instance:
+
+```javascript
+var massive = require("massive");
+
+//you can use db for 'database name' running on localhost
+//or send in everything using 'connectionString'
+massive.connect({db : "myDb"}, function(err,db){
+  db.myTable.find();
+});
+```
 
 ## SQL Files as Functions
 
-Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project (you can override this by passing in a `scripts` setting), Massive will read each SQL file therein and create a query function with the same name:
-
-```sql
-/* this is in db/productsInStock.sql */
-
-select * from products
-where in_stock=true;
-```
-
-Now you can run massive and execute it easily:
+Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project (you can override this by passing in a `scripts` setting), Massive will read each SQL file therein and create a query function with the same name. If you use subdirectories, Massive will namespace your queries in the exact same way:
 
 ```javascript
 var massive = require("massive");
 
 massive.connect({
-  connectionString: "postgres://localhost/massive"
-}, function(err, db){
-  db.productsInStock(function(err,products){
+  connectionString: "postgres://localhost/massive"}, function(err, db){
+  //call the productsInStock.sql file in the db/queries directory
+  db.queries.productsInStock(function(err,products){
     //products is a results array
   });
 });
 ```
 
-You can use arguments right inline:
-
-```sql
-/* this is in db/productsBySku.sql */
-
-select * from products
-where sku=$1;
-```
+You can use arguments right in your SQL file as well. Just format your parameters in SQL
+using $1, $2, etc: 
 
 ```javascript
 var massive = require("massive");
 
-massive.connect({
-  connectionString: "postgres://localhost/massive"
-}, function(err, db){
+massive.connect({db : "myDb"}, function(err, db){
   //just pass in the sku as an argument
-  db.productsBySku("XXXYYY", function(err,products){
+  //your SQL would be 'select * from products where sku=$1'
+  db.queries.productsBySku("XXXYYY", function(err,products){
     //products is a results array
   });
 });
@@ -66,7 +61,7 @@ The SQL above is, of course, rather simplistic but hopefully you get the idea: *
 
 ## Full JSONB Document Support
 
-Another thing I love about Postgres is the `JSONB` functionality. The queries are simple enough to write - but if you just want to encapsulate it all - we've got your back!
+Another thing that is great about Postgres is the `jsonb` functionality. The queries are simple enough to write - but if you just want to encapsulate it all - we've got your back!
 
 ```javascript
 //connect massive as above
@@ -125,7 +120,7 @@ db.my_documents.findDoc({"id <>": [3,5]}, function(err,docs){
 });
 ```
 
-### A Word About IDs
+#### A Word About IDs in Document Tables
 
 We store IDs in their own column and treat them as a normal Primary Key. These values are **not** duplicated in the database - instead they are pulled off during writes and readded during reads.
 
@@ -140,8 +135,57 @@ The API is as close to Massive 1.0 as we could make it - but there's no need for
 ```javascript
 //connect massive, get db instance
 
+//straight up SQL
+db.run("select * from products where id=$1", 1, function(err,product){
+  //product 1
+});
+
+//simplified SQL with a where
+db.products.where("id=$1 OR id=$2", [10,21], function(err,products){
+  //products 10 and 21
+});
+
+//an IN query
+db.products.find({id : [10,21]}, function(err,products){
+  //products 10 and 21
+});
+
+//a NOT IN query
+db.products.find({"id <>"" : [10,21]}, function(err,products){
+  //products other than 10 and 21
+});
+
+//Send in an ORDER clause by passing in a second argument
+db.products.find({},{order: "price desc"} function(err,products){
+  //products ordered in descending fashion
+});
+
+//Send in an ORDER clause and a LIMIT with OFFSET
+var options = {
+  limit : 10,
+  order : "id",
+  offset: 20
+}
+db.products.find({}, options, function(err,products){
+  //products ordered in descending fashion
+});
+
+//You only want the sku and name back
+var options = {
+  limit : 10,
+  columns : ["sku", "name"]
+}
+db.products.find({}, options, function(err,products){
+  // an array of sku and name
+});
+
 //find a single user by id
 db.users.findOne(1, function(err,user){
+  //returns user with id (or whatever your PK is) of 1
+});
+
+//another way to do the above
+db.users.find(1, function(err,user){
   //returns user with id (or whatever your PK is) of 1
 });
 
@@ -202,9 +246,21 @@ db > db.queries
 db >
 ```
 
+Execute your query to make sure it returns what you expect:
+
+```
+db > db.queries.productById(1);
+[ {sku : 'x', name : "Product 1", id : '1'}]
+```
+
+By default, Massive provides a callback for you if you don't pass one in. This automatic callback outputs the results using `console.log` so you can play with things easily.
+
+
 There's more to do with the massive REPL - such as generating query files for you (if you're not accomplished at SQL just yet) as well as a better way to play with the results.
 
-##Want to help?
+## Want to help?
+
+This project is just getting off the ground and could use some help with DRYing things up and refactoring.
 
 If you want to contribute - I'd love it! Just open an issue to work against so you get full credit for your fork. You can open the issue first so we can discuss and you can work your fork as we go along.
 
