@@ -43,7 +43,7 @@ massive.connect({
 ```
 
 You can use arguments right in your SQL file as well. Just format your parameters in SQL
-using $1, $2, etc: 
+using `$1`, `$2`, etc: 
 
 ```javascript
 var massive = require("massive");
@@ -58,6 +58,18 @@ massive.connect({db : "myDb"}, function(err, db){
 ```
 
 The SQL above is, of course, rather simplistic but hopefully you get the idea: *use SQL to its fullest, we'll execute it safely for you*.
+
+## Attached Tables
+
+When Massive starts up it scans your tables as well and drops a queryable function on the root namespace. This means you can query your tables as if they were objects right on your db instance:
+
+```javascript
+db.users.find(1, function(err,res){
+  //user with ID 1
+});
+```
+
+The goal with this API is expressiveness and terseness - allowing you to think as little as possible about accessing your data.
 
 ## Full JSONB Document Support
 
