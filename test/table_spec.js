@@ -38,6 +38,34 @@ describe('Tables', function () {
       });
     });
   });
+  describe('Simple queries with AND and OR', function () {
+    it('returns Product 1 OR Product 2', function (done) {
+      db.products.where("id=$1 OR id=$2", [1,2],function(err,res){
+        assert.equal(res.length, 2);
+        done();
+      });
+    });
+    it('returns Product 1 AND Product 2', function (done) {
+      db.products.where("id=$1 AND price=$2", [1,12.00],function(err,res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
+  });
+  describe('Simple queries with count', function () {
+    it('returns 2 for OR id 1 or 2', function (done) {
+      db.products.count("id=$1 OR id=$2", [1,2],function(err,res){
+        assert.equal(res,2);
+        done();
+      });
+    });
+    it('returns 1 for id 1', function (done) {
+      db.products.count("id=$1", [1],function(err,res){
+        assert.equal(res, 1);
+        done();
+      });
+    });
+  });
   describe('Simple comparative queries', function () {
     it('returns product with id greater than 2', function (done) {
       db.products.find({"id > " : 2}, function(err,res){
