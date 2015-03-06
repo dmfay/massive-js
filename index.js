@@ -86,18 +86,27 @@ Massive.prototype.documentTableSql = function(tableName){
   return sql;
 };
 
-
+//A recursive directory walker that would love to be refactored
 var walkSqlFiles = function(rootObject, rootDir){
 
   var dirs = fs.readdirSync(rootDir);
+  
+  //loop the directories found
   _.each(dirs, function(item){
+    //parsing with path is a friendly way to get info about this dir or file
     var parsed = path.parse(item);
 
+    //is this a SQL file?
     if(parsed.ext === ".sql"){
 
+      //why yes it is! Build the abspath so we can read the file
       var filePath = path.join(rootDir,item);
+
+      //pull in the SQL - don't worry this only happens once, when
+      //massive is loaded using connect()
       var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
 
+      //set a property on our root object
       rootObject[parsed.name] = function(args, next){
         args || (args = {});
 
@@ -113,9 +122,11 @@ var walkSqlFiles = function(rootObject, rootDir){
         var db = rootObject[parsed.name].db;
         var params = _.isArray(args) ? args : [args];
 
+        //execute the query on invocation
         db.query(sql,params,{}, next);
       };
-      //my god fix this I don't know what I'm doing
+
+      //I don't know what I'm doing, but it works
       rootObject[parsed.name].sql = sql;
       rootObject[parsed.name].db = self;
       rootObject[parsed.name].filePath = filePath;
@@ -124,26 +135,36 @@ var walkSqlFiles = function(rootObject, rootDir){
     }else if(parsed.ext !== ''){
       //ignore it
     }else{
-      //walk it
+      //this is a directory so shift things and move on down
+      //set a property on our root object, then use *that*
+      //as the root in the next call
       rootObject[parsed.name] = {};
+
+      //set the path to walk so we have a correct root directory
       var pathToWalk = path.join(rootDir,item);
+
+      //recursive call - do it all again
       walkSqlFiles(rootObject[parsed.name],pathToWalk);
     }
   });
 }
 
+//connects Massive to the DB
 exports.connect = function(args, next){
-  assert((args.connectionString || args.db), "Need a connectionString or db name at the very least.");
+  assert((args.connectionString || args.db), "Need a connectionString or db (name of database on localhost) at the very least.");
+  
   //override if there's a db name passed in
   if(args.db){
     args.connectionString = "postgres://localhost/"+args.db;
   }
+
   var massive = new  Massive(args);
 
   //load up the tables, queries, and commands
   massive.loadTables(function(err,db){
     self = db;
     assert(!err, err);
+    //synchronous
     db.loadQueries();
     next(null,db);
   });

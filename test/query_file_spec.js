@@ -28,10 +28,19 @@ describe('Queries built from files', function () {
         done();
       });
     });
-    it('executes productByName with arg and callback', function (done) {
-      db.productByName("Product 1", function(err,products){
-        var product = products[0];
-        assert.equal("Product 1", product.name);
+    it('executes productById with non-array arg and callback', function (done) {
+      db.special.productById(1, function(err,products){
+        var p1 = products[0];
+        assert.equal("Product 1", p1.name);
+        done();
+      });
+    });
+    it('executes productByName with multiple args and callback', function (done) {
+      db.productByName(["Product 1", "Product 2"], function(err,products){
+        var p1 = products[0];
+        var p2 = products[1];
+        assert.equal("Product 1", p1.name);
+        assert.equal("Product 2", p2.name);
         done();
       });
     });
