@@ -6,6 +6,7 @@ var util = require("util");
 var assert = require("assert");
 var Document = require("./lib/document");
 var ArgTypes = require("./lib/arg_types");
+var Args = require("args-js");
 var path = require("path");
 var self;
 
@@ -21,7 +22,7 @@ var Massive = function(args){
 }
 
 Massive.prototype.run = function(){
-  var args = ArgTypes.defaultQuery(arguments);
+  var args = ArgTypes.queryArgs(arguments);
   this.query(args);
 }
  

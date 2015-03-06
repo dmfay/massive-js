@@ -1,5 +1,6 @@
 var assert = require("assert");
 var helpers = require("./helpers");
+var _ = require("underscore")._;
 var db;
 
 describe('Tables', function () {
@@ -8,6 +9,21 @@ describe('Tables', function () {
     helpers.resetDb(function(err,res){
       db = res;
       done();
+    });
+  });
+
+  describe("Executing inline SQL", function () {
+    it('with run and no args returns 3 products', function (done) {
+      db.run("select * from products", function(err,res){
+        assert.equal(3, res.length)
+        done()
+      });
+    });
+    it('with run and id returns Product 1', function (done) {
+      db.run("select * from products where id=$1",[1], function(err,res){
+        assert.equal(1, res[0].id)
+        done()
+      });
     });
   });
   describe('Simple queries with args', function () {
@@ -108,6 +124,13 @@ describe('Tables', function () {
     it('returns second result with limit of 1, offset of 1', function (done) {
       db.products.find({},{limit : 1, offset: 1}, function(err,res){
         assert.equal(res[0].id, 2);
+        done();
+      });
+    });
+    it('returns id and name if sending in columns', function (done) {
+      db.products.find({},{columns :["id","name"]}, function(err,res){
+        var keys = _.keys(res[0]);
+        assert.equal(keys.length,2);
         done();
       });
     });
