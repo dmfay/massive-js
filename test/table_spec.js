@@ -170,4 +170,18 @@ describe('Tables', function () {
       });
     });
   });
+  describe('Full Text search', function () {
+    it('returns 3 products for term "product"', function (done) {
+      db.products.search({columns : ["name"], term: "Product"},function(err,res){
+        assert.equal(res.length,3);
+        done();
+      });
+    });
+    it('returns 1 products for term "3"', function (done) {
+      db.products.search({columns : ["name"], term: "3"},function(err,res){
+        assert.equal(res.length,1);
+        done();
+      });
+    });
+  });
 });

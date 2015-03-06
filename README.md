@@ -71,6 +71,12 @@ db.users.find(1, function(err,res){
 
 The goal with this API is expressiveness and terseness - allowing you to think as little as possible about accessing your data.
 
+## Full Text Search Built In
+
+If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc`:
+
+
+
 ## Full JSONB Document Support
 
 Another thing that is great about Postgres is the `jsonb` functionality. The queries are simple enough to write - but if you just want to encapsulate it all - we've got your back!
@@ -163,7 +169,7 @@ db.products.find({id : [10,21]}, function(err,products){
 });
 
 //a NOT IN query
-db.products.find({"id <>"" : [10,21]}, function(err,products){
+db.products.find({"id <>": [10,21]}, function(err,products){
   //products other than 10 and 21
 });
 
