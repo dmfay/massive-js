@@ -51,6 +51,12 @@ describe('Tables', function () {
         done();
       });
     });
+    it('returns Product 1 with params as not array', function (done) {
+      db.products.where("id=$1", 1,function(err,res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
   });
   describe('Simple queries with count', function () {
     it('returns 2 for OR id 1 or 2', function (done) {

@@ -99,11 +99,19 @@ var walkSqlFiles = function(rootObject, rootDir){
       var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
 
       rootObject[parsed.name] = function(args, next){
-        args || (args = {})
+        args || (args = {});
+
+        //if args is a function, it's our callback
+        if(_.isFunction(args)){
+          next = args;
+          //set args to an empty array
+          args = [];
+        }
+
         //I have no idea why this works
         var sql = rootObject[parsed.name].sql;
         var db = rootObject[parsed.name].db;
-        var params = _.isObject(args) ? args : {params : args};
+        var params = _.isArray(args) ? args : [args];
 
         db.query(sql,params,{}, next);
       };
