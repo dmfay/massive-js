@@ -73,9 +73,25 @@ The goal with this API is expressiveness and terseness - allowing you to think a
 
 ## Full Text Search Built In
 
-If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc`:
+If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc` and we'll build the index on the fly:
 
+```javascript
+db.users.search({columns :["email"], term: "rob"}, function(err,users){
+  //all users with the word 'rob' in their email
+});
+```
 
+This works the same for documents as well (more on documents in next section):
+
+```javascript
+//full text search...
+db.my_documents.searchDoc({
+  keys : ["title", "description"],
+  term : "Kauai"
+}, function(err,docs){
+  //docs returned with an on-the-fly Full Text Search for 'Kauai'
+});
+```
 
 ## Full JSONB Document Support
 
@@ -112,14 +128,6 @@ db.my_documents.findDoc({price : 99.00}, function(err,docs){
 //again flexing the index we created for you
 db.my_documents.findDoc({tags: [{slug : "simple"}]}, function(err,docs){
   //1 or more documents returned
-});
-
-//full text search...
-db.my_documents.searchDoc({
-  keys : ["title", "description"],
-  term : "Kauai"
-}, function(err,docs){
-  //docs returned with an on-the-fly Full Text Search
 });
 
 //comparative queries - these don't use indexing
