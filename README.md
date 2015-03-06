@@ -1,6 +1,6 @@
 ## Massive 2.0: A Postgres-centric Data Access Tool
 
-* This is the repository for MassiveJS 2.0. If you're looking for < 2, [you can find it here](https://github.com/robconery/massive-js/releases/tag/1.0)*
+*This is the repository for MassiveJS 2.0. If you're looking for < 2, [you can find it here](https://github.com/robconery/massive-js/releases/tag/1.0)*
 
 Massive's goal is to **help** you get data from your database. This is not an ORM, it's a bit more than a query tool - our goal is to do just enough, then get out of your way. [I'm a huge fan of Postgres](http://rob.conery.io/category/postgres/) and the inspired, creative way you can use it's modern SQL functionality to work with your data.
 
