@@ -35,7 +35,12 @@ describe('Queries built from files', function () {
         done();
       });
     });
-
+    it('executes a deep namespaced query', function (done) {
+      db.queries.users.allUsers(function(err,users){
+        assert.equal(1, users.length);
+        done();
+      });
+    });
   });
 
 });
