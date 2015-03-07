@@ -12,7 +12,7 @@ var self;
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || __dirname + "/db";
-  
+
   var runner = new Runner(args.connectionString);
   _.extend(this,runner);
 
