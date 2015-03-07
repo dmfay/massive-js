@@ -11,7 +11,7 @@ var path = require("path");
 var self;
 
 var Massive = function(args){
-  this.scriptsDir = args.scripts || __dirname + "/db";
+  this.scriptsDir = args.scripts || process.cwd() + "/db";
   
   var runner = new Runner(args.connectionString);
   _.extend(this,runner);
@@ -89,9 +89,12 @@ Massive.prototype.documentTableSql = function(tableName){
 
 //A recursive directory walker that would love to be refactored
 var walkSqlFiles = function(rootObject, rootDir){
-
-  var dirs = fs.readdirSync(rootDir);
-  
+  var dirs;
+  try {
+    dirs = fs.readdirSync(rootDir);
+  } catch (ex) {
+     return;
+  }
   //loop the directories found
   _.each(dirs, function(item){
     //parsing with path is a friendly way to get info about this dir or file
