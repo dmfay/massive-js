@@ -19,6 +19,7 @@ var Massive = function(args){
 
   this.tables = [];
   this.queryFiles = [];
+  this.schemas = [];
   //console.log("Massive online", this);
 }
 
@@ -39,15 +40,29 @@ Massive.prototype.loadTables = function(next){
       next(err,null);
     }else{
       _.each(tables, function(table){
-        var table = new Table({
+        var _table = new Table({
+          schema : table.schema,
           name : table.name,
           pk : table.pk,
           db : self
         });
-        //pin to namespace
-        self[table.name] =table;
-        //add to table collection
-        self.tables.push(table);
+        // don't namespace the public schema:
+        if(_table.schema !== "public") { 
+          schemaName = _table.schema;
+          // is this schema already attached?
+          if(!self[schemaName]) { 
+            // if not, then bolt it on:
+            self[schemaName] = {};
+            // push it into the tables collection as a namespace object:
+            self.tables.push(self[schemaName]);
+          }
+          // attach the table to the schema:
+          self[schemaName][_table.name] = _table;
+        } else { 
+          //it's public - just pin table to the root to namespace
+          self[_table.name] = _table;
+          self.tables.push(_table);
+        }
       });
       next(null,self);
     }
