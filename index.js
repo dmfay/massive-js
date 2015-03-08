@@ -90,7 +90,12 @@ Massive.prototype.documentTableSql = function(tableName){
 
 //A recursive directory walker that would love to be refactored
 var walkSqlFiles = function(rootObject, rootDir){
-  var dirs = fs.readdirSync(rootDir);
+  var dirs;
+  try {
+    dirs = fs.readdirSync(rootDir);
+  } catch (ex) {
+     return;
+  }
   
   //loop the directories found
   _.each(dirs, function(item){
@@ -135,6 +140,7 @@ var walkSqlFiles = function(rootObject, rootDir){
   });
 }
 
+//it's less congested now...
 var assignScriptAsFunction = function (rootObject, propertyName) { 
    rootObject[propertyName] = function(args, next) { 
     args || (args = {});
