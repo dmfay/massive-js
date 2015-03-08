@@ -90,14 +90,11 @@ Massive.prototype.documentTableSql = function(tableName){
 
 //A recursive directory walker that would love to be refactored
 var walkSqlFiles = function(rootObject, rootDir){
-  var dirs;
-  try {
-    dirs = fs.readdirSync(rootDir);
-  } catch (ex) {
-     return;
-  }
+  var dirs = fs.readdirSync(rootDir);
+  
   //loop the directories found
   _.each(dirs, function(item){
+
     //parsing with path is a friendly way to get info about this dir or file
     var parsed = path.parse(item);
 
@@ -111,35 +108,19 @@ var walkSqlFiles = function(rootObject, rootDir){
       //massive is loaded using connect()
       var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
 
-      //set a property on our root object
-      rootObject[parsed.name] = function(args, next){
-        args || (args = {});
-
-        //if args is a function, it's our callback
-        if(_.isFunction(args)){
-          next = args;
-          //set args to an empty array
-          args = [];
-        }
-
-        //I have no idea why this works
-        var sql = rootObject[parsed.name].sql;
-        var db = rootObject[parsed.name].db;
-        var params = _.isArray(args) ? args : [args];
-
-        //execute the query on invocation
-        db.query(sql,params,{}, next);
-      };
+      //set a property on our root object, and grab a handy variable reference:
+      var newProperty = assignScriptAsFunction(rootObject, parsed.name);
 
       //I don't know what I'm doing, but it works
-      rootObject[parsed.name].sql = sql;
-      rootObject[parsed.name].db = self;
-      rootObject[parsed.name].filePath = filePath;
-      self.queryFiles.push(rootObject[parsed.name]);
+      newProperty.sql = sql;
+      newProperty.db = self;
+      newProperty.filePath = filePath;
+      self.queryFiles.push(newProperty);
 
     }else if(parsed.ext !== ''){
       //ignore it
     }else{
+
       //this is a directory so shift things and move on down
       //set a property on our root object, then use *that*
       //as the root in the next call
@@ -152,6 +133,27 @@ var walkSqlFiles = function(rootObject, rootDir){
       walkSqlFiles(rootObject[parsed.name],pathToWalk);
     }
   });
+}
+
+var assignScriptAsFunction = function (rootObject, propertyName) { 
+   rootObject[propertyName] = function(args, next) { 
+    args || (args = {});
+    //if args is a function, it's our callback
+    if(_.isFunction(args)){
+      next = args;
+      //set args to an empty array
+      args = [];
+    }
+    //JA - use closure to assign stuff from properties before they are invented 
+    //(sorta, I think...):
+    var sql = rootObject[propertyName].sql;
+    var db = rootObject[propertyName].db;
+    var params = _.isArray(args) ? args : [args];
+
+    //execute the query on invocation
+    db.query(sql,params,{}, next);  
+  }
+  return rootObject[propertyName];
 }
 
 //connects Massive to the DB
