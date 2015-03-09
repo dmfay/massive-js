@@ -3,6 +3,45 @@ var helpers = require("./helpers");
 var _ = require("underscore")._;
 var db;
 
+
+
+describe('Tables -Add/Edit/Delete', function () {
+  
+  //Separate 'suite' for add/edit/delete so query tests don't get borked:
+  before(function(done){
+    helpers.resetDb(function(err,res){
+      db = res;
+      done();
+    });
+  });
+
+  describe('Add/Update/Delete records:', function() {
+    it('adds a product ', function (done) {
+      db.products.save({name : "Gibson Les Paul", description : "Lester's brain child", price : 3500}, function(err, res){
+        assert.equal(res.id, 4);
+        done();
+      });
+    });
+    it('updates a product ', function (done) {
+      db.products.save({id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200}, function(err, res){
+        // Update returns an array - Iassume because more than one item can be updated...
+        assert.equal(res[0].name, "Fender Stratocaster");
+        done();
+      });
+    });
+    it('deletes a product ', function (done) {
+      db.products.destroy({id : 4}, function(err, deleted){
+        var remaining = db.products.find(4, function(err, found) { 
+          //Deleted returns an array...
+          assert(found == undefined && deleted[0].id == 4);
+          done();
+        });
+      });
+    });
+  });
+
+});
+
 describe('Tables', function () {
   
   before(function(done){
@@ -154,7 +193,6 @@ describe('Tables', function () {
       });
     });
   });
-
   describe('Casing issues', function () {
     it('returns users because we delimit OK', function (done) {
       db.Users.find({}, function(err, res){
