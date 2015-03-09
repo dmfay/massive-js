@@ -46,60 +46,91 @@ Massive.prototype.loadTables = function(next){
           pk : table.pk,
           db : self
         });
-        // don't namespace the public schema:
-        if(_table.schema !== "public") { 
-          schemaName = _table.schema;
-          // is this schema already attached?
-          if(!self[schemaName]) { 
-            // if not, then bolt it on:
-            self[schemaName] = {};
-            // push it into the tables collection as a namespace object:
-            self.tables.push(self[schemaName]);
-          }
-          // attach the table to the schema:
-          self[schemaName][_table.name] = _table;
-        } else { 
-          //it's public - just pin table to the root to namespace
-          self[_table.name] = _table;
-          self.tables.push(_table);
-        }
+        // This refactoring appears to work well:
+        MapTableToNamespace(_table);
       });
       next(null,self);
     }
   });
 }
 
+// This works with schemas now, but it's ugly code. I'll need to refactor. 
 Massive.prototype.saveDoc = function(collection, doc, next){
-  //does the table exist?
-  if(!this[collection]){
+  var self = this;
+
+  // default is public. Table constructor knows what to do if 'public' is used as the schema name:
+  var schemaName = "public";
+  var tableName = collection;
+  var tableExists = true;
+
+    // is the collection namespace delimited?
+  var splits = collection.split(".");
+  if(splits.length > 1) {
+    // uh oh. Someone specified a schema name:
+    schemaName = splits[0];
+    tableName = splits[1];
+    if(!self[schemaName][tableName]) { 
+      tableExists = false;
+    } else { 
+      self[schemaName][tableName].saveDoc(doc,next);
+    }
+  } else { 
+    if(!self[tableName]) { 
+      tableExists = false;
+    } else { 
+      self[tableName].saveDoc(doc,next);
+    }
+  }
+
+  // This is clunky too. Clean this up somehow!!
+  if(!tableExists) { 
+    var _table = new Table({
+    schema : schemaName,
+     pk : "id",
+     name : tableName,
+     db : self
+    });
+
+    // Create the table in the back end:
     var sql = this.documentTableSql(collection);
-    var self = this;
     this.query(sql, function(err,res){
       if(err){
-        console.log(err)
         next(err,null);
-      }else{
-       //add the table
-       self[collection] = new Table({
-         pk : "id",
-         name : collection,
-         db : self
-       });
-
-       //call save again
-       self.saveDoc(collection,doc,next);     
-     }
+      } else {
+        MapTableToNamespace(_table);
+        // recurse
+        self.saveDoc(collection,doc,next);       
+      }
     });
-  }else{
-    //hand off to the table
-    this[collection].saveDoc(doc,next);
   }
 };
+
+var MapTableToNamespace = function(table) { 
+  var db = table.db;
+  if(table.schema !== "public") { 
+    schemaName = table.schema;
+    // is this schema already attached?
+    if(!db[schemaName]) { 
+      // if not, then bolt it on:
+      db[schemaName] = {};
+      // push it into the tables collection as a namespace object:
+      db.tables.push(db[schemaName]);
+    }
+    // attach the table to the schema:
+    db[schemaName][table.name] = table;
+  } else { 
+    //it's public - just pin table to the root to namespace
+    db[table.name] = table;
+    db.tables.push(table);
+  }  
+}
 
 Massive.prototype.documentTableSql = function(tableName){
   var docSqlFile = __dirname + "/lib/scripts/create_document_table.sql";
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
-  sql = util.format(sql, tableName, tableName,tableName);
+
+  var indexName = tableName.replace(".", "_");
+  sql = util.format(sql, tableName, indexName, tableName);
   return sql;
 };
 

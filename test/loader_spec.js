@@ -19,8 +19,8 @@ describe('On spin up', function () {
   it('loads tables in db schema as properties of namespace', function() { 
     assert(db.myschema.artists && db.myschema.albums, 'No tables loaded on schema')
   });
-  it('loads up 3 tables and 1 schema object in array property', function () {
-    assert.equal(db.tables.length, 4);
+  it('loads up 5 tables with 2 in schema object in array property', function () {
+    assert.equal(db.tables.length, 5);
   });
 
   // including one nested in a deeper folder... total of 4 now.

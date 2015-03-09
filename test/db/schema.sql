@@ -44,6 +44,10 @@ values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_goo
 -- schema stuff:
 drop table if exists myschema.artists;
 drop table if exists myschema.albums;
+drop table if exists myschema.docs;
+
+-- just in case:
+drop table if exists myschema.doggies;
 drop schema if exists myschema;
 
 create schema myschema;
@@ -59,6 +63,13 @@ create table myschema.albums (
   artist_id integer
 );
 
+-- duplicate name of public docs is intentional - let's make sure it works the way a schema is supposed to:
+create table myschema.docs(
+  id serial primary key,
+  body jsonb not null,
+  search tsvector
+);
+
 insert into myschema.artists(name)
 values ('AC/DC'), ('Bauhaus'), ('Sex Pistols');
 
@@ -67,5 +78,8 @@ values (1, 'Power Age'),
 (2, 'Press Eject and Give Me the Tape'), 
 (3, 'Never Mind the Bullocks');
 
-
+insert into myschema.docs(body) 
+values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
+('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
+('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
 
