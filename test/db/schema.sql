@@ -2,6 +2,7 @@ drop table if exists "Users";
 drop table if exists products;
 drop table if exists docs;
 
+
 create table "Users"(
   "Id" serial primary key,
   "Email" varchar(50) not null,
@@ -23,6 +24,8 @@ create table docs(
   search tsvector
 );
 
+
+
 insert into "Users"("Email")
 values('test@test.com');
 
@@ -35,3 +38,34 @@ insert into docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
+
+
+
+-- schema stuff:
+drop table if exists myschema.artists;
+drop table if exists myschema.albums;
+drop schema if exists myschema;
+
+create schema myschema;
+
+create table myschema.artists (
+  id serial primary key,
+  name text
+);
+
+create table myschema.albums (
+  id serial primary key,
+  title text,
+  artist_id integer
+);
+
+insert into myschema.artists(name)
+values ('AC/DC'), ('Bauhaus'), ('Sex Pistols');
+
+insert into myschema.albums(artist_id, title)
+values (1, 'Power Age'), 
+(2, 'Press Eject and Give Me the Tape'), 
+(3, 'Never Mind the Bullocks');
+
+
+
