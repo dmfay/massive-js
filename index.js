@@ -54,14 +54,13 @@ Massive.prototype.loadTables = function(next){
   });
 }
 
-// This works with schemas now, but it's ugly code. I'll need to refactor. 
 Massive.prototype.saveDoc = function(collection, doc, next){
   var self = this;
 
   // default is public. Table constructor knows what to do if 'public' is used as the schema name:
   var schemaName = "public";
   var tableName = collection;
-  var tableExists = true;
+  var potentialTable = null;
 
     // is the collection namespace delimited?
   var splits = collection.split(".");
@@ -69,21 +68,14 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     // uh oh. Someone specified a schema name:
     schemaName = splits[0];
     tableName = splits[1];
-    if(!self[schemaName][tableName]) { 
-      tableExists = false;
-    } else { 
-      self[schemaName][tableName].saveDoc(doc,next);
-    }
+    potentialTable = self[schemaName][tableName];
   } else { 
-    if(!self[tableName]) { 
-      tableExists = false;
-    } else { 
-      self[tableName].saveDoc(doc,next);
-    }
+    potentialTable = self[tableName];
   }
 
-  // This is clunky too. Clean this up somehow!!
-  if(!tableExists) { 
+  if(potentialTable) { 
+    potentialTable.saveDoc(doc, next);
+  } else { 
     var _table = new Table({
     schema : schemaName,
      pk : "id",
