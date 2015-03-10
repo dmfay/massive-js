@@ -230,6 +230,24 @@ describe('Tables', function () {
         done();
       });
     });
+    it('counts all funny cased users', function (done) {
+      db.Users.count(null, null, function(err, res){
+        assert.equal(res, 1);
+        done();
+      });
+    });
+    it('counts funny cased users when we use a where and delimit the condition', function (done) {
+      db.Users.count('"Email"=$1', ["test@test.com"], function(err, res){
+        assert.equal(res, 1);
+        done();
+      });
+    });
+    it('returns users when we use a simple where', function (done) {
+      db.Users.where('"Email"=$1', ["test@test.com"], function(err, res){
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
   });
   describe('Full Text search', function () {
     it('returns 3 products for term "product"', function (done) {
