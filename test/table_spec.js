@@ -39,7 +39,6 @@ describe('Tables -Add/Edit/Delete', function () {
       });
     });
   });
-
 });
 
 describe('Tables', function () {
@@ -246,6 +245,31 @@ describe('Tables', function () {
       db.Users.where('"Email"=$1', ["test@test.com"], function(err, res){
         assert.equal(res.length, 1);
         done();
+      });
+    });
+    describe('Add/Update/Delete records with nonstandard casing:', function() {
+      it('adds a User ', function (done) {
+        db.Users.save({Email : "foo@bar.com"}, function(err, res){
+          assert.equal(res.Id, 2);
+          assert.equal(res.Email, "foo@bar.com");
+          done();
+        });
+      });
+      it('updates a User ', function (done) {
+        db.Users.save({Id : 2, '"Email"' : "bar@foo.com"}, function(err, res){
+          // Update returns an array
+          assert.equal(res[0].Email, "bar@foo.com");
+          done();
+        });
+      });
+      it('deletes a User ', function (done) {
+        db.Users.destroy({Id : 2}, function(err, deleted){
+          var remaining = db.Users.find(2, function(err, found) { 
+            //Deleted returns an array...
+            assert(found == undefined && deleted[0].Id == 2);
+            done();
+          });
+        });
       });
     });
   });
