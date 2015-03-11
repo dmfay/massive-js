@@ -42,7 +42,7 @@ describe('Tables -Add/Edit/Delete', function () {
 
   describe('Add/Update/Delete records with nonstandard casing:', function() {
     it('adds a User ', function (done) {
-      db.Users.save({Email : "foo@bar.com"}, function(err, res){
+      db.Users.save({Email : "foo@bar.com", Name: "Another test user"}, function(err, res){
         assert.equal(res.Id, 2);
         assert.equal(res.Email, "foo@bar.com");
         done();
@@ -283,6 +283,12 @@ describe('Tables', function () {
     });
     it('returns 1 products for term "3"', function (done) {
       db.products.search({columns : ["name"], term: "3"},function(err,res){
+        assert.equal(res.length,1);
+        done();
+      });
+    });
+    it('returns 1 Users for term "test"', function (done) {
+      db.Users.search({columns : ["Name"], term: "test"},function(err,res){
         assert.equal(res.length,1);
         done();
       });

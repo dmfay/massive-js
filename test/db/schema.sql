@@ -6,6 +6,7 @@ drop table if exists docs;
 create table "Users"(
   "Id" serial primary key,
   "Email" varchar(50) not null,
+  "Name" varchar(50) not null,
   search tsvector
 );
 
@@ -26,8 +27,8 @@ create table docs(
 
 
 
-insert into "Users"("Email")
-values('test@test.com');
+insert into "Users"("Email", "Name")
+values('test@test.com', 'A test user');
 
 insert into products(name, price, description, in_stock)
 values ('Product 1', 12.00, 'Product 1 description', true),
