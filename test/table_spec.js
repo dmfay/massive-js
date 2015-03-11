@@ -39,7 +39,7 @@ describe('Tables -Add/Edit/Delete', function () {
       });
     });
   });
-  
+
   describe('Add/Update/Delete records with nonstandard casing:', function() {
     it('adds a User ', function (done) {
       db.Users.save({Email : "foo@bar.com"}, function(err, res){
