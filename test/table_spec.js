@@ -256,7 +256,7 @@ describe('Tables', function () {
         });
       });
       it('updates a User ', function (done) {
-        db.Users.save({Id : 2, '"Email"' : "bar@foo.com"}, function(err, res){
+        db.Users.save({Id : 2, Email : "bar@foo.com"}, function(err, res){
           // Update returns an array
           assert.equal(res[0].Email, "bar@foo.com");
           done();
