@@ -1,0 +1,3 @@
+site_name: MassiveJS - The dedicated Postgres data tool for NodeJS
+site_description: Flex the power of Postgres by embracing SQL in a sane way.
+markdown_extensions: [gfm]
