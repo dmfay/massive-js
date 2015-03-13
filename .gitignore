@@ -12,3 +12,4 @@ node_modules
 [._]s[a-w][a-z]
 Session.vim
 play.js
+mkdocs.yml
