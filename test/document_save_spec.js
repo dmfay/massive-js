@@ -25,10 +25,16 @@ describe('Document saves', function () {
     it('returns the doc', function () {
       assert.equal("Fido", newDoc.name);
     });
-      it('updates the doc', function (done) { 
+    it('updates the doc', function (done) { 
       newDoc.name = "Bruno";
       db.doggies.saveDoc(newDoc, function (err, res) { 
         assert.equal(newDoc.name, "Bruno");
+        done();
+      });
+    });
+    it("finds the updated document", function (done) {
+      db.doggies.findDoc({id:1}, function(err, res) {
+        assert.equal(res.name, "Bruno");
         done();
       });
     });
@@ -46,7 +52,7 @@ describe('Document saves', function () {
 
   });
 
-    describe("To an Existing Table", function() { 
+  describe("To an Existing Table", function() { 
     var film ={};
 
     before(function(done) { 
