@@ -1,3 +1,5 @@
+<img src="http://rob.conery.io/wp-content/uploads/2015/03/massive-logo.png" width=450 />
+
 ## Massive 2.0: A Postgres-centric Data Access Tool
 
 *This is the repository for MassiveJS 2.0. If you're looking for < 2, [you can find it here](https://github.com/robconery/massive-js/releases/tag/1.0)*
@@ -36,7 +38,7 @@ var massive = require("massive");
 massive.connect({
   connectionString: "postgres://localhost/massive"}, function(err, db){
   //call the productsInStock.sql file in the db/queries directory
-  db.queries.productsInStock(function(err,products){
+  db.productsInStock(function(err,products){
     //products is a results array
   });
 });
@@ -51,7 +53,7 @@ var massive = require("massive");
 massive.connect({db : "myDb"}, function(err, db){
   //just pass in the sku as an argument
   //your SQL would be 'select * from products where sku=$1'
-  db.queries.productsBySku("XXXYYY", function(err,products){
+  db.productsBySku("XXXYYY", function(err,products){
     //products is a results array
   });
 });
