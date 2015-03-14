@@ -8,5 +8,4 @@ routines.routine_name as "name", routines.data_type,
 FROM information_schema.routines
 WHERE routines."routine_schema" NOT IN('pg_catalog','information_schema')
 AND routines.routine_name NOT LIKE 'pgp%'
-AND routines.data_type IN ('record', 'USER-DEFINED')
 order by routine_name
