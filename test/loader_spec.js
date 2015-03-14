@@ -28,6 +28,6 @@ describe('On spin up', function () {
     assert.equal(db.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(db.functions.length,2)
+    assert.equal(db.functions.length,3)
   });
 });

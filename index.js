@@ -189,18 +189,21 @@ Massive.prototype.loadFunctions = function(next){
         var schema = fn.schema;
         var sql;
         var params = [];
-        for(var i = 1;i<fn.param_count;i++){
+
+        for(var i = 1;i<=fn.param_count;i++){
           params.push("$" + i);
         }
 
-        var newFn;
+        var newFn, pushOnTo
         if(schema !== "public"){
           self[schema] || (self[schema] =  {});
           newFn = assignScriptAsFunction(self[schema], fn.name);
           sql = util.format("select * from %s.%s", schema, fn.name);
+          self[schema][fn.name] = newFn;
         }else{
           sql = "select * from " + fn.name;
           newFn= assignScriptAsFunction(self, fn.name);
+          self[fn.name] = newFn;
         }
 
         sql+="(" + params.join(",") + ")";

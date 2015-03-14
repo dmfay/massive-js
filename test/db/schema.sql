@@ -43,7 +43,7 @@ values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_goo
 
 
 -- schema stuff:
-drop table if exists myschema.artists;
+drop table if exists myschema.artists cascade;
 drop table if exists myschema.albums cascade; -- drops functions too
 drop table if exists myschema.docs;
 
@@ -101,6 +101,12 @@ select * from myschema.albums;
 $$
 language sql;
 
-
+create or replace function myschema.artist_by_name(find_name varchar(50))
+returns setof myschema.artists
+as
+$$
+select * from myschema.artists where name=find_name;
+$$
+language sql;
 
 
