@@ -1,5 +1,12 @@
-SELECT nspname,proname, proargnames,proargmodes
-FROM    pg_catalog.pg_namespace n
-JOIN    pg_catalog.pg_proc p
-ON      p.pronamespace = n.oid
-where nspname in('public')
+SELECT routines.routine_schema as "schema", 
+routines.routine_name as "name", routines.data_type,
+(
+  select count(1) from information_schema.parameters 
+  where routines.specific_name=parameters.specific_name
+    and parameter_mode = 'IN'
+) as param_count
+FROM information_schema.routines
+WHERE routines."routine_schema" NOT IN('pg_catalog','information_schema')
+AND routines.routine_name NOT LIKE 'pgp%'
+AND routines.data_type IN ('record', 'USER-DEFINED')
+order by routine_name

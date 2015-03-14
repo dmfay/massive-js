@@ -1,5 +1,5 @@
 drop table if exists "Users";
-drop table if exists products;
+drop table if exists products cascade;
 drop table if exists docs;
 
 
@@ -44,7 +44,7 @@ values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_goo
 
 -- schema stuff:
 drop table if exists myschema.artists;
-drop table if exists myschema.albums;
+drop table if exists myschema.albums cascade; -- drops functions too
 drop table if exists myschema.docs;
 
 -- just in case:
@@ -83,4 +83,24 @@ insert into myschema.docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
+
+
+create or replace function all_products()
+returns setof products
+as
+$$
+select * from products;
+$$
+language sql;
+
+create or replace function myschema.all_albums()
+returns setof myschema.albums
+as
+$$
+select * from myschema.albums;
+$$
+language sql;
+
+
+
 

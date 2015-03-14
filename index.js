@@ -20,17 +20,18 @@ var Massive = function(args){
   this.tables = [];
   this.queryFiles = [];
   this.schemas = [];
-  //console.log("Massive online", this);
+  this.functions = [];
 }
 
 Massive.prototype.run = function(){
   var args = ArgTypes.queryArgs(arguments);
   this.query(args);
 }
- 
+
 Massive.prototype.loadQueries = function() { 
   walkSqlFiles(this,this.scriptsDir);
 };
+
 
 Massive.prototype.loadTables = function(next){
   var tableSql = __dirname + "/lib/scripts/tables.sql";
@@ -178,6 +179,40 @@ var walkSqlFiles = function(rootObject, rootDir){
   });
 }
 
+Massive.prototype.loadFunctions = function(next){
+  var functionSql = __dirname + "/lib/scripts/functions.sql";
+  this.executeSqlFile({file : functionSql}, function(err,functions){
+    if(err){
+      next(err,null);
+    }else{
+      _.each(functions, function(fn){
+        var schema = fn.schema;
+        var sql;
+        var params = [];
+        for(var i = 1;i<fn.param_count;i++){
+          params.push("$" + i);
+        }
+
+        var newFn;
+        if(schema !== "public"){
+          self[schema] || (self[schema] =  {});
+          newFn = assignScriptAsFunction(self[schema], fn.name);
+          sql = util.format("select * from %s.%s", schema, fn.name);
+        }else{
+          sql = "select * from " + fn.name;
+          newFn= assignScriptAsFunction(self, fn.name);
+        }
+
+        sql+="(" + params.join(",") + ")";
+        newFn.sql = sql;
+        newFn.db = self;
+        self.functions.push(newFn);
+      });
+      next(null,self);
+    }
+  });
+};
+
 //it's less congested now...
 var assignScriptAsFunction = function (rootObject, propertyName) { 
    rootObject[propertyName] = function(args, next) { 
@@ -214,9 +249,11 @@ exports.connect = function(args, next){
   //load up the tables, queries, and commands
   massive.loadTables(function(err,db){
     self = db;
-    assert(!err, err);
-    //synchronous
-    db.loadQueries();
-    next(null,db);
+    massive.loadFunctions(function(err,db){
+      assert(!err, err);
+      //synchronous
+      db.loadQueries();
+      next(null,db);
+    });
   });
 };

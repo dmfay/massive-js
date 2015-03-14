@@ -27,4 +27,7 @@ describe('On spin up', function () {
   it('loads up 7 queries', function () {
     assert.equal(db.queryFiles.length, 7);
   });
+  it('loads up functions', function () {
+    assert.equal(db.functions.length,2)
+  });
 });
