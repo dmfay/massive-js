@@ -89,6 +89,15 @@ describe('Document queries', function () {
         done();
       });
     });
+    it('returns multiple results', function (done) {
+      db.docs.searchDoc({
+        keys : ["title"],
+        term : "Document"
+      }, function(err, docs){
+        assert.equal(2, docs.length);
+        done();
+      });
+    });
     it('returns properly formatted documents with id etc', function (done) {
       db.docs.searchDoc({
         keys : ["title", "description"],
