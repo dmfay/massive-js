@@ -89,6 +89,15 @@ describe('Schmea-Bounds Document queries', function () {
         done();
       });
     });
+    it('returns multiple results', function (done) {
+      db.docs.searchDoc({
+        keys : ["title"],
+        term : "Document"
+      }, function(err, docs){
+        assert.equal(2, docs.length);
+        done();
+      });
+    });
     it('returns properly formatted documents with id etc', function (done) {
       db.myschema.docs.searchDoc({
         keys : ["title", "description"],
