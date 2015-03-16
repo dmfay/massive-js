@@ -14,6 +14,18 @@ describe('Schmea-Bounds Document queries', function () {
     assert(db, "No db");
   });
   describe('Querying documents in a schema-bound table', function () {
+    it('returns all documents when passed "*"', function (done) { 
+      db.myschema.docs.findDoc("*", function(err,res){
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+    it('returns all documents when passed only "next" function', function (done) { 
+      db.myschema.docs.findDoc(function(err,res){
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
     it('finds a doc by primary key', function (done) {
       db.myschema.docs.findDoc(1, function(err,doc){
         assert.equal(doc.id, 1);
