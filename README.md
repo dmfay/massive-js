@@ -255,7 +255,7 @@ db.membership.users.find({active: true}, function(err,users){
 
 ## SPROC is NOT a Four Letter Word
 
-Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and unconstrained by popular dogma-of-the-moment about database functions/stored procedures, and are unafraid to be called names by your less-enlightened friends? 
+Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and unconstrained by popular dogma about database functions/stored procedures, and unafraid to be called names by your less-enlightened friends?
 
 Massive treats Postgres functions ("sprocs") as first-class citizens. 
 
