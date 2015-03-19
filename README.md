@@ -238,6 +238,48 @@ db.users.save({email : "new@example.com"}, function(err,inserted){
 });
 ```
 
+## Database Schema
+
+Massive understands the notion of database schemas and treats any Postgres schema other then `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. For example, to steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
+
+```javascript
+db.membership.users.save({email : "new@example.com"}, function(err,inserted){
+  //the new record with the ID
+});
+
+db.membership.users.find({active: true}, function(err,users){
+  //all users who are active
+});
+
+```
+
+## SPROC is NOT a Four Letter Word
+
+Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and unconstrained by popular dogma-of-the-moment about database functions/stored procedures, and are unafraid to be called names by your less-enlightened friends? 
+
+Massive treats Postgres functions ("sprocs") as first-class citizens. 
+
+Say your database schema introdcues a complex peice of logic in a Postgres function:
+
+```sql
+create or replace function all_products()
+returns setof products
+as
+$$
+select * from products;
+$$
+language sql;
+```
+
+Massive will load up and attach the all_products function, and any other Postgres function as JS functions on the root massive namespace (or on an appropriate schema-based namespace, as we just saw), which you can then access directly as functions:
+
+```javascript
+      db.all_products(function(err,res) {
+        // returns the result of the function (all the product records, in this case...)
+      });
+```
+Obviously, this was a trivial example, but you get the idea. You can perform complex logic deep in your database, and massive will make it accessible directly. 
+
 ## REPL
 
 Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire it up to play with your DB in the console:
