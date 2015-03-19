@@ -271,7 +271,7 @@ $$
 language sql;
 ```
 
-Massive will load up and attach the all_products function, and any other Postgres function as JS functions on the root massive namespace (or on an appropriate schema-based namespace, as we just saw), which you can then access directly as functions:
+Massive will load up and attach the `all_products` function, and any other Postgres function as JS functions on the root massive namespace (or on an appropriate schema-based namespace, as we just saw), which you can then access directly as functions:
 
 ```javascript
       db.all_products(function(err,res) {
