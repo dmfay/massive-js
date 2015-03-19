@@ -32,6 +32,18 @@ describe('Document queries', function () {
         done();
       });
     });
+    it('finds a doc with > comparison on primary key', function (done) {
+      db.docs.findDoc({"id >" : 1}, function(err,doc){
+        assert.equal(doc.length, 2);
+        done();
+      });
+    });
+    it('finds a doc with >= comparison on primary key', function (done) {
+      db.docs.findDoc({"id >=" : 2}, function(err,doc){
+        assert.equal(doc.length, 2);
+        done();
+      });
+    });
     it('finds a doc by title', function (done) {
       db.docs.findDoc({title : "A Document"}, function(err,docs){
         //find will return multiple if id not specified... confusing?

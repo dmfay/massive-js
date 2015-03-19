@@ -2,7 +2,7 @@ var assert = require("assert");
 var helpers = require("./helpers");
 var db;
 
-describe('Schmea-Bounds Document queries', function () {
+describe('Schmema-Bounds Document queries', function () {
   
   before(function(done){
     helpers.resetDb(function(err,res){
@@ -29,6 +29,18 @@ describe('Schmea-Bounds Document queries', function () {
     it('finds a doc by primary key', function (done) {
       db.myschema.docs.findDoc(1, function(err,doc){
         assert.equal(doc.id, 1);
+        done();
+      });
+    });
+    it('finds a doc with > comparison on primary key', function (done) {
+      db.myschema.docs.findDoc({"id >" : 1}, function(err,doc){
+        assert.equal(doc.length, 2);
+        done();
+      });
+    });
+    it('finds a doc with >= comparison on primary key', function (done) {
+      db.myschema.docs.findDoc({"id >=" : 2}, function(err,doc){
+        assert.equal(doc.length, 2);
         done();
       });
     });
