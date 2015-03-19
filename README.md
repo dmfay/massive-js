@@ -255,7 +255,7 @@ db.membership.users.find({active: true}, function(err,users){
 
 ## SPROC is NOT a Four Letter Word
 
-Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and unconstrained by popular dogma about database functions/stored procedures? Unafraid to be called names by your less-enlightened friends?
+Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and [unconstrained by popular dogma](http://rob.conery.io/2015/02/21/its-time-to-get-over-that-stored-procedure-aversion-you-have/) about database functions/stored procedures? Unafraid to be called names by your less-enlightened friends?
 
 Massive treats Postgres functions ("sprocs") as first-class citizens. 
 
@@ -278,7 +278,7 @@ Massive will load up and attach the all_products function, and any other Postgre
         // returns the result of the function (all the product records, in this case...)
       });
 ```
-Obviously, this was a trivial example, but you get the idea. You can perform complex logic deep in your database, and massive will make it accessible directly. 
+Obviously, this was a trivial example, but you get the idea. You can perform complex logic deep in your database, and massive will make it accessible directly. For a deeper dive on this, see [pg-auth](https://github.com/robconery/pg-auth), which basically [rolls common membership up into a box](http://rob.conery.io/2015/03/17/membership-in-a-box-with-pg-auth/) and tucks the auth pain away behind a pleasing facade of Postgres functions. Guaranteed to stir up spirited discussions with your friends and neighbors.
 
 ## REPL
 
