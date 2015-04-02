@@ -277,7 +277,7 @@ db.users.save({email : "new@example.com"}, function(err,inserted){
 
 ## Database Schema
 
-Massive understands the notion of database schemas and treats any Postgres schema other than `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. For example, to steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
+Massive understands the notion of database schemas and treats any Postgres schema other than `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. To steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
 
 ```javascript
 db.membership.users.save({email : "new@example.com"}, function(err,inserted){
