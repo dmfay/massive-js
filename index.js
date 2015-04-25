@@ -108,11 +108,10 @@ var MapTableToNamespace = function(table) {
     if(!db[schemaName]) { 
       // if not, then bolt it on:
       db[schemaName] = {};
-      // push it into the tables collection as a namespace object:
-      db.tables.push(db[schemaName]);
     }
     // attach the table to the schema:
     db[schemaName][table.name] = table;
+    db.tables.push(table);
   } else { 
     //it's public - just pin table to the root to namespace
     db[table.name] = table;
