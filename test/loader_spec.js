@@ -19,8 +19,8 @@ describe('On spin up', function () {
   it('loads tables in db schema as properties of namespace', function() { 
     assert(db.myschema.artists && db.myschema.albums, 'No tables loaded on schema')
   });
-  it('loads up 5 tables with 2 in schema object in array property', function () {
-    assert.equal(db.tables.length, 5);
+  it('loads up 6 tables with 2 in schema object in array property', function () {
+    assert.equal(db.tables.length, 6);
   });
 
   // including one nested in a deeper folder... total of 4 now.
@@ -53,8 +53,8 @@ describe('Synchronous Load', function () {
   it('loads tables in syncLoaded schema as properties of namespace', function() { 
     assert(syncLoaded.myschema.artists && syncLoaded.myschema.albums, 'No tables loaded on schema')
   });
-  it('loads up 5 tables with 2 in schema object in array property', function () {
-    assert.equal(syncLoaded.tables.length, 5);
+  it('loads up 6 tables with 2 in schema object in array property', function () {
+    assert.equal(syncLoaded.tables.length, 6);
   });
 
   // including one nested in a deeper folder... total of 4 now.
