@@ -3,7 +3,8 @@ from
     information_schema.table_constraints tc
     join information_schema.key_column_usage kc 
         on kc.table_name = tc.table_name and
-           kc.constraint_name = tc.constraint_name
+           kc.constraint_schema = tc.table_schema and
+           kc.constraint_name = tc.constraint_name 
 where 
     tc.constraint_type = 'PRIMARY KEY'
 order by tc.table_schema,
