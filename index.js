@@ -19,11 +19,36 @@ var Massive = function(args){
   var runner = new Runner(args.connectionString);
   _.extend(this,runner);
 
+  this.allowedSchemas = '';
   this.tables = [];
   this.queryFiles = [];
   this.schemas = [];
   this.functions = [];
+
+  this.setAllowedSchemas(args.allowedSchemas);
 }
+
+Massive.prototype.setAllowedSchemas = function(allowedSchemas) { 
+  // an empty string will cause all schema to be loaded by default:
+  this.allowedSchemas = '';
+  if(allowedSchemas === 'all' || allowedSchemas === '*') {
+    // Do nothing else. Leave the default empty string:
+    allowedSchemas = null;
+  }
+  if(allowedSchemas) { 
+    // there is a value of some sort other than our acceptable defaults:
+    if(_.isString(allowedSchemas)) { 
+      // a string works. If comma-delimited, so much the better, we're done:
+      this.allowedSchemas = allowedSchemas;
+    } else { 
+      if(!_.isArray(allowedSchemas)) { 
+        throw("Specify allowed schemas using either a commma-delimited string or an array of strings");
+      }
+      // create a comma-delimited string:
+      this.allowedSchemas = allowedSchemas.join(", ");
+    }
+  }
+};
 
 Massive.prototype.run = function(){
   var args = ArgTypes.queryArgs(arguments);
@@ -38,7 +63,7 @@ Massive.prototype.loadQueries = function() {
 Massive.prototype.loadTables = function(next){
   var tableSql = __dirname + "/lib/scripts/tables.sql";
   var self = this;
-  this.executeSqlFile({file : tableSql}, function(err,tables){
+  this.executeSqlFile({file : tableSql, params: [this.allowedSchemas]}, function(err,tables){
     if(err){
       next(err,null);
     }else{

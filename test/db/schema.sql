@@ -53,6 +53,17 @@ drop schema if exists myschema;
 
 create schema myschema;
 
+-- Added for testing filtering on load:
+
+drop table if exists secrets.__secret_table cascade;
+drop table if exists secrets.__semi_secret_table cascade; 
+drop schema if exists secrets;
+
+create schema secrets;
+create table secrets.__secret_table (id serial primary key, secret_stuff text);
+create table secrets.__semi_secret_table (id serial primary key, semi_secret_stuff text);
+
+
 create table myschema.artists (
   id serial primary key,
   name text
@@ -108,5 +119,7 @@ $$
 select * from myschema.artists where name=find_name;
 $$
 language sql;
+
+
 
 

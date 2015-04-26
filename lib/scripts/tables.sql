@@ -7,6 +7,10 @@ from
            kc.constraint_name = tc.constraint_name 
 where 
     tc.constraint_type = 'PRIMARY KEY'
+    and 
+    ((case -- allow specific schemas (none assumes all):
+      when $1 ='' then 1=1 
+      else tc.table_schema = any(string_to_array(replace($1, ' ', ''), ',')) end))
 order by tc.table_schema,
          tc.table_name,
          kc.position_in_unique_constraint;
