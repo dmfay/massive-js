@@ -1,9 +1,9 @@
+#!/usr/bin/env node
+
 var repl = require("repl");
-var commander = require("commander");
 var massive = require("../index");
 var program = require('commander');
 var assert = require("assert");
-
 
 program
   .version('0.0.1')

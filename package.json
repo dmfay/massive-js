@@ -3,6 +3,9 @@
   "version": "2.0.3",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
   "main": "index.js",
+  "bin": {
+    "massive": "bin/massive.js"
+  },
   "directories": {
     "example": "example",
     "test": "test"
