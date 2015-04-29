@@ -323,7 +323,7 @@ Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire i
 
 ```
 # connect to local server, database my_database 
-bin massive -d my_database
+./bin/massive.js -d my_database
 db >
 ```
 
