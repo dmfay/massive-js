@@ -1,15 +1,18 @@
 var assert = require("assert");
 var helpers = require("./helpers");
 var massive = require("../index");
-// var db;
 
-var syncLoaded;
 var constr = "postgres://rob:password@localhost/massive";
 var path = require("path");
 var scriptsDir = path.join(__dirname, ".", "db");
 
+// JA NOTE: These tests run a little slower then most because we are connecting and 
+// re-loading the db with each test. 
+
+// JA NOTE: These tests can probably be improved - they seem fragile, and may not test
+// enough cases. 
+
 describe('On Load with Schema Filters', function () {
-  
   before(function(done){
     helpers.resetDb(function(err,res){
       // db = res;
@@ -36,7 +39,7 @@ describe('On Load with Schema Filters', function () {
   });
   it('loads only tables from public schema when passed "public" name as schema argument', function (done) { 
     // TODO - other schema may still be present until function filters are in place...
-    // Can;t just test for non-presence of other schema on db - gotta test for non-presence of tables
+    // Can't just test for non-presence of other schema on db - gotta test for non-presence of tables
     // from other schema. This will be cleaned up shortly. 
     massive.connect({connectionString: constr, schema: 'public'}, function (err, db) { 
       assert(!db.myschema.artists && db.products && db.tables.length == 3);
@@ -117,7 +120,7 @@ describe('On Load with Table whitelist', function () {
       done();
     });
   });
-  it('includes ONLY tables with name matching whitelist pattern as a string argument', function (done) { 
+  it('includes ONLY tables with name matching whitelisted table names as a string argument', function (done) { 
     massive.connect({connectionString: constr, whitelist: "products"}, function (err, db) { 
       assert(db.products && db.tables.length == 1);
       done();
