@@ -198,10 +198,11 @@ var walkSqlFiles = function(rootObject, rootDir){
   _.each(dirs, function(item){
 
     //parsing with path is a friendly way to get info about this dir or file
-    var parsed = path.parse(item);
+    var ext = path.extname(item);
+    var name = path.basename(item, ext);
 
     //is this a SQL file?
-    if(parsed.ext === ".sql"){
+    if(ext === ".sql"){
 
       //why yes it is! Build the abspath so we can read the file
       var filePath = path.join(rootDir,item);
@@ -211,7 +212,7 @@ var walkSqlFiles = function(rootObject, rootDir){
       var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
 
       //set a property on our root object, and grab a handy variable reference:
-      var newProperty = assignScriptAsFunction(rootObject, parsed.name);
+      var newProperty = assignScriptAsFunction(rootObject, name);
 
       //I don't know what I'm doing, but it works
       newProperty.sql = sql;
@@ -219,20 +220,20 @@ var walkSqlFiles = function(rootObject, rootDir){
       newProperty.filePath = filePath;
       self.queryFiles.push(newProperty);
 
-    }else if(parsed.ext !== ''){
+    }else if(ext !== ''){
       //ignore it
     }else{
 
       //this is a directory so shift things and move on down
       //set a property on our root object, then use *that*
       //as the root in the next call
-      rootObject[parsed.name] = {};
+      rootObject[name] = {};
 
       //set the path to walk so we have a correct root directory
       var pathToWalk = path.join(rootDir,item);
 
       //recursive call - do it all again
-      walkSqlFiles(rootObject[parsed.name],pathToWalk);
+      walkSqlFiles(rootObject[name],pathToWalk);
     }
   });
 }
