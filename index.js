@@ -257,10 +257,10 @@ Massive.prototype.loadFunctions = function(next){
         if(schema !== "public"){
           self[schema] || (self[schema] =  {});
           newFn = assignScriptAsFunction(self[schema], fn.name);
-          sql = util.format("select * from %s.%s", schema, fn.name);
+          sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
           self[schema][fn.name] = newFn;
         }else{
-          sql = "select * from " + fn.name;
+          sql = util.format("select * from \"%s\"", fn.name);
           newFn= assignScriptAsFunction(self, fn.name);
           self[fn.name] = newFn;
         }
