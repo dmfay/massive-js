@@ -55,4 +55,19 @@ describe('Functions', function () {
     });
   }); 
 
+  describe("Functions with Cased Names", function() { 
+    it("executes camel-cased function AllMyProducts and returns the results", function (done)  {
+      db.AllMyProducts(function(err,res) {
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+    it("executes schema-bound, camel-cased function AllMyAlbums and returns the results", function (done) {
+      db.myschema.AllMyAlbums(function(err,res) {
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+  }); 
+
 });

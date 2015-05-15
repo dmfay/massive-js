@@ -120,6 +120,23 @@ select * from myschema.artists where name=find_name;
 $$
 language sql;
 
+-- Create some camel-cased functions to test name escapes:
+create or replace function "AllMyProducts"()
+returns setof products
+as
+$$
+select * from products;
+$$
+language sql;
+
+create or replace function myschema."AllMyAlbums"()
+returns setof myschema.albums
+as
+$$
+select * from myschema.albums;
+$$
+language sql;
+
 
 
 

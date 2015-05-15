@@ -28,7 +28,7 @@ describe('On spin up', function () {
     assert.equal(db.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(db.functions.length,3)
+    assert.equal(db.functions.length,5)
   });
 });
 
@@ -62,6 +62,6 @@ describe('Synchronous Load', function () {
     assert.equal(syncLoaded.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(syncLoaded.functions.length,3)
+    assert.equal(syncLoaded.functions.length,5)
   });
 });
