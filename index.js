@@ -13,7 +13,6 @@ var deasync = require('deasync');
 var self;
 
 var Massive = function(args){
-
   this.scriptsDir = args.scripts || process.cwd() + "/db";
   
   var runner = new Runner(args.connectionString);
@@ -31,6 +30,10 @@ var Massive = function(args){
     this.blacklist = this.getTableFilter(args.blacklist);
     this.exceptions = this.getTableFilter(args.exceptions);
   }
+  // any "truthy" value passed will cause functions to be excluded. No param
+  // will be a "falsy" value, and functions will be included...
+  this.excludeFunctions = args.excludeFunctions;
+  this.functionBlacklist = this.getTableFilter(args.functionBlacklist)
 }
 
 Massive.prototype.getSchemaFilter = function(allowedSchemas) { 
@@ -239,40 +242,46 @@ var walkSqlFiles = function(rootObject, rootDir){
 }
 
 Massive.prototype.loadFunctions = function(next){
-  var functionSql = __dirname + "/lib/scripts/functions.sql";
-  this.executeSqlFile({file : functionSql}, function(err,functions){
-    if(err){
-      next(err,null);
-    }else{
-      _.each(functions, function(fn){
-        var schema = fn.schema;
-        var sql;
-        var params = [];
+  if(!this.excludeFunctions)
+  {
+    var functionSql = __dirname + "/lib/scripts/functions.sql";
+    var parameters = [this.functionBlacklist];
+    this.executeSqlFile({file : functionSql, params : parameters}, function(err,functions){
+      if(err){
+        next(err,null);
+      }else{
+        _.each(functions, function(fn){
+          var schema = fn.schema;
+          var sql;
+          var params = [];
 
-        for(var i = 1;i<=fn.param_count;i++){
-          params.push("$" + i);
-        }
+          for(var i = 1;i<=fn.param_count;i++){
+            params.push("$" + i);
+          }
 
-        var newFn, pushOnTo
-        if(schema !== "public"){
-          self[schema] || (self[schema] =  {});
-          newFn = assignScriptAsFunction(self[schema], fn.name);
-          sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
-          self[schema][fn.name] = newFn;
-        }else{
-          sql = util.format("select * from \"%s\"", fn.name);
-          newFn= assignScriptAsFunction(self, fn.name);
-          self[fn.name] = newFn;
-        }
+          var newFn, pushOnTo
+          if(schema !== "public"){
+            self[schema] || (self[schema] =  {});
+            newFn = assignScriptAsFunction(self[schema], fn.name);
+            sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
+            self[schema][fn.name] = newFn;
+          }else{
+            sql = util.format("select * from \"%s\"", fn.name);
+            newFn= assignScriptAsFunction(self, fn.name);
+            self[fn.name] = newFn;
+          }
 
-        sql+="(" + params.join(",") + ")";
-        newFn.sql = sql;
-        newFn.db = self;
-        self.functions.push(newFn);
-      });
-      next(null,self);
-    }
-  });
+          sql+="(" + params.join(",") + ")";
+          newFn.sql = sql;
+          newFn.db = self;
+          self.functions.push(newFn);
+        });
+        next(null,self);
+      }
+    });
+  } else { 
+    next(null,self);
+  }
 };
 
 //it's less congested now...
@@ -305,7 +314,6 @@ exports.connect = function(args, next){
   if(args.db){
     args.connectionString = "postgres://localhost/"+args.db;
   }
-
   var massive = new  Massive(args);
 
   //load up the tables, queries, and commands
