@@ -22,9 +22,11 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
-    it('updates a product ', function (done) {
-      db.products.save({id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200}, function(err, res){
+    it('updates a product', function (done) {
+      var product = {id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200};
+      db.products.save(product, function(err, res){
         // Update returns an array - Iassume because more than one item can be updated...
+        assert.equal(product.id, 4);  // should not clobber the original object
         assert.equal(res[0].name, "Fender Stratocaster");
         done();
       });
