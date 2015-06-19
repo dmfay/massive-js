@@ -21,13 +21,13 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
   });  
   it('loads all schema tables when no schema argument is passed', function (done) { 
     massive.connect({connectionString: constr}, function (err, db) { 
-      assert(db && db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 8);
+      assert(db && db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 9);
       done();
     });
   });
   it('loads all schema tables when passed "all" as schema argument', function (done) { 
     massive.connect({connectionString: constr, schema: 'all'}, function (err, db) { 
-      assert(db && db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 8);
+      assert(db && db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 9);
       done();
     });
   });
@@ -42,7 +42,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
     // Can't just test for non-presence of other schema on db - gotta test for non-presence of tables
     // from other schema. This will be cleaned up shortly. 
     massive.connect({connectionString: constr, schema: 'public'}, function (err, db) { 
-      assert(!db.myschema.artists && db.products && db.tables.length == 3);
+      assert(!db.myschema.artists && db.products && db.tables.length == 4);
       done();
     });
   });
@@ -65,31 +65,31 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
 describe('On Load with Table blacklist (these tests may run slow - loads db each test!!)', function () {
   it('loads all tables when no blacklist argument is provided', function (done) { 
     massive.connect({connectionString: constr}, function (err, db) { 
-      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 8);
+      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 9);
       done();
     });
   });
   it('excludes tables with name matching blacklist pattern as a string argument', function (done) { 
     massive.connect({connectionString: constr, blacklist: "prod%"}, function (err, db) { 
-      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 7);
+      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 8);
       done();
     });
   });
   it('excludes tables with name and schema matching blacklist pattern as a string argument', function (done) { 
     massive.connect({connectionString: constr, blacklist: "secrets.__semi%"}, function (err, db) { 
-      assert(db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 7);
+      assert(db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 8);
       done();
     });
   });
   it('excludes tables with name and schema matching multiiple blacklist patterns as a comma-delimited string argument', function (done) { 
     massive.connect({connectionString: constr, blacklist: "secrets.__semi%, prod%"}, function (err, db) { 
-      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 6);
+      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 7);
       done();
     });
   });
   it('excludes tables with name and schema matching multiiple blacklist patterns as a string array argument', function (done) { 
     massive.connect({connectionString: constr, blacklist: ['secrets.__semi%', 'prod%']}, function (err, db) { 
-      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 6);
+      assert(!db.products && db.myschema.artists && db.secrets.__secret_table && !db.secrets.__semi_secret_table && db.tables.length == 7);
       done();
     });
   });
@@ -101,7 +101,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
   });
   it('allows exceptions to blacklist filter', function (done) { 
     massive.connect({connectionString: constr, blacklist: 'myschema.a%', exceptions: 'myschema.artists'}, function (err, db) { 
-      assert(db.products && db.myschema.artists && db.tables.length == 7);
+      assert(db.products && db.myschema.artists && db.tables.length == 8);
       done();
     });
   });
@@ -116,7 +116,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
 describe('On Load with Table whitelist (these tests may run slow - loads db each test!!)', function () {
   it('loads all tables when no whitelist argument is provided', function (done) { 
     massive.connect({connectionString: constr}, function (err, db) { 
-      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 8);
+      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 9);
       done();
     });
   });
@@ -150,7 +150,7 @@ describe('On Load with Table whitelist (these tests may run slow - loads db each
 describe('On load with Function Exclusion (these tests may run slow - loads db each test!!)', function () {
   it('excludes functions at load whenever it is told...', function (done) { 
     massive.connect({connectionString: constr, excludeFunctions: true}, function (err, db) { 
-      assert(db.functions.length == 0);
+      assert(db.functions.length === 0);
       done();
     });
   });

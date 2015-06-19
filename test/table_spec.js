@@ -59,8 +59,48 @@ describe('Tables -Add/Edit/Delete', function () {
       db.Users.destroy({Id : 2}, function(err, deleted){
         var remaining = db.Users.find(2, function(err, found) { 
           //Deleted returns an array...
-          assert(found == undefined && deleted[0].Id == 2);
+          assert(found === undefined && deleted[0].Id == 2);
           done();
+        });
+      });
+    });
+  });
+
+  describe('Add/Update/Delete records with UUID keys:', function() {
+    it('adds an order', function (done) {
+      db.orders.save({product_id: 1, user_id: 1, notes: 'hi'}, function(err, res) {
+        assert.ok(res.id !== null);
+        assert.equal(res.product_id, 1);
+        assert.equal(res.user_id, 1);
+        assert.equal(res.notes, 'hi');
+        done();
+      });
+    });
+
+    it('updates an order', function (done) {
+      db.orders.findOne({}, function(err, found) { 
+        if (err) { throw err; }
+        
+        found.notes = 'hello';
+
+        db.orders.save(found, function(err, res) {
+          assert.equal(res.length, 1);
+          assert.equal(res[0].notes, 'hello');
+          done();
+        });
+      });
+    });
+
+    it('deletes an order', function (done) {
+      db.orders.findOne({}, function(err, found) { 
+        if (err) { throw err; }
+
+        db.orders.destroy({id : found.id}, function(err, deleted) {
+          db.orders.findOne({id : found.id}, function(err, remaining) { 
+            assert.equal(deleted[0].id, found.id);
+            assert.ok(remaining === undefined);
+            done();
+          });
         });
       });
     });

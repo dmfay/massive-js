@@ -19,8 +19,8 @@ describe('On spin up', function () {
   it('loads tables in db schema as properties of namespace', function() { 
     assert(db.myschema.artists && db.myschema.albums, 'No tables loaded on schema')
   });
-  it('loads up 6 tables with 2 in schema object in array property', function () {
-    assert.equal(db.tables.length, 8);
+  it('loads up 7 tables with 2 in schema object in array property', function () {
+    assert.equal(db.tables.length, 9);
   });
 
   // including one nested in a deeper folder... total of 4 now.
@@ -28,7 +28,7 @@ describe('On spin up', function () {
     assert.equal(db.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(db.functions.length,5)
+    assert.equal(db.functions.length, 20);
   });
 });
 
@@ -53,8 +53,8 @@ describe('Synchronous Load', function () {
   it('loads tables in syncLoaded schema as properties of namespace', function() { 
     assert(syncLoaded.myschema.artists && syncLoaded.myschema.albums, 'No tables loaded on schema')
   });
-  it('loads up 6 tables with 2 in schema object in array property', function () {
-    assert.equal(syncLoaded.tables.length, 8);
+  it('loads up 7 tables with 2 in schema object in array property', function () {
+    assert.equal(syncLoaded.tables.length, 9);
   });
 
   // including one nested in a deeper folder... total of 4 now.
@@ -62,6 +62,6 @@ describe('Synchronous Load', function () {
     assert.equal(syncLoaded.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(syncLoaded.functions.length,5)
+    assert.equal(syncLoaded.functions.length, 20);
   });
 });
