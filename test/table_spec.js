@@ -294,4 +294,33 @@ describe('Tables', function () {
       });
     });
   });
+
+  describe('insert', function () {
+    it('inserts a product', function (done) {
+      db.products.insert({name: "A Product"}, function (err, res) {
+        assert.equal(res.name, "A Product");
+
+        done();
+      });
+    });
+
+    it('inserts multiple products', function (done) {
+      db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (err, res, res2) {
+        assert.equal(res.length, 2);
+        assert.equal(res[0].name, "A Product");
+        assert.equal(res[1].name, "Another Product");
+
+        done();
+      });
+    });
+
+    it('inserts array fields', function (done) {
+      db.products.insert({name: "A Product", tags: ['one', 'two']}, function (err, res) {
+        assert.equal(res.name, "A Product");
+        assert.deepEqual(res.tags, ['one', 'two']);
+
+        done();
+      });
+    });
+  });
 });
