@@ -19,7 +19,8 @@ create table products(
   price decimal(10,2) default 0.00 not null,
   description text,
   in_stock boolean,
-  created_at timestamptz default now() not null
+  created_at timestamptz default now() not null,
+  tags character varying(255)[]
 );
 
 create table docs(
