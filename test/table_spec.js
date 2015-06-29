@@ -219,6 +219,27 @@ describe('Tables', function () {
         done();
       });
     });
+    it('returns products by finding a null field', function (done) {
+      db.products.find({"tags": null}, function(err,res){
+        assert.equal(res.length, 3);
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+    it('returns products by finding a non-null field', function (done) {
+      db.products.find({"id != ": null}, function(err,res){
+        assert.equal(res.length, 3);
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+    it('returns products with a compound query including a null field', function (done) {
+      db.products.find({"id": 1, "tags": null, price: 12.00}, function(err,res){
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
   });
   describe('Limiting and Offsetting results', function () {
     it('returns 1 result with limit of 1', function (done) {
