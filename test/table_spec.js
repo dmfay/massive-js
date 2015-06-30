@@ -40,6 +40,15 @@ describe('Tables -Add/Edit/Delete', function () {
         });
       });
     });
+    it('deletes all products', function (done) {
+      db.products.destroy({}, function(err, deleted){
+        var remaining = db.products.find({}, function(err, found) { 
+          assert.equal(deleted.length, 3);
+          assert.equal(found.length, 0);
+          done();
+        });
+      });
+    });
   });
 
   describe('Add/Update/Delete records with nonstandard casing:', function() {
