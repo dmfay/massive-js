@@ -31,11 +31,41 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+    it('updates multiple products', function (done) {
+      db.products.update({in_stock: true}, {in_stock: false}, function(err, res) {
+        assert.equal(res.length, 2);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].in_stock, false);
+        assert.equal(res[1].id, 2);
+        assert.equal(res[1].in_stock, false);
+        done();
+      });
+    });
+    it('updates multiple products with an IN list', function (done) {
+      db.products.update({id: [1, 2]}, {price: 123.45}, function(err, res) {
+        assert.equal(res.length, 2);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].price, 123.45);
+        assert.equal(res[1].id, 2);
+        assert.equal(res[1].price, 123.45);
+        done();
+      });
+    });
+    it('updates multiple products with a NOT IN list', function (done) {
+      db.products.update({'id !=': [1, 2]}, {price: 543.21}, function(err, res) {
+        assert.equal(res.length, 2);
+        assert.equal(res[0].id, 3);
+        assert.equal(res[0].price, 543.21);
+        assert.equal(res[1].id, 4);
+        assert.equal(res[1].price, 543.21);
+        done();
+      });
+    });
     it('deletes a product ', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
         var remaining = db.products.find(4, function(err, found) { 
           //Deleted returns an array...
-          assert(found == undefined && deleted[0].id == 4);
+          assert(found === undefined && deleted[0].id === 4);
           done();
         });
       });
