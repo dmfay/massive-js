@@ -41,6 +41,16 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+    it('updates all products', function (done) {
+      db.products.update({}, {price: 1.23}, function(err, res) {
+        assert.equal(res.length, 4);
+        assert.equal(res[0].price, 1.23);
+        assert.equal(res[1].price, 1.23);
+        assert.equal(res[2].price, 1.23);
+        assert.equal(res[3].price, 1.23);
+        done();
+      });
+    });
     it('updates multiple products with an IN list', function (done) {
       db.products.update({id: [1, 2]}, {price: 123.45}, function(err, res) {
         assert.equal(res.length, 2);
