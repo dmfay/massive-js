@@ -407,6 +407,29 @@ describe('Tables', function () {
     });
   });
 
+  describe('Streaming Results', function () {
+    it('returns a readable stream', function (done) {
+      db.products.find({}, {stream: true}, function(err, stream) {
+        assert.ok(err === null);
+
+        var result = [];
+
+        stream.on('readable', function() {
+          var res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.equal(3, result.length);
+          done();
+        });
+      });
+    });
+  });
+
   describe('insert', function () {
     it('inserts a product', function (done) {
       db.products.insert({name: "A Product"}, function (err, res) {
