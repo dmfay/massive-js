@@ -231,14 +231,34 @@ describe('Tables', function () {
   });
   describe('Simple queries with count', function () {
     it('returns 2 for OR id 1 or 2', function (done) {
-      db.products.count("id=$1 OR id=$2", [1,2],function(err,res){
+      db.products.count("id=$1 OR id=$2", [1,2], function(err,res){
         assert.equal(res,2);
         done();
       });
     });
     it('returns 1 for id 1', function (done) {
-      db.products.count("id=$1", [1],function(err,res){
+      db.products.count("id=$1", [1], function(err,res){
         assert.equal(res, 1);
+        done();
+      });
+    });
+  });
+  describe('More abstracted queries using findArgs in count', function () {
+    it('returns 2 for OR id 1 or 2', function (done) {
+      db.products.count({id: [1, 2]}, function(err,res){
+        assert.equal(res,2);
+        done();
+      });
+    });
+    it('returns 1 for id 1', function (done) {
+      db.products.count({id: 1}, function(err,res){
+        assert.equal(res, 1);
+        done();
+      });
+    });
+    it('returns 3 for everything', function (done) {
+      db.products.count({}, function(err,res){
+        assert.equal(res, 3);
         done();
       });
     });
