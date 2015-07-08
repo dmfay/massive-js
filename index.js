@@ -8,13 +8,13 @@ var Document = require("./lib/document");
 var ArgTypes = require("./lib/arg_types");
 var Args = require("args-js");
 var path = require("path");
-var deasync = require('deasync');
+var DA = require('deasync');
 
 var self;
 
 var Massive = function(args){
   this.scriptsDir = args.scripts || process.cwd() + "/db";
-  
+
   var runner = new Runner(args.connectionString);
   _.extend(this,runner);
 
@@ -36,20 +36,20 @@ var Massive = function(args){
   this.functionBlacklist = this.getTableFilter(args.functionBlacklist)
 }
 
-Massive.prototype.getSchemaFilter = function(allowedSchemas) { 
+Massive.prototype.getSchemaFilter = function(allowedSchemas) {
   // an empty string will cause all schema to be loaded by default:
   var result = '';
   if(allowedSchemas === 'all' || allowedSchemas === '*') {
     // Do nothing else. Leave the default empty string:
     allowedSchemas = null;
   }
-  if(allowedSchemas) { 
+  if(allowedSchemas) {
     // there is a value of some sort other than our acceptable defaults:
-    if(_.isString(allowedSchemas)) { 
+    if(_.isString(allowedSchemas)) {
       // a string works. If comma-delimited, so much the better, we're done:
       result = allowedSchemas;
-    } else { 
-      if(!_.isArray(allowedSchemas)) { 
+    } else {
+      if(!_.isArray(allowedSchemas)) {
         throw("Specify allowed schemas using either a commma-delimited string or an array of strings");
       }
       // create a comma-delimited string:
@@ -59,16 +59,16 @@ Massive.prototype.getSchemaFilter = function(allowedSchemas) {
   return result;
 };
 
-Massive.prototype.getTableFilter = function(filter) { 
+Massive.prototype.getTableFilter = function(filter) {
   // an empty string will cause all schema to be loaded by default:
   var result = '';
-  if(filter) { 
+  if(filter) {
     // there is a value of some sort other than our acceptable defaults:
-    if(_.isString(filter)) { 
+    if(_.isString(filter)) {
       // a string works. If comma-delimited, so much the better, we're done:
       result = filter;
-    } else { 
-      if(!_.isArray(filter)) { 
+    } else {
+      if(!_.isArray(filter)) {
         throw("Specify filter patterns using either a commma-delimited string or an array of strings");
       }
       // create a comma-delimited string:
@@ -82,8 +82,9 @@ Massive.prototype.run = function(){
   var args = ArgTypes.queryArgs(arguments);
   this.query(args);
 }
+Massive.prototype.runSync = DA(Massive.prototype.run);
 
-Massive.prototype.loadQueries = function() { 
+Massive.prototype.loadQueries = function() {
   walkSqlFiles(this,this.scriptsDir);
 };
 
@@ -94,10 +95,10 @@ Massive.prototype.loadTables = function(next){
   var self = this;
 
   // ONLY allow whitelisted items:
-  if(this.whitelist) { 
+  if(this.whitelist) {
     tableSql = __dirname + "/lib/scripts/whitelist.sql";
     var parameters = [this.whitelist]
-  } 
+  }
   this.executeSqlFile({file : tableSql, params: parameters}, function(err,tables){
     if(err){
       next(err,null);
@@ -132,13 +133,13 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     schemaName = splits[0];
     tableName = splits[1];
     potentialTable = self[schemaName][tableName];
-  } else { 
+  } else {
     potentialTable = self[tableName];
   }
 
-  if(potentialTable) { 
+  if(potentialTable) {
     potentialTable.saveDoc(doc, next);
-  } else { 
+  } else {
     var _table = new Table({
     schema : schemaName,
      pk : "id",
@@ -154,29 +155,30 @@ Massive.prototype.saveDoc = function(collection, doc, next){
       } else {
         MapTableToNamespace(_table);
         // recurse
-        self.saveDoc(collection,doc,next);       
+        self.saveDoc(collection,doc,next);
       }
     });
   }
 };
+Massive.prototype.saveDocSync = DA(Massive.prototype.saveDoc);
 
-var MapTableToNamespace = function(table) { 
+var MapTableToNamespace = function(table) {
   var db = table.db;
-  if(table.schema !== "public") { 
+  if(table.schema !== "public") {
     schemaName = table.schema;
     // is this schema already attached?
-    if(!db[schemaName]) { 
+    if(!db[schemaName]) {
       // if not, then bolt it on:
       db[schemaName] = {};
     }
     // attach the table to the schema:
     db[schemaName][table.name] = table;
     db.tables.push(table);
-  } else { 
+  } else {
     //it's public - just pin table to the root to namespace
     db[table.name] = table;
     db.tables.push(table);
-  }  
+  }
 }
 
 Massive.prototype.documentTableSql = function(tableName){
@@ -196,7 +198,7 @@ var walkSqlFiles = function(rootObject, rootDir){
   } catch (ex) {
      return;
   }
-  
+
   //loop the directories found
   _.each(dirs, function(item){
 
@@ -279,14 +281,14 @@ Massive.prototype.loadFunctions = function(next){
         next(null,self);
       }
     });
-  } else { 
+  } else {
     next(null,self);
   }
 };
 
 //it's less congested now...
-var assignScriptAsFunction = function (rootObject, propertyName) { 
-   rootObject[propertyName] = function(args, next) { 
+var assignScriptAsFunction = function (rootObject, propertyName) {
+   rootObject[propertyName] = function(args, next) {
     args || (args = {});
     //if args is a function, it's our callback
     if(_.isFunction(args)){
@@ -294,14 +296,14 @@ var assignScriptAsFunction = function (rootObject, propertyName) {
       //set args to an empty array
       args = [];
     }
-    //JA - use closure to assign stuff from properties before they are invented 
+    //JA - use closure to assign stuff from properties before they are invented
     //(sorta, I think...):
     var sql = rootObject[propertyName].sql;
     var db = rootObject[propertyName].db;
     var params = _.isArray(args) ? args : [args];
 
     //execute the query on invocation
-    db.query(sql,params,{}, next);  
+    db.query(sql,params,{}, next);
   }
   return rootObject[propertyName];
 }
@@ -309,7 +311,7 @@ var assignScriptAsFunction = function (rootObject, propertyName) {
 //connects Massive to the DB
 exports.connect = function(args, next){
   assert((args.connectionString || args.db), "Need a connectionString or db (name of database on localhost) at the very least.");
-  
+
   //override if there's a db name passed in
   if(args.db){
     args.connectionString = "postgres://localhost/"+args.db;
@@ -328,14 +330,5 @@ exports.connect = function(args, next){
   });
 };
 
-exports.loadSync = function(args) { 
-  var done = false;
-  this.connect(args, function (err, res) { 
-    result = res;
-    done = true;
-  });
-  while(!done) { 
-    deasync.runLoopOnce();
-  }
-  return result;
-}
+exports.loadSync = DA(this.connect);
+exports.connectSync = DA(this.connect);
