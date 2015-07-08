@@ -265,6 +265,24 @@ db.users.save({email : "new@example.com"}, function(err,inserted){
 });
 ```
 
+## Streams
+
+To improve performance over large result sets, you might want to consider using a stream. This has the upside of returning reads right away, but the downside of leaving a connection open until you close it. To use a stream, just send in `{stream: true}` in the options:
+
+```js
+db.users.find({company_id : 12}, {stream:true}, function(err,stream){
+
+  stream.on('readable', function(){
+    var user = stream.read();
+    //do your thing
+  });
+
+  stream.on('end', function(){
+    //deal with results here
+  });
+});
+```
+
 ## Database Schema
 
 Massive understands the notion of database schemas and treats any Postgres schema other than `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. To steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
