@@ -1,6 +1,6 @@
 {
   "name": "massive",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
   "main": "index.js",
   "bin": {
@@ -21,7 +21,8 @@
   "author": "Rob Conery <robconery@gmail.com>",
   "contributors": [
     "Karl Seguin <karl@openmymind.net>",
-    "John Atten <xivsolutions@gmail.com>"
+    "John Atten <xivsolutions@gmail.com>",
+    "Dian Fay <dmfay@gmail.com>"
   ],
   "license": "BSD",
   "dependencies": {
