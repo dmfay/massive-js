@@ -43,7 +43,7 @@ var connectionString = "postgres://massive:password@localhost/chinook";
 // connect to Massive and get the db instance. You can safely use the
 // convenience sync method here because its on app load
 // you can also use loadSync - it's an alias
-massive.connectSync({connectionString : connectionString}) {
+var massiveInstance = massive.connectSync({connectionString : connectionString}) 
 
 // Set a reference to the massive instance on Express' app:
 app.set('db', massiveInstance);
