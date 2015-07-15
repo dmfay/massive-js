@@ -179,7 +179,7 @@ var MapTableToNamespace = function(table) {
     db[table.name] = table;
     db.tables.push(table);
   }
-}
+};
 
 Massive.prototype.documentTableSql = function(tableName){
   var docSqlFile = __dirname + "/lib/scripts/create_document_table.sql";
@@ -241,7 +241,7 @@ var walkSqlFiles = function(rootObject, rootDir){
       walkSqlFiles(rootObject[name],pathToWalk);
     }
   });
-}
+};
 
 Massive.prototype.loadFunctions = function(next){
   if(!this.excludeFunctions)
@@ -288,25 +288,42 @@ Massive.prototype.loadFunctions = function(next){
 
 //it's less congested now...
 var assignScriptAsFunction = function (rootObject, propertyName) {
-   rootObject[propertyName] = function(args, next) {
-    args || (args = {});
-    //if args is a function, it's our callback
-    if(_.isFunction(args)){
-      next = args;
-      //set args to an empty array
-      args = [];
+  rootObject[propertyName] = function(params, opts, next) {
+    if (_.isFunction(params)) {       // invoked as db.function(callback)
+      next = params;
+      params = [];
+      opts = {};
+    } else if (_.isFunction(opts)) {  // invoked as db.function(something, callback)
+      next = opts;
+      
+      // figure out if we were given params or opts as the first argument
+      // lucky for us it's mutually exclusive: opts can only be an object, params can be a primitive or an array
+      if (_.isObject(params) && !_.isArray(params)) { // it's an options object, we have no params
+        opts = params;
+        params = [];
+      } else {                                        // it's a parameter primitive or array, we have no opts
+        opts = {};
+      }
     }
+
+    if (!_.isArray(params)) {
+      params = [params];
+    }
+
     //JA - use closure to assign stuff from properties before they are invented
     //(sorta, I think...):
     var sql = rootObject[propertyName].sql;
     var db = rootObject[propertyName].db;
-    var params = _.isArray(args) ? args : [args];
 
-    //execute the query on invocation
-    db.query(sql,params,{}, next);
-  }
+    if (opts.stream) {
+      db.stream(sql, params, null, next);
+    } else {
+      db.query(sql, params, null, next);
+    }
+  };
+
   return rootObject[propertyName];
-}
+};
 
 //connects Massive to the DB
 exports.connect = function(args, next){

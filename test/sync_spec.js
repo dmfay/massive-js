@@ -1,11 +1,12 @@
 var assert = require("assert");
+var helpers = require("./helpers");
 var Massive = require("../index");
 var _ = require("underscore")._;
 var db;
 
 describe("Synchronous goodies", function(){
   before(function(){
-    db = Massive.connectSync({db : "massive"});
+    db = Massive.connectSync({connectionString: helpers.connectionString});
   });
   it("loads", function(){
     assert(db);
