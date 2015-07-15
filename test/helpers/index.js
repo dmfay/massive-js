@@ -4,6 +4,7 @@ var assert = require("assert");
 var path = require("path");
 var scriptsDir = path.join(__dirname, "..", "db");
 
+exports.connectionString = connectionString;
 
 exports.init = function(next){
   massive.connect({
