@@ -170,17 +170,18 @@ describe('Tables', function () {
   describe("Executing inline SQL", function () {
     it('with run and no args returns 3 products', function (done) {
       db.run("select * from products", function(err,res){
-        assert.equal(3, res.length)
-        done()
+        assert.equal(3, res.length);
+        done();
       });
     });
     it('with run and id returns Product 1', function (done) {
       db.run("select * from products where id=$1",[1], function(err,res){
-        assert.equal(1, res[0].id)
-        done()
+        assert.equal(1, res[0].id);
+        done();
       });
     });
   });
+
   describe('Simple queries with args', function () {
     it('returns product 1 with 1 as only arg', function (done) {
       db.products.find(1, function(err,res){
@@ -195,6 +196,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Simple queries without args', function () {
     it('returns all records on find with no args', function (done) {
       db.products.find(function(err,res){
@@ -209,6 +211,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Simple queries with AND and OR', function () {
     it('returns Product 1 OR Product 2', function (done) {
       db.products.where("id=$1 OR id=$2", [1,2],function(err,res){
@@ -229,6 +232,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Simple queries with count', function () {
     it('returns 2 for OR id 1 or 2', function (done) {
       db.products.count("id=$1 OR id=$2", [1,2], function(err,res){
@@ -243,6 +247,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('More abstracted queries using findArgs in count', function () {
     it('returns 2 for OR id 1 or 2', function (done) {
       db.products.count({id: [1, 2]}, function(err,res){
@@ -263,6 +268,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Simple comparative queries', function () {
     it('returns product with id greater than 2', function (done) {
       db.products.find({"id > " : 2}, function(err,res){
@@ -310,6 +316,31 @@ describe('Tables', function () {
       });
     });
   });
+
+  describe('JSON queries', function () {
+    it('finds a product matching the desired specification in JSON', function (done) {
+      db.products.findOne({'specs->>weight': 30}, function(err, product) {
+        assert.equal(product.id, 3);
+        assert.equal(product.specs.weight, 30);
+        done();
+      });
+    });
+    it('finds a product matching the desired specification path in JSON', function (done) {
+      db.products.findOne({'specs#>>{dimensions,length}': 15}, function(err, product) {
+        assert.equal(product.id, 2);
+        assert.equal(product.specs.dimensions.length, 15);
+        done();
+      });
+    });
+    it('mixes JSON and non-JSON predicates', function (done) {
+      db.products.findOne({price: 35.00, 'specs->>weight': 30}, function(err, product) {
+        assert.equal(product.id, 3);
+        assert.equal(product.specs.weight, 30);
+        done();
+      });
+    });
+  });
+
   describe('Limiting and Offsetting results', function () {
     it('returns 1 result with limit of 1', function (done) {
       db.products.find(null,{limit : 1}, function(err,res){
@@ -350,6 +381,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Casing issues', function () {
     it('returns users because we delimit OK', function (done) {
       db.Users.find({}, function(err, res){
@@ -406,6 +438,7 @@ describe('Tables', function () {
       });
     });
   });
+
   describe('Full Text search', function () {
     it('returns 3 products for term "product"', function (done) {
       db.products.search({columns : ["name"], term: "Product"},function(err,res){
