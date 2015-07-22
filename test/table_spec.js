@@ -25,9 +25,9 @@ describe('Tables -Add/Edit/Delete', function () {
     it('updates a product', function (done) {
       var product = {id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200, tags: ['1', '2']};
       db.products.save(product, function(err, res){
-        // Update returns an array - Iassume because more than one item can be updated...
         assert.equal(product.id, 4);  // should not clobber the original object
-        assert.equal(res[0].name, "Fender Stratocaster");
+        assert.equal(res.id, 4);
+        assert.equal(res.name, "Fender Stratocaster");
         done();
       });
     });
@@ -101,8 +101,8 @@ describe('Tables -Add/Edit/Delete', function () {
     });
     it('updates a User ', function (done) {
       db.Users.save({Id : 2, Email : "bar@foo.com"}, function(err, res){
-        // Update returns an array
-        assert.equal(res[0].Email, "bar@foo.com");
+        assert.equal(res.Id, 2);
+        assert.equal(res.Email, "bar@foo.com");
         done();
       });
     });
@@ -135,8 +135,8 @@ describe('Tables -Add/Edit/Delete', function () {
         found.notes = 'hello';
 
         db.orders.save(found, function(err, res) {
-          assert.equal(res.length, 1);
-          assert.equal(res[0].notes, 'hello');
+          assert.equal(res.id, found.id);
+          assert.equal(res.notes, 'hello');
           done();
         });
       });
