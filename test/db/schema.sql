@@ -19,6 +19,7 @@ create table products(
   price decimal(10,2) default 0.00 not null,
   description text,
   in_stock boolean,
+  specs jsonb,
   created_at timestamptz default now() not null,
   tags character varying(255)[]
 );
@@ -40,16 +41,16 @@ create table orders(
 insert into "Users"("Email", "Name")
 values('test@test.com', 'A test user');
 
-insert into products(name, price, description, in_stock)
-values ('Product 1', 12.00, 'Product 1 description', true),
-('Product 2', 24.00, 'Product 2 description', true),
-('Product 3', 35.00, 'Product 3 description', false);
+insert into products(name, price, description, specs, in_stock)
+values ('Product 1', 12.00, 'Product 1 description', null, true),
+('Product 2', 24.00, 'Product 2 description', '{"weight": 20, "dimensions": {"length": 15, "width": 12}}', true),
+('Product 3', 35.00, 'Product 3 description', '{"weight": 30, "sizes": [10, 15, 20]}', false),
+('Product 4', 40.00, 'Product 4 description', '["why", "not", "have", "an", "array"]', false);
 
 insert into docs(body) 
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
-
 
 
 -- schema stuff:
