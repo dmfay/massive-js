@@ -18,7 +18,7 @@ describe('Tables -Add/Edit/Delete', function () {
   describe('Add/Update/Delete records:', function() {
     it('adds a product ', function (done) {
       db.products.save({name : "Gibson Les Paul", description : "Lester's brain child", price : 3500}, function(err, res){
-        assert.equal(res.id, 4);
+        assert.equal(res.id, 5);
         done();
       });
     });
@@ -43,11 +43,12 @@ describe('Tables -Add/Edit/Delete', function () {
     });
     it('updates all products', function (done) {
       db.products.update({}, {price: 1.23}, function(err, res) {
-        assert.equal(res.length, 4);
+        assert.equal(res.length, 5);
         assert.equal(res[0].price, 1.23);
         assert.equal(res[1].price, 1.23);
         assert.equal(res[2].price, 1.23);
         assert.equal(res[3].price, 1.23);
+        assert.equal(res[4].price, 1.23);
         done();
       });
     });
@@ -63,11 +64,13 @@ describe('Tables -Add/Edit/Delete', function () {
     });
     it('updates multiple products with a NOT IN list', function (done) {
       db.products.update({'id !=': [1, 2]}, {price: 543.21}, function(err, res) {
-        assert.equal(res.length, 2);
+        assert.equal(res.length, 3);
         assert.equal(res[0].id, 3);
         assert.equal(res[0].price, 543.21);
-        assert.equal(res[1].id, 4);
+        assert.equal(res[1].id, 5);
         assert.equal(res[1].price, 543.21);
+        assert.equal(res[2].id, 4);
+        assert.equal(res[2].price, 543.21);
         done();
       });
     });
@@ -83,7 +86,7 @@ describe('Tables -Add/Edit/Delete', function () {
     it('deletes all products', function (done) {
       db.products.destroy({}, function(err, deleted){
         var remaining = db.products.find({}, function(err, found) { 
-          assert.equal(deleted.length, 3);
+          assert.equal(deleted.length, 4);
           assert.equal(found.length, 0);
           done();
         });
@@ -168,9 +171,9 @@ describe('Tables', function () {
   });
 
   describe("Executing inline SQL", function () {
-    it('with run and no args returns 3 products', function (done) {
+    it('with run and no args returns 4 products', function (done) {
       db.run("select * from products", function(err,res){
-        assert.equal(3, res.length);
+        assert.equal(4, res.length);
         done();
       });
     });
@@ -200,7 +203,7 @@ describe('Tables', function () {
   describe('Simple queries without args', function () {
     it('returns all records on find with no args', function (done) {
       db.products.find(function(err,res){
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         done();
       });
     });
@@ -261,9 +264,9 @@ describe('Tables', function () {
         done();
       });
     });
-    it('returns 3 for everything', function (done) {
+    it('returns 4 for everything', function (done) {
       db.products.count({}, function(err,res){
-        assert.equal(res, 3);
+        assert.equal(res, 4);
         done();
       });
     });
@@ -296,14 +299,14 @@ describe('Tables', function () {
     });
     it('returns products by finding a null field', function (done) {
       db.products.find({"tags": null}, function(err,res){
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         assert.equal(res[0].id, 1);
         done();
       });
     });
     it('returns products by finding a non-null field', function (done) {
       db.products.find({"id != ": null}, function(err,res){
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         assert.equal(res[0].id, 1);
         done();
       });
@@ -318,14 +321,21 @@ describe('Tables', function () {
   });
 
   describe('JSON queries', function () {
-    it('finds a product matching the desired specification in JSON', function (done) {
+    it('finds a product matching the desired spec field in JSON', function (done) {
       db.products.findOne({'specs->>weight': 30}, function(err, product) {
         assert.equal(product.id, 3);
         assert.equal(product.specs.weight, 30);
         done();
       });
     });
-    it('finds a product matching the desired specification path in JSON', function (done) {
+    it('finds a product matching the desired spec index in JSON', function (done) {
+      db.products.findOne({'specs->>4': 'array'}, function(err, product) {
+        assert.equal(product.id, 4);
+        assert.equal(product.specs[4], 'array');
+        done();
+      });
+    });
+    it('finds a product matching the desired spec path in JSON', function (done) {
       db.products.findOne({'specs#>>{dimensions,length}': 15}, function(err, product) {
         assert.equal(product.id, 2);
         assert.equal(product.specs.dimensions.length, 15);
@@ -366,7 +376,7 @@ describe('Tables', function () {
   describe('Ordering results', function () {
     it('returns ascending order of products by price', function (done) {
       db.products.find({}, {order : "price"}, function(err,res){
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         assert.equal(res[0].id, 1);
         assert.equal(res[2].id, 3);
         done();
@@ -374,9 +384,9 @@ describe('Tables', function () {
     });
     it('returns descending order of products', function (done) {
       db.products.find({},{order : "id desc"}, function(err,res){
-        assert.equal(res.length, 3);
-        assert.equal(res[0].id, 3);
-        assert.equal(res[2].id, 1);
+        assert.equal(res.length, 4);
+        assert.equal(res[0].id, 4);
+        assert.equal(res[2].id, 2);
         done();
       });
     });
@@ -440,9 +450,9 @@ describe('Tables', function () {
   });
 
   describe('Full Text search', function () {
-    it('returns 3 products for term "product"', function (done) {
+    it('returns 4 products for term "product"', function (done) {
       db.products.search({columns : ["name"], term: "Product"},function(err,res){
-        assert.equal(res.length,3);
+        assert.equal(res.length, 4);
         done();
       });
     });
@@ -476,7 +486,7 @@ describe('Tables', function () {
         });
 
         stream.on('end', function () {
-          assert.equal(3, result.length);
+          assert.equal(4, result.length);
           done();
         });
       });

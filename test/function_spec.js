@@ -43,7 +43,7 @@ describe('Functions', function () {
   describe("Function Execution", function() { 
     it("executes all_products and returns the results", function (done)  {
       db.all_products(function(err,res) {
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         done();
       });
     });
@@ -58,7 +58,7 @@ describe('Functions', function () {
   describe("Functions with Cased Names", function() { 
     it("executes camel-cased function AllMyProducts and returns the results", function (done)  {
       db.AllMyProducts(function(err,res) {
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 4);
         done();
       });
     });

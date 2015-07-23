@@ -210,6 +210,18 @@ db.products.find({"id <>": [10,21]}, function(err,products){
   //products other than 10 and 21
 });
 
+//match a JSON field
+db.products.find({"specs->>weight": 30}, function(err, products) {
+  //products where the 'specs' field is a JSON document containing {weight: 30}
+  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
+})
+
+//drill down a JSON path
+db.products.find({"specs#>>{dimensions,length}": 15}, function(err, products) {
+  //products where the 'specs' field is a JSON document having a nested 'dimensions' object containing {length: 15}
+  //note that the corresponding SQL query would be phrased specs->>'{dimensions,length}'; Massive adds the quotes for you
+})
+
 //Send in an ORDER clause by passing in a second argument
 db.products.find({},{order: "price desc"} function(err,products){
   //products ordered in descending fashion
