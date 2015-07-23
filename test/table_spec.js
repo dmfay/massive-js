@@ -425,6 +425,18 @@ describe('Tables', function () {
         done();
       });
     });
+    it('returns 3 products for term "description" using multiple columns', function (done) {
+      db.products.search({columns : ["Name", "description"], term: "description"},function(err,res){
+        assert.equal(res.length,3);
+        done();
+      });
+    });
+    it('returns 0 products for term "none" using multiple columns', function (done) {
+      db.products.search({columns : ["Name", "description"], term: "none"},function(err,res){
+        assert.equal(res.length,0);
+        done();
+      });
+    });
   });
 
   describe('Streaming Results', function () {
