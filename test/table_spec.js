@@ -342,6 +342,13 @@ describe('Tables', function () {
         done();
       });
     });
+    it('finds a product with a spec matching an IN list', function (done) {
+      db.products.findOne({'specs->>weight': [30, 35]}, function(err, product) {
+        assert.equal(product.id, 3);
+        assert.equal(product.specs.weight, 30);
+        done();
+      });
+    });
     it('mixes JSON and non-JSON predicates', function (done) {
       db.products.findOne({price: 35.00, 'specs->>weight': 30}, function(err, product) {
         assert.equal(product.id, 3);
@@ -468,9 +475,9 @@ describe('Tables', function () {
         done();
       });
     });
-    it('returns 3 products for term "description" using multiple columns', function (done) {
+    it('returns 4 products for term "description" using multiple columns', function (done) {
       db.products.search({columns : ["Name", "description"], term: "description"},function(err,res){
-        assert.equal(res.length,3);
+        assert.equal(res.length,4);
         done();
       });
     });

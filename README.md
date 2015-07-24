@@ -216,6 +216,12 @@ db.products.find({"specs->>weight": 30}, function(err, products) {
   //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
 })
 
+//match a JSON field with an IN list (note NOT IN is not supported for JSON fields at this time)
+db.products.find({"specs->>weight": [30, 35]}, function(err, products) {
+  //products where the 'specs' field is a JSON document containing {weight: 30}
+  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
+})
+
 //drill down a JSON path
 db.products.find({"specs#>>{dimensions,length}": 15}, function(err, products) {
   //products where the 'specs' field is a JSON document having a nested 'dimensions' object containing {length: 15}
