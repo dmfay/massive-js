@@ -22,8 +22,8 @@ describe('Schema - Bound Tables -Add/Edit/Delete', function () {
     });
     it('updates an artist ', function (done) {
       db.myschema.artists.save({id : 4, name : "The Wipers"}, function(err, res){
-        // Update returns an array - Iassume because more than one item can be updated...
-        assert.equal(res[0].name, "The Wipers");
+        assert.equal(res.id, 4);
+        assert.equal(res.name, "The Wipers");
         done();
       });
     });
