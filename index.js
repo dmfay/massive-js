@@ -1,6 +1,7 @@
 var Runner = require("./lib/runner");
 var _ = require("underscore")._;
 var fs = require("fs");
+var Queryable = require("./lib/queryable");
 var Table = require("./lib/table");
 var util = require("util");
 var assert = require("assert");
@@ -19,6 +20,7 @@ var Massive = function(args){
   _.extend(this,runner);
 
   this.tables = [];
+  this.views = [];
   this.queryFiles = [];
   this.schemas = [];
   this.functions = [];
@@ -33,8 +35,8 @@ var Massive = function(args){
   // any "truthy" value passed will cause functions to be excluded. No param
   // will be a "falsy" value, and functions will be included...
   this.excludeFunctions = args.excludeFunctions;
-  this.functionBlacklist = this.getTableFilter(args.functionBlacklist)
-}
+  this.functionBlacklist = this.getTableFilter(args.functionBlacklist);
+};
 
 Massive.prototype.getSchemaFilter = function(allowedSchemas) {
   // an empty string will cause all schema to be loaded by default:
@@ -81,15 +83,14 @@ Massive.prototype.getTableFilter = function(filter) {
 Massive.prototype.run = function(){
   var args = ArgTypes.queryArgs(arguments);
   this.query(args);
-}
+};
 Massive.prototype.runSync = DA(Massive.prototype.run);
 
 Massive.prototype.loadQueries = function() {
   walkSqlFiles(this,this.scriptsDir);
 };
 
-
-Massive.prototype.loadTables = function(next){
+Massive.prototype.loadTables = function(next) {
   var tableSql = __dirname + "/lib/scripts/tables.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
   var self = this;
@@ -97,26 +98,48 @@ Massive.prototype.loadTables = function(next){
   // ONLY allow whitelisted items:
   if(this.whitelist) {
     tableSql = __dirname + "/lib/scripts/whitelist.sql";
-    var parameters = [this.whitelist]
+    parameters = [this.whitelist];
   }
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err,tables){
-    if(err){
-      next(err,null);
-    }else{
-      _.each(tables, function(table){
-        var _table = new Table({
-          schema : table.schema,
-          name : table.name,
-          pk : table.pk,
-          db : self
-        });
-        // This refactoring appears to work well:
-        MapTableToNamespace(_table);
+
+  this.executeSqlFile({file : tableSql, params: parameters}, function(err,tables) {
+    if (err) { return next(err, null); }
+
+    _.each(tables, function(table){
+      var _table = new Table({
+        schema : table.schema,
+        name : table.name,
+        pk : table.pk,
+        db : self
       });
-      next(null,self);
-    }
+
+      MapToNamespace(_table);
+    });
+    
+    next(null,self);
   });
-}
+};
+
+Massive.prototype.loadViews = function(next) {
+  var viewSql = __dirname + "/lib/scripts/views.sql";
+  var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
+  var self = this;
+
+  this.executeSqlFile({file : viewSql, params: parameters}, function(err, views){
+    if (err) { return next(err, null); }
+
+    _.each(views, function(view) {
+      var _view = new Queryable({
+        schema : view.schema,
+        name : view.name,
+        db : self
+      });
+
+      MapToNamespace(_view, "views");
+    });
+
+    next(null, self);
+  });
+};
 
 Massive.prototype.saveDoc = function(collection, doc, next){
   var self = this;
@@ -153,7 +176,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
       if(err){
         next(err,null);
       } else {
-        MapTableToNamespace(_table);
+        MapToNamespace(_table);
         // recurse
         self.saveDoc(collection,doc,next);
       }
@@ -162,23 +185,26 @@ Massive.prototype.saveDoc = function(collection, doc, next){
 };
 Massive.prototype.saveDocSync = DA(Massive.prototype.saveDoc);
 
-var MapTableToNamespace = function(table) {
-  var db = table.db;
-  if(table.schema !== "public") {
-    schemaName = table.schema;
+var MapToNamespace = function(queryable, collection) {
+  collection = collection || "tables";
+
+  var db = queryable.db;
+
+  if (queryable.schema !== "public") {
+    schemaName = queryable.schema;
     // is this schema already attached?
     if(!db[schemaName]) {
       // if not, then bolt it on:
       db[schemaName] = {};
     }
-    // attach the table to the schema:
-    db[schemaName][table.name] = table;
-    db.tables.push(table);
+    // attach the queryable to the schema:
+    db[schemaName][queryable.name] = queryable;
   } else {
     //it's public - just pin table to the root to namespace
-    db[table.name] = table;
-    db.tables.push(table);
+    db[queryable.name] = queryable;
   }
+
+  db[collection].push(queryable);
 };
 
 Massive.prototype.documentTableSql = function(tableName){
@@ -261,7 +287,7 @@ Massive.prototype.loadFunctions = function(next){
             params.push("$" + i);
           }
 
-          var newFn, pushOnTo
+          var newFn, pushOnTo;
           if(schema !== "public"){
             self[schema] || (self[schema] =  {});
             newFn = assignScriptAsFunction(self[schema], fn.name);
@@ -330,19 +356,26 @@ exports.connect = function(args, next){
   assert((args.connectionString || args.db), "Need a connectionString or db (name of database on localhost) at the very least.");
 
   //override if there's a db name passed in
-  if(args.db){
+  if (args.db) {
     args.connectionString = "postgres://localhost/"+args.db;
   }
-  var massive = new  Massive(args);
+
+  var massive = new Massive(args);
 
   //load up the tables, queries, and commands
-  massive.loadTables(function(err,db){
+  massive.loadTables(function(err, db) {
+    assert(!err, err);
     self = db;
-    massive.loadFunctions(function(err,db){
+
+    massive.loadViews(function(err, db) {
       assert(!err, err);
-      //synchronous
-      db.loadQueries();
-      next(null,db);
+
+      massive.loadFunctions(function(err, db) {
+        assert(!err, err);
+        //synchronous
+        db.loadQueries();
+        next(null,db);
+      });
     });
   });
 };

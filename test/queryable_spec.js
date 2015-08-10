@@ -11,7 +11,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Simple queries with args', function () {
+  describe('Simple table queries with args', function () {
     it('returns product 1 with 1 as only arg', function (done) {
       db.products.find(1, function(err,res){
         assert.equal(res.id, 1);
@@ -26,7 +26,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Simple queries without args', function () {
+  describe('Simple table queries without args', function () {
     it('returns all records on find with no args', function (done) {
       db.products.find(function(err,res){
         assert.equal(res.length, 4);
@@ -310,6 +310,69 @@ describe('Queryables', function () {
     it('returns 0 products for term "none" using multiple columns', function (done) {
       db.products.search({columns : ["Name", "description"], term: "none"},function(err,res){
         assert.equal(res.length,0);
+        done();
+      });
+    });
+  });
+
+  describe('View queries', function () {
+    it('returns all records on find with no args', function (done) {
+      db.popular_products.find(function(err,res) {
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+    it('returns first record with findOne no args', function (done) {
+      db.popular_products.findOne(function(err,res) {
+        assert.equal(res.id, 1);
+        done();
+      });
+    });
+    it('handles multiple predicates', function (done) {
+      db.popular_products.where("price=$1 OR price=$2", [12.00, 24.00],function(err,res) {
+        assert.equal(res.length, 2);
+        done();
+      });
+    });
+    it('counts rows with where-style args', function (done) {
+      db.popular_products.count("price=$1 OR price=$2", [12.00, 24.00],function(err,res) {
+        assert.equal(res, 2);
+        done();
+      });
+    });
+    it('counts rows with find-style args', function (done) {
+      db.popular_products.count({price: [12.00, 24.00]}, function(err, res) {
+        assert.equal(res, 2);
+        done();
+      });
+    });
+    it('makes comparisons', function (done) {
+      db.popular_products.find({"price > " : 30.00}, function(err, res) {
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 4);
+        done();
+      });
+    });
+    it('applies offsets and limits', function (done) {
+      db.popular_products.find({},{limit : 1, offset: 1}, function(err, res) {
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 2);
+        done();
+      });
+    });
+    it('restricts columns', function (done) {
+      db.popular_products.find({}, {columns :["id","price"]}, function(err, res) {
+        var keys = _.keys(res[0]);
+        assert.equal(keys.length,2);
+        done();
+      });
+    });
+    it('applies sorting', function (done) {
+      db.popular_products.find({},{order : "id desc"}, function(err, res) {
+        assert.equal(res.length, 3);
+        assert.equal(res[0].id, 4);
+        assert.equal(res[1].id, 2);
+        assert.equal(res[2].id, 1);
         done();
       });
     });
