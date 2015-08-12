@@ -22,4 +22,8 @@ describe("Synchronous goodies", function(){
     var product = db.products.findOneSync({id : 1});
     assert.equal(1,product.id);
   });
+  it('finds a document', function () {
+    var doc = db.docs.findDocSync(1);
+    assert.equal(1, doc.id);
+  });
 });
