@@ -1,0 +1,6 @@
+site_name: MassiveJS | A Postgres-centric Data Access Tool
+site_description: MassiveJS is a dedicated PostgreSQL data access tool that embraces SQL instead of completely abstracting it
+repo_url: https://github.com/robconery/massive-js
+site_favicon: favicon.ico
+site_url: http://massive-js.readthedocs.org
+theme: readthedocs
