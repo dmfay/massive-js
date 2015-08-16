@@ -38,6 +38,13 @@ create table orders(
   ordered_at date default now() not null
 );
 
+create view popular_products as
+  select p.id, p.name, p.price, count(*) as ordered
+  from products p
+  join orders o on o.product_id = p.id
+  group by p.id, p.name, p.price
+  order by ordered desc;
+
 insert into "Users"("Email", "Name")
 values('test@test.com', 'A test user');
 
@@ -52,6 +59,10 @@ values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_goo
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
 
+insert into orders(product_id, user_id, notes)
+values (1, 1, 'user 1 ordered product 1'),
+  (2, 1, 'user 1 ordered product 2'),
+  (4, 1, 'user 1 ordered product 4');
 
 -- schema stuff:
 drop table if exists myschema.artists cascade;
@@ -92,6 +103,13 @@ create table myschema.docs(
   body jsonb not null,
   search tsvector
 );
+
+create view myschema.top_artists as
+  select a.id, a.name, count(*) as albums
+  from myschema.artists a
+  left outer join myschema.albums b on b.artist_id = a.id
+  group by a.id, a.name
+  order by albums desc;
 
 insert into myschema.artists(name)
 values ('AC/DC'), ('Bauhaus'), ('Sex Pistols');
