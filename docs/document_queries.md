@@ -20,14 +20,14 @@ Massive does two things here:
 The table it creates looks like this:
 
 ```sql
-create table %s(
+create table doggies(
   id serial primary key,
   body jsonb not null,
   search tsvector,
   created_at timestamptz default now()
 );
-create index idx_%s on %s using GIN(body jsonb_path_ops); 
-create index idx_%s_search on %s using GIN(search); 
+create index idx_doggies on doggies using GIN(body jsonb_path_ops); 
+create index idx_doggies_search on doggies using GIN(search); 
 ```
 
 Notice that Massive also creates a GIN index on the body column as well as a `search` field. You can use this to your advantage to make querying documents much, much easier. We're indexing that search field too! All your data will be stored in the `body` column.
@@ -105,6 +105,19 @@ where body -> 'name' @> 'Fido';
 ```
 
 This query will take full advantage of our index.
+
+## Full Text Queries
+
+You can execute Full Text queries on the fly with Massive:
+
+```js
+db.doggies.searchDoc({
+  keys : ["name", "owner"],
+  term : "Rusty"
+}, function(err, docs){
+  //matching docs returned
+});
+```
 
 ## A Word About ID and Documents
 

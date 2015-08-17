@@ -4,6 +4,8 @@ repo_url: https://github.com/robconery/massive-js
 site_favicon: favicon.ico
 site_url: http://massive-js.readthedocs.org
 theme: readthedocs
+extra_css:
+- css/custom.css
 pages: 
 - Home : index.md
 - Installation and Quick Start : quick_start.md
