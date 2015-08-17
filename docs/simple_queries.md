@@ -128,3 +128,13 @@ db.products.count({id: [1, 2]}, function(err,res){
 });
 ```
 
+## Using Schemas
+
+If you like to separate your tables based on a schema, you can still work with them easily with Massive. For instance, our `users` table might be part of the `membership` schema:
+
+```js
+db.membership.users.find(1, function(err,res){
+  //user returned
+});
+```
+
