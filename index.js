@@ -172,6 +172,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
 
     // Create the table in the back end:
     var sql = this.documentTableSql(collection);
+
     this.query(sql, function(err,res){
       if(err){
         next(err,null);
@@ -212,7 +213,7 @@ Massive.prototype.documentTableSql = function(tableName){
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
 
   var indexName = tableName.replace(".", "_");
-  sql = util.format(sql, tableName, indexName, tableName);
+  sql = util.format(sql, tableName, indexName, tableName, tableName, tableName);
   return sql;
 };
 

@@ -4,3 +4,12 @@ repo_url: https://github.com/robconery/massive-js
 site_favicon: favicon.ico
 site_url: http://massive-js.readthedocs.org
 theme: readthedocs
+pages: 
+- Home : index.md
+- Installation and Quick Start : quick_start.md
+- Simple Queries : simple_queries.md
+- Adding, Updating, Deleting : crud.md
+- Using SQL Files : files_as_functions.md
+- Function Execution : function_execution.md
+- Document Queries : document_queries.md
+- Full Text Search : full_text_search.md
