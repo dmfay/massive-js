@@ -213,7 +213,7 @@ Massive.prototype.documentTableSql = function(tableName){
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
 
   var indexName = tableName.replace(".", "_");
-  sql = util.format(sql, tableName, indexName, tableName, tableName, tableName);
+  sql = util.format(sql, tableName, indexName, tableName, indexName, tableName);
   return sql;
 };
 
