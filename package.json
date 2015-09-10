@@ -30,7 +30,7 @@
     "async": "^0.9.0",
     "clone": "^1.0.2",
     "commander": "^2.6.0",
-    "deasync": "^0.0.10",
+    "deasync": "^0.1.1",
     "glob": "^4.4.1",
     "pg": "^4.3.0",
     "pg-query-stream": "^0.7.0",
