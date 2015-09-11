@@ -6,7 +6,7 @@ You can add data to your table by using `insert()` or `save()` on the table inst
 
 ```js
 //single record
-db.products.insert({sku : "TEST", name : "My Product", price : 12.00}, function(err,res){
+db.products.insert({sku: "TEST", name: "My Product", price: 12.00}, function(err, res){
   //full product with new id returned
 });
 
@@ -16,26 +16,18 @@ db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (e
 });
 ```
 
-You can also use `save()`, provided that there is no primary key field present. When Massive loads your tables, it notes which columns are primary keys. If you pass that field to the `save()` method, Massive will assume it's an update. Otherwise it will be treated like an insert:
-
-```js
-db.products.save({sku : "TEST", name : "My Product", price : 12.00}, function(err,res){
-  //full product with new id returned
-});
-```
-
 ## Update
 
 You can update your table directly, running a partial update as specified:
 
 ```js
 //up the price to $15
-db.products.update({id : 1, price : 15.00}, function(err,res){
+db.products.update({id: 1, price: 15.00}, function(err, res){
   //full product with new id returned
 });
 
 //does the same thing since we're passing id, which is the PK
-db.products.save({id : 1, price : 15.00}, function(err,res){
+db.products.save({id: 1, price: 15.00}, function(err, res){
   //full product with new id returned
 });
 
@@ -55,18 +47,36 @@ db.products.update({'id !=': [1, 2]}, {price: 543.21}, function(err, res) {
 });
 ```
 
+## Upsert
 
-## Destroying Data
+Instead of invoking `insert()` and `update()` separately you can use the `save()` method to cover both cases. When Massive loads your tables, it notes which columns are primary keys. If a primary key column is included in the data passed to `save()`, whether in object or array form, Massive will assume the call is an update for an existing row or rows identified by that primary key. Otherwise it will emit an insert and add new rows.
 
-Just use the `destroy` method, specifying the criteria you want deleted:
+`save()` may be invoked on an Array of _new_ objects just like `insert()`, in which case it will return the result as an Array. Using `save()` to update an Array of objects is not supported; you should use `update()` with criteria or an `IN` list instead.
 
 ```js
-db.products.destroy({id : 1}, function(err,res){
-  //destroyed record is returned
+db.products.save({sku: "TEST", name: "My Product", price: 12.00}, function(err, res) {
+  //full product with new id returned
 });
-db.products.destroy({category_id : 1}, function(err,res){
-  //all records with category id 1 deleted
+
+db.products.save({id: 1, price: 13.00}, function(err, res) {
+  //assuming this is the product from the previous call, returns that product with an id of 1 and an updated price of 13.00
+});
+
+db.products.save([{sku: "TEST", name: "My Product", price: 12.00}, {sku: "SAMPLE", name: "Another Product", price: 6.00}], function(err, res) {
+  //array containing both products returned
 });
 ```
 
+## Destroying Data
 
+Just use the `destroy` method, specifying the criteria you want deleted. Any records removed are passed to the callback in an Array. `destroy()` will never return a single object.
+
+```js
+db.products.destroy({id: 1}, function(err, res){
+  //Array containing the destroyed record is returned
+});
+
+db.products.destroy({category_id: 1}, function(err, res){
+  //Array containing all now-deleted records with category id 1 returned
+});
+```

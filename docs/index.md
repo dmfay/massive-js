@@ -4,7 +4,7 @@
 
 Massive is a PostgreSQL-specific data access tool. The **goal** of Massive is to make it easier for you to use PostgreSQL's amazing features, *not to hide them under a load of abstraction*.
 
-Massive is *not an ORM*. It loads your schema at runtime, creating an object instance that allows you to query tables, functions, and stored SQL files as if they were first-order methods:
+Massive is *not an ORM*. It loads your schema at runtime, creating an object instance that allows you to query tables, views, functions, and stored SQL files as if they were first-order methods:
 
 ```js
 var Massive = require("massive");
