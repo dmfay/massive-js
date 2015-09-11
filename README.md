@@ -29,9 +29,9 @@ massive.connect({db : "myDb"}, function(err,db){
 ```
 ## Usage
 
-One of the key features of Massive is that it loads all of your tables, Postgres functions, and local query files up as functions (this is really cool, you want this. See below for more info). Massive is fast, and does this quickly. However, there is a one-time execution penalty at intialization while all this happens. In most situations it makes sense to do this once, at application load. From there, maintain a reference to the Massive instance (Massive was conceived with this usage in mind). For example, if you are using Express as your application framework, you might do something like this:
+One of the key features of Massive is that it loads all of your tables, Postgres functions, and local query files up as functions (this is really cool, you want this. See below for more info). Massive is fast, and does this quickly. However, there is a one-time execution penalty at initialization while all this happens. In most situations it makes sense to do this once, at application load. From there, maintain a reference to the Massive instance (Massive was conceived with this usage in mind). For example, if you are using Express as your application framework, you might do something like this:
 
-####Express Example
+#### Express Example
 
 ```javascript
 var express = require("express");
@@ -43,7 +43,7 @@ var connectionString = "postgres://massive:password@localhost/chinook";
 // connect to Massive and get the db instance. You can safely use the
 // convenience sync method here because its on app load
 // you can also use loadSync - it's an alias
-var massiveInstance = massive.connectSync({connectionString : connectionString}) 
+var massiveInstance = massive.connectSync({connectionString : connectionString})
 
 // Set a reference to the massive instance on Express' app:
 app.set('db', massiveInstance);
@@ -318,7 +318,7 @@ db.membership.users.find({active: true}, function(err,users){
 
 ## Synchronous Methods
 
-Just about every method in Massive has a synchronous counterpart using [the deasync library](https://github.com/vkurchatkin/deasync). These methods are here for convenience when you're not worried about I/O and just want to move some data around without a callback mess.
+Just about every method in Massive has a synchronous counterpart using [the deasync library](https://github.com/abbr/deasync). These methods are here for convenience when you're not worried about I/O and just want to move some data around without a callback mess.
 
 ```js
 var myUser = db.users.findOneSync({id : 1});
@@ -330,7 +330,7 @@ Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully li
 
 Massive treats Postgres functions ("sprocs") as first-class citizens.
 
-Say your database schema introdcues a complex peice of logic in a Postgres function:
+Say your database schema introduces a complex piece of logic in a Postgres function:
 
 ```sql
 create or replace function all_products()
