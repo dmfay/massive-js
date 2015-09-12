@@ -365,11 +365,16 @@ exports.connect = function(args, next){
 
   //load up the tables, queries, and commands
   massive.loadTables(function(err, db) {
-    assert(!err, err);
+    //handle error if loading the functions fails and bubble it up
+    if (err) {
+      return next(err, null)
+    }
+
+    //assert(!err, err);
     self = db;
 
     massive.loadViews(function(err, db) {
-      assert(!err, err);
+      //assert(!err, err);
 
       massive.loadFunctions(function(err, db) {
         assert(!err, err);
