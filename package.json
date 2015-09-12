@@ -1,6 +1,6 @@
 {
   "name": "massive",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
   "main": "index.js",
   "bin": {
