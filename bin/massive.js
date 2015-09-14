@@ -24,6 +24,10 @@ if(program.database){
 
 if(connectionString){
   massive.connect({connectionString : connectionString}, function(err,db){ 
+    if(err) {
+      console.log("Failed loading Massive: "+err);
+      process.exit(1);
+    }
     var context = repl.start({
       prompt: "db > ",
     }).context;
