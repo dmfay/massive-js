@@ -226,7 +226,7 @@ Massive.prototype.documentTableSql = function(tableName){
 };
 
 //A recursive directory walker that would love to be refactored
-var walkSqlFiles = function(rootObject, rootDir, schema) {
+var walkSqlFiles = function(rootObject, rootDir) {
   var dirs;
   try {
     dirs = fs.readdirSync(rootDir);
@@ -271,11 +271,8 @@ var walkSqlFiles = function(rootObject, rootDir, schema) {
       //set the path to walk so we have a correct root directory
       var pathToWalk = path.join(rootDir,item);
 
-      if (schema) { schema = schema + '.' + name; }
-      else { schema = name; }
-
       //recursive call - do it all again
-      walkSqlFiles(rootObject[name], pathToWalk, schema);
+      walkSqlFiles(rootObject[name], pathToWalk);
     }
   });
 };
