@@ -1,6 +1,7 @@
 var Runner = require("./lib/runner");
 var _ = require("underscore")._;
 var fs = require("fs");
+var Executable = require("./lib/executable");
 var Queryable = require("./lib/queryable");
 var Table = require("./lib/table");
 var util = require("util");
@@ -87,7 +88,7 @@ Massive.prototype.run = function(){
 Massive.prototype.runSync = DA(Massive.prototype.run);
 
 Massive.prototype.loadQueries = function() {
-  walkSqlFiles(this,this.scriptsDir);
+  walkSqlFiles(this, this.scriptsDir);
 };
 
 Massive.prototype.loadTables = function(next) {
@@ -186,26 +187,33 @@ Massive.prototype.saveDoc = function(collection, doc, next){
 };
 Massive.prototype.saveDocSync = DA(Massive.prototype.saveDoc);
 
-var MapToNamespace = function(queryable, collection) {
+var MapToNamespace = function(entity, collection) {
   collection = collection || "tables";
 
-  var db = queryable.db;
+  var db = entity.db;
+  var executor;
 
-  if (queryable.schema !== "public") {
-    schemaName = queryable.schema;
+  // executables are always invoked directly, so we need to handle them a bit differently
+  if (entity instanceof Executable) {
+    executor = function () {
+      entity.invoke.apply(entity, arguments);
+    };
+  }
+
+  if (entity.schema === "public") {
+    db[entity.name] = executor || entity;
+  } else {
+    schemaName = entity.schema;
     // is this schema already attached?
     if(!db[schemaName]) {
       // if not, then bolt it on:
       db[schemaName] = {};
     }
-    // attach the queryable to the schema:
-    db[schemaName][queryable.name] = queryable;
-  } else {
-    //it's public - just pin table to the root to namespace
-    db[queryable.name] = queryable;
+    // attach the entity to the schema:
+    db[schemaName][entity.name] = executor || entity;
   }
 
-  db[collection].push(queryable);
+  db[collection].push(entity);
 };
 
 Massive.prototype.documentTableSql = function(tableName){
@@ -218,7 +226,7 @@ Massive.prototype.documentTableSql = function(tableName){
 };
 
 //A recursive directory walker that would love to be refactored
-var walkSqlFiles = function(rootObject, rootDir){
+var walkSqlFiles = function(rootObject, rootDir, schema) {
   var dirs;
   try {
     dirs = fs.readdirSync(rootDir);
@@ -228,14 +236,12 @@ var walkSqlFiles = function(rootObject, rootDir){
 
   //loop the directories found
   _.each(dirs, function(item){
-
     //parsing with path is a friendly way to get info about this dir or file
     var ext = path.extname(item);
     var name = path.basename(item, ext);
 
     //is this a SQL file?
-    if(ext === ".sql"){
-
+    if (ext === ".sql") {
       //why yes it is! Build the abspath so we can read the file
       var filePath = path.join(rootDir,item);
 
@@ -243,19 +249,20 @@ var walkSqlFiles = function(rootObject, rootDir){
       //massive is loaded using connect()
       var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
 
-      //set a property on our root object, and grab a handy variable reference:
-      var newProperty = assignScriptAsFunction(rootObject, name);
+      var _exec = new Executable({
+        sql: sql,
+        filePath: filePath,
+        name : name,
+        db : self
+      });
 
-      //I don't know what I'm doing, but it works
-      newProperty.sql = sql;
-      newProperty.db = self;
-      newProperty.filePath = filePath;
-      self.queryFiles.push(newProperty);
-
-    }else if(ext !== ''){
-      //ignore it
-    }else{
-
+      // unfortunately we can't use MapToNamespace here without making a ton of changes
+      // since we need to accommodate deeply-nested directories rather than 1-deep schemata
+      self.queryFiles.push(_exec);
+      rootObject[name] = function () {
+        _exec.invoke.apply(_exec, arguments);
+      };
+    } else if (ext === '') {
       //this is a directory so shift things and move on down
       //set a property on our root object, then use *that*
       //as the root in the next call
@@ -264,92 +271,61 @@ var walkSqlFiles = function(rootObject, rootDir){
       //set the path to walk so we have a correct root directory
       var pathToWalk = path.join(rootDir,item);
 
+      if (schema) { schema = schema + '.' + name; }
+      else { schema = name; }
+
       //recursive call - do it all again
-      walkSqlFiles(rootObject[name],pathToWalk);
+      walkSqlFiles(rootObject[name], pathToWalk, schema);
     }
   });
 };
 
-Massive.prototype.loadFunctions = function(next){
-  if(!this.excludeFunctions)
-  {
+Massive.prototype.loadFunctions = function(next) {
+  if (!this.excludeFunctions) {
     var functionSql = __dirname + "/lib/scripts/functions.sql";
     var parameters = [this.functionBlacklist];
-    this.executeSqlFile({file : functionSql, params : parameters}, function(err,functions){
-      if(err){
-        next(err,null);
-      }else{
-        _.each(functions, function(fn){
+
+    this.executeSqlFile({file : functionSql, params : parameters}, function (err,functions) {
+      if (err) {
+        next(err, null);
+      } else {
+        _.each(functions, function(fn) {
           var schema = fn.schema;
           var sql;
           var params = [];
 
-          for(var i = 1;i<=fn.param_count;i++){
+          for (var i = 1; i <= fn.param_count; i++) {
             params.push("$" + i);
           }
 
-          var newFn, pushOnTo;
-          if(schema !== "public"){
-            self[schema] || (self[schema] =  {});
-            newFn = assignScriptAsFunction(self[schema], fn.name);
+          var namespace = self;
+
+          if (schema !== "public") {
             sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
-            self[schema][fn.name] = newFn;
-          }else{
+            self[schema] = self[schema] || {};
+            namespace = self[schema];
+          } else {
             sql = util.format("select * from \"%s\"", fn.name);
-            newFn= assignScriptAsFunction(self, fn.name);
-            self[fn.name] = newFn;
           }
 
-          sql+="(" + params.join(",") + ")";
-          newFn.sql = sql;
-          newFn.db = self;
-          self.functions.push(newFn);
+          sql += "(" + params.join(",") + ")";
+          
+          var _exec = new Executable({
+            sql: sql,
+            schema: schema,
+            name : fn.name,
+            db : self
+          });
+
+          MapToNamespace(_exec, "functions");
         });
-        next(null,self);
+
+        next(null, self);
       }
     });
   } else {
-    next(null,self);
+    next(null, self);
   }
-};
-
-//it's less congested now...
-var assignScriptAsFunction = function (rootObject, propertyName) {
-  rootObject[propertyName] = function(params, opts, next) {
-    if (_.isFunction(params)) {       // invoked as db.function(callback)
-      next = params;
-      params = [];
-      opts = {};
-    } else if (_.isFunction(opts)) {  // invoked as db.function(something, callback)
-      next = opts;
-      
-      // figure out if we were given params or opts as the first argument
-      // lucky for us it's mutually exclusive: opts can only be an object, params can be a primitive or an array
-      if (_.isObject(params) && !_.isArray(params)) { // it's an options object, we have no params
-        opts = params;
-        params = [];
-      } else {                                        // it's a parameter primitive or array, we have no opts
-        opts = {};
-      }
-    }
-
-    if (!_.isArray(params)) {
-      params = [params];
-    }
-
-    //JA - use closure to assign stuff from properties before they are invented
-    //(sorta, I think...):
-    var sql = rootObject[propertyName].sql;
-    var db = rootObject[propertyName].db;
-
-    if (opts.stream) {
-      db.stream(sql, params, null, next);
-    } else {
-      db.query(sql, params, null, next);
-    }
-  };
-
-  return rootObject[propertyName];
 };
 
 //connects Massive to the DB
@@ -367,15 +343,12 @@ exports.connect = function(args, next){
   massive.loadTables(function(err, db) {
     //handle error if loading the functions fails and bubble it up
     if (err) {
-      return next(err, null)
+      return next(err, null);
     }
 
-    //assert(!err, err);
     self = db;
 
     massive.loadViews(function(err, db) {
-      //assert(!err, err);
-
       massive.loadFunctions(function(err, db) {
         assert(!err, err);
         //synchronous
