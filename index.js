@@ -115,7 +115,7 @@ Massive.prototype.loadTables = function(next) {
 
       MapToNamespace(_table);
     });
-    
+
     next(null,self);
   });
 };
@@ -260,7 +260,7 @@ var walkSqlFiles = function(rootObject, rootDir) {
       // since we need to accommodate deeply-nested directories rather than 1-deep schemata
       self.queryFiles.push(_exec);
       rootObject[name] = function () {
-        _exec.invoke.apply(_exec, arguments);
+        return _exec.invoke.apply(_exec, arguments);
       };
     } else if (ext === '') {
       //this is a directory so shift things and move on down
@@ -306,7 +306,7 @@ Massive.prototype.loadFunctions = function(next) {
           }
 
           sql += "(" + params.join(",") + ")";
-          
+
           var _exec = new Executable({
             sql: sql,
             schema: schema,
