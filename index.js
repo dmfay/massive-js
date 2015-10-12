@@ -11,6 +11,7 @@ var ArgTypes = require("./lib/arg_types");
 var Args = require("args-js");
 var path = require("path");
 var DA = require('deasync');
+var stripBom = require('strip-bom');
 
 var self;
 
@@ -247,7 +248,8 @@ var walkSqlFiles = function(rootObject, rootDir) {
 
       //pull in the SQL - don't worry this only happens once, when
       //massive is loaded using connect()
-      var sql = fs.readFileSync(filePath, {encoding : "utf-8"});
+      //remove the unicode Byte Order Mark
+      var sql = stripBom(fs.readFileSync(filePath, {encoding : "utf-8"}));
 
       var _exec = new Executable({
         sql: sql,

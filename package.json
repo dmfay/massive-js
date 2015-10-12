@@ -34,6 +34,7 @@
     "glob": "^4.4.1",
     "pg": "^4.3.0",
     "pg-query-stream": "^0.7.0",
+    "strip-bom": "^2.0.0",
     "underscore": "^1.8.2"
   },
   "devDependencies": {
