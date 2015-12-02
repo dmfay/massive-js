@@ -227,6 +227,22 @@ describe('Queryables', function () {
         done();
       });
     });
+
+    it('handles commas in array values', function (done) {
+      db.products.find({'tags @>': ['tag,comma']}, function (err, res) {
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 4);
+        done();
+      });
+    });
+
+    it('handles braces in array values', function (done) {
+      db.products.find({'tags @>': ['tag{brace}']}, function (err, res) {
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 4);
+        done();
+      });
+    });
   });
 
   describe('Limiting and Offsetting results', function () {
