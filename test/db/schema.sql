@@ -48,13 +48,13 @@ create view popular_products as
 insert into "Users"("Email", "Name")
 values('test@test.com', 'A test user');
 
-insert into products(name, price, description, specs, in_stock)
-values ('Product 1', 12.00, 'Product 1 description', null, true),
-('Product 2', 24.00, 'Product 2 description', '{"weight": 20, "dimensions": {"length": 15, "width": 12}}', true),
-('Product 3', 35.00, 'Product 3 description', '{"weight": 30, "sizes": [10, 15, 20]}', false),
-('Product 4', 40.00, 'Product 4 description', '["why", "not", "have", "an", "array"]', false);
+insert into products(name, price, description, specs, tags, in_stock)
+values ('Product 1', 12.00, 'Product 1 description', null, null, true),
+('Product 2', 24.00, 'Product 2 description', '{"weight": 20, "dimensions": {"length": 15, "width": 12}}', '{tag1,tag2}', true),
+('Product 3', 35.00, 'Product 3 description', '{"weight": 30, "sizes": [10, 15, 20]}', '{tag2,tag3}', false),
+('Product 4', 40.00, 'Product 4 description', '["why", "not", "have", "an", "array"]', '{tag4}', false);
 
-insert into docs(body) 
+insert into docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
@@ -78,7 +78,7 @@ create schema myschema;
 -- Added for testing filtering on load:
 
 drop table if exists secrets.__secret_table cascade;
-drop table if exists secrets.__semi_secret_table cascade; 
+drop table if exists secrets.__semi_secret_table cascade;
 drop schema if exists secrets;
 
 create schema secrets;
@@ -115,11 +115,11 @@ insert into myschema.artists(name)
 values ('AC/DC'), ('Bauhaus'), ('Sex Pistols');
 
 insert into myschema.albums(artist_id, title)
-values (1, 'Power Age'), 
-(2, 'Press Eject and Give Me the Tape'), 
+values (1, 'Power Age'),
+(2, 'Press Eject and Give Me the Tape'),
 (3, 'Never Mind the Bullocks');
 
-insert into myschema.docs(body) 
+insert into myschema.docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
@@ -165,7 +165,3 @@ $$
 select * from myschema.albums;
 $$
 language sql;
-
-
-
-
