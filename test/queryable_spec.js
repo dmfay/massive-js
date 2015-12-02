@@ -186,7 +186,7 @@ describe('Queryables', function () {
 
   describe('Array operations', function () {
     it('filters by array fields containing a value', function (done) {
-      db.products.find({'tags @>': '{tag2}'}, function (err, res) {
+      db.products.find({'tags @>': ['tag2']}, function (err, res) {
         assert.equal(res.length, 2);
         assert.equal(res[0].id, 2);
         assert.equal(res[1].id, 3);
@@ -195,18 +195,35 @@ describe('Queryables', function () {
     });
 
     it('filters by array fields contained in a value', function (done) {
-      db.products.find({'tags <@': '{tag3, tag4, tag5}'}, function (err, res) {
+      db.products.find({'tags <@': ['tag2', 'tag3', 'tag4']}, function (err, res) {
         assert.equal(res.length, 1);
-        assert.equal(res[0].id, 4);
+        assert.equal(res[0].id, 3);
         done();
       });
     });
 
     it('filters by array fields overlapping a value', function (done) {
-      db.products.find({'tags &&': '{tag3, tag4, tag5}'}, function (err, res) {
+      db.products.find({'tags &&': ['tag3', 'tag4', 'tag5']}, function (err, res) {
         assert.equal(res.length, 2);
         assert.equal(res[0].id, 3);
         assert.equal(res[1].id, 4);
+        done();
+      });
+    });
+
+    it('allows falling back to a postgres-formatted array literal', function (done) {
+      db.products.find({'tags @>': '{tag2}'}, function (err, res) {
+        assert.equal(res.length, 2);
+        assert.equal(res[0].id, 2);
+        assert.equal(res[1].id, 3);
+        done();
+      });
+    });
+
+    it('handles apostrophes in array values', function (done) {
+      db.products.find({'tags @>': ['tag\'quote']}, function (err, res) {
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 4);
         done();
       });
     });

@@ -52,7 +52,7 @@ insert into products(name, price, description, specs, tags, in_stock)
 values ('Product 1', 12.00, 'Product 1 description', null, null, true),
 ('Product 2', 24.00, 'Product 2 description', '{"weight": 20, "dimensions": {"length": 15, "width": 12}}', '{tag1,tag2}', true),
 ('Product 3', 35.00, 'Product 3 description', '{"weight": 30, "sizes": [10, 15, 20]}', '{tag2,tag3}', false),
-('Product 4', 40.00, 'Product 4 description', '["why", "not", "have", "an", "array"]', '{tag4}', false);
+('Product 4', 40.00, 'Product 4 description', '["why", "not", "have", "an", "array"]', '{tag4,tag''quote}', false);
 
 insert into docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
