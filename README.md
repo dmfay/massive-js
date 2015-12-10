@@ -330,7 +330,7 @@ Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully li
 
 Massive treats Postgres functions ("sprocs") as first-class citizens.
 
-Say your database schema introdcues a complex piece of logic in a Postgres function:
+Say your database schema introduces a complex piece of logic in a Postgres function:
 
 ```sql
 create or replace function all_products()
