@@ -11,21 +11,6 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Simple table queries with args', function () {
-    it('returns product 1 with 1 as only arg', function (done) {
-      db.products.find(1, function(err,res){
-        assert.equal(res.id, 1);
-        done();
-      });
-    });
-    it('returns first record with findOne no args', function (done) {
-      db.products.findOne(1, function(err,res){
-        assert.equal(res.id, 1);
-        done();
-      });
-    });
-  });
-
   describe('Simple table queries without args', function () {
     it('returns all records on find with no args', function (done) {
       db.products.find(function(err,res){
@@ -37,6 +22,42 @@ describe('Queryables', function () {
       db.products.findOne(function(err,res){
         assert.equal(res.id, 1);
         done();
+      });
+    });
+  });
+
+  describe('Simple table queries by primary key', function () {
+    it('finds by a numeric key and returns a result object', function (done) {
+      db.products.find(1, function(err, res) {
+        assert.equal(res.id, 1);
+        done();
+      });
+    });
+
+    it('findOnes by a numeric key and returns a result object', function (done) {
+      db.products.findOne(1, function(err, res) {
+        assert.equal(res.id, 1);
+        done();
+      });
+    });
+
+    it('finds by a string/uuid key and returns a result object', function (done) {
+      db.orders.findOne(function (err, order) {
+        assert.notStrictEqual(order, undefined);
+        db.orders.find(order.id, function(err, res) {
+          assert.equal(res.id, order.id);
+          done();
+        });
+      });
+    });
+
+    it('findOnes by a string/uuid key and returns a result object', function (done) {
+      db.orders.findOne(function (err, order) {
+        assert.notStrictEqual(order, undefined);
+        db.orders.findOne(order.id, function(err, res) {
+          assert.equal(res.id, order.id);
+          done();
+        });
       });
     });
   });
