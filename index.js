@@ -105,16 +105,34 @@ Massive.prototype.loadTables = function(next) {
 
   this.executeSqlFile({file : tableSql, params: parameters}, function(err,tables) {
     if (err) { return next(err, null); }
+    
+    var prevTable = {};
+    tables.push({});
 
     _.each(tables, function(table){
-      var _table = new Table({
-        schema : table.schema,
-        name : table.name,
-        pk : table.pk,
-        db : self
-      });
-
-      MapToNamespace(_table);
+      if (prevTable.schema == table.schema && prevTable.name == table.name) {
+    	  if (!prevTable.pk) 
+    		  prevTable = table;
+    	  else if (table.pk) {
+    		  if (!_.isArray(prevTable.pk))
+    			  prevTable.pk = [prevTable.pk];
+			  prevTable.pk.push(table.pk);
+    	  }
+    		  
+      } else {
+    	  if (prevTable.name) {
+	          var _table = new Table({
+	            schema : prevTable.schema,
+	            name : prevTable.name,
+	            pk : prevTable.pk,
+	            db : self
+	          });
+	
+	          MapToNamespace(_table);
+    	  }          
+          prevTable = table;
+      }
+    	
     });
 
     next(null,self);
