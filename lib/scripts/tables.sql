@@ -1,3 +1,14 @@
+select distinct * from 
+
+(
+
+select tc.table_schema as schema, tc.table_name as name, '' as pk
+from information_schema.tables tc
+where tc.table_schema = 'public' and tc.table_type = 'BASE TABLE'
+
+union
+
+
 -- REQUIRES THREE ARGUMENTS:
 -- $1, $2, $2 all must be empty string, or comma-delimited string, or array of string: 
 select tc.table_schema as schema, tc.table_name as name, kc.column_name as pk
@@ -22,6 +33,11 @@ where
       when $3 = '' then 1=0
       -- Below can use '%' as wildcard. Change 'like' to '=' to require exact names: 
       else replace((tc.table_schema || '.'|| tc.table_name), 'public.', '') like any(string_to_array(replace($3, ' ', ''), ',')) end)
-order by tc.table_schema,
-         tc.table_name,
-         kc.position_in_unique_constraint;
+
+
+
+) tab
+
+order by tab.schema,
+         tab.name,
+         tab.pk;
