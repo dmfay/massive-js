@@ -118,8 +118,8 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
-      it('should get operations for a quotey JSON field', function () {
-        var result = where.parseKey('"json field"->>\'key\' <=');
+      it('should get operations for a quotey/whitespacey JSON field', function () {
+        var result = where.parseKey('"json field" ->> \'key\' <=');
         assert.equal(result.field, '"json field"->>\'key\'');
         assert.equal(result.operator, '<=');
         assert.equal(result.mutator, undefined);
@@ -132,8 +132,8 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
-      it('should get operations for a quotey JSON object', function () {
-        var result = where.parseKey('"json field"#>>\'{outer,inner}\' <=');
+      it('should get operations for a quotey/whitespacey JSON object', function () {
+        var result = where.parseKey('"json field" #>> \'{outer,inner}\' <=');
         assert.equal(result.field, '"json field"#>>\'{outer,inner}\'');
         assert.equal(result.operator, '<=');
         assert.equal(result.mutator, undefined);
