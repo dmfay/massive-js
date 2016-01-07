@@ -103,6 +103,13 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
+      it('should allow any amount of whitespace', function () {
+        var result = where.parseKey('myfield    \t  \t <=');
+        assert.equal(result.field, '"myfield"');
+        assert.equal(result.operator, '<=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should get the appropriate mutator', function () {
         var result = where.parseKey('"my field" @>');
         assert.equal(result.field, '"my field"');
