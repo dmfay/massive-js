@@ -18,6 +18,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('with run and id returns Product 1', function (done) {
       db.run("select * from products where id=$1",[1], function(err,res){
         assert.equal(1, res[0].id);
@@ -33,6 +34,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('updates a product', function (done) {
       var product = {id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200, tags: ['1', '2']};
       db.products.save(product, function(err, res){
@@ -42,6 +44,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('updates multiple products', function (done) {
       db.products.update({in_stock: true}, {in_stock: false}, function(err, res) {
         assert.equal(res.length, 2);
@@ -52,6 +55,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('updates all products', function (done) {
       db.products.update({}, {price: 1.23}, function(err, res) {
         assert.equal(res.length, 5);
@@ -63,6 +67,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('updates multiple products with an IN list', function (done) {
       db.products.update({id: [1, 2]}, {price: 123.45}, function(err, res) {
         assert.equal(res.length, 2);
@@ -73,6 +78,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+
     it('updates multiple products with a NOT IN list', function (done) {
       db.products.update({'id !=': [1, 2]}, {price: 543.21}, function(err, res) {
         assert.equal(res.length, 3);
@@ -85,19 +91,57 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
-    it('deletes a product ', function (done) {
+
+    it('deletes a product', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
-        var remaining = db.products.find(4, function(err, found) { 
+        var remaining = db.products.find(4, function(err, found) {
           //Deleted returns an array...
           assert(found === undefined && deleted[0].id === 4);
           done();
         });
       });
     });
+
     it('deletes all products', function (done) {
       db.products.destroy({}, function(err, deleted){
-        var remaining = db.products.find({}, function(err, found) { 
+        var remaining = db.products.find({}, function(err, found) {
           assert.equal(deleted.length, 4);
+          assert.equal(found.length, 0);
+          done();
+        });
+      });
+    });
+
+    it('deletes by matching json', function (done) {
+      db.docs.destroy({'body->>title': 'A Document'}, function(err, deleted) {
+        assert.equal(deleted.length, 1);
+
+        db.docs.find({id: deleted[0].id}, function (err, found) {
+          assert.equal(err, null);
+          assert.equal(found.length, 0);
+          done();
+        });
+      });
+    });
+
+    it('deletes by matching json with whitespace', function (done) {
+      db.docs.destroy({'body ->> title': 'Another Document'}, function(err, deleted) {
+        assert.equal(deleted.length, 1);
+
+        db.docs.find({id: deleted[0].id}, function (err, found) {
+          assert.equal(err, null);
+          assert.equal(found.length, 0);
+          done();
+        });
+      });
+    });
+
+    it('deletes by matching json with quotes', function (done) {
+      db.docs.destroy({'"body" ->> \'title\'': 'Starsky and Hutch'}, function(err, deleted) {
+        assert.equal(deleted.length, 1);
+
+        db.docs.find({id: deleted[0].id}, function (err, found) {
+          assert.equal(err, null);
           assert.equal(found.length, 0);
           done();
         });
@@ -122,7 +166,7 @@ describe('Tables -Add/Edit/Delete', function () {
     });
     it('deletes a User ', function (done) {
       db.Users.destroy({Id : 2}, function(err, deleted){
-        var remaining = db.Users.find(2, function(err, found) { 
+        var remaining = db.Users.find(2, function(err, found) {
           //Deleted returns an array...
           assert(found === undefined && deleted[0].Id == 2);
           done();
@@ -143,9 +187,9 @@ describe('Tables -Add/Edit/Delete', function () {
     });
 
     it('updates an order', function (done) {
-      db.orders.findOne({}, function(err, found) { 
+      db.orders.findOne({}, function(err, found) {
         if (err) { throw err; }
-        
+
         found.notes = 'hello';
 
         db.orders.save(found, function(err, res) {
@@ -157,11 +201,11 @@ describe('Tables -Add/Edit/Delete', function () {
     });
 
     it('deletes an order', function (done) {
-      db.orders.findOne({}, function(err, found) { 
+      db.orders.findOne({}, function(err, found) {
         if (err) { throw err; }
 
         db.orders.destroy({id : found.id}, function(err, deleted) {
-          db.orders.findOne({id : found.id}, function(err, remaining) { 
+          db.orders.findOne({id : found.id}, function(err, remaining) {
             assert.equal(deleted[0].id, found.id);
             assert.ok(remaining === undefined);
             done();
