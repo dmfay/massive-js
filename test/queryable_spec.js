@@ -458,6 +458,12 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('works with materialized views', function (done) {
+      db.mv_orders.find(function(err,res) {
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
   });
 
   describe('Streaming Results', function () {
