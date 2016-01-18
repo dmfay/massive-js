@@ -25,7 +25,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 2);
+      assert.equal(db.views.length, 3);
 
       done();
     });
@@ -38,7 +38,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 2);
+      assert.equal(db.views.length, 3);
 
       done();
     });
@@ -60,7 +60,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert(!db.myschema.artists);
       assert(db.products);
       assert.equal(db.tables.length, 4);
-      assert.equal(db.views.length, 1);
+      assert.equal(db.views.length, 2);
       done();
     });
   });
@@ -97,7 +97,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 2);
+      assert.equal(db.views.length, 3);
 
       done();
     });
@@ -110,7 +110,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert.equal(db.tables.length, 8);
-      assert.equal(db.views.length, 1);
+      assert.equal(db.views.length, 2);
 
       done();
     });
@@ -122,7 +122,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
       assert.equal(db.tables.length, 8);
-      assert.equal(db.views.length, 2);
+      assert.equal(db.views.length, 3);
       done();
     });
   });
@@ -134,7 +134,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.secrets.__secret_table);
       assert(db.secrets.__semi_secret_table);
       assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 1);
+      assert.equal(db.views.length, 2);
       done();
     });
   });
@@ -146,7 +146,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
       assert.equal(db.tables.length, 7);
-      assert.equal(db.views.length, 1);
+      assert.equal(db.views.length, 2);
       done();
     });
   });
@@ -158,7 +158,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
       assert.equal(db.tables.length, 7);
-      assert.equal(db.views.length, 1);
+      assert.equal(db.views.length, 2);
       done();
     });
   });
@@ -188,7 +188,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.products);
       assert(db.myschema.artists);
       assert.equal(db.tables.length, 8);
-      assert.equal(db.views.length, 2);
+      assert.equal(db.views.length, 3);
       done();
     });
   });

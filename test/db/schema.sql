@@ -1,10 +1,10 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+drop materialized view if exists mv_orders;
 drop table if exists "Users";
 drop table if exists products cascade;
 drop table if exists docs;
 drop table if exists orders;
-
 
 create table "Users"(
   "Id" serial primary key,
@@ -63,6 +63,8 @@ insert into orders(product_id, user_id, notes)
 values (1, 1, 'user 1 ordered product 1'),
   (2, 1, 'user 1 ordered product 2'),
   (4, 1, 'user 1 ordered product 4');
+
+create materialized view mv_orders as select * from orders;
 
 -- schema stuff:
 drop table if exists myschema.artists cascade;
@@ -123,7 +125,6 @@ insert into myschema.docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
-
 
 create or replace function all_products()
 returns setof products
