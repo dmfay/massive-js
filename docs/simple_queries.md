@@ -88,7 +88,7 @@ db.products.find({"id < " : 2}, function(err, res){
   //id less than 2
 });
 
-db.products.find({"id < " : 2}, function(err, res){
+db.products.find({"id > " : 2}, function(err, res){
   //id greater than 2
 });
 
