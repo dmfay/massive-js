@@ -24,7 +24,7 @@ db.login(['username', password], function(err,result){
 
 ```
 
-You can create a directory in the root of your project called "db" and Massive will load the SQL files therein and make them executable based on file name. 
+You can create a directory in the root of your project called "db" and Massive will load the SQL files therein and make them executable based on file name.
 
 For instance, if you create a file called `db/my_query.sql` and add some SQL to it:
 
@@ -44,5 +44,3 @@ db.my_query(['joe', 'Hanalei'], function(err,res){
 ```
 
 This is what Massive is. It helps you access and query your database *as you want to*, embracing the goodness of SQL.
-
-

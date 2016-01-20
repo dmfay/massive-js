@@ -2,25 +2,25 @@ var assert = require("assert");
 var helpers = require("./helpers");
 var db;
 
-describe('Schmema-Bounds Document queries', function () {
-  
+describe('Schema-Bounds Document queries', function () {
+
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
-      done()
+      done();
     });
-  });  
+  });
   it('returns a db', function () {
     assert(db, "No db");
   });
   describe('Querying documents in a schema-bound table', function () {
-    it('returns all documents when passed "*"', function (done) { 
+    it('returns all documents when passed "*"', function (done) {
       db.myschema.docs.findDoc("*", function(err,res){
         assert.equal(res.length, 3);
         done();
       });
     });
-    it('returns all documents when passed only "next" function', function (done) { 
+    it('returns all documents when passed only "next" function', function (done) {
       db.myschema.docs.findDoc(function(err,res){
         assert.equal(res.length, 3);
         done();
