@@ -83,7 +83,7 @@ db.doggies.find({"body ->> 'name'" : "Fido"}, function(err,res){
 A better way is to use `findDoc()`:
 
 ```js
-db.doggies.findDoc(name : "Fido"}, function(err,res){
+db.doggies.findDoc({name : "Fido"}, function(err,res){
   //Hi Fido
 });
 ```
