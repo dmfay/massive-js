@@ -74,7 +74,7 @@ create table users(
 
 ```
 
-Quite out of `psql` with `\q` and now let's create our Node code. Create a file called "index.js" and in it, let's connect to our database and add some records:
+Quit out of `psql` with `\q` and now let's create our Node code. Create a file called "index.js" and in it, let's connect to our database and add some records:
 
 ```js
 var Massive=require("massive");
