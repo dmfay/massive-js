@@ -27,14 +27,14 @@ describe('Document updates,', function(){
       assert.equal(1, newDoc.score);
     });
     it('updates the document', function(done) {
-      db.doggies.updateDoc(newDoc.id, "vaccinated", true, function(err, doc){
+      db.doggies.setAttribute(newDoc.id, "vaccinated", true, function(err, doc){
         assert.equal(doc.vaccinated, true);
         done();
       });
     });
     it('updates the document without replacing existing attributes', function(done) {
-      db.doggies.updateDoc(newDoc.id, "score", 10, function(err, doc){
-        assert.equal(doc.score, 10);
+      db.doggies.setAttribute(newDoc.id, "score", 99, function(err, doc){
+        assert.equal(doc.score, 99);
         assert.equal(doc.vaccinated, true);
         assert.equal(doc.id, newDoc.id);
         done();
