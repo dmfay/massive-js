@@ -17,7 +17,7 @@ exports.resetDb = function(next){
     assert(!err,err);
     db.schema(function(err, res){
       assert(!err,err);
-      next(null,db);
+      next(null, db);
     });
   });
 };
