@@ -26,7 +26,7 @@ describe('Document updates,', function(){
     it('check saved attribute', function(){
       assert.equal(1, newDoc.score);
     });
-    it('updates the document', function() {
+    it('updates the document', function(done) {
       db.doggies.updateDoc(newDoc.id, "vaccinated", true, function(err, doc){
         assert.equal(doc.vaccinated, true);
         done();
