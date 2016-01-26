@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - '5'
+  - '4'
+  - '0.12'
+  - '0.10'
+addons:
+  postgresql: "9.4"
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database massive;' -U postgres
