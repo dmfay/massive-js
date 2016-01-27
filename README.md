@@ -361,11 +361,17 @@ db.myFunction(['thing1', 'thing2'], function(err,res){
 
 ## REPL
 
-Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire it up to play with your DB in the console:
+Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire it up to play with your DB in the console. The easiest way to access the REPL is to install Massive globally:
+
+```
+npm install --global massive
+```
+
+You can then connect to your database using the `massive` command:
 
 ```
 # connect to local server, database my_database
-bin massive -d my_database
+massive -d my_database
 db >
 ```
 
