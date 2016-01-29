@@ -27,6 +27,7 @@ describe('Document updates,', function(){
 
     it('updates the document', function(done) {
       db.docs.setAttribute(newDoc.id, "vaccinated", true, function(err, doc){
+        assert.ifError(err);
         assert.equal(doc.vaccinated, true);
         done();
       });
