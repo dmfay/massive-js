@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 var repl = require("repl");
 var massive = require("../index");
 var program = require('commander');
-var assert = require("assert");
 
 program
   .version('0.0.1')
@@ -23,14 +24,11 @@ if(program.database){
 }
 
 if(connectionString){
-  massive.connect({connectionString : connectionString}, function(err,db){ 
+  massive.connect({connectionString : connectionString}, function(err,db){
     var context = repl.start({
-      prompt: "db > ",
+      prompt: "db > "
     }).context;
     context.db = db;
     console.log("Massive loaded and listening");
   });
-
 }
-
-

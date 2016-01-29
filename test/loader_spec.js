@@ -7,7 +7,7 @@ describe('On spin up', function () {
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
-      done()
+      done();
     });
   });
   it('returns a valid db interface', function () {
@@ -17,7 +17,7 @@ describe('On spin up', function () {
     assert(db.myschema, "No Schema loaded");
   });
   it('loads tables in db schema as properties of namespace', function() {
-    assert(db.myschema.artists && db.myschema.albums, 'No tables loaded on schema')
+    assert(db.myschema.artists && db.myschema.albums, 'No tables loaded on schema');
   });
   it('loads up 7 tables with 2 in schema object in array property', function () {
     assert.equal(db.tables.length, 9);
@@ -50,7 +50,7 @@ describe('Synchronous Load', function () {
     assert(syncLoaded.myschema, "No Schema loaded");
   });
   it('loads tables in syncLoaded schema as properties of namespace', function() {
-    assert(syncLoaded.myschema.artists && syncLoaded.myschema.albums, 'No tables loaded on schema')
+    assert(syncLoaded.myschema.artists && syncLoaded.myschema.albums, 'No tables loaded on schema');
   });
   it('loads up 7 tables with 2 in schema object in array property', function () {
     assert.equal(syncLoaded.tables.length, 9);

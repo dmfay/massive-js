@@ -1,6 +1,5 @@
 var assert = require("assert");
 var helpers = require("./helpers");
-var _ = require("underscore")._;
 var db;
 
 describe('Tables -Add/Edit/Delete', function () {
@@ -94,7 +93,7 @@ describe('Tables -Add/Edit/Delete', function () {
 
     it('deletes a product', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
-        var remaining = db.products.find(4, function(err, found) {
+        db.products.find(4, function(err, found) {
           //Deleted returns an array...
           assert(found === undefined && deleted[0].id === 4);
           done();
@@ -104,7 +103,7 @@ describe('Tables -Add/Edit/Delete', function () {
 
     it('deletes all products', function (done) {
       db.products.destroy({}, function(err, deleted){
-        var remaining = db.products.find({}, function(err, found) {
+        db.products.find({}, function(err, found) {
           assert.equal(deleted.length, 4);
           assert.equal(found.length, 0);
           done();
@@ -166,7 +165,7 @@ describe('Tables -Add/Edit/Delete', function () {
     });
     it('deletes a User ', function (done) {
       db.Users.destroy({Id : 2}, function(err, deleted){
-        var remaining = db.Users.find(2, function(err, found) {
+        db.Users.find(2, function(err, found) {
           //Deleted returns an array...
           assert(found === undefined && deleted[0].Id == 2);
           done();
@@ -225,7 +224,7 @@ describe('Tables -Add/Edit/Delete', function () {
     });
 
     it('inserts multiple products', function (done) {
-      db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (err, res, res2) {
+      db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (err, res) {
         assert.equal(res.length, 2);
         assert.equal(res[0].name, "A Product");
         assert.equal(res[1].name, "Another Product");
