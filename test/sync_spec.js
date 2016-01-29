@@ -1,7 +1,6 @@
 var assert = require("assert");
 var helpers = require("./helpers");
 var Massive = require("../index");
-var _ = require("underscore")._;
 var db;
 
 describe("Synchronous goodies", function(){

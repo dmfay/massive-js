@@ -2,9 +2,6 @@ var assert = require("assert");
 var helpers = require("./helpers");
 var massive = require("../index");
 
-var path = require("path");
-var scriptsDir = path.join(__dirname, ".", "db");
-
 // JA NOTE: These tests run a little slower then most because we are connecting and
 // re-loading the db with each test.
 
@@ -13,9 +10,7 @@ var scriptsDir = path.join(__dirname, ".", "db");
 
 describe('On Load with Schema Filters (these tests may run slow - loads db each test!!)', function () {
   before(function(done){
-    helpers.resetDb(function(err,res){
-      done();
-    });
+    helpers.resetDb(done);
   });
   it('loads all schema entities when no schema argument is passed', function (done) {
     massive.connect({connectionString: helpers.connectionString}, function (err, db) {

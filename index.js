@@ -6,9 +6,7 @@ var Queryable = require("./lib/queryable");
 var Table = require("./lib/table");
 var util = require("util");
 var assert = require("assert");
-var Document = require("./lib/document");
 var ArgTypes = require("./lib/arg_types");
-var Args = require("args-js");
 var path = require("path");
 var DA = require('deasync');
 var stripBom = require('strip-bom');
@@ -175,7 +173,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     // Create the table in the back end:
     var sql = this.documentTableSql(collection);
 
-    this.query(sql, function(err,res){
+    this.query(sql, function(err){
       if(err){
         next(err,null);
       } else {
@@ -193,6 +191,7 @@ var MapToNamespace = function(entity, collection) {
 
   var db = entity.db;
   var executor;
+  var schemaName;
 
   // executables are always invoked directly, so we need to handle them a bit differently
   if (entity instanceof Executable) {
@@ -297,12 +296,9 @@ Massive.prototype.loadFunctions = function(next) {
             params.push("$" + i);
           }
 
-          var namespace = self;
-
           if (schema !== "public") {
             sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
             self[schema] = self[schema] || {};
-            namespace = self[schema];
           } else {
             sql = util.format("select * from \"%s\"", fn.name);
           }
@@ -347,7 +343,7 @@ exports.connect = function(args, next){
 
     self = db;
 
-    massive.loadViews(function(err, db) {
+    massive.loadViews(function() {
       massive.loadFunctions(function(err, db) {
         assert(!err, err);
         //synchronous

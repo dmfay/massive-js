@@ -1,6 +1,4 @@
 var assert = require("assert");
-var helpers = require("./helpers");
-var _ = require("underscore")._;
 var where = require('../lib/where');
 
 describe('WHERE clause generation', function () {

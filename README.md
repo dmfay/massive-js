@@ -45,7 +45,7 @@ var connectionString = "postgres://massive:password@localhost/chinook";
 // connect to Massive and get the db instance. You can safely use the
 // convenience sync method here because its on app load
 // you can also use loadSync - it's an alias
-var massiveInstance = massive.connectSync({connectionString : connectionString}) 
+var massiveInstance = massive.connectSync({connectionString : connectionString})
 
 // Set a reference to the massive instance on Express' app:
 app.set('db', massiveInstance);
@@ -414,6 +414,28 @@ By default, Massive provides a callback for you if you don't pass one in. This a
 
 
 There's more to do with the massive REPL - such as generating query files for you (if you're not accomplished at SQL just yet) as well as a better way to play with the results.
+
+## Development
+
+The tests are run against a local `massive` database.
+
+First create the database:
+
+```
+createdb massive
+```
+
+You can then run the tests:
+
+```
+npm test
+```
+
+To check your code for linting errors, run:
+
+```
+npm run lint
+```
 
 ## Want to help?
 

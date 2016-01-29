@@ -3,13 +3,13 @@ var helpers = require("./helpers");
 var db;
 
 describe('Document saves', function () {
-  
+
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
-      done()
+      done();
     });
-  });  
+  });
 
   describe("To a non-existent table", function () {
     var newDoc = {};
@@ -25,9 +25,9 @@ describe('Document saves', function () {
     it('returns the doc', function () {
       assert.equal("Fido", newDoc.name);
     });
-    it('updates the doc', function (done) { 
+    it('updates the doc', function (done) {
       newDoc.name = "Bruno";
-      db.doggies.saveDoc(newDoc, function (err, res) { 
+      db.doggies.saveDoc(newDoc, function () {
         assert.equal(newDoc.name, "Bruno");
         done();
       });
@@ -45,25 +45,23 @@ describe('Document saves', function () {
       });
     });
     after(function(done){
-      db.query("DROP TABLE doggies;", function(err,res){
-        done();
-      });
-    })
+      db.query("DROP TABLE doggies;", done);
+    });
 
   });
 
-  describe("To an Existing Table", function() { 
+  describe("To an Existing Table", function() {
     var film ={};
 
-    before(function(done) { 
-      db.docs.saveDoc( { title : "Alone", description : "yearning in the darkness", price : 89.99, is_good : true, created_at : "2015-03-04T09:43:41.643Z" }, function(err, res) { 
+    before(function(done) {
+      db.docs.saveDoc( { title : "Alone", description : "yearning in the darkness", price : 89.99, is_good : true, created_at : "2015-03-04T09:43:41.643Z" }, function(err, res) {
         film = res;
         done();
       });
     });
 
-    it("Saves a new movie", function (done) { 
-      assert(film.title == "Alone" && film.id == 4)
+    it("Saves a new movie", function (done) {
+      assert(film.title == "Alone" && film.id == 4);
       done();
     });
     it("updates the movie title", function (done) {

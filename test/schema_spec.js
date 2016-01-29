@@ -4,7 +4,7 @@ var _ = require("underscore")._;
 var db;
 
 describe('Schema - Bound Tables -Add/Edit/Delete', function () {
-  
+
   //Separate 'suite' for add/edit/delete so query tests don't get borked:
   before(function(done){
     helpers.resetDb(function(err,res){
@@ -29,7 +29,7 @@ describe('Schema - Bound Tables -Add/Edit/Delete', function () {
     });
     it('deletes an artist ', function (done) {
       db.myschema.artists.destroy({id : 4}, function(err, deleted){
-        var remaining = db.myschema.artists.find(4, function(err, found) { 
+        db.myschema.artists.find(4, function(err, found) {
           assert(deleted[0].id == 4 && found == undefined);
         });
         done();
@@ -40,7 +40,7 @@ describe('Schema - Bound Tables -Add/Edit/Delete', function () {
 });
 
 describe('Schema - Bound Tables -Querying', function () {
-  
+
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;

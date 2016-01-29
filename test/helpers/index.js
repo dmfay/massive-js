@@ -15,7 +15,7 @@ exports.init = function(next){
 exports.resetDb = function(next){
   this.init(function(err,db){
     assert(!err,err);
-    db.schema(function(err, res){
+    db.schema(function(err){
       assert(!err,err);
       next(null, db);
     });
@@ -25,4 +25,3 @@ exports.resetDb = function(next){
 before(function(done){
   exports.resetDb(done);
 });
-
