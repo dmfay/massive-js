@@ -14,3 +14,6 @@ pages:
 - SQL Files and Functions : functions.md
 - Document Queries : document_queries.md
 - Full Text Search : full_text_search.md
+- API :
+  - Tables : API/tables.md
+  - Functions : API/functions.md
