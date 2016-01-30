@@ -16,12 +16,14 @@ describe('Schema - Bound Tables -Add/Edit/Delete', function () {
   describe('Add/Update/Delete records in a schema-bound table:', function() {
     it('adds an artist ', function (done) {
       db.myschema.artists.save({name : "Nirvana"}, function(err, res){
+        assert.ifError(err);
         assert.equal(res.id, 4);
         done();
       });
     });
     it('updates an artist ', function (done) {
       db.myschema.artists.save({id : 4, name : "The Wipers"}, function(err, res){
+        assert.ifError(err);
         assert.equal(res.id, 4);
         assert.equal(res.name, "The Wipers");
         done();
@@ -29,7 +31,9 @@ describe('Schema - Bound Tables -Add/Edit/Delete', function () {
     });
     it('deletes an artist ', function (done) {
       db.myschema.artists.destroy({id : 4}, function(err, deleted){
+        assert.ifError(err);
         db.myschema.artists.find(4, function(err, found) {
+          assert.ifError(err);
           assert(deleted[0].id == 4 && found == undefined);
         });
         done();
@@ -51,12 +55,14 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Simple queries with args', function () {
     it('returns Artist 1 with 1 as only arg', function (done) {
       db.myschema.artists.find(1, function(err,res){
+        assert.ifError(err);
         assert.equal(res.id, 1);
         done();
       });
     });
     it('returns first record with findOne no args', function (done) {
       db.myschema.artists.findOne(1, function(err,res){
+        assert.ifError(err);
         assert.equal(res.id, 1);
         done();
       });
@@ -65,12 +71,14 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Simple queries without args', function () {
     it('returns all records on find with no args', function (done) {
       db.myschema.artists.find(function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 3);
         done();
       });
     });
     it('returns first record with findOne no args', function (done) {
       db.myschema.artists.findOne(function(err,res){
+        assert.ifError(err);
         assert.equal(res.id, 1);
         done();
       });
@@ -79,18 +87,21 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Simple queries with AND and OR', function () {
     it('returns Artist 1 OR Artist 2', function (done) {
       db.myschema.artists.where("id=$1 OR id=$2", [1,2],function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 2);
         done();
       });
     });
     it('returns Artist 1 AND Artist 2', function (done) {
       db.myschema.artists.where("id=$1 AND name=$2", [3, "Sex Pistols"],function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 1);
         done();
       });
     });
     it('returns Artist 1 with params as not array', function (done) {
       db.myschema.artists.where("id=$1", 1,function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 1);
         done();
       });
@@ -99,12 +110,14 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Simple queries with count', function () {
     it('returns 2 for OR id 1 or 2', function (done) {
       db.myschema.artists.count("id=$1 OR id=$2", [1,2],function(err,res){
+        assert.ifError(err);
         assert.equal(res,2);
         done();
       });
     });
     it('returns 1 for id 1', function (done) {
       db.myschema.artists.count("id=$1", [1],function(err,res){
+        assert.ifError(err);
         assert.equal(res, 1);
         done();
       });
@@ -113,24 +126,28 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Simple comparative queries', function () {
     it('returns Artist with id greater than 2', function (done) {
       db.myschema.artists.find({"id > " : 2}, function(err,res){
+        assert.ifError(err);
         assert.equal(res[0].id, 3);
         done();
       });
     });
     it('returns Artist with id less than 2', function (done) {
       db.myschema.artists.find({"id < " : 2}, function(err,res){
+        assert.ifError(err);
         assert.equal(res[0].id, 1);
         done();
       });
     });
     it('returns myschema.artists IN 1 and 2', function (done) {
       db.myschema.artists.find({id : [1,2]}, function(err,res){
+        assert.ifError(err);
         assert.equal(res[0].id, 1);
         done();
       });
     });
     it('returns Artist NOT IN 1 and 2', function (done) {
       db.myschema.artists.find({"id <>" : [1,2]}, function(err,res){
+        assert.ifError(err);
         assert.equal(res[0].id, 3);
         done();
       });
@@ -139,18 +156,21 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Limiting and Offsetting results', function () {
     it('returns 1 result with limit of 1', function (done) {
       db.myschema.artists.find(null,{limit : 1}, function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 1);
         done();
       });
     });
     it('returns second result with limit of 1, offset of 1', function (done) {
       db.myschema.artists.find({},{limit : 1, offset: 1}, function(err,res){
+        assert.ifError(err);
         assert.equal(res[0].id, 2);
         done();
       });
     });
     it('returns id and name if sending in columns', function (done) {
       db.myschema.artists.find({},{columns :["id","name"]}, function(err,res){
+        assert.ifError(err);
         var keys = _.keys(res[0]);
         assert.equal(keys.length,2);
         done();
@@ -161,6 +181,7 @@ describe('Schema - Bound Tables -Querying', function () {
   describe('Ordering results', function () {
     it('returns ascending order of myschema.artists by name', function (done) {
       db.myschema.artists.find({}, {order : "name"}, function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 3);
         assert.equal(res[0].id, 1);
         assert.equal(res[2].id, 3);
@@ -169,6 +190,7 @@ describe('Schema - Bound Tables -Querying', function () {
     });
     it('returns descending order of myschema.artists', function (done) {
       db.myschema.artists.find({},{order : "id desc"}, function(err,res){
+        assert.ifError(err);
         assert.equal(res.length, 3);
         assert.equal(res[0].id, 3);
         assert.equal(res[2].id, 1);
