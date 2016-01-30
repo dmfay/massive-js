@@ -437,6 +437,12 @@ To check your code for linting errors, run:
 npm run lint
 ```
 
+To generate a test coverage report, run:
+
+```
+npm run coverage
+```
+
 ## Want to help?
 
 This project is just getting off the ground and could use some help with DRYing things up and refactoring.

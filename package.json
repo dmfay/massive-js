@@ -13,7 +13,8 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint .",
-    "posttest": "npm run lint"
+    "posttest": "npm run lint",
+    "coverage": "istanbul cover _mocha -- -R dot"
   },
   "keywords": [
     "postgres",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "eslint": "^1.10.3",
+    "istanbul": "^0.4.2",
     "mocha": "^2.1.0",
     "sinon": "^1.12.2"
   },
