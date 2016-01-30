@@ -3,7 +3,7 @@ var helpers = require("./helpers");
 var db;
 
 describe('Queries built from files', function () {
-  
+
   before(function(done) {
     helpers.resetDb(function(err,res) {
       db = res;
@@ -35,6 +35,7 @@ describe('Queries built from files', function () {
 
     it('executes productById with a primitive param and callback', function (done) {
       db.special.productById(1, function(err,products){
+        assert.ifError(err);
         var p1 = products[0];
         assert.equal("Product 1", p1.name);
         done();
@@ -43,6 +44,7 @@ describe('Queries built from files', function () {
 
     it('executes productByName with multiple params and callback', function (done) {
       db.productByName(["Product 1", "Product 2"], function(err,products){
+        assert.ifError(err);
         var p1 = products[0];
         var p2 = products[1];
         assert.equal("Product 1", p1.name);
@@ -53,6 +55,7 @@ describe('Queries built from files', function () {
 
     it('executes a deep namespaced query', function (done) {
       db.queries.users.allUsers(function(err,users){
+        assert.ifError(err);
         assert.equal(1, users.length);
         done();
       });
@@ -60,7 +63,7 @@ describe('Queries built from files', function () {
 
     it('streams inStockProducts without params', function (done) {
       db.inStockProducts({stream: true}, function(err, stream) {
-        assert.ok(err === null);
+        assert.ifError(err);
 
         var result = [];
 
@@ -79,7 +82,7 @@ describe('Queries built from files', function () {
 
     it('streams productById with a primitive param', function (done) {
       db.special.productById(1, {stream: true}, function(err, stream) {
-        assert.ok(err === null);
+        assert.ifError(err);
 
         var result = [];
 
@@ -98,7 +101,7 @@ describe('Queries built from files', function () {
 
     it('streams productByName with params and callback', function (done) {
       db.productByName(["Product 1", "Product 2"], {stream: true}, function(err, stream) {
-        assert.ok(err === null);
+        assert.ifError(err);
 
         var result = [];
 

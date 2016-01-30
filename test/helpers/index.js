@@ -1,7 +1,7 @@
 var massive = require("../../index");
 var connectionString = "postgres://postgres@localhost/massive";
-var assert = require("assert");
 var path = require("path");
+var assert = require("assert");
 var scriptsDir = path.join(__dirname, "..", "db");
 
 exports.connectionString = connectionString;
@@ -14,9 +14,11 @@ exports.init = function(next){
 
 exports.resetDb = function(next){
   this.init(function(err,db){
-    assert(!err,err);
+    assert.ifError(err);
+
     db.schema(function(err){
-      assert(!err,err);
+      assert.ifError(err);
+
       next(null, db);
     });
   });

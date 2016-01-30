@@ -16,6 +16,7 @@ describe('Document updates,', function(){
     var newDoc = {};
     before(function(done) {
       db.saveDoc("docs", {name:"Foo", score:1}, function(err, doc){
+        assert.ifError(err);
         newDoc = doc;
         done();
       });
@@ -35,6 +36,7 @@ describe('Document updates,', function(){
 
     it('updates the document without replacing existing attributes', function(done) {
       db.docs.setAttribute(newDoc.id, "score", 99, function(err, doc){
+        assert.ifError(err);
         assert.equal(doc.score, 99);
         assert.equal(doc.vaccinated, true);
         assert.equal(doc.id, newDoc.id);
