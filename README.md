@@ -1,4 +1,4 @@
-<img src="http://rob.conery.io/wp-content/uploads/2015/03/massive-logo.png" width=450 />
+<img src="http://rob.conery.io/img/2015/03/massive-logo.png" width=450 />
 
 ## Massive 2.0: A Postgres-centric Data Access Tool
 
