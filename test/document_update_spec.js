@@ -1,5 +1,6 @@
 var assert = require("assert");
 var helpers = require("./helpers");
+var skipBelow95 = require("./helpers/versions").skipBelow95;
 
 describe('Document updates,', function(){
   var db;
@@ -22,11 +23,11 @@ describe('Document updates,', function(){
       });
     });
 
-    it('check saved attribute', function(){
+    skipBelow95('check saved attribute', function(){
       assert.equal(1, newDoc.score);
     });
 
-    it('updates the document', function(done) {
+    skipBelow95('updates the document', function(done) {
       db.docs.setAttribute(newDoc.id, "vaccinated", true, function(err, doc){
         assert.ifError(err);
         assert.equal(doc.vaccinated, true);
@@ -34,7 +35,7 @@ describe('Document updates,', function(){
       });
     });
 
-    it('updates the document without replacing existing attributes', function(done) {
+    skipBelow95('updates the document without replacing existing attributes', function(done) {
       db.docs.setAttribute(newDoc.id, "score", 99, function(err, doc){
         assert.ifError(err);
         assert.equal(doc.score, 99);
