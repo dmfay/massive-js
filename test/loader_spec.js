@@ -28,7 +28,8 @@ describe('On spin up', function () {
     assert.equal(db.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(db.functions.length, 20);
+    // newer versions of postgres include more than 20 functions
+    assert.ok(db.functions.length >= 20);
   });
 });
 
@@ -61,6 +62,7 @@ describe('Synchronous Load', function () {
     assert.equal(syncLoaded.queryFiles.length, 7);
   });
   it('loads up functions', function () {
-    assert.equal(syncLoaded.functions.length, 20);
+    // newer versions of postgres include more than 20 functions
+    assert.ok(syncLoaded.functions.length >= 20);
   });
 });
