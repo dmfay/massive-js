@@ -99,7 +99,25 @@ describe('Tables -Add/Edit/Delete', function () {
       });
     });
 
-    it('deletes a product', function (done) {
+    it('returns a product when there are no fields to be updated', function (done) {
+      db.products.update({id: 1}, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.id, 1);
+        assert.equal(res.name, 'Product 1');
+        done();
+      });
+    });
+
+    it('returns multiple products when there are no fields to be updated', function (done) {
+      db.products.update({id: [1, 2]}, {}, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].name, 'Product 1');
+        done();
+      });
+    });
+    
+    it('deletes a product ', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
         db.products.find(4, function(err, found) {
           assert.ifError(err);
