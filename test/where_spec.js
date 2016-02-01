@@ -208,6 +208,57 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[1], 'value2');
       assert.equal(result.params[2], 'value3');
     });
+
+    describe('subgroups', function () {
+      it('should encapsulate and OR together subgroups', function () {
+        var result = where.forTable({or: [{field1: 'value1'}, {field2: 'value2', field3: 'value3'}]});
+        assert.equal(result.where, ' \nWHERE (("field1" = $1) OR ("field2" = $2 AND "field3" = $3))');
+        assert.equal(result.params.length, 3);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+      });
+
+      it('should allow non-equality operations and null interpolation', function () {
+        var result = where.forTable({or: [{'field1 !=': null}, {'field2 <': 'value2'}], field3: 'value3'});
+        assert.equal(result.where, ' \nWHERE (("field1" IS NOT null) OR ("field2" < $1)) \nAND "field3" = $2');
+        assert.equal(result.params.length, 2);
+        assert.equal(result.params[0], 'value2');
+        assert.equal(result.params[1], 'value3');
+      });
+
+      it('should parse JSON traversal operations', function () {
+        var result = where.forTable({or: [{'field->>val': 'value1'}, {'field->>val': 'value2'}], field3: 'value3'});
+        assert.equal(result.where, ' \nWHERE (("field"->>\'val\' = $1) OR ("field"->>\'val\' = $2)) \nAND "field3" = $3');
+        assert.equal(result.params.length, 3);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+      });
+
+      it('should not pollute other fields', function () {
+        var result = where.forTable({or: [{field1: 'value1'}, {field2: 'value2'}], field3: 'value3'});
+        assert.equal(result.where, ' \nWHERE (("field1" = $1) OR ("field2" = $2)) \nAND "field3" = $3');
+        assert.equal(result.params.length, 3);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+      });
+
+      it('should return valid SQL if only given one subgroup', function () {
+        var result = where.forTable({or: [{field1: 'value1'}]});
+        assert.equal(result.where, ' \nWHERE (("field1" = $1))');
+        assert.equal(result.params.length, 1);
+        assert.equal(result.params[0], 'value1');
+      });
+
+      it('should return valid SQL if given one subgroup as an object', function () {
+        var result = where.forTable({or: {field1: 'value1'}});
+        assert.equal(result.where, ' \nWHERE (("field1" = $1))');
+        assert.equal(result.params.length, 1);
+        assert.equal(result.params[0], 'value1');
+      });
+    });
   });
 
   describe('forDocument', function () {
