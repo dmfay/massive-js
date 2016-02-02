@@ -102,8 +102,7 @@ db.products.find({
 
 `or` may be used in conjunction with the standard object criteria syntax, and
 supports operations, null values, JSON drilldown, and everything else allowable
-in the standard set. The one caveat is that it is not recursive -- you cannot
-nest multiple `or` keys.
+in the standard set.
 
 ### Query Options
 
