@@ -1,5 +1,6 @@
-var assert = require("assert");
 var where = require('../lib/where');
+var assert = require("assert"),
+  util = require('util');
 
 describe('WHERE clause generation', function () {
   describe('parseKey', function () {
@@ -177,140 +178,226 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[0], 'value');
     });
 
-    it('should AND together conditions', function () {
+    it('should AND together predicates', function () {
       var result = where.forTable({field1: 'value1', field2: 'value2'});
       assert.equal(result.where, ' \nWHERE "field1" = $1 \nAND "field2" = $2');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
     });
+  });
 
-    it('should interpolate nulls directly', function () {
-      var result = where.forTable({field1: 'value1', field2: null});
-      assert.equal(result.where, ' \nWHERE "field1" = $1 \nAND "field2" IS null');
-      assert.equal(result.params.length, 1);
-      assert.equal(result.params[0], 'value1');
-    });
+  describe('generate', function () {
+    it('should return predicates and parameters', function () {
+      var result = where.generate({
+        params: [],
+        predicates: [],
+        offset: 0
+      }, {field1: 'value1', field2: 'value2'}, 'predicate');
 
-    it('should apply operation mutators', function () {
-      var result = where.forTable({field1: 'value1', 'field2 @>': ['value2']});
-      assert.equal(result.where, ' \nWHERE "field1" = $1 \nAND "field2" @> $2');
+      assert.equal(result.predicates.length, 2);
+      assert.equal(result.predicates[0], '"field1" = $1');
+      assert.equal(result.predicates[1], '"field2" = $2');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
-      assert.equal(result.params[1], '{value2}');
-    });
-
-    it('should create IN clauses for array parameters', function () {
-      var result = where.forTable({field1: 'value1', field2: ['value2', 'value3']});
-      assert.equal(result.where, ' \nWHERE "field1" = $1 \nAND "field2" IN ($2, $3)');
-      assert.equal(result.params.length, 3);
-      assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
-      assert.equal(result.params[2], 'value3');
     });
 
-    describe('subgroups', function () {
+    describe('with subgroups', function () {
       it('should encapsulate and OR together subgroups', function () {
-        var result = where.forTable({or: [{field1: 'value1'}, {field2: 'value2', field3: 'value3'}]});
-        assert.equal(result.where, ' \nWHERE (("field1" = $1) OR ("field2" = $2 AND "field3" = $3))');
-        assert.equal(result.params.length, 3);
+        var result = where.generate(
+          {params: [], predicates: [], offset: 0},
+          {or: [{
+              field1: 'value1'
+            }, {
+              field2: 'value2', field3: 'value3'
+            }, {
+              field4: 'value4'
+            }]},
+          'predicate'
+        );
+
+        assert.equal(result.predicates.length, 1);
+        assert.equal(result.predicates[0], '(("field1" = $1) OR ("field2" = $2 AND "field3" = $3) OR ("field4" = $4))');
+        assert.equal(result.params.length, 4);
         assert.equal(result.params[0], 'value1');
         assert.equal(result.params[1], 'value2');
         assert.equal(result.params[2], 'value3');
-      });
-
-      it('should allow non-equality operations and null interpolation', function () {
-        var result = where.forTable({or: [{'field1 !=': null}, {'field2 <': 'value2'}], field3: 'value3'});
-        assert.equal(result.where, ' \nWHERE (("field1" IS NOT null) OR ("field2" < $1)) \nAND "field3" = $2');
-        assert.equal(result.params.length, 2);
-        assert.equal(result.params[0], 'value2');
-        assert.equal(result.params[1], 'value3');
-      });
-
-      it('should parse JSON traversal operations', function () {
-        var result = where.forTable({or: [{'field->>val': 'value1'}, {'field->>val': 'value2'}], field3: 'value3'});
-        assert.equal(result.where, ' \nWHERE (("field"->>\'val\' = $1) OR ("field"->>\'val\' = $2)) \nAND "field3" = $3');
-        assert.equal(result.params.length, 3);
-        assert.equal(result.params[0], 'value1');
-        assert.equal(result.params[1], 'value2');
-        assert.equal(result.params[2], 'value3');
+        assert.equal(result.params[3], 'value4');
       });
 
       it('should not pollute other fields', function () {
-        var result = where.forTable({or: [{field1: 'value1'}, {field2: 'value2'}], field3: 'value3'});
-        assert.equal(result.where, ' \nWHERE (("field1" = $1) OR ("field2" = $2)) \nAND "field3" = $3');
+        var result = where.generate(
+          {params: [], predicates: [], offset: 0},
+          {or: [{field1: 'value1'}, {field2: 'value2'}], field3: 'value3'},
+          'predicate'
+        );
+
+        assert.equal(result.predicates.length, 2);
+        assert.equal(result.predicates[0], '(("field1" = $1) OR ("field2" = $2))');
+        assert.equal(result.predicates[1], '"field3" = $3');
         assert.equal(result.params.length, 3);
         assert.equal(result.params[0], 'value1');
         assert.equal(result.params[1], 'value2');
         assert.equal(result.params[2], 'value3');
       });
 
-      it('should return valid SQL if only given one subgroup', function () {
-        var result = where.forTable({or: [{field1: 'value1'}]});
-        assert.equal(result.where, ' \nWHERE (("field1" = $1))');
+      it('should return a usable predicate if only given one subgroup', function () {
+        var result = where.generate(
+          {params: [], predicates: [], offset: 0},
+          {or: [{field1: 'value1'}]},
+          'predicate'
+        );
+
+        assert.equal(result.predicates.length, 1);
+        assert.equal(result.predicates[0], '(("field1" = $1))');
         assert.equal(result.params.length, 1);
         assert.equal(result.params[0], 'value1');
       });
 
-      it('should return valid SQL if given one subgroup as an object', function () {
-        var result = where.forTable({or: {field1: 'value1'}});
-        assert.equal(result.where, ' \nWHERE (("field1" = $1))');
+      it('should return a usable predicate if given one subgroup as an object', function () {
+        var result = where.generate(
+          {params: [], predicates: [], offset: 0},
+          {or: [{field1: 'value1'}]},
+          'predicate'
+        );
+
+        assert.equal(result.predicates.length, 1);
+        assert.equal(result.predicates[0], '(("field1" = $1))');
         assert.equal(result.params.length, 1);
         assert.equal(result.params[0], 'value1');
+      });
+
+      it('recurses', function () {
+        var result = where.generate(
+          {params: [], predicates: [], offset: 0},
+          {
+            or: [{
+              field1: 'value1',
+              or: [{
+                field2: 'value4'
+              }, {
+                field3: 'value5'
+              }]
+            }, {
+              field2: 'value2',
+              field3: 'value3'
+            }]
+          },
+          'predicate');
+
+        assert.equal(result.predicates.length, 1);
+        assert.equal(result.predicates[0], '(("field1" = $1 AND (("field2" = $2) OR ("field3" = $3))) OR ("field2" = $4 AND "field3" = $5))');
+        assert.equal(result.params.length, 5);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value4');
+        assert.equal(result.params[2], 'value5');
+        assert.equal(result.params[3], 'value2');
+        assert.equal(result.params[4], 'value3');
       });
     });
   });
 
-  describe('forDocument', function () {
-    it('should create a basic WHERE clause for equality predicates', function () {
-      var result = where.forDocument({field: 'value'});
-      assert.equal(result.where, ' \nWHERE body @> $1');
+  describe('predicate', function () {
+    it('should build an equality predicate', function () {
+      var condition = {quotedField: '"field"', operator: '='};
+      var result = where.predicate({params: [], predicates: [], offset: 0}, condition, 'value');
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '"field" = $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], 'value');
+    });
+
+    it('should interpolate nulls directly', function () {
+      var condition = {quotedField: '"field"', operator: '='};
+      var result = where.predicate({params: [], predicates: [], offset: 0}, condition, null);
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '"field" IS null');
+      assert.equal(result.params.length, 0);
+    });
+
+    it('should apply operation mutators', function () {
+      var condition = {
+        quotedField: '"field"',
+        operator: '@>',
+        mutator: function (arr) {
+          return util.format('{%s}', arr.map(function (v) {
+            if (v.search(/[,{}]/) !== -1) { return util.format('"%s"', v); }
+
+            return v;
+          }).join(','));
+      }};
+      var result = where.predicate({params: [], predicates: [], offset: 0}, condition, ['value']);
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '"field" @> $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], '{value}');
+    });
+
+    it('should create IN clauses for array parameters', function () {
+      var condition = {quotedField: '"field"', operator: '='};
+      var result = where.predicate({params: [], predicates: [], offset: 0}, condition, ['value1', 'value2']);
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '"field" IN ($1, $2)');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value1');
+      assert.equal(result.params[1], 'value2');
+    });
+  });
+
+  describe('docPredicate', function () {
+    it('should build an equality predicate using the JSON contains op', function () {
+      var condition = {field: 'field', operator: '='};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 'value', {field: 'value'});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], 'body @> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], JSON.stringify({field: 'value'}));
     });
 
-    it('should create a basic WHERE clause for non-equality predicates', function () {
-      var result = where.forDocument({'field <>': 'value'});
-      assert.equal(result.where, ' \nWHERE (body ->> \'field\') <> $1');
+    it('should build a non-equality predicate', function () {
+      var condition = {field: 'field', operator: '<>'};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 'value', {'field <>': 'value'});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\') <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], 'value');
     });
 
     it('should cast booleans in non-equality predicates', function () {
-      var result = where.forDocument({'field <>': true});
-      assert.equal(result.where, ' \nWHERE (body ->> \'field\')::boolean <> true');
+      var condition = {field: 'field', operator: '<>'};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, true, {'field <>': true});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\')::boolean <> true');
       assert.equal(result.params.length, 0);
     });
 
     it('should cast numbers in non-equality predicates', function () {
-      var result = where.forDocument({'field <>': 123.45});
-      assert.equal(result.where, ' \nWHERE (body ->> \'field\')::decimal <> 123.45');
+      var condition = {field: 'field', operator: '<>'};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 123.45, {'field <>': 123.45});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\')::decimal <> 123.45');
       assert.equal(result.params.length, 0);
     });
 
     it('should cast dates in non-equality predicates', function () {
       var date = new Date();
-      var result = where.forDocument({'field <': date});
-      assert.equal(result.where, ' \nWHERE (body ->> \'field\')::timestamp < $1');
+      var condition = {field: 'field', operator: '<>'};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, date, {'field <>': date});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\')::timestamp <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], date);
     });
 
-    it('should AND together conditions', function () {
-      var result = where.forDocument({field1: 'value1', field2: 'value2'});
-      assert.equal(result.where, ' \nWHERE body @> $1 \nAND body @> $2');
-      assert.equal(result.params.length, 2);
-      assert.equal(result.params[0], JSON.stringify({field1: 'value1'}));
-      assert.equal(result.params[1], JSON.stringify({field2: 'value2'}));
-    });
-
     it('should create IN clauses for array parameters', function () {
-      var result = where.forDocument({field1: 'value1', field2: ['value2', 'value3']});
-      assert.equal(result.where, ' \nWHERE body @> $1 \nAND (body ->> \'field2\') IN ($2, $3)');
-      assert.equal(result.params.length, 3);
-      assert.equal(result.params[0], JSON.stringify({field1: 'value1'}));
+      var condition = {field: 'field', operator: '='};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, ['value1', 'value2'], {field: ['value1', 'value2']});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\') IN ($1, $2)');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
-      assert.equal(result.params[2], 'value3');
     });
   });
 });
