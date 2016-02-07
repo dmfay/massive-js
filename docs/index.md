@@ -1,4 +1,4 @@
-![MassiveJS](http://rob.conery.io/wp-content/uploads/2015/03/massive-logo.png)
+![MassiveJS](http://rob.conery.io/img/2015/03/massive-logo.png)
 
 ## What Is Massive?
 

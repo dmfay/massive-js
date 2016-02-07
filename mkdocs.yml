@@ -16,4 +16,5 @@ pages:
 - Full Text Search : full_text_search.md
 - API :
   - Tables : API/tables.md
+  - JSON Documents: API/json_documents.md
   - Functions : API/functions.md
