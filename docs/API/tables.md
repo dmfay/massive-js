@@ -22,3 +22,11 @@ Returns rows that match the given constraints.
 ## `.where(constraints, [params], cb)`
 
 ## `.search(options, cb)`
+
+## `.insert(data, cb)`
+
+## `.update(constraints, data, cb)`
+
+## `.save(data, cb)`
+
+## `.destroy(constraints, cb)`
