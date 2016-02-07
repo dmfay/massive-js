@@ -1,6 +1,6 @@
 ## `.saveDoc(document, cb)`
 
-## `.findDoc(constraints, [options], cb)`
+## `.findDoc(conditions, [options], cb)`
 
 ## `.searchDoc(options, cb)`
 
