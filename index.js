@@ -36,6 +36,10 @@ var Massive = function(args){
   // will be a "falsy" value, and functions will be included...
   this.excludeFunctions = args.excludeFunctions;
   this.functionBlacklist = this.getTableFilter(args.functionBlacklist);
+
+  this.begin = function(cb){ this.query('begin', {'begin': true}, cb) };
+  this.commit = function(cb){ this.query('commit', {'commit': true}, cb) };
+  this.rollback = function(cb){ this.query('rollback', {'rollback': true}, cb) };
 };
 
 Massive.prototype.getSchemaFilter = function(allowedSchemas) {
