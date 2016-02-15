@@ -2,7 +2,7 @@ var assert = require("assert");
 var helpers = require("./helpers");
 var db;
 
-describe('Document updates,', function(){
+describe('Document attribute manipulation,', function(){
 
   before(function(done){
     helpers.resetDb(function(err, res){
@@ -26,19 +26,25 @@ describe('Document updates,', function(){
     it('check saved attribute', function(){
       assert.equal(1, newDoc.score);
     });
-    it('updates the document', function(done) {
+    it('updates the document attribute', function(done) {
       db.doggies.setAttribute(newDoc.id, "vaccinated", true, function(err, doc){
         assert.equal(doc.vaccinated, true);
         done();
       });
     });
-    it('updates the document without replacing existing attributes', function(done) {
+    it('updates the document attribute without overwriting', function(done) {
       db.doggies.setAttribute(newDoc.id, "score", 99, function(err, doc){
         assert.equal(doc.score, 99);
         assert.equal(doc.vaccinated, true);
         assert.equal(doc.id, newDoc.id);
         done();
       });
+    });
+    it('updates the document attribute using sync method', function(done) {
+      var doc = db.doggies.setAttributeSync(newDoc.id, "score", 101);
+        assert.equal(doc.score, 101);
+        assert.equal(doc.id, newDoc.id);
+        done();
     });
 
   });
