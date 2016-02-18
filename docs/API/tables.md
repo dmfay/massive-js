@@ -12,13 +12,13 @@ db.products.find({color: 'red'}, function(err, products){
 
 |Name|Type|Description|
 |----|----|-----------|
-|[conditions]|Object&nbsp;&#124;&nbsp;String&nbsp;&#124;&nbsp;Number |An object containing fields to match, or a string or number to find a row by its ID|
+|[conditions]|Object&nbsp;&#124;&nbsp;String&nbsp;&#124;&nbsp;Number|An object containing fields to match, or a string or number to find a row by its ID|
 |[options]|Object||
 |[options.order]|String||
 |[options.stream=false]|Boolean|Returns a stream instead of an array when set to _true_|
 |[options.limit]|Number|Limits the number of rows returned|
-|[options.column]|Array|Limits the columns returned|
-|cb|Function| A function called with an optional error and an array of matching rows. When an ID is used only a single object is returned.|
+|[options.columns]|Array|Limits the columns returned|
+|cb|Function|A function called with an optional error and an array of matching rows. When an ID is used only a single object is returned.|
 
 ## `.findOne([conditions], [options], cb)`
 
@@ -34,15 +34,64 @@ db.products.findOne({color: 'red'}, function(err, product){
 
 |Name|Type|Description|
 |----|----|-----------|
-|[conditions]|Object&nbsp;&#124;&nbsp;String&nbsp;&#124;&nbsp;Number |An object containing fields to match, or a string or number to find a row by its ID|
+|[conditions]|Object&nbsp;&#124;&nbsp;String&nbsp;&#124;&nbsp;Number|An object containing fields to match, or a string or number to find a row by its ID|
 |[options]|Object||
 |[options.order]|String||
-|[options.column]|Array|Limits the columns returned|
-|cb|Function| A function called with an optional error and an object. If a matching row cannot be found, the second callback argument is `undefined`. |
+|[options.columns]|Array|Limits the columns returned|
+|cb|Function|A function called with an optional error and an object. If a matching row cannot be found, the second callback argument is `undefined`. |
 
-## `.count(conditions, [params] cb)`
+## `.count([conditions], cb)`
 
-## `.where(conditions, [params], cb)`
+Returns the number of rows that match the given conditions.
+
+```js
+db.products.count({color: 'red'}, function(err, count){
+  // returns the count of matching products
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|[conditions]|Object|An object containing fields to match|
+|cb|Function|A function called with an optional error and the count as a number.|
+
+## `.count([where], [params], cb)`
+
+Returns the number of rows that match the given where clause.
+
+```js
+db.products.count('color=$1', ['red'], function(err, count){
+  // returns the count of matching products
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|[where]|String|A simple where clause string|
+|[params]|Array|An array containing query parameters|
+|cb|Function|A function called with an optional error and the count as a number.|
+
+## `.where([where], [params], cb)`
+
+Returns rows that match the given where clause.
+
+```js
+db.products.where('color=$1', ['red'], function(err, products){
+  // returns matching products
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|[where]|String|A simple where clause string|
+|[params]|Array|An array containing query parameters|
+|cb|Function|A function called with an optional error and an array of matching rows.|
 
 ## `.search(options, cb)`
 
