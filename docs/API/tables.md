@@ -95,7 +95,39 @@ db.products.where('color=$1', ['red'], function(err, products){
 
 ## `.search(options, cb)`
 
+Returns rows that match a given search term.
+
+```js
+db.products.search({columns: ["name", "description"], term: "red"}, function(err, products){
+  // returns matching products
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|options|Object||
+|[options.columns]|Array|An array of columns to search|
+|[options.term]|String|A search term|
+|cb|Function|A function called with an optional error and an array of matching rows.|
+
 ## `.insert(data, cb)`
+
+Inserts a new row into the table.
+
+```js
+db.products.insert({color: "red"}, function(err, result){
+  // returns the created row
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|data|Object&nbsp;&#124;&nbsp;Array&nbsp;|An object containing the row data, or an array of objects to insert multiple rows at once|
+|cb|Function|A function called with an optional error and the created row or an array of created rows when inserting multiple rows at once.|
 
 ## `.update(conditions, data, cb)`
 
