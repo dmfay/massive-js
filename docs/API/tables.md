@@ -108,8 +108,8 @@ db.products.search({columns: ["name", "description"], term: "red"}, function(err
 |Name|Type|Description|
 |----|----|-----------|
 |options|Object||
-|[options.columns]|Array|An array of columns to search|
-|[options.term]|String|A search term|
+|options.columns|Array|An array of columns to search|
+|options.term|String|A search term|
 |cb|Function|A function called with an optional error and an array of matching rows.|
 
 ## `.insert(data, cb)`
@@ -184,5 +184,5 @@ db.products.destroy({color: 'red'}, function(err, products){
 
 |Name|Type|Description|
 |----|----|-----------|
-|[conditions]|Object|An object containing fields to match|
+|conditions|Object|An object containing fields to match|
 |cb|Function|A function called with an optional error and an array of deleted rows|
