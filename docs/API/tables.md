@@ -114,7 +114,7 @@ db.products.search({columns: ["name", "description"], term: "red"}, function(err
 
 ## `.insert(data, cb)`
 
-Inserts a new row into the table.
+Inserts a new.
 
 ```js
 db.products.insert({color: "red"}, function(err, result){
@@ -131,6 +131,58 @@ db.products.insert({color: "red"}, function(err, result){
 
 ## `.update(conditions, data, cb)`
 
+Updates existing rows.
+
+```js
+db.products.update({id: 1}, {color: "blue"}, function(err, result){
+  // returns the updated row
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|conditions|Object&nbsp;&#124;&nbsp;String&nbsp;&#124;&nbsp;Number|An object containing fields to match, or a string or number to update a row by its ID|
+|data|Object|The changes to apply to the row or rows being updated|
+|cb|Function|A function called with an optional error and the updated row or an array of updated rows when changing multiple rows at once.|
+
 ## `.save(data, cb)`
 
+Inserts or updates a row depending on whether the primary key is included in the given fields.
+
+```js
+db.products.save({color: "red", id: 1}, function(err, result){
+  // returns the updated row
+});
+```
+
+```js
+db.products.save({color: "red"}, function(err, result){
+  // returns a new row
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|data|Object&nbsp;&#124;&nbsp;Array&nbsp;|An object containing fields to save, or an array of objects to save at once|
+|cb|Function|A function called with an optional error and the saved row or an array of saved rows when changing multiple rows at once.|
+
 ## `.destroy(conditions, cb)`
+
+Deletes rows that match the given conditions.
+
+```js
+db.products.destroy({color: 'red'}, function(err, products){
+  // returns the deleted products
+});
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|[conditions]|Object|An object containing fields to match|
+|cb|Function|A function called with an optional error and an array of deleted rows|
