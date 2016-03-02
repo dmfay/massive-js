@@ -116,7 +116,7 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
-    
+
     it('deletes a product ', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
         db.products.find(4, function(err, found) {
@@ -278,6 +278,17 @@ describe('Tables -Add/Edit/Delete', function () {
         assert.equal(res.name, "A Product");
         assert.deepEqual(res.tags, ['one', 'two']);
         done();
+      });
+    });
+
+    describe('violating a constraint', function () {
+      it('returns a useful error', function(done){
+        db.products.insert({name: null}, function (err) {
+          assert.equal(err.message, 'null value in column "name" violates not-null constraint');
+          assert.equal(err.code, '23502');
+          assert.notEqual(err.detail, undefined);
+          done();
+        });
       });
     });
   });
