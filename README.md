@@ -231,7 +231,7 @@ db.products.find({"specs#>>{dimensions,length}": 15}, function(err, products) {
 })
 
 //Send in an ORDER clause by passing in a second argument
-db.products.find({},{order: "price desc"} function(err,products){
+db.products.find({},{order: "price desc"}, function(err,products){
   //products ordered in descending fashion
 });
 
