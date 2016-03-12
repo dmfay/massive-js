@@ -12,6 +12,10 @@ ORMs abstract this away, and it's silly. Postgres is an amazing database with a 
 
 Massive embraces SQL completely, and helps you out when you don't feel like writing another mundane `select * from` statement.
 
+## Documentation
+Full documentation is available [here](http://massive-js.readthedocs.org/en/latest/).
+
+
 ## Installation
 
 ```
