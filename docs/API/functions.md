@@ -1,1 +1,1 @@
-## Functions
+## `.<name>([params], cb)`
