@@ -1,5 +1,5 @@
--- Exclude functions with a name matching the string pattern passed in (i.e. "pg_%")
--- exclusion is schema - aspecific, no schema assumes 'public'
+-- Include and/or exclude functions with a name matching the string pattern passed in (i.e. "pg_%")
+-- inclusion/exclusion is schema - aspecific, no schema assumes 'public'
 select distinct
     n.nspname as "schema",
     p.proname as "name",
@@ -11,5 +11,9 @@ where n.nspname not in ('pg_catalog','information_schema')
   and (case -- blacklist functions using LIKE by fully-qualified name (no schema assumes public):
             when $1 = '' then 1=1
             else replace((n.nspname || '.'|| p.proname), 'public.', '')  not like all(string_to_array(replace($1, ' ', ''), ','))
+       end)
+  and (case -- whitelist functions using LIKE by fully-qualified name (no schema assumes public):
+            when $2 = '' then 1=1
+            else replace((n.nspname || '.'|| p.proname), 'public.', '') like any(string_to_array(replace($2, ' ', ''), ','))
        end)
 order by n.nspname, p.proname;
