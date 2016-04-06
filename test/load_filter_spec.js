@@ -278,8 +278,8 @@ describe('On load with Function Exclusion (these tests may run slow - loads db e
   });
 });
 
-describe('On load with Function Blacklist (these tests may run slow - loads db each test!!)', function () {
-  it('loads all functions when no blacklist argument is provided', function (done) {
+describe('On load with Function Blacklist and/or Whitelist (these tests may run slow - loads db each test!!)', function () {
+  it('loads all functions when no blacklist and no whitelist argument is provided', function (done) {
     massive.connect({connectionString: helpers.connectionString}, function (err, db) {
       assert.ifError(err);
       assert(db.AllMyProducts && db.all_products && db.myschema.AllMyAlbums && db.myschema.all_albums && db.myschema.artist_by_name);
@@ -300,17 +300,45 @@ describe('On load with Function Blacklist (these tests may run slow - loads db e
       done();
     });
   });
-  it('excludes functions with name and schema matching multiiple blacklist patterns as a comma-delimited string argument', function (done) {
+  it('excludes functions with name and schema matching multiple blacklist patterns as a comma-delimited string argument', function (done) {
     massive.connect({connectionString: helpers.connectionString, functionBlacklist: "myschema.artist_%, all_%"}, function (err, db) {
       assert.ifError(err);
       assert(!db.myschema.artist_by_name && !db.all_products && db.myschema.all_albums && db.AllMyProducts);
       done();
     });
   });
-  it('excludes functions with name and schema matching multiiple blacklist patterns as a string array argument', function (done) {
+  it('excludes functions with name and schema matching multiple blacklist patterns as a string array argument', function (done) {
     massive.connect({connectionString: helpers.connectionString, functionBlacklist: ["myschema.artist_%", "all_%"]}, function (err, db) {
       assert.ifError(err);
       assert(!db.myschema.artist_by_name && !db.all_products && db.myschema.all_albums && db.AllMyProducts);
+      done();
+    });
+  });
+  it('includes functions with name and schema matching whitelist pattern as a string argument', function (done) {
+    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.all_%"}, function (err, db) {
+      assert.ifError(err);
+      assert(db.myschema.all_albums && !db.myschema.AllMyAlbums && !db.myschema.artist_by_name && !db.all_products);
+      done();
+    });
+  });
+  it('includes functions with name and schema matching multiple whitelist patterns as a comma-delimited string argument', function (done) {
+    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.artist_%, all_%"}, function (err, db) {
+      assert.ifError(err);
+      assert(db.myschema.artist_by_name && db.all_products && !db.myschema.all_albums && !db.AllMyProducts);
+      done();
+    });
+  });
+  it('includes functions with name and schema matching multiple whitelist patterns as a string array argument', function (done) {
+    massive.connect({connectionString: helpers.connectionString, functionWhitelist: ["myschema.artist_%", "all_%"]}, function (err, db) {
+      assert.ifError(err);
+      assert(db.myschema.artist_by_name && db.all_products && !db.myschema.all_albums && !db.AllMyProducts);
+      done();
+    });
+  });
+  it('both includes (whitelists) and excludes (blacklists) functions as a string arguments', function (done) {
+    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.a%", functionBlacklist: "myschema.%by_name"}, function (err, db) {
+      assert.ifError(err);
+      assert(db.myschema.all_albums && !db.myschema.artist_by_name && !db.myschema.AllMyAlbums && !db.all_products);
       done();
     });
   });
