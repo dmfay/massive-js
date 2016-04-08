@@ -36,6 +36,7 @@ var Massive = function(args){
   // will be a "falsy" value, and functions will be included...
   this.excludeFunctions = args.excludeFunctions;
   this.functionBlacklist = this.getTableFilter(args.functionBlacklist);
+  this.functionWhitelist = this.getTableFilter(args.functionWhitelist);
 };
 
 Massive.prototype.getSchemaFilter = function(allowedSchemas) {
@@ -281,7 +282,7 @@ var walkSqlFiles = function(rootObject, rootDir) {
 Massive.prototype.loadFunctions = function(next) {
   if (!this.excludeFunctions) {
     var functionSql = __dirname + "/lib/scripts/functions.sql";
-    var parameters = [this.functionBlacklist];
+    var parameters = [this.functionBlacklist, this.functionWhitelist];
 
     this.executeSqlFile({file : functionSql, params : parameters}, function (err,functions) {
       if (err) {
