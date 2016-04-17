@@ -140,7 +140,7 @@ describe('Document queries', function () {
 
   describe('Querying with options', function () {
     it('returns the first matching document', function (done) {
-      db.docs.findDoc("*", {single: true}, function(err,res) {
+      db.docs.findDoc("*", {single: true}, function (err,res) {
         assert.ifError(err);
         assert.equal(res.id, 1);
         done();
@@ -148,10 +148,33 @@ describe('Document queries', function () {
     });
 
     it('applies offset and limit with a fixed sort by pk', function (done) {
-      db.docs.findDoc("*", {offset: 1, limit: 1}, function(err,res) {
+      db.docs.findDoc("*", {offset: 1, limit: 1}, function (err,res) {
         assert.ifError(err);
         assert.equal(res.length, 1);
         assert.equal(res[0].id, 2);
+        done();
+      });
+    });
+
+    it('orders by fields in the table', function (done) {
+      db.docs.findDoc('*', {order: 'id desc'}, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        assert.equal(res[0].id, 3);
+        assert.equal(res[1].id, 2);
+        assert.equal(res[2].id, 1);
+        done();
+      });
+    });
+
+    it('orders by fields in the document body', function (done) {
+      // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
+      db.docs.findDoc('*', {order: "body->>'title' desc"}, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        assert.equal(res[0].title, 'Starsky and Hutch');
+        assert.equal(res[1].title, 'Another Document');
+        assert.equal(res[2].title, 'A Document');
         done();
       });
     });

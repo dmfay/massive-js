@@ -26,8 +26,8 @@ create table doggies(
   search tsvector,
   created_at timestamptz default now()
 );
-create index idx_doggies on doggies using GIN(body jsonb_path_ops); 
-create index idx_doggies_search on doggies using GIN(search); 
+create index idx_doggies on doggies using GIN(body jsonb_path_ops);
+create index idx_doggies_search on doggies using GIN(search);
 ```
 
 Notice that Massive also creates a GIN index on the body column as well as a `search` field. You can use this to your advantage to make querying documents much, much easier. We're indexing that search field too! All your data will be stored in the `body` column.
@@ -72,23 +72,33 @@ db.doggies.destroy({"body ->> 'name'" : "Stinky"}, function(err,res){
 
 ## Querying
 
-You can query a document table directly, or you can use our `findDoc()` abstraction. To do it directly, simply add your the proper notation for JSON:
+Document tables are still tables, and can be queried directly via the standard `find`, `findOne`, `where`, and `count` functions. Each document will be returned as the `body` field of its containing row.
+
+In order to query fields *in* the document body, you will need to format your criteria appropriately using the Postgres JSON navigation operators `->>` and `#>>`:
 
 ```js
-db.doggies.find({"body ->> 'name'" : "Fido"}, function(err,res){
-  //Hi Fido
+db.doggies.find({"body ->> 'name'" : "Fido"}, function (err, res) {
+  // All the dogs named Fido
 });
 ```
 
-A better way is to use `findDoc()`:
+However, unless you specifically need access to the rest of the document table (other than the primary key, on which [see below](A Word About IDs and Documents), a better way is to use `findDoc`:
 
 ```js
-db.doggies.findDoc({name : "Fido"}, function(err,res){
-  //Hi Fido
+db.doggies.findDoc(function (err, res) {
+  // All the dogs!
+});
+
+db.doggies.findDoc({name : "Fido"}, function (err, res) {
+  // All the dogs named Fido
+});
+
+db.doggies.findDoc({name : "Fido"}, {order: "body->>'age' desc", limit: 10}, function (err, res) {
+  // The ten oldest dogs named Fido
 });
 ```
 
-## Why `findDoc()` Is Preffered
+## Why `findDoc()` Is Preferred
 
 The JSON operator `->>` is a text-matcher and uses the "existence" operator to match the criteria. So the query above would be:
 
@@ -119,10 +129,8 @@ db.doggies.searchDoc({
 });
 ```
 
-## A Word About ID and Documents
+## A Word About IDs and Documents
 
-We need to give every row in our document table a primary key - this is still a relational system. So, for that, we use a serial integer which should work for most people 99.99% of the time.
+We need to give every row in our document table a primary key - this is still a relational system. If you allow Massive to create the table, this will be a serial integer by default, but if you create or modify your own, UUIDs are also supported.
 
-If you think you'll have bigger needs, you can create your own scheme as you like and just query it with Massive.
-
-When we save your document we pull the key off to save space. When you query it, we return only the body column and push the id back on for you. This reduces redundancy and even though it's a small bit of space, it's something.
+When we save your document we pull the primary key off to save space. When you query it, we return only the body column and push the id back on for you. This reduces redundancy and even though it's a small bit of space, it's something.
