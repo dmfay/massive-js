@@ -301,7 +301,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Limiting and Offsetting results', function () {
+  describe('Querying with options', function () {
     it('returns 1 result with limit of 1', function (done) {
       db.products.find(null,{limit : 1}, function(err,res){
         assert.ifError(err);
@@ -309,6 +309,7 @@ describe('Queryables', function () {
         done();
       });
     });
+
     it('returns second result with limit of 1, offset of 1', function (done) {
       db.products.find({},{limit : 1, offset: 1}, function(err,res){
         assert.ifError(err);
@@ -316,7 +317,8 @@ describe('Queryables', function () {
         done();
       });
     });
-    it('returns id and name if sending in columns', function (done) {
+
+    it('restricts the select list to specified columns', function (done) {
       db.products.find({},{columns :["id","name"]}, function(err,res){
         assert.ifError(err);
         var keys = _.keys(res[0]);
@@ -324,9 +326,16 @@ describe('Queryables', function () {
         done();
       });
     });
-  });
 
-  describe('Ordering results', function () {
+    it('allows expressions in the select list', function (done) {
+      db.products.find({},{columns :["id", "upper(name) as name"]}, function(err,res) {
+        assert.ifError(err);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].name, 'PRODUCT 1');
+        done();
+      });
+    });
+
     it('returns ascending order of products by price', function (done) {
       db.products.find({}, {order : "price"}, function(err,res){
         assert.ifError(err);
@@ -336,12 +345,21 @@ describe('Queryables', function () {
         done();
       });
     });
+
     it('returns descending order of products', function (done) {
       db.products.find({},{order : "id desc"}, function(err,res){
         assert.ifError(err);
         assert.equal(res.length, 4);
         assert.equal(res[0].id, 4);
         assert.equal(res[2].id, 2);
+        done();
+      });
+    });
+
+    it('returns a single result', function (done) {
+      db.products.find({}, {order : "id desc", single: true}, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.id, 4);
         done();
       });
     });
@@ -495,6 +513,16 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('runs with an empty WHERE clause if you try to search by pk', function (done) {
+      db.popular_products.find(1, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+  });
+
+  describe('View queries with options', function () {
     it('applies offsets and limits', function (done) {
       db.popular_products.find({},{limit : 1, offset: 1}, function(err, res) {
         assert.ifError(err);
@@ -503,6 +531,7 @@ describe('Queryables', function () {
         done();
       });
     });
+
     it('restricts columns', function (done) {
       db.popular_products.find({}, {columns :["id","price"]}, function(err, res) {
         assert.ifError(err);
@@ -511,6 +540,16 @@ describe('Queryables', function () {
         done();
       });
     });
+
+    it('allows expressions in the select list', function (done) {
+      db.popular_products.find({}, {columns :["id", "upper(name) as name"]}, function(err,res) {
+        assert.ifError(err);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].name, 'PRODUCT 1');
+        done();
+      });
+    });
+
     it('applies sorting', function (done) {
       db.popular_products.find({},{order : "id desc"}, function(err, res) {
         assert.ifError(err);
@@ -521,6 +560,15 @@ describe('Queryables', function () {
         done();
       });
     });
+
+    it('returns a single result', function (done) {
+      db.popular_products.find({}, {order : "id desc", single: true}, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.id, 4);
+        done();
+      });
+    });
+
     it('works with materialized views', function (done) {
       db.mv_orders.find(function(err,res) {
         assert.ifError(err);

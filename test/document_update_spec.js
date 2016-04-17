@@ -45,6 +45,17 @@ describe('Document updates,', function(){
       });
     });
 
+    skipBelow95('escapes values properly', function(done) {
+      db.docs.setAttribute(newDoc.id, "field", "value", function(err, doc){
+        assert.ifError(err);
+        assert.equal(doc.score, 99);
+        assert.equal(doc.vaccinated, true);
+        assert.equal(doc.field, 'value');
+        assert.equal(doc.id, newDoc.id);
+        done();
+      });
+    });
+
     after(function (done) {
       db.docs.destroy({id: newDoc.id}, done);
     });

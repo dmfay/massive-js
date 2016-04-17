@@ -32,7 +32,7 @@ db.products.where("id=$1 OR id=$2", [10, 21], function(err, products){
 
 Most queries don't need the full flexibility afforded by a handwritten WHERE clause, and translating parameters into an ordered list for interpolation is a messy business at best. The `find()` and `findOne()` functions support a more abstracted query syntax which is still flexible enough to cover almost all ordinary cases.
 
-`find()` generally returns results in an Array; the sole exception is if it is invoked with a primary key. `findOne()` always returns a single object.
+`find()` generally returns results in an Array, unless invoked with an integer or UUID primary key, or with the `single` option. `findOne()` always returns a single object.
 
 ### The Basics
 
@@ -106,29 +106,40 @@ in the standard set.
 
 ### Query Options
 
+Most table and view query functions, including `find`, `findOne`, `findDoc`,
+and `count` (if invoked with a criteria object rather than a plaintext `WHERE`
+clause), accept an `options` object which controls various parameters of the
+query's specification and execution.
+
+* **columns** supplies an alternate select list as an array of column names or
+expressions. If not provided, queries return all fields found.
+* **order** adds the value to the emitted query as an `ORDER BY` clause. Massive
+doesn't do any parsing or processing, so everything has to be exactly as you'd
+paste it into psql yourself.
+* **offset** skips the first *n* rows that would have been returned by the
+query.
+* **limit** stops the query after *n* rows have been discovered.
+* **stream** if true turns streaming on for the query.
+* **single** if true forces the query to return the first row as an object,
+rather than an array of rows.
+
+Not all options apply everywhere; for example, since `findOne` already returns
+only one result row as an object, most options will be redundant or of little
+use, except for `columns`. Meanwhile, `findDoc` always returns entire documents,
+ignoring `columns`.
+
 ```js
-// Send in an ORDER clause and a LIMIT with OFFSET
-var options = {
-  limit : 10,
-  order : "id",
-  offset: 20
-}
-db.products.find({}, options, function(err, products){
-  // products ordered in descending fashion
-});
-
-// You only want the sku and name back
-var options = {
-  limit : 10,
-  columns : ["sku", "name"]
-}
-db.products.find({}, options, function(err, products){
-  // an array of sku and name
-});
-
-// Send in an ORDER clause by passing in a second argument
-db.products.find({}, {order: "price desc"} function(err, products){
-  // products ordered in descending fashion
+db.products.find(
+  {
+    in_stock: true
+  }, {
+    columns: ["name", "price", "description"],
+    order: "price desc",
+    offset: 20,
+    limit: 10
+  }, function (err, products) {
+  // ten name/price/description objects, ordered by price high to low, skipping
+  // the twenty most expensive products
 });
 ```
 

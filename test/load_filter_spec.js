@@ -20,7 +20,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert(db.popular_products);
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 9);
+      assert.equal(db.tables.length, 10);
       assert.equal(db.views.length, 3);
 
       done();
@@ -34,7 +34,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert(db.popular_products);
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 9);
+      assert.equal(db.tables.length, 10);
       assert.equal(db.views.length, 3);
 
       done();
@@ -58,7 +58,7 @@ describe('On Load with Schema Filters (these tests may run slow - loads db each 
       assert.ifError(err);
       assert(!db.myschema.artists);
       assert(db.products);
-      assert.equal(db.tables.length, 4);
+      assert.equal(db.tables.length, 5);
       assert.equal(db.views.length, 2);
       done();
     });
@@ -98,7 +98,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.popular_products);
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 9);
+      assert.equal(db.tables.length, 10);
       assert.equal(db.views.length, 3);
 
       done();
@@ -112,7 +112,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(!db.popular_products);
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 8);
+      assert.equal(db.tables.length, 9);
       assert.equal(db.views.length, 2);
 
       done();
@@ -125,7 +125,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 8);
+      assert.equal(db.tables.length, 9);
       assert.equal(db.views.length, 3);
       done();
     });
@@ -138,7 +138,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(!db.myschema.top_artists);
       assert(db.secrets.__secret_table);
       assert(db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 9);
+      assert.equal(db.tables.length, 10);
       assert.equal(db.views.length, 2);
       done();
     });
@@ -151,7 +151,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 7);
+      assert.equal(db.tables.length, 8);
       assert.equal(db.views.length, 2);
       done();
     });
@@ -164,7 +164,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert(db.myschema.artists);
       assert(db.secrets.__secret_table);
       assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 7);
+      assert.equal(db.tables.length, 8);
       assert.equal(db.views.length, 2);
       done();
     });
@@ -197,7 +197,7 @@ describe('On Load with Table blacklist (these tests may run slow - loads db each
       assert.ifError(err);
       assert(db.products);
       assert(db.myschema.artists);
-      assert.equal(db.tables.length, 8);
+      assert.equal(db.tables.length, 9);
       assert.equal(db.views.length, 3);
       done();
     });
@@ -220,7 +220,7 @@ describe('On Load with Table whitelist (these tests may run slow - loads db each
   it('loads all tables when no whitelist argument is provided', function (done) {
     massive.connect({connectionString: helpers.connectionString}, function (err, db) {
       assert.ifError(err);
-      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 9);
+      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 10);
       done();
     });
   });
