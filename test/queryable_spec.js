@@ -522,7 +522,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('View queries with options', function (done) {
+  describe('View queries with options', function () {
     it('applies offsets and limits', function (done) {
       db.popular_products.find({},{limit : 1, offset: 1}, function(err, res) {
         assert.ifError(err);
