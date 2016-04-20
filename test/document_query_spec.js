@@ -224,5 +224,40 @@ describe('Document queries', function () {
         done();
       });
     });
+
+    it('returns right number of results if limit is specified', function (done) {
+      db.docs.searchDoc({
+        keys : ["title"],
+        term : "Document"
+      }, {
+        limit: 1
+      }, function(err, docs){
+        assert.ifError(err);
+        assert.equal(1, docs.length);
+        done();
+      });
+    });
+
+    it('returns right elements if offset is specified', function (done) {
+      db.docs.searchDoc({
+        keys : ["title"],
+        term : "Document"
+      }, {
+        limit: 2
+      }, function(err, docs){
+        assert.ifError(err);
+        db.docs.searchDoc({
+          keys : ["title"],
+          term : "Document"
+        }, {
+          offset: 1,
+          limit: 2
+        }, function(err2, docs2){
+          assert.ifError(err2);
+          assert.equal(docs[1].id, docs2[0].id);
+          done();
+        });
+      });
+    });
   });
 });

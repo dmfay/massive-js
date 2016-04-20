@@ -133,9 +133,11 @@ With limit and offset
 ```js
 db.doggies.searchDoc({
   keys : ["name", "owner"],
-  term : "Rusty",
-  limit: 10,
-  offset: 20
+  term : "Rusty"
+  }, {
+    limit: 10,
+    offset: 20
+  }
 }, function(err, docs){
   //matching docs returned
 });
