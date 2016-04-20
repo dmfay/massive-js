@@ -13,6 +13,7 @@ describe('Document saves', function () {
 
   describe("To a non-existent table", function () {
     var newDoc = {};
+
     before(function(done){
       db.saveDoc("doggies", {name : "Fido", age : 10}, function(err,doc){
         assert.ifError(err);
@@ -20,36 +21,41 @@ describe('Document saves', function () {
         done();
       });
     });
+
     it('creates the table', function () {
       assert(db.doggies);
     });
+
     it('returns the doc', function () {
       assert.equal("Fido", newDoc.name);
     });
+
     it('updates the doc', function (done) {
       newDoc.name = "Bruno";
-      db.doggies.saveDoc(newDoc, function (err) {
+      db.doggies.saveDoc(newDoc, function (err, saved) {
         assert.ifError(err);
-        assert.equal(newDoc.name, "Bruno");
+        assert.equal(saved.name, "Bruno");
+        assert.equal(saved.id, newDoc.id);
         done();
       });
     });
-    //TODO: This test is failing due to data and id assignment
-    //let's fix
-    it.skip("finds the updated document", function (done) {
+
+    it("finds the updated document", function (done) {
       db.doggies.findDoc({id:1}, function(err, res) {
         assert.ifError(err);
         assert.equal(res.name, "Bruno");
         done();
       });
     });
-    it.skip("deletes the doc", function (done) {
+
+    it("deletes the doc", function (done) {
       db.doggies.destroy({ id : 1 }, function(err, res) {
         assert.ifError(err);
         assert.equal(res[0].body.name, "Bruno");
         done();
       });
     });
+
     after(function(done){
       db.query("DROP TABLE doggies;", done);
     });
@@ -70,23 +76,27 @@ describe('Document saves', function () {
       assert(film.title == "Alone" && film.id == 4);
       done();
     });
+
     it("updates the movie title", function (done) {
       film.title = "Together!";
       db.docs.saveDoc(film, function (err, res) {
         assert.ifError(err);
         assert.equal(res.title, "Together!");
+        assert.equal(res.id, film.id);
         done();
       });
     });
+
     it("finds the updated movie title", function (done) {
-      db.docs.findDoc({id:4}, function (err, res) {
+      db.docs.findDoc({ id: film.id }, function (err, res) {
         assert.ifError(err);
         assert.equal(res.title, "Together!");
         done();
       });
     });
+
     it("deletes the movie", function (done) {
-      db.docs.destroy({ id : 4 }, function(err, res) {
+      db.docs.destroy({ id : film.id }, function(err, res) {
         assert.ifError(err);
         assert.equal(res[0].body.title, "Together!");
         done();
