@@ -129,6 +129,20 @@ db.doggies.searchDoc({
 });
 ```
 
+With limit and offset
+```js
+db.doggies.searchDoc({
+  keys : ["name", "owner"],
+  term : "Rusty"
+  }, {
+    limit: 10,
+    offset: 20
+  }
+}, function(err, docs){
+  //matching docs returned
+});
+```
+
 ## A Word About IDs and Documents
 
 We need to give every row in our document table a primary key - this is still a relational system. If you allow Massive to create the table, this will be a serial integer by default, but if you create or modify your own, UUIDs are also supported.
