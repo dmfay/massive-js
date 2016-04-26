@@ -305,7 +305,7 @@ Massive.prototype.dropTable = function(table, options, next) {
 };
 
 Massive.prototype.dropTableSql = function(tableName, options){
-  var docSqlFile = __dirname + "/lib/scripts/drop_document_table.sql";
+  var docSqlFile = __dirname + "/lib/scripts/drop_table.sql";
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
   var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
   sql = util.format(sql, tableName, cascadeOpt);
