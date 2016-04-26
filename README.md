@@ -197,12 +197,12 @@ db.createDocumentTable('my_schema.my_table', function(err, res) {
 });
 
 // Drop table
-db.dropDocumentTable('my_table', {cascade: true|false}, function(err, res) {
+db.dropTable('my_table', {cascade: true|false}, function(err, res) {
   // empty array
 });
 
 // Drop table on explicit schema
-db.dropDocumentTable('my_schema.my_table', {cascade: true|false}, function(err, res) {
+db.dropTable('my_schema.my_table', {cascade: true|false}, function(err, res) {
   // empty array
 });
 
