@@ -272,6 +272,14 @@ describe('Tables -Add/Edit/Delete', function () {
       });
     });
 
+    it('inserts nothing', function (done) {
+      db.products.insert([], function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 0);
+        done();
+      });
+    });
+
     it('inserts array fields', function (done) {
       db.products.insert({name: "A Product", tags: ['one', 'two']}, function (err, res) {
         assert.ifError(err);
