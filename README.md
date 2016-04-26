@@ -187,12 +187,12 @@ db.dropSchema('my_schema', {cascade: true|false}, function(err, res) {
 });
 
 // Create a new table
-db.createTable('my_table', function(err, res) {
+db.createDocumentTable('my_table', function(err, res) {
   // empty array
 });
 
 // Create a new table on explicit schema
-db.createTable('my_schema.my_table', function(err, res) {
+db.createDocumentTable('my_schema.my_table', function(err, res) {
   // empty array
 });
 
