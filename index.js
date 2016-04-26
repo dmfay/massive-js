@@ -217,8 +217,9 @@ var MapToNamespace = function(entity, collection) {
   db[collection].push(entity);
 };
 
-var RemoveFromNamespace = function(db, table, collection) {
-  collection = collection || "tables";
+var RemoveFromNamespace = function(db, table) {
+  // right now only tables are supported
+  var collection = "tables";
 
   var splits = table.split('.');
   var tableName, schemaName;
@@ -231,13 +232,10 @@ var RemoveFromNamespace = function(db, table, collection) {
     tableName = table;
   }
 
-  if(schemaName === "public") {
-    db[table] = undefined;
+  if(schemaName === "public" && db[table]) {
+    delete db[table];
   }else if(db[schemaName] && db[schemaName][tableName]) {
-    db[schemaName][tableName] = undefined;
-    // db[schemaName] = _.reject(db[schemaName], function(element) {
-    //   return element.name && element.name === tableName.name;
-    // });
+    delete db[schemaName][tableName];
   }
 
   if(db[collection]) {
@@ -348,7 +346,7 @@ Massive.prototype.dropSchema = function(schemaName, options, next) {
         });
       }
       // Remove the schema from the namespace
-      self[schemaName] = undefined;
+      delete self[schemaName];
       next(null, res);
     }
   });
