@@ -18,7 +18,7 @@ describe('Document table', function () {
   afterEach(function(done) {
     db.dropSchema(schema, {cascade: true}, function(err) {
       assert.ifError(err);
-      db.dropDocumentTable(tableName, {cascade: true}, function(err) {
+      db.dropTable(tableName, {cascade: true}, function(err) {
         assert.ifError(err);
         done();
       });
@@ -73,7 +73,7 @@ describe('Document table', function () {
       });
 
       it('removes the table from public schema', function(done) {
-        db.dropDocumentTable(tableName, {cascade: true}, function(err, res) {
+        db.dropTable(tableName, {cascade: true}, function(err, res) {
           assert.ifError(err);
           assert(_.isEqual([], res), 'should be empty array');
           assert.equal(undefined, db[tableName]);
@@ -96,7 +96,7 @@ describe('Document table', function () {
       });
 
       it('removes the table from the specified schema', function(done) {
-        db.dropDocumentTable(schemaTableName, {cascade: true}, function(err, res) {
+        db.dropTable(schemaTableName, {cascade: true}, function(err, res) {
           assert.ifError(err);
           assert(_.isEqual([], res), 'should be empty array');
           assert.equal(undefined, db[schema][tableName]);

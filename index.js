@@ -292,8 +292,8 @@ Massive.prototype.documentTableSql = function(tableName){
 };
 
 
-Massive.prototype.dropDocumentTable = function(table, options, next) {
-  var sql = this.dropDocumentTableSql(table, options);
+Massive.prototype.dropTable = function(table, options, next) {
+  var sql = this.dropTableSql(table, options);
   this.query(sql, function(err, res) {
     if(err) {
       next(err, null);
@@ -304,7 +304,7 @@ Massive.prototype.dropDocumentTable = function(table, options, next) {
   });
 };
 
-Massive.prototype.dropDocumentTableSql = function(tableName, options){
+Massive.prototype.dropTableSql = function(tableName, options){
   var docSqlFile = __dirname + "/lib/scripts/drop_document_table.sql";
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
   var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
