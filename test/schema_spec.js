@@ -40,7 +40,7 @@ describe('Schema', function() {
     beforeEach(function(done) {
       db.createSchema(schemaName, function(err) {
         assert.ifError(err);
-        db.createDocumentTable(schemaTableName, function(err) {
+        db.createTable(schemaTableName, function(err) {
           assert.ifError(err);
           done();
         });

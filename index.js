@@ -249,7 +249,7 @@ var RemoveFromNamespace = function(db, table) {
 };
 
 
-Massive.prototype.createDocumentTable = function(path, next) {
+Massive.prototype.createTable = function(path, next) {
   // Create the table in the back end:
   var splits = path.split(".");
   var tableName;

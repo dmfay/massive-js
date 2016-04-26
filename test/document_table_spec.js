@@ -30,7 +30,7 @@ describe('Document table', function () {
     describe('without schema', function() {
 
       it('creates a table on public schema', function(done) {
-        db.createDocumentTable(tableName, function(err, res) {
+        db.createTable(tableName, function(err, res) {
           assert.ifError(err);
           assert(_.isEqual([], res), 'should be empty array');
           done();
@@ -49,7 +49,7 @@ describe('Document table', function () {
       });
 
       it('creates a table on the specified schema', function(done) {
-        db.createDocumentTable(schemaTableName, function(err, res) {
+        db.createTable(schemaTableName, function(err, res) {
           assert.ifError(err);
           assert(_.isEqual([], res), 'should be empty array');
           done();
@@ -66,7 +66,7 @@ describe('Document table', function () {
     describe('without schema', function() {
 
       before(function(done) {
-        db.createDocumentTable(tableName, function(err) {
+        db.createTable(tableName, function(err) {
           assert.ifError(err);
           done();
         });
@@ -88,7 +88,7 @@ describe('Document table', function () {
       before(function(done) {
         db.createSchema(schema, function(err) {
           assert.ifError(err);
-          db.createDocumentTable(schemaTableName, function(err) {
+          db.createTable(schemaTableName, function(err) {
             assert.ifError(err);
             done();
           });
