@@ -217,6 +217,73 @@ var MapToNamespace = function(entity, collection) {
   db[collection].push(entity);
 };
 
+var RemoveFromNamespace = function(db, table, collection) {
+  collection = collection || "tables";
+
+  var splits = table.split('.');
+  var tableName, schemaName;
+
+  if(splits.length > 1) {
+    schemaName = splits[0];
+    tableName = splits[1];
+  } else {
+    schemaName = "public";
+    tableName = table;
+  }
+
+  if(schemaName === "public") {
+    db[table] = undefined;
+  }else if(db[schemaName] && db[schemaName][tableName]) {
+    db[schemaName][tableName] = undefined;
+    // db[schemaName] = _.reject(db[schemaName], function(element) {
+    //   return element.name && element.name === tableName.name;
+    // });
+  }
+
+  if(db[collection]) {
+    db[collection] = _.reject(db[collection], function(element) {
+      return element.name
+        && element.schema
+        && element.schema === schemaName
+        && element.name === tableName;
+    });
+  }
+};
+
+
+Massive.prototype.createDocumentTable = function(path, next) {
+  // Create the table in the back end:
+  var splits = path.split(".");
+  var tableName;
+  var schemaName;
+  if(splits.length > 1) {
+    // uh oh. Someone specified a schema name:
+    schemaName = splits[0];
+    tableName = splits[1];
+  } else {
+    schemaName = "public"; // default schema
+    tableName = path;
+  }
+
+  var _table = new Table({
+  schema : schemaName,
+   pk : "id",
+   name : tableName,
+   db : self
+  });
+
+  var sql = this.documentTableSql(path);
+
+  this.query(sql, function(err, res){
+    if(err){
+      next(err,null);
+    } else {
+      MapToNamespace(_table);
+      next(null, res);
+    }
+  });
+};
+
 Massive.prototype.documentTableSql = function(tableName){
   var docSqlFile = __dirname + "/lib/scripts/create_document_table.sql";
   var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
@@ -225,6 +292,78 @@ Massive.prototype.documentTableSql = function(tableName){
   sql = util.format(sql, tableName, indexName, tableName, indexName, tableName);
   return sql;
 };
+
+
+Massive.prototype.dropDocumentTable = function(table, options, next) {
+  var sql = this.dropDocumentTableSql(table, options);
+  this.query(sql, function(err, res) {
+    if(err) {
+      next(err, null);
+    } else {
+      RemoveFromNamespace(self, table);
+      next(null, res);
+    }
+  });
+};
+
+Massive.prototype.dropDocumentTableSql = function(tableName, options){
+  var docSqlFile = __dirname + "/lib/scripts/drop_document_table.sql";
+  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
+  var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
+  sql = util.format(sql, tableName, cascadeOpt);
+  return sql;
+};
+
+Massive.prototype.createSchema = function(schemaName, next) {
+  var sql = this.createSchemaSql(schemaName);
+  this.query(sql, function(err, res) {
+    if(err) {
+      next(err);
+    } else {
+      self[schemaName] = {};
+      next(null, res);
+    }
+  });
+};
+
+Massive.prototype.createSchemaSql = function(schemaName) {
+  var docSqlFile = __dirname + "/lib/scripts/create_schema.sql";
+  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
+
+  sql = util.format(sql, schemaName);
+  return sql;
+};
+
+Massive.prototype.dropSchema = function(schemaName, options, next) {
+  var sql = this.dropSchemaSql(schemaName, options);
+
+  this.query(sql, function(err, res) {
+    if(err) {
+      next(err);
+    } else {
+      // Remove all the tables from the namespace
+      if(self[schemaName]) {
+        _.each(Object.keys(self[schemaName]), function(table) {
+          RemoveFromNamespace(self, schemaName + "." + table);
+        });
+      }
+      // Remove the schema from the namespace
+      self[schemaName] = undefined;
+      next(null, res);
+    }
+  });
+};
+
+Massive.prototype.dropSchemaSql = function(schemaName, options) {
+  var docSqlFile = __dirname + "/lib/scripts/drop_schema.sql";
+  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
+  // Default to restrict, but optional cascade
+  var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
+  sql = util.format(sql, schemaName, cascadeOpt);
+  return sql;
+};
+
+
 
 //A recursive directory walker that would love to be refactored
 var walkSqlFiles = function(rootObject, rootDir) {
