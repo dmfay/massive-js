@@ -35,7 +35,7 @@
     "commander": "^2.6.0",
     "deasync": "^0.1.1",
     "glob": "^4.4.1",
-    "pg": "^4.3.0",
+    "pg": "^4.5.5",
     "pg-query-stream": "^0.7.0",
     "strip-bom": "^2.0.0",
     "underscore": "^1.8.2"
