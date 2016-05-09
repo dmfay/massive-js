@@ -14,11 +14,11 @@ language sql;
 ```
 
 ## The DB Directory
-Massive doesn't stop at the functions present in the database itself. On startup, it looks for a `db` directory at the root of your project (this may be overridden by passing a `scripts` property in the `connect()` args) and loads each SQL file present as a top-level function on the instance object. Each function will have the same name as the script file, sans extension. Subdirectories act as namespaces in a manner similar to the loading of database functions by schema.
+Massive doesn't stop at the functions present in the database itself. On startup, it looks for a `db` directory at the root of your project (this may be overridden by passing a `scripts` property in the `connect()` args) and loads each SQL file present as a top-level function on the instance object. Each function will have the same name as the script file, sans the `.sql` extension. Subdirectories act as namespaces in a manner similar to the loading of database functions by schema.
 
 Script files are loaded last on initialization, and will override any already-loaded tables, views, or database functions with the same name.
 
-A simple query script reproducing the products_in_stock database function above:
+A simple query script file named `products_in_stock.sql` residing in the appropriate `db` directory reproduces the products_in_stock database function above:
 
 ```sql
 select * from products
