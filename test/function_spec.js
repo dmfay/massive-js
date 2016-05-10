@@ -1,11 +1,56 @@
 var assert = require("assert");
 var helpers = require("./helpers");
+var _ = require("underscore");
 var db;
 
 describe('Functions', function () {
   before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
+      done();
+    });
+  });
+  it('executes multiple args without passing as array', function (done) {
+      db.multiple_args(1, 2, 3, 4, 5, 6, function(err,res){
+        assert.ifError(err);
+        assert(res.length === 1);
+        var record = res[0];
+        _.each([1, 2, 3, 4, 5, 6], function (idx) {
+          assert(record["a" + idx] === idx);
+      });
+      done();
+    });
+  });
+  it('executes multiple args with passing as array', function (done) {
+    db.multiple_args([1, 2, 3, 4, 5, 6], function(err,res){
+      assert.ifError(err);
+      assert(res.length === 1);
+      var record = res[0];
+      _.each([1, 2, 3, 4, 5, 6], function (idx) {
+        assert(record["a" + idx] === idx);
+      });
+      done();
+    });
+  });
+  it('executes multiple args without passing as an array and using options', function (done) {
+    db.multiple_args(1, 2, 3, 4, 5, 6, { this_is_ignored: true }, function(err,res){
+      assert.ifError(err);
+      assert(res.length === 1);
+      var record = res[0];
+      _.each([1, 2, 3, 4, 5, 6], function (idx) {
+        assert(record["a" + idx] === idx);
+      });
+      done();
+    });
+  });
+  it('executes multiple args with passing as an array and using options', function (done) {
+    db.multiple_args([1, 2, 3, 4, 5, 6], { this_is_ignored: true }, function(err,res){
+      assert.ifError(err);
+      assert(res.length === 1);
+      var record = res[0];
+      _.each([1, 2, 3, 4, 5, 6], function (idx) {
+        assert(record["a" + idx] === idx);
+      });
       done();
     });
   });

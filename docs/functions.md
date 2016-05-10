@@ -48,7 +48,7 @@ massive.connect({
 ```
 
 ## Parameters
-Many, if not most, functions will expect some sort of input. If the function takes only one parameter, it may be passed in raw:
+Many, if not most, functions will expect some sort of input.
 
 ```js
 var massive = require("massive");
@@ -61,7 +61,20 @@ massive.connect({
 });
 ```
 
-If it takes multiple parameters, they must be wrapped in an Array:
+And you can do that with multiple inputs as well:
+
+```js
+var massive = require("massive");
+
+massive.connect({
+  connectionString: "postgres://localhost/massive"}, function(err, db) {
+  db.top_x_products_by_country(5, 'US', function(err, products) {
+    //products is a results array
+  });
+});
+```
+
+You may also pass in multiple arguments as a single Array, but you do not have to:
 
 ```js
 var massive = require("massive");
@@ -73,3 +86,6 @@ massive.connect({
   });
 });
 ```
+
+The inputs must be scalars.  You may not pass in objects or arrays as arguments per-se.  You are allowed to group all inputs into an array and pass them in as that (as demonstrated in the last example), should you like to do so.
+
