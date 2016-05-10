@@ -23,9 +23,9 @@ describe('On spin up', function () {
     assert.equal(db.tables.length, 10);
   });
 
-  // including one nested in a deeper folder... total of 4 now.
-  it('loads up 7 queries', function () {
-    assert.equal(db.queryFiles.length, 7);
+  // including one nested in a deeper folder... total of 8 now.
+  it('loads up 8 queries', function () {
+    assert.equal(db.queryFiles.length, 8);
   });
   it('loads up functions', function () {
     // newer versions of postgres include more than 20 functions
@@ -57,9 +57,9 @@ describe('Synchronous Load', function () {
     assert.equal(syncLoaded.tables.length, 10);
   });
 
-  // including one nested in a deeper folder... total of 4 now.
-  it('loads up 7 queries', function () {
-    assert.equal(syncLoaded.queryFiles.length, 7);
+  // including one nested in a deeper folder... total of 8 now.
+  it('loads up 8 queries', function () {
+    assert.equal(syncLoaded.queryFiles.length, 8);
   });
   it('loads up functions', function () {
     // newer versions of postgres include more than 20 functions
