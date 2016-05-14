@@ -230,7 +230,7 @@ The API is as close to Massive 1.0 as we could make it - but there's no need for
 //connect massive, get db instance
 
 //straight up SQL
-db.run("select * from products where id=$1", 1, function(err,product){
+db.run("select * from products where id=$1", [1], function(err,product){
   //product 1
 });
 
