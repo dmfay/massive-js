@@ -58,27 +58,53 @@ db.users.find({active: true}, function(err, users){
 });
 ```
 
-### More Complex Operations
+### Conditions
+Most of the common ANSI and Postgres-specific boolean operators are supported,
+in as close to actual Postgres syntax as possible. Certain alternative forms can
+also be used: for instance, while the standard syntax for inequality is `<>`,
+Massive will also recognize and convert `!` and `!=`.
 
-```js
-// an IN query
-db.products.find({id : [10, 21]}, function(err, products){
-  // products 10 and 21
-});
+Where applicable, operators are case-insensitive: `like` and `LIKE` are equally
+valid.
 
-// a NOT IN query
-db.products.find({"id <>": [10, 21]}, function(err, products){
-  // products other than 10 and 21
-});
+#### Comparison
+* `=` (equality): `{price: 20}`, `{"price =": 20}`
+* `<>` (inequality): `{"price <>": 20}`, `{"price !=": 20}`, `{"price !": 20}`
+* `<` (less than): `{"price <": 20}`
+* `>` (greater than): `{"price >": 20}`
+* `<=` (less than or equal): `{"price <=": 20}`
+* `>=` (greater than or equal): `{"price >=": 20}`
 
-db.products.find({"id < " : 2}, function(err, res){
-  // all products having id less than 2
-});
+#### Null values
+* `IS NULL`: `{description: null}`, `{"description =": null}`
+* `IS NOT NULL`: `{"description <>": null}`, `{"description !=": null}`, `{"description !": null}`
+* `IS DISTINCT FROM` (null-sensitive `<>`): `{"color is distinct from": "red"}`
+* `IS NOT DISTINCT FROM` (null-sensitive `=`): `{"color is not distinct from": "red"}`
 
-db.products.find({"id > " : 2}, function(err, res){
-  // all products having id greater than 2
-});
-```
+#### Membership
+* `IN` (membership): `{id: [10, 21]}`
+* `NOT IN` (absence): `{"id <>": [10, 21]}`
+
+#### Array Membership
+* `@>` (contains): `{"categories @>": ["things", "stuff"]}`
+* `<@` (contained by): `{"categories <@": ["things", "stuff"]}`
+* `&&` (overlap): `{"categories &&": ["things", "stuff"]}`
+
+#### Pattern Matching
+* `LIKE` (match): `{"name like": "%New and Improved%"}`, `{"name ~~": "%New and Improved%"}`
+* `NOT LIKE` (no match): `{"name not like": "%New and Improved%"}`, `{"name !~~": "%New and Improved%"}`
+* `ILIKE` (case-insensitive match): `{"name ilike": "%new and improved%"}`, `{"name ~~*": "%new and improved%"}`
+* `NOT ILIKE` (no case-insensitive match): `{"name not ilike": "%new and improved%"}`, `{"name !~~*": "%new and improved%"}`
+* `SIMILAR TO` (regexlike match): `{"name similar to": "%New (and|\&) Improved%"}`
+* `NOT SIMILAR TO` (no regexlike match): `{"name not similar to": "%New (and|\&) Improved%"}`
+
+#### Regular Expressions
+Postgres supports the POSIX standard for regular expressions.
+
+* `~` (case-sensitive match): `{"name ~": "%New (and|\&) Improved%"}`
+* `!~` (no case-sensitive match): `{"name !~": "%New (and|\&) Improved%"}`
+* `~*` (case-insensitive match): `{"name ~*": "%new (and|\&) improved%"}`
+* `!~*` (no case-insensitive match): `{"name !~*": "%new (and|\&) improved%"}`
 
 ### Predicate Subgroups
 The standard object syntax generates a predicate which simply ANDs together all

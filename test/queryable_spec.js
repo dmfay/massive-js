@@ -180,11 +180,143 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('returns products using distinct from', function (done) {
+      db.products.find({"tags is distinct from": '{tag1,tag2}'}, function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+    it('returns products using not distinct from', function (done) {
+      db.products.find({"tags is not distinct from": '{tag1,tag2}'}, function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length, 1);
+        done();
+      });
+    });
     it('returns products with a compound query including a null field', function (done) {
       db.products.find({"id": 1, "tags": null, price: 12.00}, function(err,res){
         assert.ifError(err);
         assert.equal(res.length, 1);
         assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+  });
+
+  describe('Pattern-matching queries', function () {
+    it('finds a product by a search string with LIKE', function (done) {
+      db.products.findOne({'name like': '%odu_t 2'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 2);
+        assert.equal(product.name, 'Product 2');
+
+        done();
+      });
+    });
+
+    it('finds a product by a search string with NOT LIKE', function (done) {
+      db.products.findOne({'name not like': '%odu_t 2'}, function (err, product) {
+        assert.ifError(err);
+        assert.notEqual(product.id, 2);
+        assert.notEqual(product.name, 'Product 2');
+
+        done();
+      });
+    });
+
+    it('uses alternative forms', function (done) {
+      db.products.findOne({'name ~~': '%odu_t 2'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 2);
+        assert.equal(product.name, 'Product 2');
+
+        done();
+      });
+    });
+
+    it('finds a product by a search string with ILIKE', function (done) {
+      db.products.findOne({'name ilike': '%OdU_t 2'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 2);
+        assert.equal(product.name, 'Product 2');
+
+        done();
+      });
+    });
+
+    it('finds a product by a search string with NOT ILIKE', function (done) {
+      db.products.findOne({'name not ilike': '%OdU_t 2'}, function (err, product) {
+        assert.ifError(err);
+        assert.notEqual(product.id, 2);
+        assert.notEqual(product.name, 'Product 2');
+
+        done();
+      });
+    });
+
+    it('finds products matching a regexoid with SIMILAR TO', function (done) {
+      db.products.find({'name similar to': '(P[rod]+uct 2|%duct 3)'}, function (err, products) {
+        assert.ifError(err);
+        assert.equal(products.length, 2);
+        assert.equal(products[0].id, 2);
+        assert.equal(products[0].name, 'Product 2');
+        assert.equal(products[1].id, 3);
+        assert.equal(products[1].name, 'Product 3');
+
+        done();
+      });
+    });
+
+    it('finds products not matching a regexoid with NOT SIMILAR TO', function (done) {
+      db.products.find({'name not similar to': '(P[rod]+uct 2|%duct 3)'}, function (err, products) {
+        assert.ifError(err);
+        assert.equal(products.length, 2);
+        assert.equal(products[0].id, 1);
+        assert.equal(products[0].name, 'Product 1');
+        assert.equal(products[1].id, 4);
+        assert.equal(products[1].name, 'Product 4');
+
+        done();
+      });
+    });
+
+    it('finds products matching a case-sensitive POSIX regex', function (done) {
+      db.products.findOne({'name ~': 'Product[ ]*1(?!otherstuff)'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 1);
+        assert.equal(product.name, 'Product 1');
+
+        done();
+      });
+    });
+
+    it('finds products not matching a case-sensitive POSIX regex', function (done) {
+      db.products.findOne({'name !~': 'Product[ ]*[2-4](?!otherstuff)'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 1);
+        assert.equal(product.name, 'Product 1');
+
+        done();
+      });
+    });
+
+    it('finds products matching a case-insensitive POSIX regex', function (done) {
+      db.products.findOne({'name ~*': 'product[ ]*1(?!otherstuff)'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 1);
+        assert.equal(product.name, 'Product 1');
+
+        done();
+      });
+    });
+
+    it('finds products not matching a case-insensitive POSIX regex', function (done) {
+      db.products.findOne({'name !~*': 'product[ ]*[2-4](?!otherstuff)'}, function (err, product) {
+        assert.ifError(err);
+        assert.equal(product.id, 1);
+        assert.equal(product.name, 'Product 1');
+
         done();
       });
     });
