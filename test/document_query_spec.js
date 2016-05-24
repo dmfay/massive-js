@@ -259,5 +259,17 @@ describe('Document queries', function () {
         });
       });
     });
+
+    it('returns right elements if filter is specified', function (done) {
+      db.docs.searchDoc({
+        keys : ["title"],
+        term : "Document",
+        where: {'price': 22.00}
+      }, function(err, docs){
+        assert.ifError(err);
+        assert.equal(docs.length, 1);
+        done();
+      });
+    });
   });
 });
