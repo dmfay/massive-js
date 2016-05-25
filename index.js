@@ -5,7 +5,6 @@ var Executable = require("./lib/executable");
 var Queryable = require("./lib/queryable");
 var Table = require("./lib/table");
 var util = require("util");
-var assert = require("assert");
 var ArgTypes = require("./lib/arg_types");
 var path = require("path");
 var DA = require('deasync');
@@ -13,11 +12,11 @@ var stripBom = require('strip-bom');
 
 var self;
 
-var Massive = function(args){
+var Massive = function(args) {
   this.scriptsDir = args.scripts || process.cwd() + "/db";
 
-  var runner = new Runner(args.connectionString);
-  _.extend(this,runner);
+  var runner = new Runner(args.connectionString, args.defaults);
+  _.extend(this, runner);
 
   this.tables = [];
   this.views = [];
@@ -25,7 +24,7 @@ var Massive = function(args){
   this.schemas = [];
   this.functions = [];
 
-  if(args.whitelist) {
+  if (args.whitelist) {
     this.whitelist = this.getTableFilter(args.whitelist);
   } else {
     this.allowedSchemas = this.getSchemaFilter(args.schema);
@@ -123,7 +122,6 @@ Massive.prototype.loadTables = function(next) {
 Massive.prototype.loadViews = function(next) {
   var viewSql = __dirname + "/lib/scripts/views.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-  var self = this;
 
   this.executeSqlFile({file : viewSql, params: parameters}, function(err, views){
     if (err) { return next(err, null); }
@@ -143,8 +141,6 @@ Massive.prototype.loadViews = function(next) {
 };
 
 Massive.prototype.saveDoc = function(collection, doc, next){
-  var self = this;
-
   // default is public. Table constructor knows what to do if 'public' is used as the schema name:
   var schemaName = "public";
   var tableName = collection;
@@ -240,10 +236,7 @@ var RemoveFromNamespace = function(db, table) {
 
   if(db[collection]) {
     db[collection] = _.reject(db[collection], function(element) {
-      return element.name
-        && element.schema
-        && element.schema === schemaName
-        && element.name === tableName;
+      return element.name && element.schema && element.schema === schemaName && element.name === tableName;
     });
   }
 };
@@ -462,31 +455,31 @@ Massive.prototype.loadFunctions = function(next) {
 };
 
 //connects Massive to the DB
-exports.connect = function(args, next){
-  assert((args.connectionString || args.db), "Need a connectionString or db (name of database on localhost) at the very least.");
-
+exports.connect = function(args, next) {
   //override if there's a db name passed in
   if (args.db) {
     args.connectionString = "postgres://localhost/"+args.db;
+  } else if (!args.connectionString) {
+    return next(new Error("Need a connectionString or db (name of database on localhost) to connect."));
   }
 
   var massive = new Massive(args);
 
   //load up the tables, queries, and commands
   massive.loadTables(function(err, db) {
-    //handle error if loading the functions fails and bubble it up
-    if (err) {
-      return next(err, null);
-    }
+    if (err) { return next(err); }
 
     self = db;
 
     massive.loadViews(function() {
+      if (err) { return next(err); }
+
       massive.loadFunctions(function(err, db) {
-        assert(!err, err);
-        //synchronous
-        db.loadQueries();
-        next(null,db);
+        if (err) { return next(err); }
+
+        db.loadQueries(); // synchronous
+
+        next(null, db);
       });
     });
   });
