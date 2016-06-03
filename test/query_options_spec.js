@@ -1,6 +1,5 @@
 var QueryOptions = require("../lib/query_options");
-var assert = require("assert"),
-  util = require("util");
+var assert = require("assert");
 
 describe("QueryOptions", function () {
   describe("selectList", function () {
