@@ -47,5 +47,17 @@ describe("QueryOptions", function () {
 
       assert.equal(result.queryOptions(), " order by col1 asc,(body->>'col2')::varchar desc,col3 + col4 asc");
     });
+
+    it("should build an order clause for a document table", function () {
+      var result = new QueryOptions({
+        order: [
+          {field: "col1", direction: "asc", type: "int"},
+          {field: "col2", direction: "desc", type: "varchar"}
+        ],
+        orderBody: true
+      }, {});
+
+      assert.equal(result.queryOptions(), " order by (body->>'col1')::int asc,(body->>'col2')::varchar desc");
+    });
   });
 });
