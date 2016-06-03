@@ -540,6 +540,17 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('returns users with a complex order by', function (done) {
+      db.Users.find({}, {
+        order: [
+          {field: '"Email"', direction: 'asc'}, 
+          {field: '"Id"', direction: 'desc'}
+        ]}, function(err, res){
+          assert.ifError(err);
+          assert.equal(res.length, 1);
+          done();
+        });
+    });
     it('counts all funny cased users', function (done) {
       db.Users.count(null, null, function(err, res){
         assert.ifError(err);
