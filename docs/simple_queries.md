@@ -155,19 +155,46 @@ use, except for `columns`. Meanwhile, `findDoc` always returns entire documents,
 ignoring `columns`.
 
 ```js
-db.products.find(
-  {
-    in_stock: true
-  }, {
-    columns: ["name", "price", "description"],
-    order: "price desc",
-    offset: 20,
-    limit: 10
-  }, function (err, products) {
+db.products.find({
+  in_stock: true
+}, {
+  columns: ["name", "price", "description"],
+  order: "price desc",
+  offset: 20,
+  limit: 10
+}, function (err, products) {
   // ten name/price/description objects, ordered by price high to low, skipping
   // the twenty most expensive products
 });
 ```
+
+#### Complex Ordering
+
+The simplest possible `order` is a string which will be directly interpolated
+into the emitted query. However, Massive can also assemble an `ORDER BY` clause
+from an array of expressions.
+
+Each element in the array _must_ contain a `field` representing the expression
+being sorted on, generally the name of a column. The `direction` may be `asc` or
+`desc`. If the expression requires casting (common for sorting properties of
+JSON fields) the `type` determines that.
+
+```js
+db.products.find({
+  in_stock: true
+}, {
+  order: [
+    {field: "price", direction: "desc"},
+    {field: "specs->>'height'", direction: "asc", type: "int"}
+  ]
+}, function (err, products) {...});
+```
+
+If you're querying a document table and don't want to write out all the 
+`body->>'field'` boilerplate yourself you can set `options.orderBody` to true
+and Massive will handle it. The one major limitation is that this allows you to
+sort _only_ by fields in the document body, since the traversal operator is
+applied to every order expression.
 
 ### JSON Drilldown
 
