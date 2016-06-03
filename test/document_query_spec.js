@@ -178,6 +178,20 @@ describe('Document queries', function () {
         done();
       });
     });
+
+    it('orders by fields in the document body with criteria', function (done) {
+      db.docs.findDoc('*', {
+        order: [{field: 'title', direction: 'desc', type: 'varchar'}], 
+        orderBody: true
+      }, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        assert.equal(res[0].title, 'Starsky and Hutch');
+        assert.equal(res[1].title, 'Another Document');
+        assert.equal(res[2].title, 'A Document');
+        done();
+      });
+    });
   });
 
   describe('Full Text Search', function () {
@@ -268,6 +282,22 @@ describe('Document queries', function () {
       }, function(err, docs){
         assert.ifError(err);
         assert.equal(docs.length, 1);
+        done();
+      });
+    });
+
+    it('orders by fields in the document body with criteria', function (done) {
+      db.docs.searchDoc({
+        keys: ["title"],
+        term: "Document"
+      }, {
+        order: [{field: 'title', direction: 'desc', type: 'varchar'}],
+        orderBody: true
+      }, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 2);
+        assert.equal(res[0].title, 'Another Document');
+        assert.equal(res[1].title, 'A Document');
         done();
       });
     });
