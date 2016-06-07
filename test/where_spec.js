@@ -149,6 +149,12 @@ describe('WHERE clause generation', function () {
   });
 
   describe('forTable', function () {
+    it('should create an empty WHERE clause', function () {
+      var result = where.forTable({});
+      assert.equal(result.where, ' \nWHERE 1=1');
+      assert.equal(result.params.length, 0);
+    });
+
     it('should create a basic WHERE clause', function () {
       var result = where.forTable({field: 'value'});
       assert.equal(result.where, ' \nWHERE "field" = $1');

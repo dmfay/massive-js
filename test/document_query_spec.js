@@ -24,6 +24,14 @@ describe('Document queries', function () {
       });
     });
 
+    it('returns all documents when passed an empty conditions block', function (done) {
+      db.docs.findDoc({}, function(err,res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        done();
+      });
+    });
+
     it('returns all documents when passed only "next" function', function (done) {
       db.docs.findDoc(function(err,res){
         assert.ifError(err);
