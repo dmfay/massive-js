@@ -495,6 +495,15 @@ describe('Queryables', function () {
         done();
       });
     });
+
+    it('supports options in findOne', function (done) {
+      db.products.findOne({}, {order: "id desc", columns: "id"}, function(err,res) {
+        assert.ifError(err);
+        assert.equal(res.id, 4);
+        assert.equal(Object.keys(res).length, 1);
+        done();
+      });
+    });
   });
 
   describe('Casing issues', function () {
