@@ -146,6 +146,24 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
     });
+
+    describe('casting', function () {
+      it('should cast fields', function () {
+        var result = where.parseKey('field::text LIKE');
+        assert.equal(result.field, 'field::text');
+        assert.equal(result.quotedField, '"field"::text');
+        assert.equal(result.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should cast quoted fields', function () {
+        var result = where.parseKey('"field"::text LIKE');
+        assert.equal(result.field, 'field::text');
+        assert.equal(result.quotedField, '"field"::text');
+        assert.equal(result.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+    });
   });
 
   describe('forTable', function () {
