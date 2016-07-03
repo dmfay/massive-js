@@ -130,6 +130,12 @@ db.products.find({
 supports operations, null values, JSON drilldown, and everything else allowable
 in the standard set.
 
+### Casting
+
+Postgres syntax for casting is supported for simple cases: 
+`{'field::text LIKE': '%value%'}` and the like. More complex casts such as from
+JSON or JSONB traversal operations are not supported in the criteria API as yet.
+
 ### Query Options
 
 Most table and view query functions, including `find`, `findOne`, `findDoc`,
