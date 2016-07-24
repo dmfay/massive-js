@@ -46,6 +46,26 @@ var Massive = function(args) {
   this.functionWhitelist = this.getTableFilter(args.functionWhitelist);
 };
 
+Massive.prototype.withConnectionWrapper = function(wrapper) {
+  if (typeof wrapper !== 'function') {
+    throw new Error("withConnectionWrapper expected a function");
+  }
+  if (wrapper.length !== 3) {
+    throw new Error("withConnectionWrapper expected a function accepting 3 arguments");
+  }
+  var oldWrapper = this.connectionWrapper;
+  var newDb = new Massive(this._options);
+  newDb.connectionWrapper = function (fn) {
+    var oldHandler = oldWrapper.call(this, fn);
+    return function(err, pgClient, done) {
+      if (err) return oldHandler(err, pgClient, done);
+      wrapper(pgClient, oldHandler, done);
+    };
+  };
+  newDb.initialize(this._resources);
+  return newDb;
+};
+
 Massive.prototype.getSchemaFilter = function(allowedSchemas) {
   // an empty string will cause all schema to be loaded by default:
   var result = '';
