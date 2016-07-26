@@ -440,7 +440,9 @@ Massive.prototype.loadFunctions = function(next) {
             sql: sql,
             schema: schema,
             name : fn.name,
-            db : self
+            db : self,
+            singleRow: fn.return_single_row,
+            singleValue: fn.return_single_value
           });
 
           MapToNamespace(_exec, "functions");
