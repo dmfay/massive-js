@@ -119,5 +119,28 @@ describe('Functions', function () {
         done();
       });
     });
+    it("executes schema-bound, camel-cased function RandomAlbum and returns the single row result", function (done) {
+      db.myschema.RandomAlbum(function(err,res) {
+        assert.ifError(err);
+        assert(_.isObject(res));
+        assert.deepEqual(Object.keys(res), ["id", "title", "artist_id"]);
+        done();
+      });
+    });
+    it("executes schema-bound, camel-cased function JsonHelloWorld and returns the single integer value", function (done) {
+      db.myschema.getRandomNumber(function(err,res) {
+        assert.ifError(err);
+        assert.equal(res, 4);
+        done();
+      });
+    });
+    it("executes schema-bound, camel-cased function JsonHelloWorld and returns the single JSON value", function (done) {
+      db.myschema.JsonHelloWorld(function(err,res) {
+        assert.ifError(err);
+        assert(_.isObject(res));
+        assert.deepEqual(res, {hello: "world"});
+        done();
+      });
+    });
   });
 });

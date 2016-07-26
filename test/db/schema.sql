@@ -82,6 +82,8 @@ create materialized view mv_orders as select * from orders;
 drop table if exists myschema.artists cascade;
 drop table if exists myschema.albums cascade; -- drops functions too
 drop table if exists myschema.docs;
+drop function if exists myschema."JsonHelloWorld"();
+drop function if exists myschema."getRandomNumber"();
 
 -- just in case:
 drop table if exists myschema.doggies;
@@ -176,5 +178,30 @@ returns setof myschema.albums
 as
 $$
 select * from myschema.albums;
+$$
+language sql;
+
+create or replace function myschema."RandomAlbum"()
+returns myschema.albums
+as
+$$
+select * from myschema.albums order by random() limit 1;
+$$
+language sql;
+
+create or replace function myschema."getRandomNumber"()
+returns integer
+as
+$$
+select 4; -- chosen by fair dice roll.
+          -- guaranteed to be random.
+$$
+language sql;
+
+create or replace function myschema."JsonHelloWorld"()
+returns json
+as
+$$
+select '{"hello": "world"}'::json;
 $$
 language sql;
