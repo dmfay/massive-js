@@ -174,5 +174,12 @@ describe('Functions', function () {
       });
     });
     */
+    it("executes function example_email and returns 'example@example.com'::email_address", function (done) {
+      db.example_email(function(err,res) {
+        assert.ifError(err);
+        assert.equal(res, 'example@example.com');
+        done();
+      });
+    });
   });
 });

@@ -3,7 +3,7 @@
 select distinct
     n.nspname as "schema",
     (not p.proretset) as "return_single_row",
-    (t.typtype in ('b', 'e', 'r')) as "return_single_value",
+    (t.typtype in ('b', 'd', 'e', 'r')) as "return_single_value",
     p.proname as "name",
     p.pronargs as param_count
 from pg_proc p

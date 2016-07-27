@@ -228,3 +228,11 @@ $$ language sql;
 -- , (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
 -- ];
 -- $$ language sql;
+
+drop function if exists example_email();
+drop domain if exists email_address;
+create domain email_address as text check(value similar to '[^@]+@[^@]+.[^@]+');
+
+create function example_email() returns email_address as $$
+select 'example@example.com'::email_address;
+$$ language sql;
