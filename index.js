@@ -14,6 +14,7 @@ var self;
 
 var Massive = function(args) {
   this.scriptsDir = args.scripts || process.cwd() + "/db";
+  this.interpretFunctionReturnTypes = args.interpretFunctionReturnTypes || false;
 
   var runner = new Runner(args.connectionString, args.defaults);
   _.extend(this, runner);
@@ -441,8 +442,8 @@ Massive.prototype.loadFunctions = function(next) {
             schema: schema,
             name : fn.name,
             db : self,
-            singleRow: fn.return_single_row,
-            singleValue: fn.return_single_value
+            singleRow: self.interpretFunctionReturnTypes && fn.return_single_row,
+            singleValue: self.interpretFunctionReturnTypes && fn.return_single_value
           });
 
           MapToNamespace(_exec, "functions");
