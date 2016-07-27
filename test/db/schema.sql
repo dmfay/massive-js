@@ -205,3 +205,26 @@ $$
 select '{"hello": "world"}'::json;
 $$
 language sql;
+
+create or replace function yesses() returns text[] as $$
+select array['yes', 'yes', 'yes', 'yes'];
+$$ language sql;
+
+drop function if exists coin_toss();
+drop function if exists coin_tosses();
+drop type if exists coin_toss;
+create type coin_toss as enum ('heads', 'tails');
+
+create function coin_toss() returns coin_toss as $$
+select (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end);
+$$ language sql;
+
+-- `pg` module doesn't support arrays of custom types yet
+-- see: https://github.com/brianc/node-postgres/issues/986
+-- create function coin_tosses() returns coin_toss[] as $$
+-- select array[
+--   (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- , (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- , (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- ];
+-- $$ language sql;

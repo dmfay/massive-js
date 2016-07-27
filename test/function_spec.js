@@ -142,5 +142,37 @@ describe('Functions', function () {
         done();
       });
     });
+    it("executes function yesses and returns array of 'yes'", function (done) {
+      db.yesses(function(err,res) {
+        assert.ifError(err);
+        assert(Array.isArray(res), "Expected array");
+        res.forEach(function(el) {
+          assert.equal(el, 'yes');
+        });
+        done();
+      });
+    });
+    it("executes function coin_toss and returns 'heads' or 'tails'", function (done) {
+      db.coin_toss(function(err,res) {
+        assert.ifError(err);
+        assert(['heads', 'tails'].indexOf(res) >= 0, "'" + res + "' must be heads or tails");
+        done();
+      });
+    });
+    /*
+    // `pg` module doesn't support arrays of custom types yet
+    // see: https://github.com/brianc/node-postgres/issues/986
+    it("executes function coin_tosses and returns array of 'heads' or 'tails'", function (done) {
+      db.coin_tosses(function(err,res) {
+        assert.ifError(err);
+        console.dir(res);
+        assert(Array.isArray(res), "Expected array");
+        res.forEach(function(el) {
+          assert(['heads', 'tails'].indexOf(el) >= 0, "'" + el + "' must be heads or tails");
+        });
+        done();
+      });
+    });
+    */
   });
 });
