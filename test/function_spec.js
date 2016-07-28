@@ -181,5 +181,27 @@ describe('Functions', function () {
         done();
       });
     });
+    it("executes function regexp_matches and returns stream of matches", function (done) {
+      db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}, function(err, stream) {
+        assert.ifError(err);
+        var result = [];
+
+        stream.on('readable', function() {
+          var res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.equal(20, result.length);
+          result.forEach(function(r) {
+            assert.equal(r, 'a');
+          });
+          done();
+        });
+      });
+    });
   });
 });
