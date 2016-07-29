@@ -7,7 +7,8 @@ massive.connect({
   connectionString: 'postgres://postgres@localhost/massive',
   defaults: {
     poolSize: 20
-  }
+  },
+  enhancedFunctions: true
 }, function (err, db) {
   // db contains your tables, views, and functions
 })
@@ -21,3 +22,7 @@ the underlying node-postgres driver to set options such as `poolSize` or
 `parseInt8`. For more complete documentation of available driver defaults, see
 the [node-postgres](https://github.com/brianc/node-postgres/wiki/pg#pgdefaults)
 documentation.
+
+`enhancedFunctions` is an experimental setting that allows functions to return
+a value matching their return type rather than a set of rows, see
+[Function Invocation](functions.md#function-invocation).

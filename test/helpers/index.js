@@ -9,7 +9,7 @@ exports.connectionString = connectionString;
 exports.init = function(next){
   massive.connect({
     connectionString : connectionString,
-    interpretFunctionReturnTypes : true,
+    enhancedFunctions : true,
     scripts : scriptsDir}, next);
 };
 
