@@ -14,6 +14,7 @@ var self;
 
 var Massive = function(args) {
   this.scriptsDir = args.scripts || process.cwd() + "/db";
+  this.enhancedFunctions = args.enhancedFunctions || false;
 
   var runner = new Runner(args.connectionString, args.defaults);
   _.extend(this, runner);
@@ -440,7 +441,9 @@ Massive.prototype.loadFunctions = function(next) {
             sql: sql,
             schema: schema,
             name : fn.name,
-            db : self
+            db : self,
+            singleRow: self.enhancedFunctions && fn.return_single_row,
+            singleValue: self.enhancedFunctions && fn.return_single_value
           });
 
           MapToNamespace(_exec, "functions");

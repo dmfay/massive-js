@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS citext;
 
 drop materialized view if exists mv_orders;
 drop table if exists "Users";
@@ -82,6 +83,8 @@ create materialized view mv_orders as select * from orders;
 drop table if exists myschema.artists cascade;
 drop table if exists myschema.albums cascade; -- drops functions too
 drop table if exists myschema.docs;
+drop function if exists myschema."JsonHelloWorld"();
+drop function if exists myschema."getRandomNumber"();
 
 -- just in case:
 drop table if exists myschema.doggies;
@@ -178,3 +181,59 @@ $$
 select * from myschema.albums;
 $$
 language sql;
+
+create or replace function myschema."RandomAlbum"()
+returns myschema.albums
+as
+$$
+select * from myschema.albums order by random() limit 1;
+$$
+language sql;
+
+create or replace function myschema."getRandomNumber"()
+returns integer
+as
+$$
+select 4; -- chosen by fair dice roll.
+          -- guaranteed to be random.
+$$
+language sql;
+
+create or replace function myschema."JsonHelloWorld"()
+returns json
+as
+$$
+select '{"hello": "world"}'::json;
+$$
+language sql;
+
+create or replace function yesses() returns text[] as $$
+select array['yes', 'yes', 'yes', 'yes'];
+$$ language sql;
+
+drop function if exists coin_toss();
+drop function if exists coin_tosses();
+drop type if exists coin_toss;
+create type coin_toss as enum ('heads', 'tails');
+
+create function coin_toss() returns coin_toss as $$
+select (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end);
+$$ language sql;
+
+-- `pg` module doesn't support arrays of custom types yet
+-- see: https://github.com/brianc/node-postgres/issues/986
+-- create function coin_tosses() returns coin_toss[] as $$
+-- select array[
+--   (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- , (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- , (case when random() > 0.5 then 'heads'::coin_toss else 'tails'::coin_toss end)
+-- ];
+-- $$ language sql;
+
+drop function if exists example_email();
+drop domain if exists email_address;
+create domain email_address as text check(value similar to '[^@]+@[^@]+.[^@]+');
+
+create function example_email() returns email_address as $$
+select 'example@example.com'::email_address;
+$$ language sql;

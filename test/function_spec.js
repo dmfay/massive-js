@@ -119,5 +119,89 @@ describe('Functions', function () {
         done();
       });
     });
+    it("executes schema-bound, camel-cased function RandomAlbum and returns the single row result", function (done) {
+      db.myschema.RandomAlbum(function(err,res) {
+        assert.ifError(err);
+        assert(_.isObject(res));
+        assert.deepEqual(Object.keys(res), ["id", "title", "artist_id"]);
+        done();
+      });
+    });
+    it("executes schema-bound, camel-cased function JsonHelloWorld and returns the single integer value", function (done) {
+      db.myschema.getRandomNumber(function(err,res) {
+        assert.ifError(err);
+        assert.equal(res, 4);
+        done();
+      });
+    });
+    it("executes schema-bound, camel-cased function JsonHelloWorld and returns the single JSON value", function (done) {
+      db.myschema.JsonHelloWorld(function(err,res) {
+        assert.ifError(err);
+        assert(_.isObject(res));
+        assert.deepEqual(res, {hello: "world"});
+        done();
+      });
+    });
+    it("executes function yesses and returns array of 'yes'", function (done) {
+      db.yesses(function(err,res) {
+        assert.ifError(err);
+        assert(Array.isArray(res), "Expected array");
+        res.forEach(function(el) {
+          assert.equal(el, 'yes');
+        });
+        done();
+      });
+    });
+    it("executes function coin_toss and returns 'heads' or 'tails'", function (done) {
+      db.coin_toss(function(err,res) {
+        assert.ifError(err);
+        assert(['heads', 'tails'].indexOf(res) >= 0, "'" + res + "' must be heads or tails");
+        done();
+      });
+    });
+    /*
+    // `pg` module doesn't support arrays of custom types yet
+    // see: https://github.com/brianc/node-postgres/issues/986
+    it("executes function coin_tosses and returns array of 'heads' or 'tails'", function (done) {
+      db.coin_tosses(function(err,res) {
+        assert.ifError(err);
+        console.dir(res);
+        assert(Array.isArray(res), "Expected array");
+        res.forEach(function(el) {
+          assert(['heads', 'tails'].indexOf(el) >= 0, "'" + el + "' must be heads or tails");
+        });
+        done();
+      });
+    });
+    */
+    it("executes function example_email and returns 'example@example.com'::email_address", function (done) {
+      db.example_email(function(err,res) {
+        assert.ifError(err);
+        assert.equal(res, 'example@example.com');
+        done();
+      });
+    });
+    it("executes function regexp_matches and returns stream of matches", function (done) {
+      db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}, function(err, stream) {
+        assert.ifError(err);
+        var result = [];
+
+        stream.on('readable', function() {
+          var res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.equal(20, result.length);
+          result.forEach(function(r) {
+            assert.equal(r, 'a');
+          });
+          done();
+        });
+      });
+    });
   });
 });
