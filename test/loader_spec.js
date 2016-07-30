@@ -29,6 +29,10 @@ describe('On spin up', function () {
     assert.equal(db.tables.length, 6);
   });
 
+  it('loads all views', function () {
+    assert.equal(db.views.length, 6);
+  });
+
   it('loads query files', function () {
     assert.ok(db.queryFiles.length > 0);
   });
@@ -68,6 +72,10 @@ describe('Synchronous Load', function () {
 
   it('loads all tables', function () {
     assert.equal(syncLoaded.tables.length, 6);
+  });
+
+  it('loads all views', function () {
+    assert.equal(syncLoaded.views.length, 6);
   });
 
   it('loads query files', function () {

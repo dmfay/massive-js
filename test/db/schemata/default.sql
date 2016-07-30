@@ -2,15 +2,6 @@ CREATE SCHEMA public;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-drop materialized view if exists mv_orders;
-drop table if exists "Users";
-drop table if exists products cascade;
-drop table if exists docs;
-drop table if exists orders;
-drop table if exists doggies;
-drop table if exists puppies;
-
-
 create table "Users"(
   "Id" serial primary key,
   "Email" varchar(50) not null,

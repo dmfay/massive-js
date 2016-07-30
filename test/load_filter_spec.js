@@ -18,10 +18,19 @@ describe('Loading entities (these tests may be slow!)', function () {
       assert(!!db.f1 && !!db.f2);
       assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
       assert(!!db.two && !! db.two.t1);
-      assert(!db.t3); // tables without primary keys aren't loaded
       assert.equal(db.tables.length, 6);
       assert.equal(db.views.length, 6);
       assert.equal(db.functions.length, 4);
+
+      done();
+    });
+  });
+
+  it('does not load tables without primary keys', function (done) {
+    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
+      assert.ifError(err);
+
+      assert(!db.t3); // tables without primary keys aren't loaded
 
       done();
     });
@@ -38,7 +47,6 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.mv1 && !!db.mv2);
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
-        assert(!db.t3); // tables without primary keys aren't loaded
         assert(!!db.two && !! db.two.t1);
         assert.equal(db.tables.length, 6);
         assert.equal(db.views.length, 6);

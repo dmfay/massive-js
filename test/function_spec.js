@@ -44,7 +44,7 @@ describe('Functions', function () {
     });
   });
 
-  describe('invoking and arguments passing', function () {
+  describe('invocation and arguments passing', function () {
     it('invokes a function with no arguments', function (done) {
       db.get_number(function (err, res) {
         assert.ifError(err);
