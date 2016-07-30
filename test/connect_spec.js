@@ -4,10 +4,7 @@ var helpers = require("./helpers");
 
 describe('Connecting', function () {
   before(function(done) {
-    helpers.resetDb('loader', function (err,res) {
-      db = res;
-      done();
-    });
+    helpers.resetDb('loader', done);
   });
 
   it('connects', function (done) {

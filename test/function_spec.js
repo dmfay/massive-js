@@ -45,7 +45,7 @@ describe('Functions', function () {
   });
 
   describe('invoking and arguments passing', function () {
-    it('invokes a function with no arguments', function () {
+    it('invokes a function with no arguments', function (done) {
       db.get_number(function (err, res) {
         assert.ifError(err);
         assert.equal(res, 1);
@@ -53,7 +53,7 @@ describe('Functions', function () {
       });
     });
 
-    it('invokes a function with one argument directly', function () {
+    it('invokes a function with one argument directly', function (done) {
       db.single_arg(1, function (err, res) {
         assert.ifError(err);
         assert.equal(res, 1);
@@ -61,7 +61,7 @@ describe('Functions', function () {
       });
     });
 
-    it('invokes a function with one argument in an array', function () {
+    it('invokes a function with one argument in an array', function (done) {
       db.single_arg([ 1 ], function (err, res) {
         assert.ifError(err);
         assert.equal(res, 1);
@@ -69,7 +69,7 @@ describe('Functions', function () {
       });
     });
 
-    it('invokes a function with multiple arguments directly', function () {
+    it('invokes a function with multiple arguments directly', function (done) {
       db.multi_arg(1, 2, function (err, res) {
         assert.ifError(err);
         assert.equal(res, 3);
@@ -77,14 +77,13 @@ describe('Functions', function () {
       });
     });
 
-    it('invokes a function with multiple arguments in an array', function () {
+    it('invokes a function with multiple arguments in an array', function (done) {
       db.multi_arg([ 1, 2 ], function (err, res) {
         assert.ifError(err);
         assert.equal(res, 3);
         done();
       });
     });
-
   });
 
   describe('return types', function () {

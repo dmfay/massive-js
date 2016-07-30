@@ -4,10 +4,7 @@ var massive = require("../index");
 
 describe('Loading entities (these tests may be slow!)', function () {
   before(function (done) {
-    helpers.resetDb('loader', function(err,res) {
-      db = res;
-      done();
-    });
+    helpers.resetDb('loader', done);
   });
 
   it('loads everything it can by default', function (done) {
