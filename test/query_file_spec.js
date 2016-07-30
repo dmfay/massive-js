@@ -1,3 +1,4 @@
+var _ = require("underscore");
 var assert = require("assert");
 var helpers = require("./helpers");
 var db;
@@ -12,14 +13,6 @@ describe('Queries built from files', function () {
   });
 
   describe('Loading of queries', function () {
-    it('returns a db', function () {
-      assert(db, "No db");
-    });
-
-    it('has a schema query attached', function () {
-      assert(db.schema, "No schema query");
-    });
-
     it('has an inStockProducts query attached', function () {
       assert(db.inStockProducts, "Not there");
     });
@@ -115,6 +108,56 @@ describe('Queries built from files', function () {
           assert.equal(2, result.length);
           done();
         });
+      });
+    });
+  });
+
+  describe('Passing multiple arguments', function () {
+    it('executes multiple args without passing as array', function (done) {
+      db.multiple_args(1, 2, 3, 4, 5, 6, function(err,res){
+        assert.ifError(err);
+        assert(res.length === 1);
+        var record = res[0];
+        _.each([1, 2, 3, 4, 5, 6], function (idx) {
+          assert(record["a" + idx] === idx);
+        });
+        done();
+      });
+    });
+
+    it('executes multiple args with passing as array', function (done) {
+      db.multiple_args([1, 2, 3, 4, 5, 6], function(err,res){
+        assert.ifError(err);
+        assert(res.length === 1);
+        var record = res[0];
+        _.each([1, 2, 3, 4, 5, 6], function (idx) {
+          assert(record["a" + idx] === idx);
+        });
+        done();
+      });
+    });
+
+    it('executes multiple args without passing as an array and using options', function (done) {
+      db.multiple_args(1, 2, 3, 4, 5, 6, { this_is_ignored: true }, function(err,res){
+        assert.ifError(err);
+        assert(res.length === 1);
+        var record = res[0];
+        _.each([1, 2, 3, 4, 5, 6], function (idx) {
+          assert(record["a" + idx] === idx);
+        });
+        done();
+      });
+    });
+
+    it('executes multiple args with passing as an array and using options', function (done) {
+      db.multiple_args([1, 2, 3, 4, 5, 6], { this_is_ignored: true }, function(err,res){
+        assert.ifError(err);
+        assert(res.length === 1);
+        var record = res[0];
+        _.each([1, 2, 3, 4, 5, 6], function (idx) {
+          assert(record["a" + idx] === idx);
+        });
+        done();
       });
     });
   });

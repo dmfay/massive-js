@@ -8,26 +8,20 @@ var schemaTableName = schema + '.' + tableName;
 
 describe('Document table', function () {
 
-  beforeEach(function(done){
+  before(function(done){
     helpers.resetDb(function(err,res){
       db = res;
       done();
     });
   });
 
-  afterEach(function(done) {
-    db.dropSchema(schema, {cascade: true}, function(err) {
-      assert.ifError(err);
-      db.dropTable(tableName, {cascade: true}, function(err) {
-        assert.ifError(err);
-        done();
-      });
-    });
-  });
-
   describe('create', function() {
 
     describe('without schema', function() {
+
+      after(function(done) {
+        db.dropTable(tableName, {cascade: true}, done);
+      });
 
       it('creates a table on public schema', function(done) {
         db.createDocumentTable(tableName, function(err, res) {
@@ -42,10 +36,11 @@ describe('Document table', function () {
     describe('with schema', function() {
 
       before(function(done) {
-        db.createSchema(schema, function(err) {
-          assert.ifError(err);
-          done();
-        });
+        db.createSchema(schema, done);
+      });
+
+      after(function(done) {
+        db.dropTable(schemaTableName, {cascade: true}, done);
       });
 
       it('creates a table on the specified schema', function(done) {
@@ -66,10 +61,7 @@ describe('Document table', function () {
     describe('without schema', function() {
 
       before(function(done) {
-        db.createDocumentTable(tableName, function(err) {
-          assert.ifError(err);
-          done();
-        });
+        db.createDocumentTable(tableName, done);
       });
 
       it('removes the table from public schema', function(done) {
@@ -88,10 +80,7 @@ describe('Document table', function () {
       before(function(done) {
         db.createSchema(schema, function(err) {
           assert.ifError(err);
-          db.createDocumentTable(schemaTableName, function(err) {
-            assert.ifError(err);
-            done();
-          });
+          db.createDocumentTable(schemaTableName, done);
         });
       });
 

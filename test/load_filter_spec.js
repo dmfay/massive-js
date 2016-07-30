@@ -2,344 +2,401 @@ var assert = require("assert");
 var helpers = require("./helpers");
 var massive = require("../index");
 
-// JA NOTE: These tests run a little slower then most because we are connecting and
-// re-loading the db with each test.
-
-// JA NOTE: These tests can probably be improved - they seem fragile, and may not test
-// enough cases.
-
-describe('On Load with Schema Filters (these tests may run slow - loads db each test!!)', function () {
-  before(function(done){
-    helpers.resetDb(done);
+describe('Loading entities (these tests may be slow!)', function () {
+  before(function (done) {
+    helpers.resetDb('loader', done);
   });
-  it('loads all schema entities when no schema argument is passed', function (done) {
+
+  it('loads everything it can by default', function (done) {
     massive.connect({connectionString: helpers.connectionString}, function (err, db) {
       assert.ifError(err);
+
       assert(db);
-      assert(db.products);
-      assert(db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 10);
-      assert.equal(db.views.length, 3);
+      assert(!!db.t1 && !!db.t2 && !!db.tA);
+      assert(!!db.v1 && !!db.v2);
+      assert(!!db.mv1 && !!db.mv2);
+      assert(!!db.f1 && !!db.f2);
+      assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+      assert(!!db.two && !! db.two.t1);
+      assert.equal(db.tables.length, 6);
+      assert.equal(db.views.length, 6);
+      assert.equal(db.functions.length, 4);
 
       done();
     });
   });
-  it('loads all schema entities when passed "all" as schema argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'all'}, function (err, db) {
-      assert.ifError(err);
-      assert(db);
-      assert(db.products);
-      assert(db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 10);
-      assert.equal(db.views.length, 3);
 
-      done();
-    });
-  });
-  it('loads only entities from specified schema when passed schema name as schema argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'myschema'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.myschema.artists);
-      assert(db.myschema.top_artists);
-      assert.equal(db.tables.length, 3);
-      assert.equal(db.views.length, 1);
-      done();
-    });
-  });
-  it('loads only entities from public schema when passed "public" name as schema argument', function (done) {
-    // TODO - other schema may still be present until function filters are in place...
-    // Can't just test for non-presence of other schema on db - gotta test for non-presence of tables
-    // from other schema. This will be cleaned up shortly.
-    massive.connect({connectionString: helpers.connectionString, schema: 'public'}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.myschema.artists);
-      assert(db.products);
-      assert.equal(db.tables.length, 5);
-      assert.equal(db.views.length, 2);
-      done();
-    });
-  });
-  it('loads only entities from specified schema when passed comma-delimited list of schema names', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: ['myschema, secrets']}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.products);
-      assert(db.myschema.artists);
-      assert(db.myschema.top_artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 5);
-      assert.equal(db.views.length, 1);
-      done();
-    });
-  });
-  it('loads only entities from specified schema when passed an array of schema names', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: ['myschema', 'secrets']}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.products);
-      assert(db.myschema.artists);
-      assert(db.myschema.top_artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 5);
-      assert.equal(db.views.length, 1);
-      done();
-    });
-  });
-});
-
-describe('On Load with Table blacklist (these tests may run slow - loads db each test!!)', function () {
-  it('loads all entities when no blacklist argument is provided', function (done) {
+  it('does not load tables without primary keys', function (done) {
     massive.connect({connectionString: helpers.connectionString}, function (err, db) {
       assert.ifError(err);
-      assert(db);
-      assert(db.products);
-      assert(db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 10);
-      assert.equal(db.views.length, 3);
+
+      assert(!db.t3); // tables without primary keys aren't loaded
 
       done();
     });
   });
-  it('excludes entities with name matching blacklist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: "%prod%"}, function (err, db) {
-      assert.ifError(err);
-      assert(db);
-      assert(!db.products);
-      assert(!db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 2);
 
-      done();
-    });
-  });
-  it('excludes tables with name and schema matching blacklist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: "secrets.__semi%"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 3);
-      done();
-    });
-  });
-  it('excludes views with name and schema matching blacklist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: "myschema.top%"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products);
-      assert(db.myschema.artists);
-      assert(!db.myschema.top_artists);
-      assert(db.secrets.__secret_table);
-      assert(db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 10);
-      assert.equal(db.views.length, 2);
-      done();
-    });
-  });
-  it('excludes entities with name and schema matching multiiple blacklist patterns as a comma-delimited string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: "secrets.__semi%, %prod%"}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.products);
-      assert(!db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 8);
-      assert.equal(db.views.length, 2);
-      done();
-    });
-  });
-  it('excludes entities with name and schema matching multiple blacklist patterns as a string array argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: ['secrets.__semi%', '%prod%']}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.products);
-      assert(!db.popular_products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 8);
-      assert.equal(db.views.length, 2);
-      done();
-    });
-  });
-  it('allows table exceptions to schema filter', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'myschema', exceptions: 'products'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products);
-      assert(db.myschema.artists);
-      assert.equal(db.tables.length, 4);
-      assert.equal(db.views.length, 1);
+  describe('schema filters', function () {
+    it('loads everything it can with "all" schemata', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: 'all'}, function (err, db) {
+        assert.ifError(err);
 
-      done();
-    });
-  });
-  it('allows view exceptions to schema filter', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'myschema', exceptions: 'popular_products'}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.products);
-      assert(db.popular_products);
-      assert(db.myschema.artists);
-      assert.equal(db.tables.length, 3);
-      assert.equal(db.views.length, 2);
+        assert(db);
+        assert(!!db.t1 && !!db.t2 && !!db.tA);
+        assert(!!db.v1 && !!db.v2);
+        assert(!!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !! db.two.t1);
+        assert.equal(db.tables.length, 6);
+        assert.equal(db.views.length, 6);
+        assert.equal(db.functions.length, 4);
 
-      done();
+        done();
+      });
     });
-  });
-  it('allows exceptions to blacklist filter', function (done) {
-    massive.connect({connectionString: helpers.connectionString, blacklist: 'myschema.a%', exceptions: 'myschema.artists'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products);
-      assert(db.myschema.artists);
-      assert.equal(db.tables.length, 9);
-      assert.equal(db.views.length, 3);
-      done();
-    });
-  });
-  it('allows exceptions to schema and blacklist filters', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'myschema', blacklist: 'secrets.__%', exceptions: 'products, secrets.__secret_table'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products);
-      assert(db.myschema.artists);
-      assert(db.secrets.__secret_table);
-      assert(!db.secrets.__semi_secret_table);
-      assert.equal(db.tables.length, 5);
-      assert.equal(db.views.length, 1);
-      done();
-    });
-  });
-});
 
-describe('On Load with Table whitelist (these tests may run slow - loads db each test!!)', function () {
-  it('loads all tables when no whitelist argument is provided', function (done) {
-    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products && db.myschema.artists && db.secrets.__secret_table && db.tables.length == 10);
-      done();
-    });
-  });
-  it('includes ONLY tables with name matching whitelisted table names as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, whitelist: "products"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products && db.tables.length == 1);
-      done();
-    });
-  });
-  it('includes ONLY tables with name matching whitelisted items in comma-delimited string', function (done) {
-    massive.connect({connectionString: helpers.connectionString, whitelist: 'products, myschema.artists'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products && db.myschema.artists && db.tables.length == 2);
-      done();
-    });
-  });
-  it('includes ONLY tables with name matching whitelisted items in string array', function (done) {
-    massive.connect({connectionString: helpers.connectionString, whitelist: ['products', 'myschema.artists']}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products && db.myschema.artists && db.tables.length == 2);
-      done();
-    });
-  });
-  it('whitelist overrides other filters', function (done) {
-    massive.connect({connectionString: helpers.connectionString, schema: 'myschema', blacklist: 'a%', whitelist: 'products, secrets.__secret_table'}, function (err, db) {
-      assert.ifError(err);
-      assert(db.products && !db.myschema.artists && db.secrets.__secret_table && db.tables.length == 2);
-      done();
-    });
-  });
-});
+    it('loads only entities (except public functions) from a schema string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: 'one'}, function (err, db) {
+        assert.ifError(err);
 
-describe('On load with Function Exclusion (these tests may run slow - loads db each test!!)', function () {
-  it('excludes functions at load whenever it is told...', function (done) {
-    massive.connect({connectionString: helpers.connectionString, excludeFunctions: true}, function (err, db) {
-      assert.ifError(err);
-      assert.equal(db.functions.length, 0);
-      done();
-    });
-  });
-  it('includes all functions at load whenever it is told...', function (done) {
-    massive.connect({connectionString: helpers.connectionString, excludeFunctions: false}, function (err, db) {
-      assert.ifError(err);
-      assert(db.functions.length > 0);
-      done();
-    });
-  });
-  it('includes all functions at load by default...', function (done) {
-    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
-      assert.ifError(err);
-      assert(db.functions.length > 0);
-      done();
-    });
-  });
-});
+        assert(db);
+        assert(!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
 
-describe('On load with Function Blacklist and/or Whitelist (these tests may run slow - loads db each test!!)', function () {
-  it('loads all functions when no blacklist and no whitelist argument is provided', function (done) {
-    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
-      assert.ifError(err);
-      assert(db.AllMyProducts && db.all_products && db.myschema.AllMyAlbums && db.myschema.all_albums && db.myschema.artist_by_name);
-      done();
+        done();
+      });
+    });
+
+    it('loads only entities (except public functions) from a comma-delimited schema string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: 'one, two'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !!db.two.t1);
+        assert.equal(db.tables.length, 3);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('loads only entities (except public functions) from a schema array', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: [ 'one, two' ]}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !!db.two.t1);
+        assert.equal(db.tables.length, 3);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('allows exceptions', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: 'two', exceptions: 't1, v1, one.v2'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !db.t2 && !db.tA);
+        assert(!!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !!db.two.t1);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
     });
   });
-  it('excludes functions with name matching blacklist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionBlacklist: "all_%"}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.all_products && db.AllMyProducts);
-      done();
+
+  describe('table blacklists', function () {
+    it('excludes tables and views by a blacklist pattern string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, blacklist: '%1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !!db.t2 && !!db.tA);
+        assert(!db.v1 && !!db.v2);
+        assert(!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 3);
+        assert.equal(db.views.length, 3);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('checks schema names in the pattern', function (done) {
+      massive.connect({connectionString: helpers.connectionString, blacklist: 'one.%1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !!db.t2 && !!db.tA);
+        assert(!!db.v1 && !!db.v2);
+        assert(!!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !!db.two.t1);
+        assert.equal(db.tables.length, 5);
+        assert.equal(db.views.length, 5);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('excludes tables and views from a comma-delimited blacklist', function (done) {
+      massive.connect({connectionString: helpers.connectionString, blacklist: '%1, one.%2'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !!db.t2 && !!db.tA);
+        assert(!db.v1 && !!db.v2);
+        assert(!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('excludes tables and views from a blacklist array', function (done) {
+      massive.connect({connectionString: helpers.connectionString, blacklist: [ '%1, one.%2' ]}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !!db.t2 && !!db.tA);
+        assert(!db.v1 && !!db.v2);
+        assert(!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 2);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('allows exceptions', function (done) {
+      massive.connect({connectionString: helpers.connectionString, blacklist: '%1', exceptions: 'one.%1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!db.t1 && !!db.t2 && !!db.tA);
+        assert(!db.v1 && !!db.v2);
+        assert(!db.mv1 && !!db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 4);
+        assert.equal(db.views.length, 4);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
     });
   });
-  it('excludes functions with name and schema matching blacklist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionBlacklist: "myschema.all_%"}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.myschema.all_albums && db.myschema.artist_by_name && db.all_products);
-      done();
+
+  describe('table whitelists', function () {
+    it('includes only tables exactly matching a whitelist string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, whitelist: 't1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 1);
+        assert.equal(db.views.length, 0);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('includes only tables exactly matching a comma-delimited whitelist string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, whitelist: 't1, one.t1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 0);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+
+    it('includes only tables exactly matching a whitelist array', function (done) {
+      massive.connect({connectionString: helpers.connectionString, whitelist: [ 't1', 'one.t1' ]}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 2);
+        assert.equal(db.views.length, 0);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
+    });
+    
+    it('overrides other filters', function (done) {
+      massive.connect({connectionString: helpers.connectionString, schema: 'one', blacklist: 't1', whitelist: 't1'}, function (err, db) {
+        assert.ifError(err);
+
+        assert(db);
+        assert(!!db.t1 && !db.t2 && !db.tA);
+        assert(!db.v1 && !db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.two);
+        assert.equal(db.tables.length, 1);
+        assert.equal(db.views.length, 0);
+        assert.equal(db.functions.length, 4);
+
+        done();
+      });
     });
   });
-  it('excludes functions with name and schema matching multiple blacklist patterns as a comma-delimited string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionBlacklist: "myschema.artist_%, all_%"}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.myschema.artist_by_name && !db.all_products && db.myschema.all_albums && db.AllMyProducts);
-      done();
+
+  describe('function exclusion', function () {
+    it('skips loading functions when set', function (done) {
+      massive.connect({connectionString: helpers.connectionString, excludeFunctions: true}, function (err, db) {
+        assert.ifError(err);
+        assert.equal(db.functions.length, 0);
+        done();
+      });
+    });
+
+    it('loads all functions when false', function (done) {
+      massive.connect({connectionString: helpers.connectionString, excludeFunctions: false}, function (err, db) {
+        assert.ifError(err);
+        assert(db.functions.length > 0);
+        done();
+      });
     });
   });
-  it('excludes functions with name and schema matching multiple blacklist patterns as a string array argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionBlacklist: ["myschema.artist_%", "all_%"]}, function (err, db) {
-      assert.ifError(err);
-      assert(!db.myschema.artist_by_name && !db.all_products && db.myschema.all_albums && db.AllMyProducts);
-      done();
+
+  describe('function blacklists', function () {
+    it('excludes functions matching a blacklist pattern string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionBlacklist: '%1'}, function (err, db) {
+        assert.ifError(err);
+        assert(!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.f1 && !!db.one.f2);
+
+        done();
+      });
+    });
+
+    it('excludes functions matching a comma-delimited blacklist', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionBlacklist: '%1, one.f2'}, function (err, db) {
+        assert.ifError(err);
+        assert(!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.f1 && !db.one.f2);
+
+        done();
+      });
+    });
+
+    it('excludes functions matching a blacklist array', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionBlacklist: [ '%1', 'one.f2' ]}, function (err, db) {
+        assert.ifError(err);
+        assert(!db.f1 && !!db.f2);
+        assert(!!db.one && !db.one.f1 && !db.one.f2);
+
+        done();
+      });
     });
   });
-  it('includes functions with name and schema matching whitelist pattern as a string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.all_%"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.myschema.all_albums && !db.myschema.AllMyAlbums && !db.myschema.artist_by_name && !db.all_products);
-      done();
+
+  describe('function whitelists', function () {
+    it('includes functions matching a whitelist pattern string', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionWhitelist: '%1'}, function (err, db) {
+        assert.ifError(err);
+        assert(!!db.f1 && !db.f2);
+        assert(!!db.one && !!db.one.f1 && !db.one.f2);
+
+        done();
+      });
     });
-  });
-  it('includes functions with name and schema matching multiple whitelist patterns as a comma-delimited string argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.artist_%, all_%"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.myschema.artist_by_name && db.all_products && !db.myschema.all_albums && !db.AllMyProducts);
-      done();
+
+    it('includes functions matching a comma-delimited whitelist', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionWhitelist: '%1, one.f2'}, function (err, db) {
+        assert.ifError(err);
+        assert(!!db.f1 && !db.f2);
+        assert(!!db.one && !!db.one.f1 && !!db.one.f2);
+
+        done();
+      });
     });
-  });
-  it('includes functions with name and schema matching multiple whitelist patterns as a string array argument', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionWhitelist: ["myschema.artist_%", "all_%"]}, function (err, db) {
-      assert.ifError(err);
-      assert(db.myschema.artist_by_name && db.all_products && !db.myschema.all_albums && !db.AllMyProducts);
-      done();
+
+    it('includes functions matching a whitelist array', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionWhitelist: [ '%1', 'one.f2' ]}, function (err, db) {
+        assert.ifError(err);
+        assert(!!db.f1 && !db.f2);
+        assert(!!db.one && !!db.one.f1 && !!db.one.f2);
+
+        done();
+      });
     });
-  });
-  it('both includes (whitelists) and excludes (blacklists) functions as a string arguments', function (done) {
-    massive.connect({connectionString: helpers.connectionString, functionWhitelist: "myschema.a%", functionBlacklist: "myschema.%by_name"}, function (err, db) {
-      assert.ifError(err);
-      assert(db.myschema.all_albums && !db.myschema.artist_by_name && !db.myschema.AllMyAlbums && !db.all_products);
-      done();
+
+    it('overlaps whitelists and blacklists', function (done) {
+      massive.connect({connectionString: helpers.connectionString, functionBlacklist: 'one.%1', functionWhitelist: 'one.%'}, function (err, db) {
+        assert.ifError(err);
+        assert(!db.f1 && !db.f2);
+        assert(!!db.one && !db.one.f1 && !!db.one.f2);
+
+        done();
+      });
     });
   });
 });
