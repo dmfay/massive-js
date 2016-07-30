@@ -5,118 +5,181 @@ var db;
 
 describe('Functions', function () {
   before(function(done){
-    helpers.resetDb(function(err,res){
+    helpers.resetDb('functions', function(err,res) {
       db = res;
       done();
     });
   });
-  it('executes multiple args without passing as array', function (done) {
-      db.multiple_args(1, 2, 3, 4, 5, 6, function(err,res){
+
+  describe('loading with schema and casing', function () {
+    it('loads everything', function () {
+      assert(!!db.get_number);
+      assert(!!db.GetNumber);
+      assert(!!db.one.get_number);
+      assert(!!db.one.GetNumber);
+    });
+
+    it('returns expected results', function (done) {
+      db.get_number(function (err, res) {
         assert.ifError(err);
-        assert(res.length === 1);
-        var record = res[0];
-        _.each([1, 2, 3, 4, 5, 6], function (idx) {
-          assert(record["a" + idx] === idx);
+        assert.equal(res, 1);
+
+        db.GetNumber(function (err, res) {
+          assert.ifError(err);
+          assert.equal(res, 2);
+
+          db.one.get_number(function (err, res) {
+            assert.ifError(err);
+            assert.equal(res, 3);
+
+            db.one.GetNumber(function (err, res) {
+              assert.ifError(err);
+              assert.equal(res, 4);
+
+              done();
+            });
+          });
+        });
       });
-      done();
-    });
-  });
-  it('executes multiple args with passing as array', function (done) {
-    db.multiple_args([1, 2, 3, 4, 5, 6], function(err,res){
-      assert.ifError(err);
-      assert(res.length === 1);
-      var record = res[0];
-      _.each([1, 2, 3, 4, 5, 6], function (idx) {
-        assert(record["a" + idx] === idx);
-      });
-      done();
-    });
-  });
-  it('executes multiple args without passing as an array and using options', function (done) {
-    db.multiple_args(1, 2, 3, 4, 5, 6, { this_is_ignored: true }, function(err,res){
-      assert.ifError(err);
-      assert(res.length === 1);
-      var record = res[0];
-      _.each([1, 2, 3, 4, 5, 6], function (idx) {
-        assert(record["a" + idx] === idx);
-      });
-      done();
-    });
-  });
-  it('executes multiple args with passing as an array and using options', function (done) {
-    db.multiple_args([1, 2, 3, 4, 5, 6], { this_is_ignored: true }, function(err,res){
-      assert.ifError(err);
-      assert(res.length === 1);
-      var record = res[0];
-      _.each([1, 2, 3, 4, 5, 6], function (idx) {
-        assert(record["a" + idx] === idx);
-      });
-      done();
-    });
-  });
-  it('executes all products', function (done) {
-    db.all_products(function(err,res){
-      assert.ifError(err);
-      assert(res.length > 0);
-      done();
-    });
-  });
-  it('executes all myschema.albums', function (done) {
-    db.myschema.all_albums(function(err,res){
-      assert.ifError(err);
-      assert(res.length > 0);
-      done();
-    });
-  });
-  it('executes artists with param', function (done) {
-    db.myschema.artist_by_name('AC/DC', function(err,res){
-      assert.ifError(err);
-      assert(res.length > 0);
-      done();
     });
   });
 
-  describe("Loading of Functions from PG", function() {
-    it("has an all_products function attached", function (done) {
-      assert(db.all_products, "no all_products function");
-      done();
+  describe('invoking and arguments passing', function () {
+    it('invokes a function with no arguments', function () {
+      db.get_number(function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 1);
+        done();
+      });
     });
-    it("has a schema-bound function attached to myschema", function (done) {
-      assert(db.myschema.all_albums, "no all_albums function on myschema");
-      done();
+
+    it('invokes a function with one argument directly', function () {
+      db.single_arg(1, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 1);
+        done();
+      });
     });
+
+    it('invokes a function with one argument in an array', function () {
+      db.single_arg([ 1 ], function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 1);
+        done();
+      });
+    });
+
+    it('invokes a function with multiple arguments directly', function () {
+      db.multi_arg(1, 2, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 3);
+        done();
+      });
+    });
+
+    it('invokes a function with multiple arguments in an array', function () {
+      db.multi_arg([ 1, 2 ], function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 3);
+        done();
+      });
+    });
+
   });
 
-  describe("Function Execution", function() {
-    it("executes all_products and returns the results", function (done)  {
-      db.all_products(function(err,res) {
+  describe('return types', function () {
+    it('gets primitives', function (done) {
+      db.get_number(function (err, res) {
         assert.ifError(err);
+        assert.equal(res, 1);
+        done();
+      });
+    });
+
+    it('gets json', function (done) {
+      db.get_json(function (err, res) {
+        assert.ifError(err);
+        assert(_.isObject(res));
+        assert.equal(res.hello, 'world');
+        done();
+      });
+    });
+
+    it('gets arrays', function (done) {
+      db.get_array(function (err, res) {
+        assert.ifError(err);
+        assert(_.isArray(res));
         assert.equal(res.length, 4);
+        assert(res.every(function (e) { return e === 'yes'; }));
         done();
       });
     });
-    it("executes schema-bound function and returns the results", function (done) {
-      db.myschema.all_albums(function(err,res) {
+
+    /*
+    // `pg` module doesn't support arrays of custom types yet
+    // see: https://github.com/brianc/node-postgres/issues/986
+    it("executes function coin_tosses and returns array of 'heads' or 'tails'", function (done) {
+      db.coin_tosses(function(err,res) {
         assert.ifError(err);
-        assert.equal(res.length, 3);
+        console.dir(res);
+        assert(Array.isArray(res), "Expected array");
+        res.forEach(function(el) {
+          assert(['heads', 'tails'].indexOf(el) >= 0, "'" + el + "' must be heads or tails");
+        });
+        done();
+      });
+    });
+    */
+
+    it('gets enums', function (done) {
+      db.get_enum(function (err, res) {
+        assert.ifError(err);
+        assert(res === 'heads' || res === 'tails');
+        done();
+      });
+    });
+
+    it('gets domains', function (done) {
+      db.get_domain(function (err, res) {
+        assert.ifError(err);
+        assert.equal(res, 'example@example.com');
+        done();
+      });
+    });
+
+    it('gets records', function (done) {
+      db.get_record(function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[0].field1, 'two');
+        assert.equal(res[0].field2, 'three');
         done();
       });
     });
   });
 
-  describe("Functions with Cased Names", function() {
-    it("executes camel-cased function AllMyProducts and returns the results", function (done)  {
-      db.AllMyProducts(function(err,res) {
+  describe('streaming function results', function () {
+    it('executes citext-added function regexp_matches and returns stream of matches', function (done) {
+      db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}, function(err, stream) {
         assert.ifError(err);
-        assert.equal(res.length, 4);
-        done();
-      });
-    });
-    it("executes schema-bound, camel-cased function AllMyAlbums and returns the results", function (done) {
-      db.myschema.AllMyAlbums(function(err,res) {
-        assert.ifError(err);
-        assert.equal(res.length, 3);
-        done();
+        var result = [];
+
+        stream.on('readable', function() {
+          var res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.equal(20, result.length);
+          result.forEach(function(r) {
+            assert.equal(r, 'a');
+          });
+          done();
+        });
       });
     });
   });

@@ -47,6 +47,39 @@ massive.connect({
 });
 ```
 
+### Experimental: Enhanced Functions
+
+Massive can interpret the return types of functions, however this breaks backwards compatibility and thus must be opted into with setting `enhancedFunctions: true`.
+
+For example, if you have this [getRandomNumber function](https://xkcd.com/221/):
+
+```sql
+create function myschema."getRandomNumber"()
+returns integer as $$
+select 4; -- chosen by fair dice roll.
+          -- guaranteed to be random.
+$$ language sql;
+```
+
+Without `enhancedFunctions` you'd get the same results as a regular table fetch - a set of rows: `[{"getRandomNumber": 4}]`.
+
+With `enhancedFunctions: true`, you'd get simply the result of the function: `4`.
+
+```js
+var massive = require("massive");
+
+massive.connect({
+  connectionString: "postgres://localhost/massive",
+  enhancedFunctions: true // Enable return type honoring
+}, function(err, db) {
+  db.getRandomNumber(function(err, randomNumber) {
+    //randomNumber is the integer 4
+  });
+});
+```
+
+This also works for text, arrays, JSON, text domains and some other types. If it doesn't work for your use case, please raise an issue (or a PR!); we're aware of some restrictions due to [how the pg module currently handles types](https://github.com/brianc/node-postgres/issues/986).
+
 ## Parameters
 Many, if not most, functions will expect some sort of input.
 

@@ -1,5 +1,3 @@
-DROP SCHEMA IF EXISTS public CASCADE;
-
 CREATE SCHEMA public;
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -81,18 +79,13 @@ values (1, 1, 'user 1 ordered product 1'),
 
 create materialized view mv_orders as select * from orders;
 
-drop schema if exists myschema cascade;
-
 create schema myschema;
 
 -- Added for testing filtering on load:
 
-drop schema if exists secrets cascade;
-
 create schema secrets;
 create table secrets.__secret_table (id serial primary key, secret_stuff text);
 create table secrets.__semi_secret_table (id serial primary key, semi_secret_stuff text);
-
 
 create table myschema.artists (
   id serial primary key,

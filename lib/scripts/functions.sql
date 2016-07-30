@@ -2,10 +2,13 @@
 -- inclusion/exclusion is schema - aspecific, no schema assumes 'public'
 select distinct
     n.nspname as "schema",
+    (not p.proretset) as "return_single_row",
+    (t.typtype in ('b', 'd', 'e', 'r')) as "return_single_value",
     p.proname as "name",
     p.pronargs as param_count
 from pg_proc p
      inner join pg_namespace n on (p.pronamespace = n.oid)
+     inner join pg_type t on (p.prorettype = t.oid)
 where n.nspname not in ('pg_catalog','information_schema')
   and n.nspname NOT LIKE 'pgp%'
   and (case -- blacklist functions using LIKE by fully-qualified name (no schema assumes public):
