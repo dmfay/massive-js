@@ -17,6 +17,9 @@ if (typeof Promise == 'undefined') {
 
 var Massive = function(args) {
   this._options = args;
+  if (typeof args.warn === 'function') {
+    this.warn = args.warn;
+  }
   this.scriptsDir = args.scripts || process.cwd() + "/db";
   this.enhancedFunctions = args.enhancedFunctions || false;
 
@@ -172,7 +175,7 @@ Massive.prototype.initialize = function(resources) {
       // unfortunately we can't use MapToNamespace here without making a ton of changes
       // since we need to accommodate deeply-nested directories rather than 1-deep schemata
       if (rootObject[name]) {
-        console.error("[Massive] Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
+        self.warn("Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
       } else {
         var _exec = new Executable(_.extend({}, spec, {
           db : self
@@ -185,7 +188,7 @@ Massive.prototype.initialize = function(resources) {
     });
     for (var name in queries.children) {
       if (rootObject[name]) {
-        console.error("[Massive] Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
+        self.warn("Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
       } else {
         rootObject[name] = {};
         addQueries(rootObject[name], queryPath + name + '/', queries.children[name]);
@@ -546,6 +549,11 @@ Massive.prototype.bootstrap = function(next) {
       });
     });
   });
+};
+
+// Can be over-ridden via `warn` connection setting
+Massive.prototype.warn = function (message) {
+  console.warn("[Massive] WARNING: " + message); // eslint-disable-line no-console
 };
 
 //connects Massive to the DB
