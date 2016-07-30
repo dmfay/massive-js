@@ -3,6 +3,13 @@ var massive = require("../index");
 var helpers = require("./helpers");
 
 describe('Connecting', function () {
+  before(function(done) {
+    helpers.resetDb('loader', function (err,res) {
+      db = res;
+      done();
+    });
+  });
+
   it('connects', function (done) {
     massive.connect({
       connectionString: helpers.connectionString
@@ -19,7 +26,7 @@ describe('Connecting', function () {
       assert.ifError(err);
       assert.equal(db.defaults.parseInt8, true);
 
-      db.products.count({}, function (err, count) {
+      db.t1.count({}, function (err, count) {
         assert.ifError(err);
         assert.equal(typeof count, 'number');
 

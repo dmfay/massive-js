@@ -42,7 +42,7 @@
   "devDependencies": {
     "eslint": "^1.10.3",
     "istanbul": "^0.4.2",
-    "mocha": "^2.1.0",
+    "mocha": "^2.5.3",
     "sinon": "^1.12.2"
   },
   "repository": {
