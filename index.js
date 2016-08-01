@@ -187,12 +187,10 @@ Massive.prototype.initialize = function(resources) {
       }
     });
     for (var name in queries.children) {
-      if (rootObject[name]) {
-        self.warn("Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
-      } else {
+      if (!rootObject[name]) {
         rootObject[name] = {};
-        addQueries(rootObject[name], queryPath + name + '/', queries.children[name]);
       }
+      addQueries(rootObject[name], queryPath + name + '/', queries.children[name]);
     }
   }
   addQueries(self, '', resources.queries);
