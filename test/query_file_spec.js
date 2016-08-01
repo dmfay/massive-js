@@ -14,7 +14,10 @@ describe('Queries built from files', function () {
 
   describe('Loading of queries', function () {
     it('has an inStockProducts query attached', function () {
-      assert(db.inStockProducts, "Not there");
+      assert.equal(typeof db.inStockProducts, 'function', "Not a function");
+    });
+    it('has an inStockProducts.byPrice query attached', function () {
+      assert.equal(typeof db.inStockProducts.byPrice, 'function', "Not a function");
     });
   });
 
