@@ -1,42 +1,42 @@
-var QueryOptions = require("../lib/query_options");
+var Query = require("../lib/query");
 var assert = require("assert");
 
-describe("QueryOptions", function () {
+describe("Query", function () {
   describe("selectList", function () {
     it("should join arrays", function () {
-      var result = new QueryOptions({columns: ["col1", "col2"]}, {});
+      var result = new Query({columns: ["col1", "col2"]}, {});
       assert.equal(result.selectList(), "col1,col2");
     });
 
     it("should leave anything else alone", function () {
-      var result = new QueryOptions({columns: "*"}, {});
+      var result = new Query({columns: "*"}, {});
       assert.equal(result.selectList(), "*");
     });
   });
 
   describe("queryOptions", function () {
     it("should emit an order by", function () {
-      var result = new QueryOptions({}, {});
+      var result = new Query({}, {});
       assert.equal(result.queryOptions(), " order by 1");
     });
 
     it("should add an offset", function () {
-      var result = new QueryOptions({offset: 10}, {});
+      var result = new Query({offset: 10}, {});
       assert.equal(result.queryOptions(), " order by 1 offset 10");
     });
 
     it("should add a limit", function () {
-      var result = new QueryOptions({limit: 10}, {});
+      var result = new Query({limit: 10}, {});
       assert.equal(result.queryOptions(), " order by 1 limit 10");
     });
 
     it("should add both offset and limit", function () {
-      var result = new QueryOptions({offset: 10, limit: 10}, {});
+      var result = new Query({offset: 10, limit: 10}, {});
       assert.equal(result.queryOptions(), " order by 1 offset 10 limit 10");
     });
 
     it("should accept an array of sort criteria", function () {
-      var result = new QueryOptions({
+      var result = new Query({
         order: [
           {field: "col1", direction: "asc"},
           {field: "body->>'col2'", direction: "desc", type: "varchar"},
@@ -48,7 +48,7 @@ describe("QueryOptions", function () {
     });
 
     it("should build an order clause for a document table", function () {
-      var result = new QueryOptions({
+      var result = new Query({
         order: [
           {field: "col1", direction: "asc", type: "int"},
           {field: "col2", direction: "desc", type: "varchar"}
