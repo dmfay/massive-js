@@ -372,6 +372,9 @@ var walkSqlFiles = function(rootObject, rootDir) {
     var ext = path.extname(item);
     var name = path.basename(item, ext);
 
+    // if dotfile, ignore
+    if (name[0] === '.') return
+
     //is this a SQL file?
     if (ext === ".sql") {
       //why yes it is! Build the abspath so we can read the file
@@ -396,7 +399,12 @@ var walkSqlFiles = function(rootObject, rootDir) {
         return _exec.invoke.apply(_exec, arguments);
       };
     } else if (ext === '') {
-      //this is a directory so shift things and move on down
+      //this is a directory
+
+      // if node_modules dir, ignore
+      if (name === 'node_modules') return
+
+      //shift things and move on down
       //set a property on our root object, then use *that*
       //as the root in the next call
       rootObject[name] = {};
