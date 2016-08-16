@@ -1,6 +1,5 @@
 var assert = require("assert");
 var helpers = require("./helpers");
-var _ = require("underscore")._;
 var db;
 
 describe("Table Inheritance", function () {
