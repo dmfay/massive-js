@@ -15,14 +15,20 @@ describe('On spin up', function () {
     assert(db && db.tables && db.queryFiles && db.connectionString);
   });
 
-  it('loads non-public schemata as namespace properties', function() {
+  it('loads non-public schemata as namespace properties', function () {
     assert(db.one && db.two, "No schemata loaded");
   });
 
-  it('loads tables in db schema as properties of namespace', function() {
+  it('loads schema objects with the appropriate namespacing', function (done) {
     assert(db.one.t1, 'Schema table not loaded');
     assert(db.one.v1, 'Schema view not loaded');
     assert(db.one.f1, 'schema function not loaded');
+
+    db.one.t1.find({}, function (err) {
+      assert.ifError(err);
+
+      done();
+    });
   });
 
   it('loads all tables', function () {
@@ -41,7 +47,6 @@ describe('On spin up', function () {
     assert.equal(db.functions.length, 4);
   });
 });
-
 
 describe('Synchronous Load', function () {
   // no need to re-set the back-end; it wasn't changed by the previous 'suite' ...
