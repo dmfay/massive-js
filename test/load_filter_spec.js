@@ -287,7 +287,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         done();
       });
     });
-    
+
     it('overrides other filters', function (done) {
       massive.connect({connectionString: helpers.connectionString, schema: 'one', blacklist: 't1', whitelist: 't1'}, function (err, db) {
         assert.ifError(err);
