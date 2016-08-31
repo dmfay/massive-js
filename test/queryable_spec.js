@@ -619,6 +619,30 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('returns 2 products for term "description" using multiple columns when limit is set to 2', function (done) {
+      db.products.search({columns : ["Name", "description"], term: "description"}, {limit: 2},function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length,2);
+        done();
+      });
+    });
+    it('returns same correct element when offset is set', function (done) {
+      db.products.search({columns : ["Name", "description"], term: "description"}, function(err,res){
+        assert.ifError(err);
+        db.products.search({columns : ["Name", "description"], term: "description"}, {offset: 1},function(err,res2){
+          assert.ifError(err);
+          assert.equal(res[1].id, res2[0].id);
+          done();
+        });
+      });
+    });
+    it('returns results filtered by where', function (done) {
+      db.docs.search({columns : ["body->>'description'"], term: "C:*", where: {"body->>'is_good'": 'true'}}, function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length,1);
+        done();
+      });
+    });
   });
 
   describe('View queries', function () {
