@@ -34,8 +34,19 @@ describe("Table Inheritance", function () {
       });
     });
 
-    it("(currently) does not load descendant tables", function () {
-      assert.equal(db.hasOwnProperty("capitals"), false);
+    it("does load descendant tables", function () {
+      assert.equal(db.hasOwnProperty("capitals"), true);
+    });
+
+    it("descendant table rows", function (done) {
+      db.capitals.find(function (err,res) {
+        assert.ifError(err);
+        assert.equal(res.length, 4);
+
+        assert.equal(res[0].hasOwnProperty("of_state"), true);
+
+        done();
+      });
     });
   });
 
