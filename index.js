@@ -141,7 +141,7 @@ Massive.prototype.loadInheritsTables = function(next) {
 
         MapToNamespace(_table);
       }
-    })
+    });
 
     next(null, self);
   });
@@ -515,7 +515,7 @@ exports.connect = function(args, next) {
           next(null, db);
         });
       });
-    })
+    });
   });
 };
 
