@@ -1,7 +1,6 @@
 -- REQUIRES THREE ARGUMENTS:
 -- $1, $2, $2 all must be empty string, or comma-delimited string, or array of string:
 SELECT c.relname AS child, p.relname AS parent, tc.table_schema as schema
-
 FROM pg_catalog.pg_inherits
     JOIN pg_catalog.pg_class AS c ON (inhrelid = c.oid)
     JOIN pg_catalog.pg_class AS p ON (inhparent = p.oid)

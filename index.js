@@ -120,15 +120,15 @@ Massive.prototype.loadTables = function(next) {
   });
 };
 
-Massive.prototype.loadInheritsTables = function(next) {
-  var tableSql = __dirname + "/lib/scripts/tables_inherits.sql";
+Massive.prototype.loadDescendantTables = function(next) {
+  var tableSql = __dirname + "/lib/scripts/descendant_tables.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
   var self = this;
 
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err, tablesInherits) {
+  this.executeSqlFile({file : tableSql, params: parameters}, function(err, descendantTables) {
     if (err) { return next(err, null); }
 
-    _.each(tablesInherits, function (table) {
+    _.each(descendantTables, function (table) {
       // if parent table is already defined it means it has been whitelisted / validated
       // so we safely can add the descendant to the available tables
       if (undefined !== typeof self[table.parent]) {
@@ -501,7 +501,7 @@ exports.connect = function(args, next) {
 
     self = db;
 
-    massive.loadInheritsTables(function () {
+    massive.loadDescendantTables(function () {
       if (err) { return next(err); }
 
       massive.loadViews(function() {
