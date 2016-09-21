@@ -34,7 +34,7 @@ Notice that Massive also creates a GIN index on the body column as well as a `se
 
 ## Another Way To Save a Document
 
-Once your table is created, you can query it just like any other table with Massive:
+Once your table is created, you can query it just like any other table with Massive. For convenience there is also a `saveDoc` function which works just like `db.saveDoc` only without the first argument:
 
 ```js
 db.doggies.saveDoc({name : "Stinky"}, function(err,doc){
@@ -42,7 +42,7 @@ db.doggies.saveDoc({name : "Stinky"}, function(err,doc){
 });
 ```
 
-You can update as well - but PostgreSQL does not support partial updates, so if you do an update it's a full swap. We're considering supporting partial updates at the code level (basically running a diff) - but this can be quite difficult to get right. For now, it's a full replace:
+`saveDoc` will also replace a document if the primary key field is included:
 
 ```js
 db.doggies.saveDoc({id : 1, name : "Fido Dido"}, function(err,doc){
@@ -50,7 +50,17 @@ db.doggies.saveDoc({id : 1, name : "Fido Dido"}, function(err,doc){
 });
 ```
 
-Saving a document complies with the same rules as table-based queries: *if an id is present, an update will run. If not, it's an insert*.
+This usage conforms to the same specifications as `db.mytable.save()`: *if an id is present, an update will run. If not, it's an insert*.
+
+## Partial Updates
+
+To update a document without having to have the entire body to hand, use `setAttribute`:
+
+```js
+db.doggies.setAttribute(1, "pawQuantity", 4, function (err, doc) {
+  // 4 paws confirmed
+});
+```
 
 ## Deleting
 
