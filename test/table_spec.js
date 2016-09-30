@@ -3,14 +3,16 @@ var helpers = require("./helpers");
 var db;
 
 describe('Tables -Add/Edit/Delete', function () {
-  before(function(done){
+  function init(done) {
     helpers.resetDb(function(err,res){
       db = res;
       done();
     });
-  });
+  }
 
   describe("Executing inline SQL", function () {
+    before(init);
+
     it('with run and no args returns 4 products', function (done) {
       db.run("select * from products", function(err,res){
         assert.ifError(err);
@@ -28,7 +30,9 @@ describe('Tables -Add/Edit/Delete', function () {
     });
   });
 
-  describe('Add/Update/Delete records:', function() {
+  describe('save', function () {
+    before(init);
+
     it('adds a product ', function (done) {
       db.products.save({name : "Gibson Les Paul", description : "Lester's brain child", price : 3500}, function(err, res){
         assert.ifError(err);
@@ -47,6 +51,60 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+  });
+
+  describe('insert', function () {
+    before(init);
+
+    it('inserts a product', function (done) {
+      db.products.insert({name: "A Product"}, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.name, "A Product");
+        done();
+      });
+    });
+
+    it('inserts multiple products', function (done) {
+      db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 2);
+        assert.equal(res[0].name, "A Product");
+        assert.equal(res[1].name, "Another Product");
+        done();
+      });
+    });
+
+    it('inserts nothing', function (done) {
+      db.products.insert([], function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 0);
+        done();
+      });
+    });
+
+    it('inserts array fields', function (done) {
+      db.products.insert({name: "A Product", tags: ['one', 'two']}, function (err, res) {
+        assert.ifError(err);
+        assert.equal(res.name, "A Product");
+        assert.deepEqual(res.tags, ['one', 'two']);
+        done();
+      });
+    });
+
+    describe('violating a constraint', function () {
+      it('returns a useful error', function(done){
+        db.products.insert({name: null}, function (err) {
+          assert.equal(err.message, 'null value in column "name" violates not-null constraint');
+          assert.equal(err.code, '23502');
+          assert.notEqual(err.detail, undefined);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('update', function () {
+    before(init);
 
     it('updates multiple products', function (done) {
       db.products.update({in_stock: true}, {in_stock: false}, function(err, res) {
@@ -63,12 +121,22 @@ describe('Tables -Add/Edit/Delete', function () {
     it('updates all products', function (done) {
       db.products.update({}, {price: 1.23}, function(err, res) {
         assert.ifError(err);
-        assert.equal(res.length, 5);
+        assert.equal(res.length, 4);
         assert.equal(res[0].price, 1.23);
         assert.equal(res[1].price, 1.23);
         assert.equal(res[2].price, 1.23);
         assert.equal(res[3].price, 1.23);
-        assert.equal(res[4].price, 1.23);
+        done();
+      });
+    });
+
+    it('updates products with predicates of varying length', function (done) {
+      db.products.update({'specs !=': null}, {price: 1.23}, function(err, res) {
+        assert.ifError(err);
+        assert.equal(res.length, 3);
+        assert.equal(res[0].price, 1.23);
+        assert.equal(res[1].price, 1.23);
+        assert.equal(res[2].price, 1.23);
         done();
       });
     });
@@ -88,13 +156,11 @@ describe('Tables -Add/Edit/Delete', function () {
     it('updates multiple products with a NOT IN list', function (done) {
       db.products.update({'id !=': [1, 2]}, {price: 543.21}, function(err, res) {
         assert.ifError(err);
-        assert.equal(res.length, 3);
+        assert.equal(res.length, 2);
         assert.equal(res[0].id, 3);
         assert.equal(res[0].price, 543.21);
-        assert.equal(res[1].id, 5);
+        assert.equal(res[1].id, 4);
         assert.equal(res[1].price, 543.21);
-        assert.equal(res[2].id, 4);
-        assert.equal(res[2].price, 543.21);
         done();
       });
     });
@@ -116,6 +182,10 @@ describe('Tables -Add/Edit/Delete', function () {
         done();
       });
     });
+  });
+
+  describe('destroy', function () {
+    before(init);
 
     it('deletes a product ', function (done) {
       db.products.destroy({id : 4}, function(err, deleted){
@@ -132,7 +202,7 @@ describe('Tables -Add/Edit/Delete', function () {
       db.products.destroy({}, function(err, deleted){
         db.products.find({}, function(err, found) {
           assert.ifError(err);
-          assert.equal(deleted.length, 4);
+          assert.equal(deleted.length, 3);
           assert.equal(found.length, 0);
           done();
         });
@@ -179,6 +249,8 @@ describe('Tables -Add/Edit/Delete', function () {
   });
 
   describe('Add/Update/Delete records with nonstandard casing:', function() {
+    before(init);
+
     it('adds a User ', function (done) {
       db.Users.save({Email : "foo@bar.com", Name: "Another test user"}, function(err, res){
         assert.ifError(err);
@@ -209,6 +281,8 @@ describe('Tables -Add/Edit/Delete', function () {
   });
 
   describe('Add/Update/Delete records with UUID keys:', function() {
+    before(init);
+
     it('adds an order', function (done) {
       db.orders.save({product_id: 1, user_id: 1, notes: 'hi'}, function(err, res) {
         assert.ifError(err);
@@ -248,54 +322,6 @@ describe('Tables -Add/Edit/Delete', function () {
             assert.ok(remaining === undefined);
             done();
           });
-        });
-      });
-    });
-  });
-
-  describe('Extra insert tests', function () {
-    it('inserts a product', function (done) {
-      db.products.insert({name: "A Product"}, function (err, res) {
-        assert.ifError(err);
-        assert.equal(res.name, "A Product");
-        done();
-      });
-    });
-
-    it('inserts multiple products', function (done) {
-      db.products.insert([{name: "A Product"}, {name: "Another Product"}], function (err, res) {
-        assert.ifError(err);
-        assert.equal(res.length, 2);
-        assert.equal(res[0].name, "A Product");
-        assert.equal(res[1].name, "Another Product");
-        done();
-      });
-    });
-
-    it('inserts nothing', function (done) {
-      db.products.insert([], function (err, res) {
-        assert.ifError(err);
-        assert.equal(res.length, 0);
-        done();
-      });
-    });
-
-    it('inserts array fields', function (done) {
-      db.products.insert({name: "A Product", tags: ['one', 'two']}, function (err, res) {
-        assert.ifError(err);
-        assert.equal(res.name, "A Product");
-        assert.deepEqual(res.tags, ['one', 'two']);
-        done();
-      });
-    });
-
-    describe('violating a constraint', function () {
-      it('returns a useful error', function(done){
-        db.products.insert({name: null}, function (err) {
-          assert.equal(err.message, 'null value in column "name" violates not-null constraint');
-          assert.equal(err.code, '23502');
-          assert.notEqual(err.detail, undefined);
-          done();
         });
       });
     });
