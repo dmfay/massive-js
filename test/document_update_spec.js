@@ -15,6 +15,7 @@ describe('Document updates,', function(){
   // update objects set body=jsonb_set(body, '{name,last}', '', true) where id=3;
   describe("Save data and update,", function() {
     var newDoc = {};
+    var array = [1,2,3];
     before(function(done) {
       db.saveDoc("docs", {name:"Foo", score:1}, function(err, doc){
         assert.ifError(err);
@@ -35,12 +36,21 @@ describe('Document updates,', function(){
       });
     });
 
+    skipBelow95('updates the document when passed array value', function(done) {
+      db.docs.setAttribute(newDoc.id, "array", array, function(err, doc){
+        assert.ifError(err);
+        assert.deepEqual(doc.array, array);
+        done();
+      });
+    });
+
     skipBelow95('updates the document without replacing existing attributes', function(done) {
       db.docs.setAttribute(newDoc.id, "score", 99, function(err, doc){
         assert.ifError(err);
         assert.equal(doc.score, 99);
         assert.equal(doc.vaccinated, true);
         assert.equal(doc.id, newDoc.id);
+        assert.deepEqual(doc.array, array);
         done();
       });
     });
@@ -52,6 +62,7 @@ describe('Document updates,', function(){
         assert.equal(doc.vaccinated, true);
         assert.equal(doc.field, 'value');
         assert.equal(doc.id, newDoc.id);
+        assert.deepEqual(doc.array, array);
         done();
       });
     });
