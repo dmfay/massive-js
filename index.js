@@ -12,6 +12,10 @@ var stripBom = require('strip-bom');
 
 var self;
 
+if (typeof Promise == 'undefined') {
+  global.Promise = require('promise-polyfill');
+}
+
 var Massive = function(args) {
   this.scriptsDir = args.scripts || process.cwd() + "/db";
   this.enhancedFunctions = args.enhancedFunctions || false;
