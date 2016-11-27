@@ -32,8 +32,8 @@ describe('Document table', function () {
 
     describe('with schema', function() {
 
-      before(function(done) {
-        db.createSchema(schema, done);
+      before(function() {
+        return db.createSchema(schema);
       });
 
       after(function(done) {
@@ -75,8 +75,7 @@ describe('Document table', function () {
     describe('with schema', function() {
 
       before(function(done) {
-        db.createSchema(schema, function(err) {
-          assert.ifError(err);
+        db.createSchema(schema).then(() => {
           db.createDocumentTable(schemaTableName, done);
         });
       });

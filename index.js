@@ -311,53 +311,38 @@ Massive.prototype.dropTableSql = function(tableName, options){
   return sql;
 };
 
-Massive.prototype.createSchema = function(schemaName, next) {
-  var sql = this.createSchemaSql(schemaName);
-  this.query(sql, (err, res) => {
-    if(err) {
-      next(err);
-    } else {
+Massive.prototype.createSchema = function(schemaName) {
+  return new Promise((resolve, reject) => {
+    this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName}`, err => {
+      if (err) { return reject(err); }
+
       this[schemaName] = {};
-      next(null, res);
-    }
+
+      return resolve();
+    });
   });
 };
 
-Massive.prototype.createSchemaSql = function(schemaName) {
-  var docSqlFile = __dirname + "/lib/scripts/create_schema.sql";
-  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
+Massive.prototype.dropSchema = function(schemaName, options) {
+  return new Promise((resolve, reject) => {
+    const cascade = options && options.cascade;
 
-  sql = util.format(sql, schemaName);
-  return sql;
-};
+    this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${cascade ? "CASCADE" : ""}`, err => {
+      if (err) { return reject(err); }
 
-Massive.prototype.dropSchema = function(schemaName, options, next) {
-  var sql = this.dropSchemaSql(schemaName, options);
-
-  this.query(sql, (err, res) => {
-    if(err) {
-      next(err);
-    } else {
       // Remove all the tables from the namespace
       if(this[schemaName]) {
         _.each(Object.keys(this[schemaName]), function(table) {
           RemoveFromNamespace(this, schemaName + "." + table);
         });
       }
+
       // Remove the schema from the namespace
       delete this[schemaName];
-      next(null, res);
-    }
-  });
-};
 
-Massive.prototype.dropSchemaSql = function(schemaName, options) {
-  var docSqlFile = __dirname + "/lib/scripts/drop_schema.sql";
-  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
-  // Default to restrict, but optional cascade
-  var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
-  sql = util.format(sql, schemaName, cascadeOpt);
-  return sql;
+      return resolve();
+    });
+  });
 };
 
 Massive.prototype.loadScripts = function (collection, dir) {
