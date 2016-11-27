@@ -4,11 +4,8 @@ var db;
 
 describe('Document queries', function () {
 
-  before(function(done){
-    helpers.resetDb(function(err,res){
-      db = res;
-      done();
-    });
+  before(function(){
+    return helpers.resetDb().then(instance => db = instance);
   });
 
   it('returns a db', function () {
@@ -189,7 +186,7 @@ describe('Document queries', function () {
 
     it('orders by fields in the document body with criteria', function (done) {
       db.docs.findDoc('*', {
-        order: [{field: 'title', direction: 'desc', type: 'varchar'}], 
+        order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true
       }, function (err, res) {
         assert.ifError(err);

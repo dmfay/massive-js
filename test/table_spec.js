@@ -3,11 +3,8 @@ var helpers = require("./helpers");
 var db;
 
 describe('Tables -Add/Edit/Delete', function () {
-  function init(done) {
-    helpers.resetDb(function(err,res){
-      db = res;
-      done();
-    });
+  function init() {
+    return helpers.resetDb().then(instance => db = instance);
   }
 
   describe("Executing inline SQL", function () {

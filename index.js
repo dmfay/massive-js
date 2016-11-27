@@ -1,23 +1,20 @@
-var Runner = require("./lib/runner");
-var _ = require("underscore")._;
-var fs = require("fs");
-var Executable = require("./lib/executable");
-var Queryable = require("./lib/queryable");
-var Table = require("./lib/table");
-var util = require("util");
-var ArgTypes = require("./lib/arg_types");
-var path = require("path");
-var DA = require('deasync');
-var stripBom = require('strip-bom');
-
-var self;
+const Runner = require("./lib/runner");
+const _ = require("underscore")._;
+const co = require("co");
+const fs = require("fs");
+const Executable = require("./lib/executable");
+const Queryable = require("./lib/queryable");
+const Table = require("./lib/table");
+const util = require("util");
+const ArgTypes = require("./lib/arg_types");
+const path = require("path");
 
 if (typeof Promise == 'undefined') {
   global.Promise = require('promise-polyfill');
 }
 
 var Massive = function(args) {
-  this.scriptsDir = args.scripts || process.cwd() + "/db";
+  this.scriptsDir = args.scripts || path.join(process.cwd(), "db");
   this.enhancedFunctions = args.enhancedFunctions || false;
 
   var runner = new Runner(args.connectionString, args.defaults);
@@ -89,16 +86,34 @@ Massive.prototype.run = function(){
   var args = ArgTypes.queryArgs(arguments);
   this.query(args);
 };
-Massive.prototype.runSync = DA(Massive.prototype.run);
 
-Massive.prototype.loadQueries = function() {
-  walkSqlFiles(this, this.scriptsDir);
+Massive.prototype.attach = function (entity, collection) {
+  var executor;
+  entity.db = this;
+
+  // executables are always invoked directly, so we need to handle them a bit differently
+  if (entity instanceof Executable) {
+    executor = function () {
+      entity.invoke.apply(entity, arguments);
+    };
+  }
+
+  if (entity.schema !== "public") {
+    if (!this.hasOwnProperty(entity.schema)) {
+      this[entity.schema] = {};
+    }
+
+    this[entity.schema][entity.name] = executor || entity;
+  } else {
+    this[entity.name] = executor || entity;
+  }
+
+  this[collection].push(entity);
 };
 
-Massive.prototype.loadTables = function(next) {
-  var tableSql = __dirname + "/lib/scripts/tables.sql";
-  var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-  var self = this;
+Massive.prototype.loadTables = co.wrap(function* () {
+  let tableSql = __dirname + "/lib/scripts/tables.sql";
+  let parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
 
   // ONLY allow whitelisted items:
   if(this.whitelist) {
@@ -106,71 +121,33 @@ Massive.prototype.loadTables = function(next) {
     parameters = [this.whitelist];
   }
 
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err, tables) {
-    if (err) { return next(err, null); }
+  const tables = yield this.executeSqlFile({file: tableSql, params: parameters});
 
-    _.each(tables, function(table){
-      var _table = new Table({
-        schema : table.schema,
-        name : table.name,
-        pk : table.pk,
-        db : self
-      });
+  tables.forEach(t => this.attach(new Table(t), "tables"));
+});
 
-      MapToNamespace(_table);
-    });
+Massive.prototype.loadDescendantTables = co.wrap(function* () {
+  const tableSql = __dirname + "/lib/scripts/descendant_tables.sql";
+  const parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
 
-    next(null,self);
+  const tables = yield this.executeSqlFile({file: tableSql, params: parameters});
+
+  tables.forEach(t => {
+    if (this.hasOwnProperty(t.parent)) {
+      t.pk = this[t.parent].pk;
+
+      this.attach(new Table(t), "tables");
+    }
   });
-};
+});
 
-Massive.prototype.loadDescendantTables = function(next) {
-  var tableSql = __dirname + "/lib/scripts/descendant_tables.sql";
-  var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-  var self = this;
+Massive.prototype.loadViews = co.wrap(function* () {
+  const viewSql = __dirname + "/lib/scripts/views.sql";
+  const parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
+  const views = yield this.executeSqlFile({file: viewSql, params: parameters});
 
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err, descendantTables) {
-    if (err) { return next(err, null); }
-
-    _.each(descendantTables, function (table) {
-      // if parent table is already defined it means it has been whitelisted / validated
-      // so we safely can add the descendant to the available tables
-      if (undefined !== typeof self[table.parent]) {
-        var _table = new Table({
-          schema : table.schema,
-          name : table.child,
-          pk : self[table.parent].pk,
-          db : self
-        });
-
-        MapToNamespace(_table);
-      }
-    });
-
-    next(null, self);
-  });
-};
-
-Massive.prototype.loadViews = function(next) {
-  var viewSql = __dirname + "/lib/scripts/views.sql";
-  var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-
-  this.executeSqlFile({file : viewSql, params: parameters}, function(err, views){
-    if (err) { return next(err, null); }
-
-    _.each(views, function(view) {
-      var _view = new Queryable({
-        schema : view.schema,
-        name : view.name,
-        db : self
-      });
-
-      MapToNamespace(_view, "views");
-    });
-
-    next(null, self);
-  });
-};
+  views.forEach(v => this.attach(new Queryable(v), "views"));
+});
 
 Massive.prototype.saveDoc = function(collection, doc, next){
   // default is public. Table constructor knows what to do if 'public' is used as the schema name:
@@ -184,9 +161,9 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     // uh oh. Someone specified a schema name:
     schemaName = splits[0];
     tableName = splits[1];
-    potentialTable = self[schemaName][tableName];
+    potentialTable = this[schemaName][tableName];
   } else {
-    potentialTable = self[tableName];
+    potentialTable = this[tableName];
   }
 
   if(potentialTable) {
@@ -196,24 +173,23 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     schema : schemaName,
      pk : "id",
      name : tableName,
-     db : self
+     db : this
     });
 
     // Create the table in the back end:
     var sql = this.documentTableSql(collection);
 
-    this.query(sql, function(err){
+    this.query(sql, err =>{
       if(err){
         next(err,null);
       } else {
         MapToNamespace(_table);
         // recurse
-        self.saveDoc(collection,doc,next);
+        this.saveDoc(collection,doc,next);
       }
     });
   }
 };
-Massive.prototype.saveDocSync = DA(Massive.prototype.saveDoc);
 
 var MapToNamespace = function(entity, collection) {
   collection = collection || "tables";
@@ -273,7 +249,6 @@ var RemoveFromNamespace = function(db, table) {
   }
 };
 
-
 Massive.prototype.createDocumentTable = function(path, next) {
   // Create the table in the back end:
   var splits = path.split(".");
@@ -292,7 +267,7 @@ Massive.prototype.createDocumentTable = function(path, next) {
   schema : schemaName,
    pk : "id",
    name : tableName,
-   db : self
+   db : this
   });
 
   var sql = this.documentTableSql(path);
@@ -316,14 +291,13 @@ Massive.prototype.documentTableSql = function(tableName){
   return sql;
 };
 
-
 Massive.prototype.dropTable = function(table, options, next) {
   var sql = this.dropTableSql(table, options);
-  this.query(sql, function(err, res) {
+  this.query(sql, (err, res) => {
     if(err) {
       next(err, null);
     } else {
-      RemoveFromNamespace(self, table);
+      RemoveFromNamespace(this, table);
       next(null, res);
     }
   });
@@ -339,11 +313,11 @@ Massive.prototype.dropTableSql = function(tableName, options){
 
 Massive.prototype.createSchema = function(schemaName, next) {
   var sql = this.createSchemaSql(schemaName);
-  this.query(sql, function(err, res) {
+  this.query(sql, (err, res) => {
     if(err) {
       next(err);
     } else {
-      self[schemaName] = {};
+      this[schemaName] = {};
       next(null, res);
     }
   });
@@ -360,18 +334,18 @@ Massive.prototype.createSchemaSql = function(schemaName) {
 Massive.prototype.dropSchema = function(schemaName, options, next) {
   var sql = this.dropSchemaSql(schemaName, options);
 
-  this.query(sql, function(err, res) {
+  this.query(sql, (err, res) => {
     if(err) {
       next(err);
     } else {
       // Remove all the tables from the namespace
-      if(self[schemaName]) {
-        _.each(Object.keys(self[schemaName]), function(table) {
-          RemoveFromNamespace(self, schemaName + "." + table);
+      if(this[schemaName]) {
+        _.each(Object.keys(this[schemaName]), function(table) {
+          RemoveFromNamespace(this, schemaName + "." + table);
         });
       }
       // Remove the schema from the namespace
-      delete self[schemaName];
+      delete this[schemaName];
       next(null, res);
     }
   });
@@ -386,142 +360,87 @@ Massive.prototype.dropSchemaSql = function(schemaName, options) {
   return sql;
 };
 
+Massive.prototype.loadScripts = function (collection, dir) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) { return reject(err); }
 
+      Promise.all(files.map(f => new Promise((resolve, reject) => {
+        let filePath = path.join(dir, f);
 
-//A recursive directory walker that would love to be refactored
-var walkSqlFiles = function(rootObject, rootDir) {
-  var dirs;
-  try {
-    dirs = fs.readdirSync(rootDir);
-  } catch (ex) {
-     return;
-  }
+        fs.stat(filePath, (err, s) => {
+          if (err) {
+            return reject(err);
+          } else if (s.isDirectory() && !collection.hasOwnProperty(f)) {
+            collection[f] = {};
+            this.loadScripts(collection[f], filePath).then(resolve);
+          } else if (s.isFile() && path.extname(f) === ".sql") {
+            fs.readFile(filePath, {encoding: "utf-8"}, (err, sql) => {
+              if (err) { return reject(err); }
 
-  //loop the directories found
-  _.each(dirs, function(item){
-    //parsing with path is a friendly way to get info about this dir or file
-    var ext = path.extname(item);
-    var name = path.basename(item, ext);
+              let name = path.basename(f, ".sql");
+              let exec = new Executable({
+                sql: sql,
+                filePath: filePath,
+                name: name,
+                db: this
+              });
 
-    //is this a SQL file?
-    if (ext === ".sql") {
-      //why yes it is! Build the abspath so we can read the file
-      var filePath = path.join(rootDir,item);
+              this.queryFiles.push(exec);
+              collection[name] = function () {
+                return exec.invoke.apply(exec, arguments);
+              };
 
-      //pull in the SQL - don't worry this only happens once, when
-      //massive is loaded using connect()
-      //remove the unicode Byte Order Mark
-      var sql = stripBom(fs.readFileSync(filePath, {encoding : "utf-8"}));
-
-      var _exec = new Executable({
-        sql: sql,
-        filePath: filePath,
-        name : name,
-        db : self
-      });
-
-      // unfortunately we can't use MapToNamespace here without making a ton of changes
-      // since we need to accommodate deeply-nested directories rather than 1-deep schemata
-      self.queryFiles.push(_exec);
-      rootObject[name] = function () {
-        return _exec.invoke.apply(_exec, arguments);
-      };
-    } else if (ext === '') {
-      //this is a directory so shift things and move on down
-      //set a property on our root object, then use *that*
-      //as the root in the next call
-      rootObject[name] = {};
-
-      //set the path to walk so we have a correct root directory
-      var pathToWalk = path.join(rootDir,item);
-
-      //recursive call - do it all again
-      walkSqlFiles(rootObject[name], pathToWalk);
-    }
+              return resolve();
+            });
+          }
+        });
+      }))).then(resolve);
+    });
   });
 };
 
-Massive.prototype.loadFunctions = function(next) {
-  if (!this.excludeFunctions) {
-    var functionSql = __dirname + "/lib/scripts/functions.sql";
-    var parameters = [this.functionBlacklist, this.functionWhitelist];
+Massive.prototype.loadFunctions = co.wrap(function* () {
+  if (this.excludeFunctions) { return; }
 
-    this.executeSqlFile({file : functionSql, params : parameters}, function (err,functions) {
-      if (err) {
-        next(err, null);
-      } else {
-        _.each(functions, function(fn) {
-          var schema = fn.schema;
-          var sql;
-          var params = [];
+  const functionSql = __dirname + "/lib/scripts/functions.sql";
+  const parameters = [this.functionBlacklist, this.functionWhitelist];
 
-          for (var i = 1; i <= fn.param_count; i++) {
-            params.push("$" + i);
-          }
+  const functions = yield this.executeSqlFile({file: functionSql, params: parameters});
 
-          if (schema !== "public") {
-            sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
-            self[schema] = self[schema] || {};
-          } else {
-            sql = util.format("select * from \"%s\"", fn.name);
-          }
+  functions.forEach(fn => {
+    const name = fn.schema === "public" ? `"${fn.name}"` : `"${fn.schema}"."${fn.name}"`;
+    const params = _.range(1, fn.param_count + 1).map(i => `$${i}`);
 
-          sql += "(" + params.join(",") + ")";
+    if (fn.schema !== "public" && !this.hasOwnProperty(fn.schema)) {
+      this[fn.schema] = {};
+    }
 
-          var _exec = new Executable({
-            sql: sql,
-            schema: schema,
-            name : fn.name,
-            db : self,
-            singleRow: self.enhancedFunctions && fn.return_single_row,
-            singleValue: self.enhancedFunctions && fn.return_single_value
-          });
-
-          MapToNamespace(_exec, "functions");
-        });
-
-        next(null, self);
-      }
-    });
-  } else {
-    next(null, self);
-  }
-};
+    this.attach(new Executable({
+      sql: `select * from ${name}(${params.join(",")})`,
+      schema: fn.schema,
+      name : fn.name,
+      singleRow: this.enhancedFunctions && fn.return_single_row,
+      singleValue: this.enhancedFunctions && fn.return_single_value
+    }), "functions");
+  });
+});
 
 //connects Massive to the DB
-exports.connect = function(args, next) {
-  //override if there's a db name passed in
+exports.connect = co.wrap(function* (args) {
   if (args.db) {
-    args.connectionString = "postgres://localhost/"+args.db;
+    args.connectionString = "postgres://localhost/" + args.db;
   } else if (!args.connectionString) {
-    return next(new Error("Need a connectionString or db (name of database on localhost) to connect."));
+    throw new Error("Need a connectionString or db (name of database on localhost) to connect.");
   }
 
   var massive = new Massive(args);
 
-  //load up the tables, queries, and commands
-  massive.loadTables(function(err, db) {
-    if (err) { return next(err); }
+  yield massive.loadTables();
+  yield massive.loadDescendantTables();
+  yield massive.loadViews();
+  yield massive.loadFunctions();
+  yield massive.loadScripts(massive, massive.scriptsDir);
 
-    self = db;
-
-    massive.loadDescendantTables(function () {
-      if (err) { return next(err); }
-
-      massive.loadViews(function() {
-        if (err) { return next(err); }
-
-        massive.loadFunctions(function(err, db) {
-          if (err) { return next(err); }
-
-          db.loadQueries(); // synchronous
-
-          next(null, db);
-        });
-      });
-    });
-  });
-};
-
-exports.loadSync = DA(this.connect);
-exports.connectSync = DA(this.connect);
+  return Promise.resolve(massive);
+});

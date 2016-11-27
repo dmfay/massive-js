@@ -4,11 +4,8 @@ var _ = require("underscore");
 var db;
 
 describe('Functions', function () {
-  before(function(done){
-    helpers.resetDb('functions', function(err,res) {
-      db = res;
-      done();
-    });
+  before(function() {
+    return helpers.resetDb('functions').then(instance => db = instance);
   });
 
   describe('loading with schema and casing', function () {

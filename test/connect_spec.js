@@ -1,26 +1,33 @@
-var assert = require("assert");
+var assert = require("chai").assert;
 var massive = require("../index");
 var helpers = require("./helpers");
 
 describe('Connecting', function () {
-  before(function(done) {
-    helpers.resetDb('loader', done);
+  before(function() {
+    return helpers.resetDb('loader');
   });
 
-  it('connects', function (done) {
-    massive.connect({
-      connectionString: helpers.connectionString
-    }, done);
+  it('connects', function () {
+    return massive.connect(
+      {
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`
+      }
+    ).then(db => {
+      assert.isOk(db);
+
+      return Promise.resolve();
+    });
   });
 
   it('overrides and applies defaults', function (done) {
     massive.connect({
       connectionString: helpers.connectionString,
+      scripts: `${__dirname}/db`,
       defaults: {
         parseInt8: true
       }
-    }, function (err, db) {
-      assert.ifError(err);
+    }).then(db => {
       assert.equal(db.defaults.parseInt8, true);
 
       db.t1.count({}, function (err, count) {
@@ -32,13 +39,13 @@ describe('Connecting', function () {
     });
   });
 
-  it('rejects connection blocks without a connstr or db', function (done) {
-    massive.connect({
+  it('rejects connection blocks without a connstr or db', function () {
+    return massive.connect({
       things: 'stuff'
-    }, function (err) {
+    }).then(() => {
+      assert.fail();
+    }).catch(err => {
       assert.equal(err.message, 'Need a connectionString or db (name of database on localhost) to connect.');
-
-      done();
     });
   });
 });

@@ -4,11 +4,8 @@ var db;
 
 describe('Schema-Bounds Document queries', function () {
 
-  before(function(done){
-    helpers.resetDb(function(err,res){
-      db = res;
-      done();
-    });
+  before(function(){
+    return helpers.resetDb().then(instance => db = instance);
   });
   it('returns a db', function () {
     assert(db, "No db");

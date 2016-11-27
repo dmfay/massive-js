@@ -1,46 +1,49 @@
-var massive = require("../../index");
-var connectionString = "postgres://postgres@localhost/massive";
-var async = require('async');
-var path = require("path");
-var assert = require("assert");
-var scriptsDir = path.join(__dirname, "..", "db");
+const massive = require("../../index");
+const connectionString = "postgres://postgres@localhost/massive";
+const co = require('co');
+const path = require("path");
+const scriptsDir = path.join(__dirname, "..", "db");
 
 exports.connectionString = connectionString;
 
-exports.init = function(next) {
-  massive.connect({
+exports.init = () => {
+  return massive.connect({
     connectionString : connectionString,
     enhancedFunctions : true,
     scripts : scriptsDir
-  }, next);
-};
-
-exports.resetDb = function(schema, next) {
-  if (typeof schema === 'function') {
-    next = schema;
-    schema = 'default';
-  }
-
-  var self = this;
-
-  self.init(function(err,db) {
-    assert.ifError(err);
-
-    db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'", function (err, schemata) {
-      assert.ifError(err);
-
-      async.each(schemata, function (schema, next) {
-        db.run('drop schema ' + schema.schema_name + ' cascade', next);  
-      }, function (err) {
-        assert.ifError(err);
-
-        db.schemata[schema](function (err) {
-          assert.ifError(err);
-
-          self.init(next);  // reconnect to ensure all functions have been unloaded
-        });
-      });
-    });
   });
 };
+
+exports.resetDb = co.wrap(function* (schema) {
+  schema = schema || 'default';
+
+  let db = yield this.init();
+
+  let schemata = yield new Promise((resolve, reject) => {
+    db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'", function (err, schemata) {
+      if (err) { return reject(err); }
+
+      return resolve(schemata);
+    });
+  });
+
+  yield Promise.all(schemata.map(schema =>
+    new Promise((resolve, reject) =>
+      db.run(`drop schema ${schema.schema_name} cascade`, err => {
+        if (err) { return reject(err); }
+
+        return resolve();
+      })
+    )
+  ));
+
+  yield new Promise((resolve, reject) =>
+    db.schemata[schema](err => {
+      if (err) { return reject(err); }
+      return resolve();
+    })
+  );
+
+  return yield this.init();
+});
 

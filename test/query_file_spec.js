@@ -5,11 +5,8 @@ var db;
 
 describe('Queries built from files', function () {
 
-  before(function(done) {
-    helpers.resetDb(function(err,res) {
-      db = res;
-      done();
-    });
+  before(function() {
+    return helpers.resetDb().then(instance => db = instance);
   });
 
   describe('Loading of queries', function () {

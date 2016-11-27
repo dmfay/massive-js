@@ -3,14 +3,15 @@ var helpers = require("./helpers");
 var massive = require("../index");
 
 describe('Loading entities (these tests may be slow!)', function () {
-  before(function (done) {
-    helpers.resetDb('loader', done);
+  before(function () {
+    return helpers.resetDb('loader');
   });
 
-  it('loads everything it can by default', function (done) {
-    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
-      assert.ifError(err);
-
+  it('loads everything it can by default', function () {
+    return massive.connect({
+      connectionString: helpers.connectionString,
+      scripts: `${__dirname}/db`
+    }).then(db => {
       assert(db);
       assert(!!db.t1 && !!db.t2 && !!db.tA);
       assert(!!db.v1 && !!db.v2);
@@ -21,26 +22,25 @@ describe('Loading entities (these tests may be slow!)', function () {
       assert.equal(db.tables.length, 6);
       assert.equal(db.views.length, 6);
       assert.equal(db.functions.length, 4);
-
-      done();
     });
   });
 
-  it('does not load tables without primary keys', function (done) {
-    massive.connect({connectionString: helpers.connectionString}, function (err, db) {
-      assert.ifError(err);
-
+  it('does not load tables without primary keys', function () {
+    return massive.connect({
+      connectionString: helpers.connectionString,
+      scripts: `${__dirname}/db`
+    }).then(db => {
       assert(!db.t3); // tables without primary keys aren't loaded
-
-      done();
     });
   });
 
   describe('schema filters', function () {
-    it('loads everything it can with "all" schemata', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: 'all'}, function (err, db) {
-        assert.ifError(err);
-
+    it('loads everything it can with "all" schemata', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: "all"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -51,15 +51,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 6);
         assert.equal(db.views.length, 6);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('loads only entities (except public functions) from a schema string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: 'one'}, function (err, db) {
-        assert.ifError(err);
-
+    it('loads only entities (except public functions) from a schema string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: "one"
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -70,15 +70,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('loads only entities (except public functions) from a comma-delimited schema string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: 'one, two'}, function (err, db) {
-        assert.ifError(err);
-
+    it('loads only entities (except public functions) from a comma-delimited schema string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: "one, two"
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -89,15 +89,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('loads only entities (except public functions) from a schema array', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: [ 'one, two' ]}, function (err, db) {
-        assert.ifError(err);
-
+    it('loads only entities (except public functions) from a schema array', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: ["one", "two"]
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -108,15 +108,16 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('allows exceptions', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: 'two', exceptions: 't1, v1, one.v2'}, function (err, db) {
-        assert.ifError(err);
-
+    it('allows exceptions', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: "two",
+        exceptions: "t1, v1, one.v2"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!!db.v1 && !db.v2);
@@ -127,17 +128,17 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
   });
 
   describe('table blacklists', function () {
-    it('excludes tables and views by a blacklist pattern string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, blacklist: '%1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('excludes tables and views by a blacklist pattern string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        blacklist: "%1"
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -148,15 +149,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 3);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('checks schema names in the pattern', function (done) {
-      massive.connect({connectionString: helpers.connectionString, blacklist: 'one.%1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('checks schema names in the pattern', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        blacklist: "one.%1"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -167,15 +168,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 5);
         assert.equal(db.views.length, 5);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('excludes tables and views from a comma-delimited blacklist', function (done) {
-      massive.connect({connectionString: helpers.connectionString, blacklist: '%1, one.%2'}, function (err, db) {
-        assert.ifError(err);
-
+    it('excludes tables and views from a comma-delimited blacklist', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        blacklist: "%1, one.%2"
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -186,15 +187,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('excludes tables and views from a blacklist array', function (done) {
-      massive.connect({connectionString: helpers.connectionString, blacklist: [ '%1, one.%2' ]}, function (err, db) {
-        assert.ifError(err);
-
+    it('excludes tables and views from a blacklist array', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        blacklist: [ "%1", "one.%2"]
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -205,15 +206,16 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('allows exceptions', function (done) {
-      massive.connect({connectionString: helpers.connectionString, blacklist: '%1', exceptions: 'one.%1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('allows exceptions', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        blacklist: "%1",
+        exceptions: "one.%1"
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -224,17 +226,17 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 4);
         assert.equal(db.views.length, 4);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
   });
 
   describe('table whitelists', function () {
-    it('includes only tables exactly matching a whitelist string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, whitelist: 't1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('includes only tables exactly matching a whitelist string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        whitelist: "t1"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -245,15 +247,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('includes only tables exactly matching a comma-delimited whitelist string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, whitelist: 't1, one.t1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('includes only tables exactly matching a comma-delimited whitelist string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        whitelist: "t1, one.t1"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -264,15 +266,15 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('includes only tables exactly matching a whitelist array', function (done) {
-      massive.connect({connectionString: helpers.connectionString, whitelist: [ 't1', 'one.t1' ]}, function (err, db) {
-        assert.ifError(err);
-
+    it('includes only tables exactly matching a whitelist array', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        whitelist: ["t1", "one.t1"]
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -283,15 +285,17 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
 
-    it('overrides other filters', function (done) {
-      massive.connect({connectionString: helpers.connectionString, schema: 'one', blacklist: 't1', whitelist: 't1'}, function (err, db) {
-        assert.ifError(err);
-
+    it('overrides other filters', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        schema: "one",
+        blacklist: "t1",
+        whitelist: "t1"
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -302,100 +306,110 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
         assert.equal(db.functions.length, 4);
-
-        done();
       });
     });
   });
 
   describe('function exclusion', function () {
-    it('skips loading functions when set', function (done) {
-      massive.connect({connectionString: helpers.connectionString, excludeFunctions: true}, function (err, db) {
-        assert.ifError(err);
+    it('skips loading functions when set', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        excludeFunctions: true
+      }).then(db => {
         assert.equal(db.functions.length, 0);
-        done();
       });
     });
 
-    it('loads all functions when false', function (done) {
-      massive.connect({connectionString: helpers.connectionString, excludeFunctions: false}, function (err, db) {
-        assert.ifError(err);
+    it('loads all functions when false', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        excludeFunctions: false
+      }).then(db => {
         assert(db.functions.length > 0);
-        done();
       });
     });
   });
 
   describe('function blacklists', function () {
-    it('excludes functions matching a blacklist pattern string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionBlacklist: '%1'}, function (err, db) {
-        assert.ifError(err);
+    it('excludes functions matching a blacklist pattern string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionBlacklist: "%1"
+      }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
-
-        done();
       });
     });
 
-    it('excludes functions matching a comma-delimited blacklist', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionBlacklist: '%1, one.f2'}, function (err, db) {
-        assert.ifError(err);
+    it('excludes functions matching a comma-delimited blacklist', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionBlacklist: "%1, one.f2"
+      }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
-
-        done();
       });
     });
 
-    it('excludes functions matching a blacklist array', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionBlacklist: [ '%1', 'one.f2' ]}, function (err, db) {
-        assert.ifError(err);
+    it('excludes functions matching a blacklist array', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionBlacklist: ["%1", "one.f2"]
+      }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
-
-        done();
       });
     });
   });
 
   describe('function whitelists', function () {
-    it('includes functions matching a whitelist pattern string', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionWhitelist: '%1'}, function (err, db) {
-        assert.ifError(err);
+    it('includes functions matching a whitelist pattern string', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionWhitelist: "%1"
+      }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !db.one.f2);
-
-        done();
       });
     });
 
-    it('includes functions matching a comma-delimited whitelist', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionWhitelist: '%1, one.f2'}, function (err, db) {
-        assert.ifError(err);
+    it('includes functions matching a comma-delimited whitelist', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionWhitelist: "%1, one.f2"
+      }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
-
-        done();
       });
     });
 
-    it('includes functions matching a whitelist array', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionWhitelist: [ '%1', 'one.f2' ]}, function (err, db) {
-        assert.ifError(err);
+    it('includes functions matching a whitelist array', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionWhitelist: ["%1", "one.f2"]
+      }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
-
-        done();
       });
     });
 
-    it('overlaps whitelists and blacklists', function (done) {
-      massive.connect({connectionString: helpers.connectionString, functionBlacklist: 'one.%1', functionWhitelist: 'one.%'}, function (err, db) {
-        assert.ifError(err);
+    it('overlaps whitelists and blacklists', function () {
+      return massive.connect({
+        connectionString: helpers.connectionString,
+        scripts: `${__dirname}/db`,
+        functionBlacklist: "one.%1",
+        functionWhitelist: "one.%"
+      }).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
-
-        done();
       });
     });
   });

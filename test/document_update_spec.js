@@ -1,15 +1,11 @@
 var assert = require("assert");
 var helpers = require("./helpers");
-var skipBelow95 = require("./helpers/versions").skipBelow95;
 
 describe('Document updates,', function(){
   var db;
 
-  before(function(done){
-    helpers.resetDb(function(err, res){
-      db = res;
-      done();
-    });
+  before(function(){
+    return helpers.resetDb().then(instance => db = instance);
   });
 
   // update objects set body=jsonb_set(body, '{name,last}', '', true) where id=3;
@@ -24,11 +20,11 @@ describe('Document updates,', function(){
       });
     });
 
-    skipBelow95('check saved attribute', function(){
+    it('check saved attribute', function(){
       assert.equal(1, newDoc.score);
     });
 
-    skipBelow95('updates the document', function(done) {
+    it('updates the document', function(done) {
       db.docs.setAttribute(newDoc.id, "vaccinated", true, function(err, doc){
         assert.ifError(err);
         assert.equal(doc.vaccinated, true);
@@ -36,7 +32,7 @@ describe('Document updates,', function(){
       });
     });
 
-    skipBelow95('updates the document when passed array value', function(done) {
+    it('updates the document when passed array value', function(done) {
       db.docs.setAttribute(newDoc.id, "array", array, function(err, doc){
         assert.ifError(err);
         assert.deepEqual(doc.array, array);
@@ -44,7 +40,7 @@ describe('Document updates,', function(){
       });
     });
 
-    skipBelow95('updates the document without replacing existing attributes', function(done) {
+    it('updates the document without replacing existing attributes', function(done) {
       db.docs.setAttribute(newDoc.id, "score", 99, function(err, doc){
         assert.ifError(err);
         assert.equal(doc.score, 99);
@@ -55,7 +51,7 @@ describe('Document updates,', function(){
       });
     });
 
-    skipBelow95('escapes values properly', function(done) {
+    it('escapes values properly', function(done) {
       db.docs.setAttribute(newDoc.id, "field", "value", function(err, doc){
         assert.ifError(err);
         assert.equal(doc.score, 99);

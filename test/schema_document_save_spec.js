@@ -4,11 +4,8 @@ var db;
 
 describe('Schema-Bound Document Saves', function () {
 
-  before(function(done){
-    helpers.resetDb(function(err,res){
-      db = res;
-      done();
-    });
+  before(function() {
+    return helpers.resetDb().then(instance => db = instance);
   });
 
   describe("To a non-existent table", function () {

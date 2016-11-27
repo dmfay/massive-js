@@ -3,11 +3,8 @@ var helpers = require("./helpers");
 var db;
 
 describe("Table Inheritance", function () {
-  before(function(done) {
-    helpers.resetDb("inheritance", function (err,res) {
-      db = res;
-      done();
-    });
+  before(function() {
+    return helpers.resetDb("inheritance").then(instance => db = instance);
   });
 
   describe("Querying", function () {

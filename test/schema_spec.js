@@ -8,11 +8,8 @@ describe("Schema", function() {
   var tableName = "doggies";
   var schemaTableName = schemaName + "." + tableName;
 
-  before(function(done) {
-    helpers.resetDb("empty", function(err,res){
-      db = res;
-      done();
-    });
+  before(function() {
+    return helpers.resetDb("empty").then(instance => db = instance);
   });
 
   describe("create", function() {
