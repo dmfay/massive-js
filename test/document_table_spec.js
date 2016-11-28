@@ -1,95 +1,73 @@
-var assert = require("assert");
-var _ = require('underscore')._;
-var helpers = require("./helpers");
+const assert = require("chai").assert;
+const co = require("co");
+const helpers = require("./helpers");
+const Table = require("../lib/table");
 var db;
-var schema = 'spec';
-var tableName = 'doggies';
-var schemaTableName = schema + '.' + tableName;
+const schema = "spec";
+const tableName = "doggies";
+const schemaTableName = `${schema}.${tableName}`;
 
 describe('Document table', function () {
-
-  before(function(){
+  before(function() {
     return helpers.resetDb().then(instance => db = instance);
   });
 
   describe('create', function() {
-
     describe('without schema', function() {
-
-      after(function(done) {
-        db.dropTable(tableName, {cascade: true}, done);
+      after(function() {
+        return db.dropTable(tableName, {cascade: true});
       });
 
-      it('creates a table on public schema', function(done) {
-        db.createDocumentTable(tableName, function(err, res) {
-          assert.ifError(err);
-          assert(_.isEqual([], res), 'should be empty array');
-          done();
+      it('creates a table on public schema', function() {
+        return db.createDocumentTable(tableName).then(() => {
+          assert.isOk(db[tableName]);
+          assert.instanceOf(db[tableName], Table);
         });
       });
-
     });
 
     describe('with schema', function() {
-
       before(function() {
         return db.createSchema(schema);
       });
 
-      after(function(done) {
-        db.dropTable(schemaTableName, {cascade: true}, done);
+      after(function() {
+        return db.dropSchema(schema, {cascade: true});
       });
 
-      it('creates a table on the specified schema', function(done) {
-        db.createDocumentTable(schemaTableName, function(err, res) {
-          assert.ifError(err);
-          assert(_.isEqual([], res), 'should be empty array');
-          done();
+      it('creates a table on the specified schema', function() {
+        return db.createDocumentTable(schemaTableName).then(() => {
+          assert.isOk(db[schema][tableName]);
+          assert.instanceOf(db[schema][tableName], Table);
         });
       });
-
     });
-
   });
 
-
   describe('drop', function() {
-
     describe('without schema', function() {
-
-      before(function(done) {
-        db.createDocumentTable(tableName, done);
+      before(function() {
+        return db.createDocumentTable(tableName);
       });
 
-      it('removes the table from public schema', function(done) {
-        db.dropTable(tableName, {cascade: true}, function(err, res) {
-          assert.ifError(err);
-          assert(_.isEqual([], res), 'should be empty array');
-          assert.equal(undefined, db[tableName]);
-          done();
+      it('removes the table from public schema', function() {
+        return db.dropTable(tableName, {cascade: true}).then(() => {
+          assert.isUndefined(db[tableName]);
         });
       });
-
     });
 
     describe('with schema', function() {
+      before(co.wrap(function* () {
+        yield db.createSchema(schema);
+        yield db.createDocumentTable(schemaTableName);
+      }));
 
-      before(function(done) {
-        db.createSchema(schema).then(() => {
-          db.createDocumentTable(schemaTableName, done);
-        });
-      });
-
-      it('removes the table from the specified schema', function(done) {
-        db.dropTable(schemaTableName, {cascade: true}, function(err, res) {
-          assert.ifError(err);
-          assert(_.isEqual([], res), 'should be empty array');
-          assert.equal(undefined, db[schema][tableName]);
-          done();
+      it('removes the table from the specified schema', function() {
+        return db.dropTable(schemaTableName, {cascade: true}).then(() => {
+          assert.isUndefined(db[schema][tableName]);
         });
       });
     });
-
   });
-
 });

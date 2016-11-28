@@ -108,7 +108,27 @@ Massive.prototype.attach = function (entity, collection) {
     this[entity.name] = executor || entity;
   }
 
-  this[collection].push(entity);
+  this[collection || "tables"].push(entity);
+};
+
+Massive.prototype.detach = function(entity, collection) {
+  // var tableName, schemaName;
+  let schemaName = "public";
+
+  if (entity.indexOf(".") > -1) {
+    const tokens = entity.split(".");
+
+    schemaName = tokens[0];
+    entity = tokens[1];
+
+    delete this[schemaName][entity];
+  } else {
+    delete this[entity];
+  }
+
+  this[collection || "tables"] = _.reject(this[collection || "tables"], function(element) {
+    return element.name && element.schema && element.schema === schemaName && element.name === entity;
+  });
 };
 
 Massive.prototype.loadTables = co.wrap(function* () {
@@ -169,151 +189,54 @@ Massive.prototype.saveDoc = function(collection, doc, next){
   if(potentialTable) {
     potentialTable.saveDoc(doc, next);
   } else {
-    var _table = new Table({
-    schema : schemaName,
-     pk : "id",
-     name : tableName,
-     db : this
-    });
-
-    // Create the table in the back end:
-    var sql = this.documentTableSql(collection);
-
-    this.query(sql, err =>{
-      if(err){
-        next(err,null);
-      } else {
-        MapToNamespace(_table);
-        // recurse
-        this.saveDoc(collection,doc,next);
-      }
+    this.createDocumentTable(collection).then(() => {
+      this.saveDoc(collection, doc, next);
     });
   }
 };
 
-var MapToNamespace = function(entity, collection) {
-  collection = collection || "tables";
+Massive.prototype.createDocumentTable = function(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(`${__dirname}/lib/scripts/create_document_table.sql`, "UTF-8", (err, sql) => {
+      if (err) { return reject(err); }
 
-  var db = entity.db;
-  var executor;
-  var schemaName;
+      const splits = path.split(".");
+      const tableName = splits.pop();
+      const schemaName = splits.length === 1 ? splits.pop() : "public";
+      const indexName = tableName.replace(".", "_");
 
-  // executables are always invoked directly, so we need to handle them a bit differently
-  if (entity instanceof Executable) {
-    executor = function () {
-      entity.invoke.apply(entity, arguments);
-    };
-  }
+      this.query(util.format(sql, path, indexName, path, indexName, path), err => {
+        if (err) { return reject(err); }
 
-  if (entity.schema === "public") {
-    db[entity.name] = executor || entity;
-  } else {
-    schemaName = entity.schema;
-    // is this schema already attached?
-    if(!db[schemaName]) {
-      // if not, then bolt it on:
-      db[schemaName] = {};
-    }
-    // attach the entity to the schema:
-    db[schemaName][entity.name] = executor || entity;
-  }
+        this.attach(new Table({
+          schema: schemaName,
+          pk: "id",
+          name: tableName
+        }));
 
-  db[collection].push(entity);
-};
-
-var RemoveFromNamespace = function(db, table) {
-  // right now only tables are supported
-  var collection = "tables";
-
-  var splits = table.split('.');
-  var tableName, schemaName;
-
-  if(splits.length > 1) {
-    schemaName = splits[0];
-    tableName = splits[1];
-  } else {
-    schemaName = "public";
-    tableName = table;
-  }
-
-  if(schemaName === "public" && db[table]) {
-    delete db[table];
-  }else if(db[schemaName] && db[schemaName][tableName]) {
-    delete db[schemaName][tableName];
-  }
-
-  if(db[collection]) {
-    db[collection] = _.reject(db[collection], function(element) {
-      return element.name && element.schema && element.schema === schemaName && element.name === tableName;
+        return resolve();
+      });
     });
-  }
-};
-
-Massive.prototype.createDocumentTable = function(path, next) {
-  // Create the table in the back end:
-  var splits = path.split(".");
-  var tableName;
-  var schemaName;
-  if(splits.length > 1) {
-    // uh oh. Someone specified a schema name:
-    schemaName = splits[0];
-    tableName = splits[1];
-  } else {
-    schemaName = "public"; // default schema
-    tableName = path;
-  }
-
-  var _table = new Table({
-  schema : schemaName,
-   pk : "id",
-   name : tableName,
-   db : this
-  });
-
-  var sql = this.documentTableSql(path);
-
-  this.query(sql, function(err, res){
-    if(err){
-      next(err,null);
-    } else {
-      MapToNamespace(_table);
-      next(null, res);
-    }
   });
 };
 
-Massive.prototype.documentTableSql = function(tableName){
-  var docSqlFile = __dirname + "/lib/scripts/create_document_table.sql";
-  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
+Massive.prototype.dropTable = function(table, options) {
+  return new Promise((resolve, reject) => {
+    const cascade = options && options.cascade;
 
-  var indexName = tableName.replace(".", "_");
-  sql = util.format(sql, tableName, indexName, tableName, indexName, tableName);
-  return sql;
-};
+    this.query(`DROP TABLE IF EXISTS ${table} ${cascade ? "CASCADE" : ""};`, err => {
+      if (err) { return reject(err); }
 
-Massive.prototype.dropTable = function(table, options, next) {
-  var sql = this.dropTableSql(table, options);
-  this.query(sql, (err, res) => {
-    if(err) {
-      next(err, null);
-    } else {
-      RemoveFromNamespace(this, table);
-      next(null, res);
-    }
+      this.detach(table);
+
+      return resolve();
+    });
   });
-};
-
-Massive.prototype.dropTableSql = function(tableName, options){
-  var docSqlFile = __dirname + "/lib/scripts/drop_table.sql";
-  var sql = fs.readFileSync(docSqlFile, {encoding: 'utf-8'});
-  var cascadeOpt = options && options.cascade === true ? "CASCADE" : "";
-  sql = util.format(sql, tableName, cascadeOpt);
-  return sql;
 };
 
 Massive.prototype.createSchema = function(schemaName) {
   return new Promise((resolve, reject) => {
-    this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName}`, err => {
+    this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`, err => {
       if (err) { return reject(err); }
 
       this[schemaName] = {};
@@ -327,13 +250,13 @@ Massive.prototype.dropSchema = function(schemaName, options) {
   return new Promise((resolve, reject) => {
     const cascade = options && options.cascade;
 
-    this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${cascade ? "CASCADE" : ""}`, err => {
+    this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${cascade ? "CASCADE" : ""};`, err => {
       if (err) { return reject(err); }
 
       // Remove all the tables from the namespace
       if(this[schemaName]) {
-        _.each(Object.keys(this[schemaName]), function(table) {
-          RemoveFromNamespace(this, schemaName + "." + table);
+        _.each(Object.keys(this[schemaName]), table => {
+          this.detach(schemaName + "." + table);
         });
       }
 

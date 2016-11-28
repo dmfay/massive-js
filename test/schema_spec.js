@@ -27,13 +27,8 @@ describe("Schema", function() {
   });
 
   describe("drop", function() {
-    beforeEach(function(done) {
-      db.createSchema(schemaName).then(() => {
-        db.createDocumentTable(schemaTableName, function(err) {
-          assert.ifError(err);
-          done();
-        });
-      });
+    beforeEach(function() {
+      return db.createSchema(schemaName).then(db.createDocumentTable.bind(db, schemaTableName));
     });
 
     after(function() {
