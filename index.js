@@ -2,6 +2,7 @@ const Runner = require("./lib/runner");
 const _ = require("underscore")._;
 const co = require("co");
 const fs = require("fs");
+const filters = require("./lib/filters");
 const Executable = require("./lib/executable");
 const Queryable = require("./lib/queryable");
 const Table = require("./lib/table");
@@ -27,59 +28,18 @@ var Massive = function(args) {
   this.functions = [];
 
   if (args.whitelist) {
-    this.whitelist = this.getTableFilter(args.whitelist);
+    this.whitelist = filters.entity(args.whitelist);
   } else {
-    this.allowedSchemas = this.getSchemaFilter(args.schema);
-    this.blacklist = this.getTableFilter(args.blacklist);
-    this.exceptions = this.getTableFilter(args.exceptions);
+    this.allowedSchemas = filters.schema(args.schema);
+    this.blacklist = filters.entity(args.blacklist);
+    this.exceptions = filters.entity(args.exceptions);
   }
+
   // any "truthy" value passed will cause functions to be excluded. No param
   // will be a "falsy" value, and functions will be included...
   this.excludeFunctions = args.excludeFunctions;
-  this.functionBlacklist = this.getTableFilter(args.functionBlacklist);
-  this.functionWhitelist = this.getTableFilter(args.functionWhitelist);
-};
-
-Massive.prototype.getSchemaFilter = function(allowedSchemas) {
-  // an empty string will cause all schema to be loaded by default:
-  var result = '';
-  if(allowedSchemas === 'all' || allowedSchemas === '*') {
-    // Do nothing else. Leave the default empty string:
-    allowedSchemas = null;
-  }
-  if(allowedSchemas) {
-    // there is a value of some sort other than our acceptable defaults:
-    if(_.isString(allowedSchemas)) {
-      // a string works. If comma-delimited, so much the better, we're done:
-      result = allowedSchemas;
-    } else {
-      if(!_.isArray(allowedSchemas)) {
-        throw("Specify allowed schemas using either a commma-delimited string or an array of strings");
-      }
-      // create a comma-delimited string:
-      result = allowedSchemas.join(", ");
-    }
-  }
-  return result;
-};
-
-Massive.prototype.getTableFilter = function(filter) {
-  // an empty string will cause all schema to be loaded by default:
-  var result = '';
-  if(filter) {
-    // there is a value of some sort other than our acceptable defaults:
-    if(_.isString(filter)) {
-      // a string works. If comma-delimited, so much the better, we're done:
-      result = filter;
-    } else {
-      if(!_.isArray(filter)) {
-        throw("Specify filter patterns using either a commma-delimited string or an array of strings");
-      }
-      // create a comma-delimited string:
-      result = filter.join(", ");
-    }
-  }
-  return result;
+  this.functionBlacklist = filters.entity(args.functionBlacklist);
+  this.functionWhitelist = filters.entity(args.functionWhitelist);
 };
 
 Massive.prototype.run = function(){

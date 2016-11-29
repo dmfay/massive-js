@@ -3,7 +3,6 @@ var helpers = require("./helpers");
 var db;
 
 describe('Document saves', function () {
-
   before(function(){
     return helpers.resetDb().then(instance => db = instance);
   });
