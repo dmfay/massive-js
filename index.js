@@ -72,7 +72,6 @@ Massive.prototype.attach = function (entity, collection) {
 };
 
 Massive.prototype.detach = function(entity, collection) {
-  // var tableName, schemaName;
   let schemaName = "public";
 
   if (entity.indexOf(".") > -1) {
@@ -109,7 +108,6 @@ Massive.prototype.loadTables = co.wrap(function* () {
 Massive.prototype.loadDescendantTables = co.wrap(function* () {
   const tableSql = __dirname + "/lib/scripts/descendant_tables.sql";
   const parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-
   const tables = yield this.executeSqlFile({file: tableSql, params: parameters});
 
   tables.forEach(t => {
@@ -127,6 +125,72 @@ Massive.prototype.loadViews = co.wrap(function* () {
   const views = yield this.executeSqlFile({file: viewSql, params: parameters});
 
   views.forEach(v => this.attach(new Queryable(v), "views"));
+});
+
+Massive.prototype.loadScripts = function (collection, dir) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) { return reject(err); }
+
+      Promise.all(files.map(f => new Promise((resolve, reject) => {
+        let filePath = path.join(dir, f);
+
+        fs.stat(filePath, (err, s) => {
+          if (err) {
+            return reject(err);
+          } else if (s.isDirectory() && !collection.hasOwnProperty(f)) {
+            collection[f] = {};
+            this.loadScripts(collection[f], filePath).then(resolve);
+          } else if (s.isFile() && path.extname(f) === ".sql") {
+            fs.readFile(filePath, {encoding: "utf-8"}, (err, sql) => {
+              if (err) { return reject(err); }
+
+              let name = path.basename(f, ".sql");
+              let exec = new Executable({
+                sql: sql,
+                filePath: filePath,
+                name: name,
+                db: this
+              });
+
+              this.queryFiles.push(exec);
+              collection[name] = function () {
+                return exec.invoke.apply(exec, arguments);
+              };
+
+              return resolve();
+            });
+          }
+        });
+      }))).then(resolve);
+    });
+  });
+};
+
+Massive.prototype.loadFunctions = co.wrap(function* () {
+  if (this.excludeFunctions) { return; }
+
+  const functionSql = __dirname + "/lib/scripts/functions.sql";
+  const parameters = [this.functionBlacklist, this.functionWhitelist];
+
+  const functions = yield this.executeSqlFile({file: functionSql, params: parameters});
+
+  functions.forEach(fn => {
+    const name = fn.schema === "public" ? `"${fn.name}"` : `"${fn.schema}"."${fn.name}"`;
+    const params = _.range(1, fn.param_count + 1).map(i => `$${i}`);
+
+    if (fn.schema !== "public" && !this.hasOwnProperty(fn.schema)) {
+      this[fn.schema] = {};
+    }
+
+    this.attach(new Executable({
+      sql: `select * from ${name}(${params.join(",")})`,
+      schema: fn.schema,
+      name : fn.name,
+      singleRow: this.enhancedFunctions && fn.return_single_row,
+      singleValue: this.enhancedFunctions && fn.return_single_value
+    }), "functions");
+  });
 });
 
 Massive.prototype.saveDoc = function(collection, doc, next){
@@ -228,73 +292,6 @@ Massive.prototype.dropSchema = function(schemaName, options) {
   });
 };
 
-Massive.prototype.loadScripts = function (collection, dir) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dir, (err, files) => {
-      if (err) { return reject(err); }
-
-      Promise.all(files.map(f => new Promise((resolve, reject) => {
-        let filePath = path.join(dir, f);
-
-        fs.stat(filePath, (err, s) => {
-          if (err) {
-            return reject(err);
-          } else if (s.isDirectory() && !collection.hasOwnProperty(f)) {
-            collection[f] = {};
-            this.loadScripts(collection[f], filePath).then(resolve);
-          } else if (s.isFile() && path.extname(f) === ".sql") {
-            fs.readFile(filePath, {encoding: "utf-8"}, (err, sql) => {
-              if (err) { return reject(err); }
-
-              let name = path.basename(f, ".sql");
-              let exec = new Executable({
-                sql: sql,
-                filePath: filePath,
-                name: name,
-                db: this
-              });
-
-              this.queryFiles.push(exec);
-              collection[name] = function () {
-                return exec.invoke.apply(exec, arguments);
-              };
-
-              return resolve();
-            });
-          }
-        });
-      }))).then(resolve);
-    });
-  });
-};
-
-Massive.prototype.loadFunctions = co.wrap(function* () {
-  if (this.excludeFunctions) { return; }
-
-  const functionSql = __dirname + "/lib/scripts/functions.sql";
-  const parameters = [this.functionBlacklist, this.functionWhitelist];
-
-  const functions = yield this.executeSqlFile({file: functionSql, params: parameters});
-
-  functions.forEach(fn => {
-    const name = fn.schema === "public" ? `"${fn.name}"` : `"${fn.schema}"."${fn.name}"`;
-    const params = _.range(1, fn.param_count + 1).map(i => `$${i}`);
-
-    if (fn.schema !== "public" && !this.hasOwnProperty(fn.schema)) {
-      this[fn.schema] = {};
-    }
-
-    this.attach(new Executable({
-      sql: `select * from ${name}(${params.join(",")})`,
-      schema: fn.schema,
-      name : fn.name,
-      singleRow: this.enhancedFunctions && fn.return_single_row,
-      singleValue: this.enhancedFunctions && fn.return_single_value
-    }), "functions");
-  });
-});
-
-//connects Massive to the DB
 exports.connect = co.wrap(function* (args) {
   if (args.db) {
     args.connectionString = "postgres://localhost/" + args.db;
