@@ -1,7 +1,7 @@
 const Runner = require("./lib/runner");
 const _ = require("underscore")._;
 const co = require("co");
-const fs = require("fs");
+const fs = require("mz/fs");
 const filters = require("./lib/filters");
 const Executable = require("./lib/executable");
 const Queryable = require("./lib/queryable");
@@ -127,45 +127,34 @@ Massive.prototype.loadViews = co.wrap(function* () {
   views.forEach(v => this.attach(new Queryable(v), "views"));
 });
 
-Massive.prototype.loadScripts = function (collection, dir) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dir, (err, files) => {
-      if (err) { return reject(err); }
+Massive.prototype.loadScripts = co.wrap(function* (collection, dir) {
+  const files = yield fs.readdir(dir);
 
-      Promise.all(files.map(f => new Promise((resolve, reject) => {
-        let filePath = path.join(dir, f);
+  return Promise.all(files.map(co.wrap(function* (f) {
+    const filePath = path.join(dir, f);
+    const s = yield fs.stat(path.join(dir, f));
 
-        fs.stat(filePath, (err, s) => {
-          if (err) {
-            return reject(err);
-          } else if (s.isDirectory() && !collection.hasOwnProperty(f)) {
-            collection[f] = {};
-            this.loadScripts(collection[f], filePath).then(resolve);
-          } else if (s.isFile() && path.extname(f) === ".sql") {
-            fs.readFile(filePath, {encoding: "utf-8"}, (err, sql) => {
-              if (err) { return reject(err); }
+    if (s.isDirectory() && !collection.hasOwnProperty(f)) {
+      collection[f] = {};
 
-              let name = path.basename(f, ".sql");
-              let exec = new Executable({
-                sql: sql,
-                filePath: filePath,
-                name: name,
-                db: this
-              });
+      return this.loadScripts(collection[f], filePath);
+    } else if (s.isFile() && path.extname(f) === ".sql") {
+      const sql = yield fs.readFile(filePath, {encoding: "utf-8"});
+      const name = path.basename(f, ".sql");
+      const exec = new Executable({
+        sql: sql,
+        filePath: filePath,
+        name: name,
+        db: this
+      });
 
-              this.queryFiles.push(exec);
-              collection[name] = function () {
-                return exec.invoke.apply(exec, arguments);
-              };
-
-              return resolve();
-            });
-          }
-        });
-      }))).then(resolve);
-    });
-  });
-};
+      this.queryFiles.push(exec);
+      collection[name] = function () {
+        return exec.invoke.apply(exec, arguments);
+      };
+    }
+  }).bind(this)));
+});
 
 Massive.prototype.loadFunctions = co.wrap(function* () {
   if (this.excludeFunctions) { return; }

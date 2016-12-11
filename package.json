@@ -35,6 +35,7 @@
     "commander": "^2.6.0",
     "deasync": "^0.1.1",
     "glob": "^7.0.5",
+    "mz": "^2.6.0",
     "pg": "^6.1.0",
     "pg-query-stream": "^0.7.0",
     "promise-polyfill": "^6.0.2",
