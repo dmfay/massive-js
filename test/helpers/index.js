@@ -25,6 +25,6 @@ exports.resetDb = co.wrap(function* (schema) {
 
   yield db.schemata[schema]();
 
-  yield this.init();
+  return yield this.init();
 });
 
