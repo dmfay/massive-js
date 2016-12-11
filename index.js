@@ -153,7 +153,7 @@ Massive.prototype.loadScripts = co.wrap(function* (collection, dir) {
         return exec.invoke.apply(exec, arguments);
       };
     }
-  }).bind(this)));
+  }).bind(this)));  // bind Massive's scope to the loader promises since they can recurse
 });
 
 Massive.prototype.loadFunctions = co.wrap(function* () {
@@ -164,7 +164,7 @@ Massive.prototype.loadFunctions = co.wrap(function* () {
 
   const functions = yield this.executeSqlFile({file: functionSql, params: parameters});
 
-  functions.forEach(fn => {
+  return Promise.all(functions.map(fn => {
     const name = fn.schema === "public" ? `"${fn.name}"` : `"${fn.schema}"."${fn.name}"`;
     const params = _.range(1, fn.param_count + 1).map(i => `$${i}`);
 
@@ -179,7 +179,9 @@ Massive.prototype.loadFunctions = co.wrap(function* () {
       singleRow: this.enhancedFunctions && fn.return_single_row,
       singleValue: this.enhancedFunctions && fn.return_single_value
     }), "functions");
-  });
+
+    return Promise.resolve();
+  }));
 });
 
 Massive.prototype.saveDoc = function(collection, doc, next){
