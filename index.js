@@ -42,9 +42,9 @@ var Massive = function(args) {
   this.functionWhitelist = filters.entity(args.functionWhitelist);
 };
 
-Massive.prototype.run = function(){
+Massive.prototype.run = function() {
   var args = ArgTypes.queryArgs(arguments);
-  this.query(args);
+  return this.query(args);
 };
 
 Massive.prototype.attach = function (entity, collection) {
