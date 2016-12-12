@@ -1,31 +1,25 @@
-const assert = require("chai").assert;
-const helpers = require("./helpers");
-
-require("co-mocha");
-
 var db;
 
 describe("On spin up", function () {
   before(function() {
-    return helpers.resetDb("loader").then(instance => db = instance);
+    return resetDb("loader").then(instance => db = instance);
   });
 
   it("returns a valid db interface", function () {
-    assert(db && db.tables && db.queryFiles && db.connectionString);
+    assert.isOk(db);
+    assert.isOk(db.tables);
+    assert.isOk(db.queryFiles);
+    assert.isOk(db.connectionString);
   });
 
   it("loads non-public schemata as namespace properties", function () {
-    assert(db.one && db.two, "No schemata loaded");
-  });
+    assert.isOk(db.one);
+    assert.isOk(db.two);
+    assert.isOk(db.one.t1);
+    assert.isOk(db.one.v1);
+    assert.isOk(db.one.f1);
 
-  it("loads schema objects with the appropriate namespacing", function* () {
-    assert(db.one.t1, "Schema table not loaded");
-    assert(db.one.v1, "Schema view not loaded");
-    assert(db.one.f1, "schema function not loaded");
-
-    const result = yield db.one.t1.find({});
-
-    assert.isOk(result);
+    assert.eventually.equal(db.one.t1.count(), 0);
   });
 
   it("loads all tables", function () {

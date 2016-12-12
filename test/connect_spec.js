@@ -1,17 +1,11 @@
-const assert = require("chai").assert;
-const massive = require("../index");
-const helpers = require("./helpers");
-
-require("co-mocha");
-
 describe("Connecting", function () {
   before(function() {
-    return helpers.resetDb("loader");
+    return resetDb("loader");
   });
 
   it("connects", function* () {
     const db = yield massive.connect({
-      connectionString: helpers.connectionString,
+      connectionString: connectionString,
       scripts: `${__dirname}/db`
     });
 
@@ -20,7 +14,7 @@ describe("Connecting", function () {
 
   it("overrides and applies defaults", function* () {
     const db = yield massive.connect({
-      connectionString: helpers.connectionString,
+      connectionString: connectionString,
       scripts: `${__dirname}/db`,
       defaults: {
         parseInt8: true
@@ -29,20 +23,10 @@ describe("Connecting", function () {
 
     assert.equal(db.defaults.parseInt8, true);
 
-    const count = yield db.t1.count({});
-
-    assert.equal(typeof count, "number");
+    return assert.eventually.strictEqual(db.t1.count(), 0);
   });
 
-  it("rejects connection blocks without a connstr or db", function* () {
-    try {
-      yield massive.connect({
-        things: "stuff"
-      });
-
-      assert.fail();
-    } catch (err) {
-      assert.equal(err.message, "Need a connectionString or db (name of database on localhost) to connect.");
-    }
+  it("rejects connection blocks without a connstr or db", function () {
+    assert.isRejected(massive.connect({things: "stuff"}));
   });
 });

@@ -1,12 +1,14 @@
-const massive = require("../../index");
 const connectionString = "postgres://postgres@localhost/massive";
 const co = require('co');
 const path = require("path");
 const scriptsDir = path.join(__dirname, "..", "db");
 
-exports.connectionString = connectionString;
+require("co-mocha");
 
-exports.init = () => {
+global.assert = require("chai").use(require("chai-as-promised")).assert;
+global.massive = require("../../index");
+global.connectionString = connectionString;
+global.init = () => {
   return massive.connect({
     connectionString : connectionString,
     enhancedFunctions : true,
@@ -14,7 +16,7 @@ exports.init = () => {
   });
 };
 
-exports.resetDb = co.wrap(function* (schema) {
+global.resetDb = co.wrap(function* (schema) {
   schema = schema || 'default';
 
   const db = yield this.init();
