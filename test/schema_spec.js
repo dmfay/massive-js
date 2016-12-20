@@ -1,15 +1,14 @@
-var assert = require("chai").assert;
-var helpers = require("./helpers");
-var _ = require("underscore")._;
-var db;
+const assert = require("chai").assert;
+const _ = require("underscore")._;
 
 describe("Schema", function() {
+  var db;
   var schemaName = "spec";
   var tableName = "doggies";
   var schemaTableName = schemaName + "." + tableName;
 
   before(function() {
-    return helpers.resetDb("empty").then(instance => db = instance);
+    return resetDb("empty").then(instance => db = instance);
   });
 
   describe("create", function() {

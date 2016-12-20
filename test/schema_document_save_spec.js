@@ -1,11 +1,10 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var db;
+const assert = require("chai").assert;
 
 describe('Schema-Bound Document Saves', function () {
+  var db;
 
   before(function() {
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
 
   describe("To a non-existent table", function () {

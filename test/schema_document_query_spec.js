@@ -1,11 +1,10 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var db;
+const assert = require("chai").assert;
 
 describe('Schema-Bounds Document queries', function () {
+  var db;
 
   before(function(){
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
   it('returns a db', function () {
     assert(db, "No db");

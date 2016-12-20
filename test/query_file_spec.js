@@ -1,12 +1,11 @@
-var _ = require("underscore");
-var assert = require("assert");
-var helpers = require("./helpers");
-var db;
+const _ = require("underscore");
+const assert = require("chai").assert;
 
 describe('Queries built from files', function () {
+  var db;
 
   before(function() {
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
 
   describe('Loading of queries', function () {

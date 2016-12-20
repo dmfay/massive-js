@@ -1,11 +1,10 @@
-var assert = require("assert");
-var helpers = require("./helpers");
+const assert = require("chai").assert;
 
 describe('Document updates,', function(){
   var db;
 
   before(function(){
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
 
   // update objects set body=jsonb_set(body, '{name,last}', '', true) where id=3;

@@ -1,11 +1,11 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var _ = require("underscore")._;
-var db;
+const assert = require("chai").assert;
+const _ = require("underscore")._;
 
 describe('Queryables', function () {
+  var db;
+
   before(function() {
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
 
   describe('Simple table queries without args', function () {

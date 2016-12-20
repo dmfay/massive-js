@@ -1,15 +1,15 @@
 const assert = require("chai").assert;
 const co = require("co");
-const helpers = require("./helpers");
 const Table = require("../lib/table");
-var db;
-const schema = "spec";
-const tableName = "doggies";
-const schemaTableName = `${schema}.${tableName}`;
 
 describe('Document table', function () {
+  const schema = "spec";
+  const tableName = "doggies";
+  const schemaTableName = `${schema}.${tableName}`;
+  var db;
+
   before(function() {
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   });
 
   describe('create', function() {

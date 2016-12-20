@@ -1,11 +1,11 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var _ = require("underscore");
-var db;
+const assert = require("chai").assert;
+const _ = require("underscore");
 
 describe('Functions', function () {
+  var db;
+
   before(function() {
-    return helpers.resetDb('functions').then(instance => db = instance);
+    return resetDb('functions').then(instance => db = instance);
   });
 
   describe('loading with schema and casing', function () {

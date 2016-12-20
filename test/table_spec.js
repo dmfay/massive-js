@@ -1,10 +1,10 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var db;
+const assert = require("chai").assert;
 
 describe('Tables -Add/Edit/Delete', function () {
+  var db;
+
   function init() {
-    return helpers.resetDb().then(instance => db = instance);
+    return resetDb().then(instance => db = instance);
   }
 
   describe("Executing inline SQL", function () {

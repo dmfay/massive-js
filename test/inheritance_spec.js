@@ -1,10 +1,10 @@
-var assert = require("assert");
-var helpers = require("./helpers");
-var db;
+const assert = require("chai").assert;
 
 describe("Table Inheritance", function () {
+  var db;
+
   before(function() {
-    return helpers.resetDb("inheritance").then(instance => db = instance);
+    return resetDb("inheritance").then(instance => db = instance);
   });
 
   describe("Querying", function () {
