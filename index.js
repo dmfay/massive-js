@@ -54,7 +54,7 @@ Massive.prototype.attach = function (entity, collection) {
   // executables are always invoked directly, so we need to handle them a bit differently
   if (entity instanceof Executable) {
     executor = function () {
-      entity.invoke.apply(entity, arguments);
+      return entity.invoke.apply(entity, arguments);
     };
   }
 

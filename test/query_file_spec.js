@@ -15,45 +15,52 @@ describe('Queries built from files', function () {
   });
 
   describe('Execution', function () {
-    it('executes inStockProducts with only a callback', function (done) {
-      db.inStockProducts(function(err,products){
+    it('executes a function with no arguments', function () {
+      return db.inStockProducts().then(products => {
         assert.equal(2, products.length);
-        done();
       });
     });
 
-    it('executes productById with a primitive param and callback', function (done) {
-      db.special.productById(1, function(err,products){
-        assert.ifError(err);
-        var p1 = products[0];
-        assert.equal("Product 1", p1.name);
-        done();
+    it('executes a function with options', function () {
+      return db.inStockProducts({ignoreme: true}).then(products => {
+        assert.equal(2, products.length);
       });
     });
 
-    it('executes productByName with multiple params and callback', function (done) {
-      db.productByName(["Product 1", "Product 2"], function(err,products){
-        assert.ifError(err);
-        var p1 = products[0];
-        var p2 = products[1];
-        assert.equal("Product 1", p1.name);
-        assert.equal("Product 2", p2.name);
-        done();
+    it('executes a function with an argument', function () {
+      return db.special.productById(1).then(products => {
+        assert.equal("Product 1", products[0].name);
       });
     });
 
-    it('executes a deep namespaced query', function (done) {
-      db.queries.users.allUsers(function(err,users){
-        assert.ifError(err);
+    it('executes a function with an argument and options', function () {
+      return db.special.productById(1, {ignoreme: true}).then(products => {
+        assert.equal("Product 1", products[0].name);
+      });
+    });
+
+    it('executes a function with multiple arguments', function () {
+      return db.productByName("Product 1", "Product 2").then(products => {
+        assert.equal("Product 1", products[0].name);
+        assert.equal("Product 2", products[1].name);
+      });
+    });
+
+    it('executes a function with multiple arguments and options', function () {
+      return db.productByName("Product 1", "Product 2", {ignoreme: true}).then(products => {
+        assert.equal("Product 1", products[0].name);
+        assert.equal("Product 2", products[1].name);
+      });
+    });
+
+    it('executes a deep namespaced query', function () {
+      return db.queries.users.allUsers().then(users => {
         assert.equal(1, users.length);
-        done();
       });
     });
 
     it('streams inStockProducts without params', function (done) {
-      db.inStockProducts({stream: true}, function(err, stream) {
-        assert.ifError(err);
-
+      db.inStockProducts({stream: true}).then(stream => {
         var result = [];
 
         stream.on('readable', function() {
@@ -70,9 +77,7 @@ describe('Queries built from files', function () {
     });
 
     it('streams productById with a primitive param', function (done) {
-      db.special.productById(1, {stream: true}, function(err, stream) {
-        assert.ifError(err);
-
+      db.special.productById(1, {stream: true}).then(stream => {
         var result = [];
 
         stream.on('readable', function() {
@@ -89,9 +94,7 @@ describe('Queries built from files', function () {
     });
 
     it('streams productByName with params and callback', function (done) {
-      db.productByName(["Product 1", "Product 2"], {stream: true}, function(err, stream) {
-        assert.ifError(err);
-
+      db.productByName(["Product 1", "Product 2"], {stream: true}).then(stream => {
         var result = [];
 
         stream.on('readable', function() {
@@ -104,56 +107,6 @@ describe('Queries built from files', function () {
           assert.equal(2, result.length);
           done();
         });
-      });
-    });
-  });
-
-  describe('Passing multiple arguments', function () {
-    it('executes multiple args without passing as array', function (done) {
-      db.multiple_args(1, 2, 3, 4, 5, 6, function(err,res){
-        assert.ifError(err);
-        assert(res.length === 1);
-        var record = res[0];
-        _.each([1, 2, 3, 4, 5, 6], function (idx) {
-          assert(record["a" + idx] === idx);
-        });
-        done();
-      });
-    });
-
-    it('executes multiple args with passing as array', function (done) {
-      db.multiple_args([1, 2, 3, 4, 5, 6], function(err,res){
-        assert.ifError(err);
-        assert(res.length === 1);
-        var record = res[0];
-        _.each([1, 2, 3, 4, 5, 6], function (idx) {
-          assert(record["a" + idx] === idx);
-        });
-        done();
-      });
-    });
-
-    it('executes multiple args without passing as an array and using options', function (done) {
-      db.multiple_args(1, 2, 3, 4, 5, 6, { this_is_ignored: true }, function(err,res){
-        assert.ifError(err);
-        assert(res.length === 1);
-        var record = res[0];
-        _.each([1, 2, 3, 4, 5, 6], function (idx) {
-          assert(record["a" + idx] === idx);
-        });
-        done();
-      });
-    });
-
-    it('executes multiple args with passing as an array and using options', function (done) {
-      db.multiple_args([1, 2, 3, 4, 5, 6], { this_is_ignored: true }, function(err,res){
-        assert.ifError(err);
-        assert(res.length === 1);
-        var record = res[0];
-        _.each([1, 2, 3, 4, 5, 6], function (idx) {
-          assert(record["a" + idx] === idx);
-        });
-        done();
       });
     });
   });
