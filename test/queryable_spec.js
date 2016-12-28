@@ -500,9 +500,7 @@ describe('Queryables', function () {
 
   describe('Streaming Results', function () {
     it('returns a readable stream', function (done) {
-      db.products.find({}, {stream: true}, function(err, stream) {
-        assert.ifError(err);
-
+      db.products.find({}, {stream: true}).then(stream => {
         var result = [];
 
         stream.on('readable', function() {
