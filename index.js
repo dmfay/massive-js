@@ -184,16 +184,14 @@ Massive.prototype.loadFunctions = co.wrap(function* () {
   }));
 });
 
-Massive.prototype.saveDoc = function(collection, doc, next){
-  // default is public. Table constructor knows what to do if 'public' is used as the schema name:
+Massive.prototype.saveDoc = co.wrap(function* (collection, doc) {
   var schemaName = "public";
   var tableName = collection;
   var potentialTable = null;
 
-    // is the collection namespace delimited?
+  // is the collection namespace delimited?
   var splits = collection.split(".");
-  if(splits.length > 1) {
-    // uh oh. Someone specified a schema name:
+  if (splits.length > 1) {
     schemaName = splits[0];
     tableName = splits[1];
     potentialTable = this[schemaName][tableName];
@@ -201,73 +199,53 @@ Massive.prototype.saveDoc = function(collection, doc, next){
     potentialTable = this[tableName];
   }
 
-  if(potentialTable) {
-    potentialTable.saveDoc(doc, next);
+  if (potentialTable) {
+    return yield potentialTable.saveDoc(doc);
   } else {
-    this.createDocumentTable(collection).then(() => {
-      this.saveDoc(collection, doc, next);
-    });
+    yield this.createDocumentTable(collection);
+
+    return yield this.saveDoc(collection, doc);
   }
-};
+});
 
-Massive.prototype.createDocumentTable = function(path) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(`${__dirname}/lib/scripts/create_document_table.sql`, "UTF-8", (err, sql) => {
-      if (err) { return reject(err); }
+Massive.prototype.createDocumentTable = co.wrap(function* (path) {
+  const sql = yield fs.readFile(`${__dirname}/lib/scripts/create_document_table.sql`, "UTF-8");
+  const splits = path.split(".");
+  const tableName = splits.pop();
+  const schemaName = splits.length === 1 ? splits.pop() : "public";
+  const indexName = tableName.replace(".", "_");
 
-      const splits = path.split(".");
-      const tableName = splits.pop();
-      const schemaName = splits.length === 1 ? splits.pop() : "public";
-      const indexName = tableName.replace(".", "_");
-
-      this.query(util.format(sql, path, indexName, path, indexName, path), err => {
-        if (err) { return reject(err); }
-
-        this.attach(new Table({
-          schema: schemaName,
-          pk: "id",
-          name: tableName
-        }));
-
-        return resolve();
-      });
+  return this.query(util.format(sql, path, indexName, path, indexName, path))
+    .then(() => {
+      this.attach(new Table({
+        schema: schemaName,
+        pk: "id",
+        name: tableName
+      }));
     });
-  });
-};
+});
 
-Massive.prototype.dropTable = function(table, options) {
-  return new Promise((resolve, reject) => {
-    const cascade = options && options.cascade;
+Massive.prototype.dropTable = function (table, options) {
+  const cascade = options && options.cascade;
 
-    this.query(`DROP TABLE IF EXISTS ${table} ${cascade ? "CASCADE" : ""};`, err => {
-      if (err) { return reject(err); }
-
+  return this.query(`DROP TABLE IF EXISTS ${table} ${cascade ? "CASCADE" : ""};`)
+    .then(() => {
       this.detach(table);
-
-      return resolve();
     });
-  });
 };
 
-Massive.prototype.createSchema = function(schemaName) {
-  return new Promise((resolve, reject) => {
-    this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`, err => {
-      if (err) { return reject(err); }
-
+Massive.prototype.createSchema = function (schemaName) {
+  return this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`)
+    .then(() => {
       this[schemaName] = {};
-
-      return resolve();
     });
-  });
 };
 
 Massive.prototype.dropSchema = function(schemaName, options) {
-  return new Promise((resolve, reject) => {
-    const cascade = options && options.cascade;
+  const cascade = options && options.cascade;
 
-    this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${cascade ? "CASCADE" : ""};`, err => {
-      if (err) { return reject(err); }
-
+  return this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${cascade ? "CASCADE" : ""};`)
+    .then(() => {
       // Remove all the tables from the namespace
       if(this[schemaName]) {
         _.each(Object.keys(this[schemaName]), table => {
@@ -277,10 +255,7 @@ Massive.prototype.dropSchema = function(schemaName, options) {
 
       // Remove the schema from the namespace
       delete this[schemaName];
-
-      return resolve();
     });
-  });
 };
 
 exports.connect = co.wrap(function* (args) {

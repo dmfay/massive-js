@@ -1,15 +1,15 @@
 const assert = require("chai").assert;
-const co = require("co");
 const Table = require("../lib/table");
 
-describe('Document table', function () {
+describe('Index document functions', function () {
   const schema = "spec";
   const tableName = "doggies";
   const schemaTableName = `${schema}.${tableName}`;
   var db;
 
-  before(function() {
-    return resetDb().then(instance => db = instance);
+  before(function* () {
+    db = yield resetDb("empty");
+    yield db.createSchema("public");
   });
 
   describe('create', function() {
@@ -58,15 +58,73 @@ describe('Document table', function () {
     });
 
     describe('with schema', function() {
-      before(co.wrap(function* () {
+      before(function* () {
         yield db.createSchema(schema);
         yield db.createDocumentTable(schemaTableName);
-      }));
+      });
 
       it('removes the table from the specified schema', function() {
         return db.dropTable(schemaTableName, {cascade: true}).then(() => {
           assert.isUndefined(db[schema][tableName]);
         });
+      });
+    });
+  });
+
+  describe("save", function () {
+    describe("with an existing table", function () {
+      before(function() {
+        return db.createDocumentTable("docs");
+      });
+
+      it("saves a new document without an id", function () {
+        return db.saveDoc("docs", {
+          title: "Alone",
+          description: "yearning in the darkness",
+          price: 89.99,
+          is_good: true,
+          created_at: "2015-03-04T09:43:41.643Z"
+        }).then(doc => {
+          assert.equal(doc.title, "Alone");
+          assert.equal(doc.id, 1);
+        });
+      });
+
+      it("updates an existing document with an id", function* () {
+        const doc = yield db.saveDoc("docs", {
+          title: "Alone",
+          description: "yearning in the darkness",
+          price: 89.99,
+          is_good: true,
+          created_at: "2015-03-04T09:43:41.643Z"
+        });
+
+        assert.equal(doc.title, "Alone");
+        assert.isOk(doc.id);
+
+        doc.title = "Together!";
+
+        const updated = yield db.saveDoc("docs", doc);
+
+        assert.equal(updated.id, doc.id);
+        assert.equal(updated.title, "Together!");
+
+        const retrieved = yield db.docs.findDoc(doc.id);
+
+        assert.equal(retrieved.title, "Together!");
+      });
+    });
+
+    describe('without existing table', function () {
+      it('creates a table if none exists', function* () {
+        const doc = yield db.saveDoc("doggies", {name: "Fido", age: 10});
+
+        assert.isOk(db.doggies);
+        assert.equal(doc.name, "Fido");
+      });
+
+      after(function() {
+        return db.query("DROP TABLE doggies;");
       });
     });
   });
