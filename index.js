@@ -10,11 +10,7 @@ const util = require("util");
 const ArgTypes = require("./lib/arg_types");
 const path = require("path");
 
-if (typeof Promise == 'undefined') {
-  global.Promise = require('promise-polyfill');
-}
-
-var Massive = function(args) {
+const Massive = function(args) {
   this.scriptsDir = args.scripts || path.join(process.cwd(), "db");
   this.enhancedFunctions = args.enhancedFunctions || false;
 
