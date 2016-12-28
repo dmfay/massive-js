@@ -1,5 +1,3 @@
-const assert = require("chai").assert;
-
 describe("Table Inheritance", function () {
   var db;
 

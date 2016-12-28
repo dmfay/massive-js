@@ -1,10 +1,11 @@
-const connectionString = "postgres://postgres@localhost/massive";
-const co = require('co');
+const co = require("co");
 const path = require("path");
+const connectionString = "postgres://postgres@localhost/massive";
 const scriptsDir = path.join(__dirname, "..", "db");
 
 require("co-mocha");
 
+global._ = require("underscore");
 global.assert = require("chai").use(require("chai-as-promised")).assert;
 global.massive = require("../../index");
 global.connectionString = connectionString;

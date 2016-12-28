@@ -355,14 +355,6 @@ db.membership.users.find({active: true}, function(err,users){
 
 ```
 
-## Synchronous Methods
-
-Just about every method in Massive has a synchronous counterpart using [the deasync library](https://github.com/vkurchatkin/deasync). These methods are here for convenience when you're not worried about I/O and just want to move some data around without a callback mess.
-
-```js
-var myUser = db.users.findOneSync({id : 1});
-```
-
 ## We <3 Functions
 
 Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and [unconstrained by popular dogma](http://rob.conery.io/2015/02/21/its-time-to-get-over-that-stored-procedure-aversion-you-have/) about database functions/stored procedures? Unafraid to be called names by your less-enlightened friends?

@@ -1,4 +1,3 @@
-const assert = require("chai").assert;
 const Table = require("../lib/table");
 
 describe('Index document functions', function () {

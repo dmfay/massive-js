@@ -1,5 +1,4 @@
 var Query = require("../lib/query");
-var assert = require("assert");
 
 describe("Query", function () {
   describe("selectList", function () {

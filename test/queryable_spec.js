@@ -1,8 +1,3 @@
-const assert = require("chai").assert;
-const _ = require("underscore")._;
-
-require("co-mocha");
-
 describe('Queryables', function () {
   var db;
 
@@ -417,12 +412,11 @@ describe('Queryables', function () {
         assert.lengthOf(res, 2);
       });
     });
-    it('returns same correct element when offset is set', function () {
-      return db.products.search({columns : ["Name", "description"], term: "description"}, function(err,res){
-        db.products.search({columns : ["Name", "description"], term: "description"}, {offset: 1}).then(res => {
-          assert.equal(res[1].id, res2[0].id);
-        });
-      });
+    it('returns same correct element when offset is set', function* () {
+      const one = yield db.products.search({columns : ["Name", "description"], term: "description"});
+      const two = yield db.products.search({columns : ["Name", "description"], term: "description"}, {offset: 1});
+
+      assert.equal(one[1].id, two[0].id);
     });
     it('returns results filtered by where', function () {
       return db.docs.search({columns : ["body->>'description'"], term: "C:*", where: {"body->>'is_good'": 'true'}}).then(res => {
@@ -501,10 +495,10 @@ describe('Queryables', function () {
   describe('Streaming Results', function () {
     it('returns a readable stream', function (done) {
       db.products.find({}, {stream: true}).then(stream => {
-        var result = [];
+        const result = [];
 
         stream.on('readable', function() {
-          var res = stream.read();
+          const res = stream.read();
 
           if (res) {
             result.push(res);

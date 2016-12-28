@@ -1,6 +1,3 @@
-const assert = require("chai").assert;
-const massive = require("../index");
-
 describe('Loading entities (these tests may be slow!)', function () {
   before(function () {
     return resetDb('loader');

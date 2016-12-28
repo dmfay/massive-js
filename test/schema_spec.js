@@ -1,6 +1,3 @@
-const assert = require("chai").assert;
-const _ = require("underscore")._;
-
 describe("Schema", function() {
   var db;
   var schemaName = "spec";

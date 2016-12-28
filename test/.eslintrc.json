@@ -1,0 +1,10 @@
+{
+  "globals": {
+    "_": true,
+    "assert": true,
+    "massive": true,
+    "connectionString": true,
+    "init": true,
+    "resetDb": true
+  }
+}

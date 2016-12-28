@@ -1,8 +1,4 @@
-const assert = require("chai").assert;
-
-require("co-mocha");
-
-describe('Tables -Add/Edit/Delete', function () {
+describe('Tables', function () {
   var db;
 
   function init() {

@@ -1,6 +1,5 @@
-var where = require('../lib/where');
-var assert = require("assert"),
-  util = require('util');
+const where = require('../lib/where');
+const util = require('util');
 
 describe('WHERE clause generation', function () {
   describe('parseKey', function () {

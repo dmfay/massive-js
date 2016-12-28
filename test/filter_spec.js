@@ -1,4 +1,3 @@
-var assert = require("chai").assert;
 var filters = require("../lib/filters");
 
 describe("Filter generation", function () {

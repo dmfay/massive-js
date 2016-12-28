@@ -1,8 +1,3 @@
-const _ = require("underscore");
-const assert = require("chai").assert;
-
-require("co-mocha");
-
 describe("Executables", function () {
   var db;
 

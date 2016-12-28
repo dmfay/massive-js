@@ -1,7 +1,4 @@
-const assert = require("chai").assert;
 const Table = require("../lib/table");
-
-require('co-mocha');
 
 describe('Document queries', function () {
   var db;
