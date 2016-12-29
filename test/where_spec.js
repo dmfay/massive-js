@@ -168,20 +168,20 @@ describe('WHERE clause generation', function () {
   describe('forTable', function () {
     it('should create an empty WHERE clause', function () {
       var result = where.forTable({});
-      assert.equal(result.where, ' \nWHERE TRUE');
+      assert.equal(result.where, '\nWHERE TRUE');
       assert.equal(result.params.length, 0);
     });
 
     it('should create a basic WHERE clause', function () {
       var result = where.forTable({field: 'value'});
-      assert.equal(result.where, ' \nWHERE "field" = $1');
+      assert.equal(result.where, '\nWHERE "field" = $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], 'value');
     });
 
     it('should AND together predicates', function () {
       var result = where.forTable({field1: 'value1', field2: 'value2'});
-      assert.equal(result.where, ' \nWHERE "field1" = $1 \nAND "field2" = $2');
+      assert.equal(result.where, '\nWHERE "field1" = $1 \nAND "field2" = $2');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');

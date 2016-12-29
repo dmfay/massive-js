@@ -7,7 +7,6 @@ const Executable = require("./lib/executable");
 const Queryable = require("./lib/queryable");
 const Table = require("./lib/table");
 const util = require("util");
-const ArgTypes = require("./lib/arg_types");
 const path = require("path");
 
 const Massive = function(args) {
@@ -38,9 +37,9 @@ const Massive = function(args) {
   this.functionWhitelist = filters.entity(args.functionWhitelist);
 };
 
+// TODO remove
 Massive.prototype.run = function() {
-  var args = ArgTypes.queryArgs(arguments);
-  return this.query(args);
+  return this.query.apply(this, arguments);
 };
 
 Massive.prototype.attach = function (entity, collection) {

@@ -29,11 +29,8 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
-    "args-js": "^0.10.12",
-    "async": "^2.1.4",
     "co": "^4.6.0",
     "commander": "^2.6.0",
-    "glob": "^7.0.5",
     "mz": "^2.6.0",
     "pg": "^6.1.0",
     "pg-query-stream": "^1.0.0",
