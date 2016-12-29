@@ -43,8 +43,7 @@
     "co-mocha": "^1.1.3",
     "eslint": "^3.12.2",
     "istanbul": "^0.4.2",
-    "mocha": "^3.2.0",
-    "sinon": "^1.12.2"
+    "mocha": "^3.2.0"
   },
   "repository": {
     "type": "git",
