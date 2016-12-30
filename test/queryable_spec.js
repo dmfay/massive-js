@@ -5,82 +5,91 @@ describe('Queryables', function () {
     return resetDb().then(instance => db = instance);
   });
 
-  describe('Simple table queries without args', function () {
-    it('returns all records on find with no args', function () {
-      return db.products.find().then(res => assert.lengthOf(res, 4));
-    });
+  describe('count', function () {
+    describe('where syntax', function () {
+      it('returns 2 for OR id 1 or 2', function () {
+        return db.products.count("id=$1 OR id=$2", [1,2]).then(res => assert.equal(res,2));
+      });
 
-    it('returns first record with findOne no args', function () {
-      return db.products.findOne().then(res => assert.equal(res.id, 1));
-    });
-  });
-
-  describe('Simple table queries by primary key', function () {
-    it('finds by a numeric key and returns a result object', function () {
-      return db.products.find(1).then(res => {
-        assert.isObject(res);
-        assert.equal(res.id, 1);
+      it('returns 1 for id 1', function () {
+        return db.products.count("id=$1", [1]).then(res => assert.equal(res, 1));
       });
     });
 
-    it('findOnes by a numeric key and returns a result object', function () {
-      return db.products.findOne(1).then(res => {
-        assert.isObject(res);
-        assert.equal(res.id, 1);
+    describe('find syntax', function () {
+      it('returns 2 for OR id 1 or 2', function () {
+        return db.products.count({id: [1, 2]}).then(res => assert.equal(res, 2));
+      });
+
+      it('returns 1 for id 1', function () {
+        return db.products.count({id: 1}).then(res => assert.equal(res, 1));
+      });
+
+      it('returns 4 for everything', function () {
+        return db.products.count({}).then(res => assert.equal(res, 4));
+      });
+    });
+  });
+
+  describe('find', function () {
+    describe('all records', function () {
+      it('returns all records on find with no args', function () {
+        return db.products.find().then(res => assert.lengthOf(res, 4));
+      });
+
+      it('returns all records on find with empty conditions', function () {
+        return db.products.find({}).then(res => assert.lengthOf(res, 4));
+      });
+
+      it('returns all records on find with *', function () {
+        return db.products.find('*').then(res => assert.lengthOf(res, 4));
       });
     });
 
-    it('finds by a string/uuid key and returns a result object', function* () {
-      const order = yield db.orders.findOne();
-      assert.isOk(order);
+    describe('primary keys', function () {
+      it('finds by a numeric key and returns a result object', function () {
+        return db.products.find(1).then(res => {
+          assert.isObject(res);
+          assert.equal(res.id, 1);
+        });
+      });
 
-      const res = yield db.orders.find(order.id);
-      assert.equal(res.id, order.id);
-    });
+      it('finds by a string/uuid key and returns a result object', function* () {
+        const order = yield db.orders.findOne();
+        assert.isOk(order);
 
-    it('findOnes by a string/uuid key and returns a result object', function* () {
-      const order = yield db.orders.findOne();
-      assert.isOk(order);
+        const res = yield db.orders.find(order.id);
+        assert.equal(res.id, order.id);
+      });
 
-      const res = yield db.orders.findOne(order.id);
-      assert.equal(res.id, order.id);
+      it('finds a doc by an integer primary key', function () {
+        return db.docs.find(1, {document: true}).then(doc => {
+          assert.equal(doc.id, 1);
+        });
+      });
+
+      it('finds a doc by a uuid primary key', function* () {
+        const row = yield db.uuid_docs.findOne();
+        const doc = yield db.uuid_docs.find(row.id, {document: true});
+
+        assert.equal(doc.id, row.id);
+      });
+
+      it('finds docs with > comparison on primary key', function () {
+        return db.docs.find({"id >" : 1}, {document: true}).then(docs => {
+          assert.lengthOf(docs, 2);
+        });
+      });
+
+      it('finds docs with >= comparison on primary key', function () {
+        return db.docs.find({"id >=" : 2}, {document: true}).then(docs => {
+          assert.lengthOf(docs, 2);
+        });
+      });
     });
   });
 
-  describe('Simple queries with AND and OR', function () {
-    it('returns Product 1 OR Product 2', function () {
-      return db.products.where("id=$1 OR id=$2", [1,2]).then(res => assert.lengthOf(res, 2));
-    });
-    it('returns Product 1 AND Product 2', function () {
-      return db.products.where("id=$1 AND price=$2", [1,12.00]).then(res => assert.lengthOf(res, 1));
-    });
-    it('returns Product 1 with params as not array', function () {
-      return db.products.where("id=$1", 1).then(res => assert.lengthOf(res, 1));
-    });
-  });
-
-  describe('Simple queries with count', function () {
-    it('returns 2 for OR id 1 or 2', function () {
-      return db.products.count("id=$1 OR id=$2", [1,2]).then(res => assert.equal(res,2));
-    });
-    it('returns 1 for id 1', function () {
-      return db.products.count("id=$1", [1]).then(res => assert.equal(res, 1));
-    });
-  });
-
-  describe('More abstracted queries using findArgs in count', function () {
-    it('returns 2 for OR id 1 or 2', function () {
-      return db.products.count({id: [1, 2]}).then(res => assert.equal(res, 2));
-    });
-    it('returns 1 for id 1', function () {
-      return db.products.count({id: 1}).then(res => assert.equal(res, 1));
-    });
-    it('returns 4 for everything', function () {
-      return db.products.count({}).then(res => assert.equal(res, 4));
-    });
-  });
-
-  describe('Simple comparative queries', function () {
+  describe('find - comparative queries', function () {
     it('returns product with id greater than 2', function () {
       return db.products.find({"id > " : 2}).then(res => assert.equal(res[0].id, 3));
     });
@@ -119,7 +128,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Pattern-matching queries', function () {
+  describe('find - pattern-matching queries', function () {
     it('finds a product by a search string with LIKE', function () {
       return db.products.findOne({'name like': '%odu_t 2'}).then(product => {
         assert.equal(product.id, 2);
@@ -204,7 +213,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('JSON queries', function () {
+  describe('find - JSON queries', function () {
     it('finds a product matching the desired spec field in JSON', function () {
       return db.products.findOne({'specs->>weight': 30}).then(product => {
         assert.equal(product.id, 3);
@@ -237,7 +246,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Array operations', function () {
+  describe('find - array operations', function () {
     it('filters by array fields containing a value', function () {
       return db.products.find({'tags @>': ['tag2']}).then(res => {
         assert.lengthOf(res, 2);
@@ -291,7 +300,48 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Querying with options', function () {
+  describe('find - documents', function () {
+    it('finds a doc by title', function () {
+      return db.docs.find({title: "A Document"}, {document: true}).then(docs => {
+        //find will return multiple if id not specified... confusing?
+        assert.equal(docs[0].title, "A Document");
+      });
+    });
+
+    it('orders by fields in the table', function () {
+      return db.docs.find('*', {order: 'id desc', document: true}).then(docs => {
+        assert.lengthOf(docs, 3);
+        assert.equal(docs[0].id, 3);
+        assert.equal(docs[1].id, 2);
+        assert.equal(docs[2].id, 1);
+      });
+    });
+
+    it('orders by fields in the document body', function () {
+      // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
+      return db.docs.find('*', {order: "body->>'title' desc", document: true}).then(docs => {
+        assert.lengthOf(docs, 3);
+        assert.equal(docs[0].title, 'Starsky and Hutch');
+        assert.equal(docs[1].title, 'Another Document');
+        assert.equal(docs[2].title, 'A Document');
+      });
+    });
+
+    it('orders by fields in the document body with criteria', function () {
+      return db.docs.find('*', {
+        order: [{field: 'title', direction: 'desc', type: 'varchar'}],
+        orderBody: true,
+        document: true
+      }).then(docs => {
+        assert.lengthOf(docs, 3);
+        assert.equal(docs[0].title, 'Starsky and Hutch');
+        assert.equal(docs[1].title, 'Another Document');
+        assert.equal(docs[2].title, 'A Document');
+      });
+    });
+  });
+
+  describe('find - querying with options', function () {
     it('returns 1 result with limit of 1', function () {
       return db.products.find(null,{limit : 1}).then(res => assert.lengthOf(res, 1));
     });
@@ -342,7 +392,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Casing issues', function () {
+  describe('find - casing issues', function () {
     it('returns users because we delimit OK', function () {
       return db.Users.find({}).then(res => assert.lengthOf(res, 1));
     });
@@ -381,7 +431,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Full Text search', function () {
+  describe('find - full text search', function () {
     it('returns 4 products for term "product"', function () {
       return db.products.search({columns : ["name"], term: "Product"}).then(res => {
         assert.lengthOf(res, 4);
@@ -425,7 +475,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('View queries', function () {
+  describe('find - view queries', function () {
     it('returns all records on find with no args', function () {
       return db.popular_products.find().then(res => assert.lengthOf(res, 3));
     });
@@ -452,7 +502,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('View queries with options', function () {
+  describe('find - view queries with options', function () {
     it('applies offsets and limits', function () {
       return db.popular_products.find({},{limit : 1, offset: 1}).then(res => {
         assert.lengthOf(res, 1);
@@ -492,7 +542,7 @@ describe('Queryables', function () {
     });
   });
 
-  describe('Streaming Results', function () {
+  describe('find - streaming Results', function () {
     it('returns a readable stream', function (done) {
       db.products.find({}, {stream: true}).then(stream => {
         const result = [];
@@ -510,6 +560,43 @@ describe('Queryables', function () {
           done();
         });
       });
+    });
+  });
+
+  describe('findOne', function () {
+    describe('all records', function () {
+      it('returns first record with findOne no args', function () {
+        return db.products.findOne().then(res => assert.equal(res.id, 1));
+      });
+    });
+
+    describe('primary keys', function () {
+      it('findOnes by a numeric key and returns a result object', function () {
+        return db.products.findOne(1).then(res => {
+          assert.isObject(res);
+          assert.equal(res.id, 1);
+        });
+      });
+
+      it('findOnes by a string/uuid key and returns a result object', function* () {
+        const order = yield db.orders.findOne();
+        assert.isOk(order);
+
+        const res = yield db.orders.findOne(order.id);
+        assert.equal(res.id, order.id);
+      });
+    });
+  });
+
+  describe('where', function () {
+    it('returns Product 1 OR Product 2', function () {
+      return db.products.where("id=$1 OR id=$2", [1,2]).then(res => assert.lengthOf(res, 2));
+    });
+    it('returns Product 1 AND Product 2', function () {
+      return db.products.where("id=$1 AND price=$2", [1,12.00]).then(res => assert.lengthOf(res, 1));
+    });
+    it('returns Product 1 with params as not array', function () {
+      return db.products.where("id=$1", 1).then(res => assert.lengthOf(res, 1));
     });
   });
 });

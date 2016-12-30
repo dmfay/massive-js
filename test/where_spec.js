@@ -186,38 +186,6 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[0], '{"field1":"value1"}');
       assert.equal(result.params[1], '{"field2":"value2"}');
     });
-
-    it('should defer to forTable and set pkQuery for primitive pk searches', function () {
-      var result = where.forDocument(1);
-      assert.equal(result.where, '\nWHERE "id" = $1');
-      assert.equal(result.params.length, 1);
-      assert.equal(result.params[0], 1);
-      assert.isTrue(result.pkQuery);
-    });
-
-    it('should defer to forTable and set pkQuery for complex pk searches', function () {
-      var result = where.forDocument({id: 1});
-      assert.equal(result.where, '\nWHERE "id" = $1');
-      assert.equal(result.params.length, 1);
-      assert.equal(result.params[0], 1);
-      assert.isTrue(result.pkQuery);
-    });
-
-    it('should set pkQuery for complex pk searches with explicit =', function () {
-      var result = where.forDocument({'id  =': 1});
-      assert.equal(result.where, '\nWHERE "id" = $1');
-      assert.equal(result.params.length, 1);
-      assert.equal(result.params[0], 1);
-      assert.isTrue(result.pkQuery);
-    });
-
-    it('should recognize operators in pk searches', function () {
-      var result = where.forDocument({'id >=': 1});
-      assert.equal(result.where, '\nWHERE "id" >= $1');
-      assert.equal(result.params.length, 1);
-      assert.equal(result.params[0], 1);
-      assert.isFalse(result.pkQuery);
-    });
   });
 
   describe('forTable', function () {
