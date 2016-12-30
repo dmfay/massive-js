@@ -165,6 +165,61 @@ describe('WHERE clause generation', function () {
     });
   });
 
+  describe('forDocument', function () {
+    it('should create an empty WHERE clause', function () {
+      var result = where.forDocument({});
+      assert.equal(result.where, '\nWHERE TRUE');
+      assert.equal(result.params.length, 0);
+    });
+
+    it('should create a basic document WHERE clause', function () {
+      var result = where.forDocument({field: 'value'});
+      assert.equal(result.where, '\nWHERE "body" @> $1');
+      assert.equal(result.params.length, 1);
+      assert.deepEqual(result.params[0], '{"field":"value"}');
+    });
+
+    it('should AND together predicates', function () {
+      var result = where.forDocument({field1: 'value1', field2: 'value2'});
+      assert.equal(result.where, '\nWHERE "body" @> $1 \nAND "body" @> $2');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], '{"field1":"value1"}');
+      assert.equal(result.params[1], '{"field2":"value2"}');
+    });
+
+    it('should defer to forTable and set pkQuery for primitive pk searches', function () {
+      var result = where.forDocument(1);
+      assert.equal(result.where, '\nWHERE "id" = $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], 1);
+      assert.isTrue(result.pkQuery);
+    });
+
+    it('should defer to forTable and set pkQuery for complex pk searches', function () {
+      var result = where.forDocument({id: 1});
+      assert.equal(result.where, '\nWHERE "id" = $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], 1);
+      assert.isTrue(result.pkQuery);
+    });
+
+    it('should set pkQuery for complex pk searches with explicit =', function () {
+      var result = where.forDocument({'id  =': 1});
+      assert.equal(result.where, '\nWHERE "id" = $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], 1);
+      assert.isTrue(result.pkQuery);
+    });
+
+    it('should recognize operators in pk searches', function () {
+      var result = where.forDocument({'id >=': 1});
+      assert.equal(result.where, '\nWHERE "id" >= $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], 1);
+      assert.isFalse(result.pkQuery);
+    });
+  });
+
   describe('forTable', function () {
     it('should create an empty WHERE clause', function () {
       var result = where.forTable({});
@@ -351,7 +406,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '='};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 'value', {field: 'value'});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], 'body @> $1');
+      assert.equal(result.predicates[0], '"body" @> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], JSON.stringify({field: 'value'}));
     });
@@ -360,7 +415,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '<>'};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 'value', {'field <>': 'value'});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\') <> $1');
+      assert.equal(result.predicates[0], '("body" ->> \'field\') <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], 'value');
     });
@@ -369,7 +424,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '<>'};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, true, {'field <>': true});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\')::boolean <> true');
+      assert.equal(result.predicates[0], '("body" ->> \'field\')::boolean <> true');
       assert.equal(result.params.length, 0);
     });
 
@@ -377,7 +432,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '<>'};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 123.45, {'field <>': 123.45});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\')::decimal <> 123.45');
+      assert.equal(result.predicates[0], '("body" ->> \'field\')::decimal <> 123.45');
       assert.equal(result.params.length, 0);
     });
 
@@ -386,7 +441,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '<>'};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, date, {'field <>': date});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\')::timestamp <> $1');
+      assert.equal(result.predicates[0], '("body" ->> \'field\')::timestamp <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], date);
     });
@@ -395,7 +450,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '='};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, ['value1', 'value2'], {field: ['value1', 'value2']});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\') IN ($1, $2)');
+      assert.equal(result.predicates[0], '("body" ->> \'field\') IN ($1, $2)');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
@@ -425,6 +480,10 @@ describe('WHERE clause generation', function () {
 
     it('should reject badly formatted uuids', function () {
       assert.equal(where.isPkSearch('a2a072cc7a419fd6bd16ae1677166c05'), false);
+    });
+
+    it('should reject objects', function () {
+      assert.equal(where.isPkSearch({id: 1}), false);
     });
   });
 });
