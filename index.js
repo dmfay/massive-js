@@ -13,8 +13,7 @@ const Massive = function(args) {
   this.scriptsDir = args.scripts || path.join(process.cwd(), "db");
   this.enhancedFunctions = args.enhancedFunctions || false;
 
-  var runner = new Runner(args.connectionString, args.defaults);
-  _.extend(this, runner);
+  _.extend(this, new Runner(args));
 
   this.tables = [];
   this.views = [];
@@ -256,17 +255,19 @@ Massive.prototype.dropSchema = function(schemaName, options) {
 exports.connect = co.wrap(function* (args) {
   if (args.db) {
     args.connectionString = "postgres://localhost/" + args.db;
-  } else if (!args.connectionString) {
-    throw new Error("Need a connectionString or db (name of database on localhost) to connect.");
   }
 
-  var massive = new Massive(args);
+  try {
+    const massive = new Massive(args);
 
-  yield massive.loadTables();
-  yield massive.loadDescendantTables();
-  yield massive.loadViews();
-  yield massive.loadFunctions();
-  yield massive.loadScripts(massive, massive.scriptsDir);
+    yield massive.loadTables();
+    yield massive.loadDescendantTables();
+    yield massive.loadViews();
+    yield massive.loadFunctions();
+    yield massive.loadScripts(massive, massive.scriptsDir);
 
-  return Promise.resolve(massive);
+    return Promise.resolve(massive);
+  } catch (e) {
+    return Promise.reject(e);
+  }
 });
