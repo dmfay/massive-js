@@ -15,6 +15,8 @@ const Massive = function(args) {
 
   _.extend(this, new Runner(args));
 
+  this.run = this.query;
+
   this.tables = [];
   this.views = [];
   this.queryFiles = [];
@@ -34,11 +36,6 @@ const Massive = function(args) {
   this.excludeFunctions = args.excludeFunctions;
   this.functionBlacklist = filters.entity(args.functionBlacklist);
   this.functionWhitelist = filters.entity(args.functionWhitelist);
-};
-
-// TODO remove
-Massive.prototype.run = function() {
-  return this.query.apply(this, arguments);
 };
 
 Massive.prototype.attach = function (entity, collection) {
