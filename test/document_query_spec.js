@@ -77,6 +77,14 @@ describe('Document queries', function () {
         done();
       });
     });
+
+    it('finds multiple docs with an IN on primary key', function (done) {
+      db.docs.findDoc({"id" : [1, 2, 3]}, function(err,docs) {
+        assert.ifError(err);
+        assert.equal(docs.length, 3);
+        done();
+      });
+    });
   });
 
   describe('Querying documents by fields', function () {
