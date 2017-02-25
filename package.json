@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "mocha",
-    "lint": "eslint .",
+    "lint": "eslint '**/*.js'",
     "posttest": "npm run lint",
     "coverage": "istanbul cover _mocha -- -R dot"
   },
