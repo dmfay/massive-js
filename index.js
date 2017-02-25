@@ -1,3 +1,4 @@
+'use strict';
 const Runner = require("./lib/runner");
 const _ = require("underscore")._;
 const co = require("co");
@@ -39,7 +40,7 @@ const Massive = function(args) {
 };
 
 Massive.prototype.attach = function (entity, collection) {
-  var executor;
+  let executor;
   entity.db = this;
 
   // executables are always invoked directly, so we need to handle them a bit differently
@@ -176,12 +177,12 @@ Massive.prototype.loadFunctions = co.wrap(function* () {
 });
 
 Massive.prototype.saveDoc = co.wrap(function* (collection, doc) {
-  var schemaName = "public";
-  var tableName = collection;
-  var potentialTable = null;
+  let schemaName = "public";
+  let tableName = collection;
+  let potentialTable = null;
 
   // is the collection namespace delimited?
-  var splits = collection.split(".");
+  const splits = collection.split(".");
   if (splits.length > 1) {
     schemaName = splits[0];
     tableName = splits[1];

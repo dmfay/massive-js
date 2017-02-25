@@ -1,3 +1,4 @@
+'use strict';
 describe('Loading entities (these tests may be slow!)', function () {
   before(function () {
     return resetDb('loader');

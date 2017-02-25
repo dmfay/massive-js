@@ -1,4 +1,5 @@
-var filters = require("../lib/filters");
+'use strict';
+const filters = require("../lib/filters");
 
 describe("Filter generation", function () {
   describe("schema filtering", function () {

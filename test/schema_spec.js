@@ -1,8 +1,9 @@
+'use strict';
 describe("Schema", function() {
-  var db;
-  var schemaName = "spec";
-  var tableName = "doggies";
-  var schemaTableName = schemaName + "." + tableName;
+  let db;
+  const schemaName = "spec";
+  const tableName = "doggies";
+  const schemaTableName = schemaName + "." + tableName;
 
   before(function() {
     return resetDb("empty").then(instance => db = instance);

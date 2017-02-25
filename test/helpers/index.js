@@ -1,3 +1,4 @@
+'use strict';
 const co = require("co");
 const path = require("path");
 const connectionString = "postgres://postgres@localhost/massive";

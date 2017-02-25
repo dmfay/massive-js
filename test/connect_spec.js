@@ -1,3 +1,4 @@
+'use strict';
 describe("Connecting", function () {
   before(function() {
     return resetDb("loader");

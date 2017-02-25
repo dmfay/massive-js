@@ -1,7 +1,8 @@
+'use strict';
 const Table = require("../lib/table");
 
 describe('Document queries', function () {
-  var db;
+  let db;
 
   before(function(){
     return resetDb().then(instance => db = instance);
@@ -127,8 +128,8 @@ describe('Document queries', function () {
   });
 
   describe("setAttribute", function() {
-    var newDoc = {};
-    var array = [1,2,3];
+    let newDoc = {};
+    const array = [1,2,3];
 
     before(function() {
       return db.saveDoc("docs", {name:"Foo", score:1}).then(doc => newDoc = doc);

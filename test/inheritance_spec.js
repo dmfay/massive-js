@@ -1,5 +1,6 @@
+'use strict';
 describe("Table Inheritance", function () {
-  var db;
+  let db;
 
   before(function() {
     return resetDb("inheritance").then(instance => db = instance);
@@ -10,7 +11,7 @@ describe("Table Inheritance", function () {
       return db.cities.find().then(res => {
         assert.equal(res.length, 10);
 
-        var okc = res.filter(function (c) { return c.name === "Oklahoma City"; })[0];
+        const okc = res.filter(function (c) { return c.name === "Oklahoma City"; })[0];
 
         assert(okc);
         assert.equal(okc.hasOwnProperty("of_state"), false);

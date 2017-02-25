@@ -1,5 +1,6 @@
+'use strict';
 describe('Queryables', function () {
-  var db;
+  let db;
 
   before(function() {
     return resetDb().then(instance => db = instance);
@@ -352,7 +353,7 @@ describe('Queryables', function () {
 
     it('restricts the select list to specified columns', function () {
       return db.products.find({},{columns :["id","name"]}).then(res => {
-        var keys = _.keys(res[0]);
+        const keys = _.keys(res[0]);
         assert.equal(keys.length,2);
       });
     });
@@ -512,7 +513,7 @@ describe('Queryables', function () {
 
     it('restricts columns', function () {
       return db.popular_products.find({}, {columns :["id","price"]}).then(res => {
-        var keys = _.keys(res[0]);
+        const keys = _.keys(res[0]);
         assert.equal(keys.length,2);
       });
     });

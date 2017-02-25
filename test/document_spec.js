@@ -1,10 +1,11 @@
+'use strict';
 const Table = require("../lib/table");
 
 describe('Index document functions', function () {
   const schema = "spec";
   const tableName = "doggies";
   const schemaTableName = `${schema}.${tableName}`;
-  var db;
+  let db;
 
   before(function* () {
     db = yield resetDb("empty");

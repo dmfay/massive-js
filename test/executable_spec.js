@@ -1,5 +1,6 @@
+'use strict';
 describe("Executables", function () {
-  var db;
+  let db;
 
   before(function() {
     return resetDb("functions").then(instance => db = instance);
@@ -11,7 +12,7 @@ describe("Executables", function () {
     });
 
     it("handles casing and schema", function* () {
-      var res;
+      let res;
 
       assert.isOk(db.get_number);
       res = yield db.get_number();
@@ -128,10 +129,10 @@ describe("Executables", function () {
   describe("streaming function results", function () {
     it("executes citext-added function regexp_matches and returns stream of matches", function (done) {
       db.regexp_matches("aaaaaaaaaaaaaaaaaaaa", "a", "g", {stream: true}).then(stream => {
-        var result = [];
+        const result = [];
 
         stream.on("readable", function() {
-          var res = stream.read();
+          const res = stream.read();
 
           if (res) {
             result.push(res);

@@ -1,4 +1,5 @@
-var db;
+'use strict';
+let db;
 
 describe("On spin up", function () {
   before(function() {

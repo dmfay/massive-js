@@ -1,5 +1,6 @@
+'use strict';
 describe('Tables', function () {
-  var db;
+  let db;
 
   function init() {
     return resetDb().then(instance => db = instance);
@@ -31,7 +32,7 @@ describe('Tables', function () {
     });
 
     it('updates a product', function () {
-      var product = {id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200, tags: ['1', '2']};
+      const product = {id : 4, name : "Fender Stratocaster", description : "Leo Fender's baby", price : 1200, tags: ['1', '2']};
       db.products.save(product).then(res => {
         assert.equal(product.id, 4);  // should not clobber the original object
         assert.equal(res.id, 4);
