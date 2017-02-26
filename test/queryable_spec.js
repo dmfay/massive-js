@@ -344,7 +344,7 @@ describe('Queryables', function () {
 
   describe('find - querying with options', function () {
     it('returns 1 result with limit of 1', function () {
-      return db.products.find(null,{limit : 1}).then(res => assert.lengthOf(res, 1));
+      return db.products.find({}, {limit : 1}).then(res => assert.lengthOf(res, 1));
     });
 
     it('returns second result with limit of 1, offset of 1', function () {
@@ -422,7 +422,7 @@ describe('Queryables', function () {
         });
     });
     it('counts all funny cased users', function () {
-      return db.Users.count(null, null).then(res => assert.equal(res, 1));
+      return db.Users.count({}).then(res => assert.equal(res, 1));
     });
     it('counts funny cased users when we use a where and delimit the condition', function () {
       return db.Users.count('"Email"=$1', ["test@test.com"]).then(res => assert.equal(res, 1));
