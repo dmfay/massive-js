@@ -1,5 +1,6 @@
 'use strict';
-const Query = require("../lib/query");
+
+const Query = require('../../lib/query/query');
 
 describe("Query", function () {
   describe("selectList", function () {

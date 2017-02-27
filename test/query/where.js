@@ -1,4 +1,6 @@
-const where = require('../lib/where');
+'use strict';
+
+const where = require('../../lib/query/where');
 const util = require('util');
 
 describe('WHERE clause generation', function () {
@@ -386,44 +388,6 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
-    });
-  });
-
-  describe('isPkSearch', function () {
-    it('should pass integers', function () {
-      assert.equal(where.isPkSearch(1, {}), true);
-    });
-
-    it('should pass v1 uuids', function () {
-      assert.equal(where.isPkSearch('a432c1f6-0443-11e6-b512-3e1d05defe78', {}), true);
-    });
-
-    it('should pass v4 uuids', function () {
-      assert.equal(where.isPkSearch('a2a072cc-7a41-4fd6-bd16-ae1677166c05', {}), true);
-    });
-
-    it('should reject integers in strings', function () {
-      assert.equal(where.isPkSearch('1', {}), false);
-    });
-
-    it('should reject badly versioned uuids', function () {
-      assert.equal(where.isPkSearch('a2a072cc-7a41-9fd6-bd16-ae1677166c05', {}), false);
-    });
-
-    it('should reject badly formatted uuids', function () {
-      assert.equal(where.isPkSearch('a2a072cc7a419fd6bd16ae1677166c05', {}), false);
-    });
-
-    it('should accept simple document criteria', function () {
-      assert.equal(where.isPkSearch({id: 1}, {document: true}), true);
-    });
-
-    it('should accept complex document criteria', function () {
-      assert.equal(where.isPkSearch({'id >=': 1}, {document: true}), true);
-    });
-
-    it('should reject objects if not looking at a document', function () {
-      assert.equal(where.isPkSearch({id: 1}, {}), false);
     });
   });
 });
