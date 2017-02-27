@@ -1,0 +1,1 @@
+todo: make 'where' 'conditions' 'criteria' naming less confusing in table/doctable/queryable then merge back into promises branch
