@@ -311,7 +311,7 @@ describe('WHERE clause generation', function () {
         params: [],
         mutator: function (arr) {
           return util.format('{%s}', arr.map(function (v) {
-            if (v.search(/[,{}]/) !== -1) { return util.format('"%s"', v); }
+            if (v.search(/[,{}]/) !== -1) { return `"${v}"`; }
 
             return v;
           }).join(','));
