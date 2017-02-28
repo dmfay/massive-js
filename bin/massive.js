@@ -23,12 +23,19 @@ if(program.database){
   console.log(" -c or --connection to enter the full connection string: postgres://user:password@server/tablename");
 }
 
-if(connectionString){
-  massive.connect({connectionString : connectionString}, function(err,db){
+if (connectionString) {
+  massive.connect({connectionString: connectionString}, function(err, db) {
+    if (err) {
+      console.log("Failed loading Massive: "+err);
+      process.exit(1);
+    }
+
     var context = repl.start({
       prompt: "db > "
     }).context;
+
     context.db = db;
+
     console.log("Massive loaded and listening");
   });
 }
