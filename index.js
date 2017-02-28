@@ -9,14 +9,17 @@ var ArgTypes = require("./lib/arg_types");
 var path = require("path");
 var DA = require('deasync');
 var stripBom = require('strip-bom');
-
-var self;
+var async = require('async');
 
 if (typeof Promise == 'undefined') {
   global.Promise = require('promise-polyfill');
 }
 
 var Massive = function(args) {
+  this._options = args;
+  if (typeof args.warn === 'function') {
+    this.warn = args.warn;
+  }
   this.scriptsDir = args.scripts || process.cwd() + "/db";
   this.enhancedFunctions = args.enhancedFunctions || false;
 
@@ -41,6 +44,26 @@ var Massive = function(args) {
   this.excludeFunctions = args.excludeFunctions;
   this.functionBlacklist = this.getTableFilter(args.functionBlacklist);
   this.functionWhitelist = this.getTableFilter(args.functionWhitelist);
+};
+
+Massive.prototype.withConnectionWrapper = function(wrapper) {
+  if (typeof wrapper !== 'function') {
+    throw new Error("withConnectionWrapper expected a function");
+  }
+  if (wrapper.length !== 3) {
+    throw new Error("withConnectionWrapper expected a function accepting 3 arguments");
+  }
+  var oldWrapper = this.connectionWrapper;
+  var newDb = new Massive(this._options);
+  newDb.connectionWrapper = function (fn) {
+    var oldHandler = oldWrapper.call(this, fn);
+    return function(err, pgClient, done) {
+      if (err) return oldHandler(err, pgClient, done);
+      wrapper(pgClient, oldHandler, done);
+    };
+  };
+  newDb.initialize(this._resources);
+  return newDb;
 };
 
 Massive.prototype.getSchemaFilter = function(allowedSchemas) {
@@ -91,14 +114,111 @@ Massive.prototype.run = function(){
 };
 Massive.prototype.runSync = DA(Massive.prototype.run);
 
-Massive.prototype.loadQueries = function() {
-  walkSqlFiles(this, this.scriptsDir);
+Massive.prototype.fetchQueries = function(next) {
+  walkSqlFiles(this, this.scriptsDir, next);
 };
 
-Massive.prototype.loadTables = function(next) {
+Massive.prototype.initialize = function(resources) {
+  var self = this;
+  self._resources = resources;
+
+  _.each(resources.tables, function(table){
+    var _table = new Table({
+      schema : table.schema,
+      name : table.name,
+      pk : table.pk,
+      db : self
+    });
+
+    MapToNamespace(_table);
+  });
+  _.each(resources.descendantTables, function (table) {
+    // if parent table is already defined it means it has been whitelisted / validated
+    // so we safely can add the descendant to the available tables
+    if (undefined !== typeof self[table.parent]) {
+      var _table = new Table({
+        schema : table.schema,
+        name : table.child,
+        pk : self[table.parent].pk,
+        db : self
+      });
+
+      MapToNamespace(_table);
+    }
+  });
+  _.each(resources.views, function(view) {
+    var _view = new Queryable({
+      schema : view.schema,
+      name : view.name,
+      db : self
+    });
+
+    MapToNamespace(_view, "views");
+  });
+  _.each(resources.functions, function(fn) {
+    var schema = fn.schema;
+    var sql;
+    var params = [];
+
+    for (var i = 1; i <= fn.param_count; i++) {
+      params.push("$" + i);
+    }
+
+    if (schema !== "public") {
+      sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
+      self[schema] = self[schema] || {};
+    } else {
+      sql = util.format("select * from \"%s\"", fn.name);
+    }
+
+    sql += "(" + params.join(",") + ")";
+
+    var _exec = new Executable({
+      sql: sql,
+      schema: schema,
+      name : fn.name,
+      db : self,
+      singleRow: self.enhancedFunctions && fn.return_single_row,
+      singleValue: self.enhancedFunctions && fn.return_single_value
+    });
+
+    MapToNamespace(_exec, "functions");
+  });
+
+  // queries is a nested structure that takes the form:
+  // {self: [{sql, filePath, name}, {...}, ...], children: {name: {self: [{...}, {...}, ...
+  function addQueries(rootObject, queryPath, queries) {
+    queries.self.forEach(function(spec) {
+      // spec takes the form: {sql, filePath, name}
+      var name = spec.name;
+
+      // unfortunately we can't use MapToNamespace here without making a ton of changes
+      // since we need to accommodate deeply-nested directories rather than 1-deep schemata
+      if (rootObject[name]) {
+        self.warn("Refusing to overwrite property '" + queryPath + name + "' (" + queries.path + ")");
+      } else {
+        var _exec = new Executable(_.extend({}, spec, {
+          db : self
+        }));
+        self.queryFiles.push(_exec);
+        rootObject[name] = function () {
+          return _exec.invoke.apply(_exec, arguments);
+        };
+      }
+    });
+    for (var name in queries.children) {
+      if (!rootObject[name]) {
+        rootObject[name] = {};
+      }
+      addQueries(rootObject[name], queryPath + name + '/', queries.children[name]);
+    }
+  }
+  addQueries(self, '', resources.queries);
+};
+
+Massive.prototype.fetchTables = function(next) {
   var tableSql = __dirname + "/lib/scripts/tables.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-  var self = this;
 
   // ONLY allow whitelisted items:
   if(this.whitelist) {
@@ -106,70 +226,21 @@ Massive.prototype.loadTables = function(next) {
     parameters = [this.whitelist];
   }
 
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err, tables) {
-    if (err) { return next(err, null); }
-
-    _.each(tables, function(table){
-      var _table = new Table({
-        schema : table.schema,
-        name : table.name,
-        pk : table.pk,
-        db : self
-      });
-
-      MapToNamespace(_table);
-    });
-
-    next(null,self);
-  });
+  this.executeSqlFile({file : tableSql, params: parameters}, next);
 };
 
-Massive.prototype.loadDescendantTables = function(next) {
+Massive.prototype.fetchDescendantTables = function(next) {
   var tableSql = __dirname + "/lib/scripts/descendant_tables.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
-  var self = this;
 
-  this.executeSqlFile({file : tableSql, params: parameters}, function(err, descendantTables) {
-    if (err) { return next(err, null); }
-
-    _.each(descendantTables, function (table) {
-      // if parent table is already defined it means it has been whitelisted / validated
-      // so we safely can add the descendant to the available tables
-      if (undefined !== typeof self[table.parent]) {
-        var _table = new Table({
-          schema : table.schema,
-          name : table.child,
-          pk : self[table.parent].pk,
-          db : self
-        });
-
-        MapToNamespace(_table);
-      }
-    });
-
-    next(null, self);
-  });
+  this.executeSqlFile({file : tableSql, params: parameters}, next);
 };
 
-Massive.prototype.loadViews = function(next) {
+Massive.prototype.fetchViews = function(next) {
   var viewSql = __dirname + "/lib/scripts/views.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
 
-  this.executeSqlFile({file : viewSql, params: parameters}, function(err, views){
-    if (err) { return next(err, null); }
-
-    _.each(views, function(view) {
-      var _view = new Queryable({
-        schema : view.schema,
-        name : view.name,
-        db : self
-      });
-
-      MapToNamespace(_view, "views");
-    });
-
-    next(null, self);
-  });
+  this.executeSqlFile({file : viewSql, params: parameters}, next);
 };
 
 Massive.prototype.saveDoc = function(collection, doc, next){
@@ -177,6 +248,7 @@ Massive.prototype.saveDoc = function(collection, doc, next){
   var schemaName = "public";
   var tableName = collection;
   var potentialTable = null;
+  var self = this;
 
     // is the collection namespace delimited?
   var splits = collection.split(".");
@@ -271,6 +343,16 @@ var RemoveFromNamespace = function(db, table) {
       return element.name && element.schema && element.schema === schemaName && element.name === tableName;
     });
   }
+
+  var tableIndex = -1;
+  db._resources.tables.forEach(function(spec, index) {
+    if (spec.schema === schemaName && spec.name === tableName) {
+      tableIndex = index;
+    }
+  });
+  if (tableIndex >= 0) {
+    db._resources.tables.splice(tableIndex, 1);
+  }
 };
 
 
@@ -279,6 +361,7 @@ Massive.prototype.createDocumentTable = function(path, next) {
   var splits = path.split(".");
   var tableName;
   var schemaName;
+  var self = this;
   if(splits.length > 1) {
     // uh oh. Someone specified a schema name:
     schemaName = splits[0];
@@ -319,6 +402,7 @@ Massive.prototype.documentTableSql = function(tableName){
 
 Massive.prototype.dropTable = function(table, options, next) {
   var sql = this.dropTableSql(table, options);
+  var self = this;
   this.query(sql, function(err, res) {
     if(err) {
       next(err, null);
@@ -339,6 +423,7 @@ Massive.prototype.dropTableSql = function(tableName, options){
 
 Massive.prototype.createSchema = function(schemaName, next) {
   var sql = this.createSchemaSql(schemaName);
+  var self = this;
   this.query(sql, function(err, res) {
     if(err) {
       next(err);
@@ -359,6 +444,7 @@ Massive.prototype.createSchemaSql = function(schemaName) {
 
 Massive.prototype.dropSchema = function(schemaName, options, next) {
   var sql = this.dropSchemaSql(schemaName, options);
+  var self = this;
 
   this.query(sql, function(err, res) {
     if(err) {
@@ -386,106 +472,106 @@ Massive.prototype.dropSchemaSql = function(schemaName, options) {
   return sql;
 };
 
-
-
 //A recursive directory walker that would love to be refactored
-var walkSqlFiles = function(rootObject, rootDir) {
-  var dirs;
-  try {
-    dirs = fs.readdirSync(rootDir);
-  } catch (ex) {
-     return;
+var walkSqlFiles = function(self, rootDir, next) {
+  var results = {
+    path: rootDir,
+    self: [],
+    children: {}
+  };
+  function processFile(file, next) {
+    var filePath = path.join(rootDir, file);
+    fs.stat(filePath, function(err, stats) {
+      if (err) return next();
+      var ext = path.extname(file);
+      var name = path.basename(file, ext);
+
+      if (stats.isFile() && ext === ".sql") {
+        //why yes it is! pull in the SQL
+        //remove the unicode Byte Order Mark
+        var sql = stripBom(fs.readFileSync(filePath, {encoding : "utf-8"}));
+        results.self.push({
+          sql: sql,
+          filePath: filePath,
+          name : name
+        });
+        next();
+      } else if (stats.isDirectory()) {
+        walkSqlFiles(self, filePath, function(err, childResults) {
+          if (err) return next(err);
+          results.children[name] = childResults;
+          next();
+        });
+      } else {
+        next();
+      }
+    });
   }
+  fs.readdir(rootDir, function(err, files) {
+    // Swallow errors from non-existent directories
+    if (err) return next(null, results);
 
-  //loop the directories found
-  _.each(dirs, function(item){
-    //parsing with path is a friendly way to get info about this dir or file
-    var ext = path.extname(item);
-    var name = path.basename(item, ext);
+    // Ensure clashes are deterministic; if 'foo' and 'foo.sql' both exist then
+    // 'foo.sql' should win
+    files.sort().reverse();
 
-    //is this a SQL file?
-    if (ext === ".sql") {
-      //why yes it is! Build the abspath so we can read the file
-      var filePath = path.join(rootDir,item);
-
-      //pull in the SQL - don't worry this only happens once, when
-      //massive is loaded using connect()
-      //remove the unicode Byte Order Mark
-      var sql = stripBom(fs.readFileSync(filePath, {encoding : "utf-8"}));
-
-      var _exec = new Executable({
-        sql: sql,
-        filePath: filePath,
-        name : name,
-        db : self
-      });
-
-      // unfortunately we can't use MapToNamespace here without making a ton of changes
-      // since we need to accommodate deeply-nested directories rather than 1-deep schemata
-      self.queryFiles.push(_exec);
-      rootObject[name] = function () {
-        return _exec.invoke.apply(_exec, arguments);
-      };
-    } else if (ext === '') {
-      //this is a directory so shift things and move on down
-      //set a property on our root object, then use *that*
-      //as the root in the next call
-      rootObject[name] = {};
-
-      //set the path to walk so we have a correct root directory
-      var pathToWalk = path.join(rootDir,item);
-
-      //recursive call - do it all again
-      walkSqlFiles(rootObject[name], pathToWalk);
-    }
+    // Executing in series so we don't end up with too many in parallel; plus
+    // we want clashes to be deterministic.
+    async.eachSeries(files, processFile, function(err) {
+      next(err, results);
+    });
   });
 };
 
-Massive.prototype.loadFunctions = function(next) {
+Massive.prototype.fetchFunctions = function(next) {
   if (!this.excludeFunctions) {
     var functionSql = __dirname + "/lib/scripts/functions.sql";
     var parameters = [this.functionBlacklist, this.functionWhitelist];
 
-    this.executeSqlFile({file : functionSql, params : parameters}, function (err,functions) {
-      if (err) {
-        next(err, null);
-      } else {
-        _.each(functions, function(fn) {
-          var schema = fn.schema;
-          var sql;
-          var params = [];
-
-          for (var i = 1; i <= fn.param_count; i++) {
-            params.push("$" + i);
-          }
-
-          if (schema !== "public") {
-            sql = util.format("select * from \"%s\".\"%s\"", schema, fn.name);
-            self[schema] = self[schema] || {};
-          } else {
-            sql = util.format("select * from \"%s\"", fn.name);
-          }
-
-          sql += "(" + params.join(",") + ")";
-
-          var _exec = new Executable({
-            sql: sql,
-            schema: schema,
-            name : fn.name,
-            db : self,
-            singleRow: self.enhancedFunctions && fn.return_single_row,
-            singleValue: self.enhancedFunctions && fn.return_single_value
-          });
-
-          MapToNamespace(_exec, "functions");
-        });
-
-        next(null, self);
-      }
-    });
+    this.executeSqlFile({file : functionSql, params : parameters}, next);
   } else {
-    next(null, self);
+    next(null, {});
   }
+};
+
+Massive.prototype.bootstrap = function(next) {
+
+  var self = this;
+  //load up the tables, queries, and commands
+  self.fetchTables(function(err, tables) {
+    if (err) { return next(err); }
+
+    self.fetchDescendantTables(function (err, descendantTables) {
+      if (err) { return next(err); }
+
+      self.fetchViews(function(err, views) {
+        if (err) { return next(err); }
+
+        self.fetchFunctions(function(err, functions) {
+          if (err) { return next(err); }
+
+          self.fetchQueries(function(err, queries) {
+            if (err) { return next(err); }
+
+            self.initialize({
+              tables: tables,
+              descendantTables: descendantTables,
+              views: views,
+              functions: functions,
+              queries: queries
+            });
+
+            next(null, self);
+          });
+        });
+      });
+    });
+  });
+};
+
+// Can be over-ridden via `warn` connection setting
+Massive.prototype.warn = function (message) {
+  console.warn("[Massive] WARNING: " + message); // eslint-disable-line no-console
 };
 
 //connects Massive to the DB
@@ -499,28 +585,7 @@ exports.connect = function(args, next) {
 
   var massive = new Massive(args);
 
-  //load up the tables, queries, and commands
-  massive.loadTables(function(err, db) {
-    if (err) { return next(err); }
-
-    self = db;
-
-    massive.loadDescendantTables(function () {
-      if (err) { return next(err); }
-
-      massive.loadViews(function() {
-        if (err) { return next(err); }
-
-        massive.loadFunctions(function(err, db) {
-          if (err) { return next(err); }
-
-          db.loadQueries(); // synchronous
-
-          next(null, db);
-        });
-      });
-    });
-  });
+  massive.bootstrap(next);
 };
 
 exports.loadSync = DA(this.connect);
