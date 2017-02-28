@@ -1,14 +1,15 @@
 'use strict';
-const Runner = require("./lib/runner");
-const _ = require("underscore")._;
-const co = require("co");
-const fs = require("mz/fs");
-const filters = require("./lib/filters");
-const Executable = require("./lib/executable");
-const Queryable = require("./lib/queryable");
-const Table = require("./lib/table");
-const util = require("util");
-const path = require("path");
+
+const Runner = require('./lib/runner');
+const _ = require('lodash');
+const co = require('co');
+const fs = require('mz/fs');
+const filters = require('./lib/filters');
+const Executable = require('./lib/executable');
+const Queryable = require('./lib/queryable');
+const Table = require('./lib/table');
+const util = require('util');
+const path = require('path');
 
 const Massive = function(args) {
   this.scriptsDir = args.scripts || path.join(process.cwd(), "db");

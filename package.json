@@ -31,11 +31,11 @@
   "dependencies": {
     "co": "^4.6.0",
     "commander": "^2.6.0",
+    "lodash": "^4.17.4",
     "mz": "^2.6.0",
     "pg": "^6.1.0",
     "pg-query-stream": "^1.0.0",
-    "strip-bom": "^3.0.0",
-    "underscore": "^1.8.2"
+    "strip-bom": "^3.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
