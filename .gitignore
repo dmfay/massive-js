@@ -13,3 +13,4 @@ node_modules
 Session.vim
 play.js
 coverage
+.nyc_output
