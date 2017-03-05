@@ -1,4 +1,5 @@
 'use strict';
+
 describe('Queryables', function () {
   let db;
 

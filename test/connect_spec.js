@@ -5,7 +5,7 @@ describe("Connecting", function () {
   });
 
   it("connects with a connectionString", function* () {
-    const db = yield massive.connect({
+    const db = yield massive({
       connectionString: connectionString,
       scripts: `${__dirname}/db`
     });
@@ -15,7 +15,7 @@ describe("Connecting", function () {
   });
 
   it("builds a connectionString if given a database name", function* () {
-    const db = yield massive.connect({
+    const db = yield massive({
       db: "massive",
       scripts: `${__dirname}/db`
     });
@@ -25,49 +25,36 @@ describe("Connecting", function () {
   });
 
   it("connects with pool configuration", function* () {
-    const db = yield massive.connect({
+    const db = yield massive({
       user: "postgres",
       database: "massive",
       host: "localhost",
       port: 5432,
-      max: 5,
-      idleTimeoutMillis: 30000,
+      poolSize: 5,
       scripts: `${__dirname}/db`
     });
 
     assert.isOk(db);
     assert.isOk(db.t1);
-    assert.isOk(db.pool);
-    assert.equal(db.pool.options.max, 5);
   });
 
   it("rejects with connection errors", function () {
-    // nb: if you pass *nothing*, you wind up with a pool created for you
-    // going to a database named after you, no password, at localhost:5432
-    // which may very possibly exist!
-    return massive.connect({ database: 'doesntexist', scripts: `${__dirname}/db` })
+    return massive({ database: 'doesntexist', scripts: `${__dirname}/db` })
       .then(
         () => { assert.fail(); },
         err => {
-          assert.equal(err.code, "3D000");  // invalid catalog name
+          assert.equal(err.code, '3D000');
           return Promise.resolve();
         }
       );
   });
 
-  it("rejects if no valid scripts directory exists", function () {
-    return massive.connect({ db: "massive" })
-      .then(
-        () => { assert.fail(); },
-        err => {
-          assert.equal(err.code, "ENOENT");
-          return Promise.resolve();
-        }
-      );
+  it("allows undefined scripts directories", function () {
+    return massive({ db: "massive" });
   });
 
   it("overrides and applies defaults", function* () {
-    const db = yield massive.connect({
+    const db = yield massive({
       connectionString: connectionString,
       scripts: `${__dirname}/db`,
       defaults: {
@@ -81,6 +68,6 @@ describe("Connecting", function () {
   });
 
   it("rejects connection blocks without a connstr or db", function () {
-    assert.isRejected(massive.connect({things: "stuff"}));
+    assert.isRejected(massive({things: "stuff"}));
   });
 });

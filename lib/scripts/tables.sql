@@ -1,27 +1,37 @@
 -- REQUIRES THREE ARGUMENTS:
--- $1, $2, $2 all must be empty string, or comma-delimited string, or array of string: 
-select tc.table_schema as schema, tc.table_name as name, kc.column_name as pk
-from 
-    information_schema.table_constraints tc
-    join information_schema.key_column_usage kc 
-        on kc.table_name = tc.table_name and
-           kc.constraint_schema = tc.table_schema and
-           kc.constraint_name = tc.constraint_name 
-where 
-    tc.constraint_type = 'PRIMARY KEY'
-    and 
-    ((case -- allow specific schemas (none or '' assumes all):
-      when $1 ='' then 1=1 
-      else tc.table_schema = any(string_to_array(replace($1, ' ', ''), ',')) end)
-    and
-    (case -- blacklist tables using LIKE by fully-qualified name (no schema assumes public):
-      when $2 = '' then 1=1 
-      else replace((tc.table_schema || '.'|| tc.table_name), 'public.', '') not like all(string_to_array(replace($2, ' ', ''), ',')) end))
-    or
-    (case -- make exceptions for specific tables, with fully-qualified name or wildcard pattern (no schema assumes public). 
-      when $3 = '' then 1=0
-      -- Below can use '%' as wildcard. Change 'like' to '=' to require exact names: 
-      else replace((tc.table_schema || '.'|| tc.table_name), 'public.', '') like any(string_to_array(replace($3, ' ', ''), ',')) end)
-order by tc.table_schema,
-         tc.table_name,
-         kc.position_in_unique_constraint;
+-- $1, $2, $2 all must be empty string, or comma-delimited string, or array of string:
+SELECT * FROM (
+  SELECT tc.table_schema AS schema, tc.table_name AS name, NULL AS parent, kc.column_name AS pk
+  FROM information_schema.table_constraints tc
+  JOIN information_schema.key_column_usage kc
+    ON kc.table_name = tc.table_name
+    AND kc.constraint_schema = tc.table_schema
+    AND kc.constraint_name = tc.constraint_name
+  WHERE tc.constraint_type = 'PRIMARY KEY'
+  UNION
+  SELECT tc.table_schema AS schema, c.relname AS name, p.relname AS parent, kc.column_name AS pk
+  FROM pg_catalog.pg_inherits
+  JOIN pg_catalog.pg_class AS c ON (inhrelid = c.oid)
+  JOIN pg_catalog.pg_class AS p ON (inhparent = p.oid)
+  JOIN information_schema.table_constraints tc ON tc.table_name = p.relname
+  JOIN information_schema.key_column_usage kc
+    ON kc.table_name = tc.table_name
+    AND kc.constraint_schema = tc.table_schema
+    AND kc.constraint_name = tc.constraint_name
+  WHERE tc.constraint_type = 'PRIMARY KEY'
+) tables WHERE ((
+    -- allow specific schemas (none or '' assumes all):
+    CASE WHEN $1 ='' THEN 1=1
+    ELSE schema = ANY(string_to_array(replace($1, ' ', ''), ','))
+    END
+  ) AND (
+    -- blacklist tables using LIKE by fully-qualified name (no schema assumes public):
+    CASE WHEN $2 = '' THEN 1=1
+    ELSE replace((schema || '.'|| name), 'public.', '') NOT LIKE ALL(string_to_array(replace($2, ' ', ''), ','))
+    END
+  )
+) OR (-- make exceptions for specific tables, with fully-qualified name or wildcard pattern (no schema assumes public).
+  CASE WHEN $3 = '' THEN 1=0
+  ELSE replace((schema || '.'|| name), 'public.', '') LIKE ANY(string_to_array(replace($3, ' ', ''), ','))
+  END
+);

@@ -5,7 +5,7 @@ describe('Loading entities (these tests may be slow!)', function () {
   });
 
   it('loads everything it can by default', function () {
-    return massive.connect({
+    return massive({
       connectionString: connectionString,
       scripts: `${__dirname}/db`
     }).then(db => {
@@ -23,7 +23,7 @@ describe('Loading entities (these tests may be slow!)', function () {
   });
 
   it('does not load tables without primary keys', function () {
-    return massive.connect({
+    return massive({
       connectionString: connectionString,
       scripts: `${__dirname}/db`
     }).then(db => {
@@ -32,8 +32,8 @@ describe('Loading entities (these tests may be slow!)', function () {
   });
 
   describe('schema filters', function () {
-    it('applies filters', function () {
-      return massive.connect({
+    it.only('applies filters', function () {
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         schema: "one, two"
@@ -52,7 +52,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('allows exceptions', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         schema: "two",
@@ -74,7 +74,7 @@ describe('Loading entities (these tests may be slow!)', function () {
 
   describe('table blacklists', function () {
     it('applies blacklists to tables and views', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         blacklist: "%1, one.%2"
@@ -93,7 +93,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('checks schema names in the pattern', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         blacklist: "one.%1"
@@ -112,7 +112,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('allows exceptions', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         blacklist: "%1",
@@ -134,7 +134,7 @@ describe('Loading entities (these tests may be slow!)', function () {
 
   describe('table whitelists', function () {
     it('applies a whitelist with exact matching', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         whitelist: "t1, one.t1"
@@ -153,7 +153,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('overrides other filters', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         schema: "one",
@@ -176,7 +176,7 @@ describe('Loading entities (these tests may be slow!)', function () {
 
   describe('function exclusion', function () {
     it('skips loading functions when set', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         excludeFunctions: true
@@ -186,7 +186,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('loads all functions when false', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         excludeFunctions: false
@@ -198,7 +198,7 @@ describe('Loading entities (these tests may be slow!)', function () {
 
   describe('function filtering', function () {
     it('blacklists functions', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         functionBlacklist: "%1, one.f2"
@@ -209,7 +209,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('whitelists functions', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         functionWhitelist: "%1, one.f2"
@@ -220,7 +220,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
 
     it('overlaps whitelists and blacklists', function () {
-      return massive.connect({
+      return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         functionBlacklist: "one.%1",

@@ -12,10 +12,10 @@ global.assert = require('chai').use(require('chai-as-promised')).assert;
 global.massive = require('../../index');
 global.connectionString = connectionString;
 global.init = () => {
-  return massive.connect({
-    connectionString : connectionString,
-    enhancedFunctions : true,
-    scripts : scriptsDir
+  return massive({
+    connectionString: connectionString,
+    enhancedFunctions: true,
+    scripts: scriptsDir
   });
 };
 
