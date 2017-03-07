@@ -135,7 +135,7 @@ Massive.prototype.loadDescendantTables = function(next) {
     _.each(descendantTables, function (table) {
       // if parent table is already defined it means it has been whitelisted / validated
       // so we safely can add the descendant to the available tables
-      if (undefined !== typeof self[table.parent]) {
+      if ('undefined' !== typeof self[table.parent]) {
         var _table = new Table({
           schema : table.schema,
           name : table.child,
