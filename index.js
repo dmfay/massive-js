@@ -12,9 +12,19 @@ const Query = require('./lib/query/query');
 const format = require('./lib/formatters');
 const util = require('util');
 const path = require('path');
+const configFields = ['pgFormatting', 'pgNative', 'promiseLib', 'noLocking', 'capSQL', 'noWarnings', 'connect', 'disconnect', 'query', 'receive', 'task', 'transact', 'error', 'extend'];
+const connectionFields = ['connectionString', 'db', 'database', 'host', 'port', 'user', 'password', 'ssl', 'binary', 'client_encoding', 'application_name', 'fallback_application_name', 'poolSize'];
 
-exports = module.exports = co.wrap(function* (config) {
-  this.pgp = require('pg-promise')(config || {});
+exports = module.exports = config => {
+  const db = Object.create(null);
+
+  let connection = _.pick(config, connectionFields);
+
+  if (Object.keys(connection).length === 1 && (!!connection.database || !!connection.db)) {
+    connection = `postgres://localhost:5432/${connection.database || connection.db}`;
+  }
+
+  db.pgp = require('pg-promise')(_.pick(config, configFields));
 
   const loaderConfig = {
     enhancedFunctions: config.enhancedFunctions || false,
@@ -32,11 +42,7 @@ exports = module.exports = co.wrap(function* (config) {
     loaderConfig.exceptions = filters.entity(config.exceptions);
   }
 
-  if (config.db) {
-    config.connectionString = "postgres://localhost/" + config.db;
-  }
-
-  this.query = (query, params, options = {}) => {
+  db.query = (query, params, options = {}) => {
     let sql;
 
     if (query instanceof Query) {
@@ -50,9 +56,9 @@ exports = module.exports = co.wrap(function* (config) {
     let qrm;
 
     if (options.single) {
-      qrm = this.pgp.queryResult.one | this.pgp.queryResult.none;
+      qrm = db.pgp.queryResult.one | db.pgp.queryResult.none;
     } else {
-      qrm = this.pgp.queryResult.any;
+      qrm = db.pgp.queryResult.any;
     }
 
     let promise;
@@ -60,9 +66,9 @@ exports = module.exports = co.wrap(function* (config) {
     if (options.stream) {
       const qs = new QueryStream(sql, params);
 
-      promise = new Promise((resolve, reject) => this.driver.stream(qs, resolve).catch(reject));
+      promise = new Promise((resolve, reject) => db.driver.stream(qs, resolve).catch(reject));
     } else {
-      promise = this.driver.query(sql, params, qrm);
+      promise = db.driver.query(sql, params, qrm);
     }
 
     if (options.document) {
@@ -73,60 +79,69 @@ exports = module.exports = co.wrap(function* (config) {
   };
 
   const attach = (ctor, ...sources) => {
-    const sourcePromises = sources.map(source => source(this.driver, loaderConfig));
+    const sourcePromises = sources.map(source => source(db.driver, loaderConfig));
 
     return Promise.all(sourcePromises).then(([result]) => {
       return Promise.resolve(result.map(spec => {
         spec = _.extend(spec, loaderConfig);
-        spec.db = {query: this.query};
+        spec.db = {query: db.query};
+        spec.path = spec.schema === 'public' ? spec.name : [spec.schema, spec.name].join('.');
 
         const entity = new (Function.prototype.bind.apply(ctor, [null, spec]));
-        const path = entity.schema === 'public' ? entity.name : [entity.schema, entity.name].join('.');
         let executor;
 
         if (ctor === Executable) {
-          executor = () => entity.invoke(...arguments);
+          executor = function() { return entity.invoke(...arguments); };
         }
 
-        _.set(this, path, executor || entity);
+        _.set(db, spec.path, executor || entity);
 
         return entity;
       }));
     });
   };
 
+  const detach = function(entity, collection) {
+    let schemaName = "public";
+
+    if (entity.indexOf(".") > -1) {
+      const tokens = entity.split(".");
+
+      schemaName = tokens[0];
+      entity = tokens[1];
+
+      delete db[schemaName][entity];
+    } else {
+      delete db[entity];
+    }
+
+    db[collection || "tables"] = _.reject(db[collection || "tables"], function(element) {
+      return element.name && element.schema && element.schema === schemaName && element.name === entity;
+    });
+  };
+
+  db.reload = co.wrap(function* () {
+    if (db.tables) { db.tables.forEach(t => detach(t.name, 'tables')); }
+    if (db.views) { db.views.forEach(v => detach(v.name, 'views')); }
+    if (db.functions) { db.functions.forEach(f => detach(f.name, 'functions')); }
+    if (db.queryFiles) { db.queryFiles.forEach(q => detach(q.name, 'queryFiles')); }
+
+    db.tables = yield attach(Table, require('./lib/loaders/tables'));
+    db.views = yield attach(Queryable, require('./lib/loaders/views'));
+    db.functions = yield attach(Executable, require('./lib/loaders/functions'));
+    db.queryFiles = yield attach(Executable, require('./lib/loaders/scripts'));
+
+    return db;
+  });
+
   try {
-    this.driver = this.pgp(config.connectionString || config);
-    this.run = this.driver.query;
+    db.driver = db.pgp(connection);
+    db.run = db.driver.query;
 
-    this.tables = yield attach(Table, require('./lib/loaders/tables'));
-    this.views = yield attach(Queryable, require('./lib/loaders/views'));
-    this.functions = yield attach(Executable, require('./lib/loaders/functions'));
-    this.queryFiles = yield attach(Executable, require('./lib/loaders/scripts'));
-
-    return Promise.resolve(this);
+    return db.reload();
   } catch (e) {
     return Promise.reject(e);
   }
-});
-
-exports.detach = function(entity, collection) {
-  let schemaName = "public";
-
-  if (entity.indexOf(".") > -1) {
-    const tokens = entity.split(".");
-
-    schemaName = tokens[0];
-    entity = tokens[1];
-
-    delete this[schemaName][entity];
-  } else {
-    delete this[entity];
-  }
-
-  this[collection || "tables"] = _.reject(this[collection || "tables"], function(element) {
-    return element.name && element.schema && element.schema === schemaName && element.name === entity;
-  });
 };
 
 exports.saveDoc = co.wrap(function* (collection, doc) {

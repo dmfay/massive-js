@@ -11,18 +11,16 @@ global._ = require('lodash');
 global.assert = require('chai').use(require('chai-as-promised')).assert;
 global.massive = require('../../index');
 global.connectionString = connectionString;
-global.init = () => {
-  return massive({
-    connectionString: connectionString,
-    enhancedFunctions: true,
-    scripts: scriptsDir
-  });
-};
 
 global.resetDb = co.wrap(function* (schema) {
   schema = schema || 'default';
 
-  const db = yield this.init();
+  const db = yield massive({
+    connectionString: connectionString,
+    enhancedFunctions: true,
+    scripts: scriptsDir,
+    noWarnings: true
+  });
 
   const schemata = yield db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'");
 
@@ -30,6 +28,6 @@ global.resetDb = co.wrap(function* (schema) {
 
   yield db.schemata[schema]();
 
-  return yield this.init();
+  return yield db.reload();
 });
 

@@ -32,7 +32,7 @@ describe('Loading entities (these tests may be slow!)', function () {
   });
 
   describe('schema filters', function () {
-    it.only('applies filters', function () {
+    it('applies filters', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,

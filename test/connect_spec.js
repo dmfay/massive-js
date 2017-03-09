@@ -7,7 +7,8 @@ describe("Connecting", function () {
   it("connects with a connectionString", function* () {
     const db = yield massive({
       connectionString: connectionString,
-      scripts: `${__dirname}/db`
+      scripts: `${__dirname}/db`,
+      noWarnings: true
     });
 
     assert.isOk(db);
@@ -17,7 +18,8 @@ describe("Connecting", function () {
   it("builds a connectionString if given a database name", function* () {
     const db = yield massive({
       db: "massive",
-      scripts: `${__dirname}/db`
+      scripts: `${__dirname}/db`,
+      noWarnings: true
     });
 
     assert.isOk(db);
@@ -31,7 +33,8 @@ describe("Connecting", function () {
       host: "localhost",
       port: 5432,
       poolSize: 5,
-      scripts: `${__dirname}/db`
+      scripts: `${__dirname}/db`,
+      noWarnings: true
     });
 
     assert.isOk(db);
@@ -39,18 +42,24 @@ describe("Connecting", function () {
   });
 
   it("rejects with connection errors", function () {
-    return massive({ database: 'doesntexist', scripts: `${__dirname}/db` })
-      .then(
-        () => { assert.fail(); },
-        err => {
-          assert.equal(err.code, '3D000');
-          return Promise.resolve();
-        }
-      );
+    return massive({
+      database: 'doesntexist',
+      scripts: `${__dirname}/db`,
+      noWarnings: true
+    }).then(
+      () => { assert.fail(); },
+      err => {
+        assert.equal(err.code, '3D000');
+        return Promise.resolve();
+      }
+    );
   });
 
   it("allows undefined scripts directories", function () {
-    return massive({ db: "massive" });
+    return massive({
+      db: "massive",
+      noWarnings: true
+    });
   });
 
   it("overrides and applies defaults", function* () {
@@ -59,7 +68,8 @@ describe("Connecting", function () {
       scripts: `${__dirname}/db`,
       defaults: {
         parseInt8: true
-      }
+      },
+      noWarnings: true
     });
 
     assert.equal(db.defaults.parseInt8, true);
@@ -68,6 +78,9 @@ describe("Connecting", function () {
   });
 
   it("rejects connection blocks without a connstr or db", function () {
-    assert.isRejected(massive({things: "stuff"}));
+    assert.isRejected(massive({
+      things: "stuff",
+      noWarnings: true
+    }));
   });
 });
