@@ -76,9 +76,6 @@ describe("Connecting", function () {
   });
 
   it("rejects connection blocks without a connstr or db", function () {
-    assert.isRejected(massive({
-      things: "stuff",
-      noWarnings: true
-    }));
+    assert.isRejected(massive({}), 'No connection information specified.');
   });
 });

@@ -11,6 +11,8 @@ exports = module.exports = config => {
 
   if (Object.keys(connection).length === 1 && (!!connection.database || !!connection.db)) {
     connection = `postgres://localhost:5432/${connection.database || connection.db}`;
+  } else if (_.isEmpty(connection)) {
+    return Promise.reject('No connection information specified.');
   }
 
   return (new Massive(config, connection)).reload();
