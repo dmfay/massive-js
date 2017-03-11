@@ -9,7 +9,7 @@ describe("Executables", function () {
 
   describe("initialization", function () {
     it("loads functions", function () {
-      assert.isOk("db.all_products");
+      assert.isOk(db.get_number);
     });
 
     it("handles casing and schema", function* () {
@@ -30,10 +30,6 @@ describe("Executables", function () {
       assert.isOk(db.one.GetNumber);
       res = yield db.one.GetNumber();
       assert.equal(res, 4);
-    });
-
-    it("loads query files", function () {
-      assert.isOk("db.inStockProducts");
     });
   });
 
