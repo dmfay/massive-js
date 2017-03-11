@@ -1,4 +1,5 @@
 'use strict';
+
 describe("Connecting", function () {
   before(function() {
     return resetDb("loader");
@@ -54,6 +55,23 @@ describe("Connecting", function () {
     assert.isOk(db.t1);
   });
 
+  it("allows undefined scripts directories", function () {
+    return massive({
+      noWarnings: true
+    }, {
+      db: "massive"
+    });
+  });
+
+  it("exposes driver defaults through pg-promise", function* () {
+    const db = yield massive({
+      scripts: `${__dirname}/db`,
+      noWarnings: true
+    }, connectionString);
+
+    assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
+  });
+
   it("rejects with connection errors", function () {
     return massive({
       scripts: `${__dirname}/db`,
@@ -67,25 +85,6 @@ describe("Connecting", function () {
         return Promise.resolve();
       }
     );
-  });
-
-  it("allows undefined scripts directories", function () {
-    return massive({
-      noWarnings: true
-    }, {
-      db: "massive"
-    });
-  });
-
-  it("overrides and applies defaults", function* () {
-    const db = yield massive({
-      scripts: `${__dirname}/db`,
-      noWarnings: true
-    }, connectionString);
-
-    db.pgp.pg.defaults.parseInt8 = true;
-
-    return assert.eventually.strictEqual(db.t1.count(), 0);
   });
 
   it("rejects undefined connections", function () {
