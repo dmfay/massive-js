@@ -18,7 +18,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       assert(!!db.two && !! db.two.t1);
       assert.lengthOf(db.tables, 6);
       assert.lengthOf(db.views, 6);
-      assert.lengthOf(db.functions, 4);
+      assert.lengthOf(db.functions, 15);
+      assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
     });
   });
 
@@ -47,7 +48,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
@@ -67,7 +69,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
   });
@@ -88,7 +91,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
@@ -107,7 +111,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 5);
         assert.equal(db.views.length, 5);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
@@ -127,7 +132,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 4);
         assert.equal(db.views.length, 4);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
   });
@@ -148,7 +154,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
@@ -169,7 +176,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
   });
@@ -181,7 +189,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         excludeFunctions: true,
         noWarnings: true
       }, connectionString).then(db => {
-        assert.equal(db.functions.length, 0);
+        assert.lengthOf(db.functions, 11);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 0);
       });
     });
 
@@ -191,7 +200,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         excludeFunctions: false,
         noWarnings: true
       }, connectionString).then(db => {
-        assert(db.functions.length > 0);
+        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
   });

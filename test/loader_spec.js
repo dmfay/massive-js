@@ -9,7 +9,7 @@ describe("On spin up", function () {
   it("returns a valid db interface", function () {
     assert.isOk(db);
     assert.isOk(db.tables);
-    assert.isOk(db.queryFiles);
+    assert.isOk(db.functions);
   });
 
   it("loads non-public schemata as namespace properties", function () {
@@ -31,10 +31,12 @@ describe("On spin up", function () {
   });
 
   it("loads query files", function () {
-    assert.ok(db.queryFiles.length > 0);
+    assert.ok(db.functions.length > 0);
+    assert.lengthOf(db.functions.filter(f => !!f.filePath), 11);
   });
 
   it("loads functions", function () {
-    assert.equal(db.functions.length, 4);
+    assert.equal(db.functions.length, 15);
+    assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
   });
 });
