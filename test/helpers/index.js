@@ -16,11 +16,10 @@ global.resetDb = co.wrap(function* (schema) {
   schema = schema || 'default';
 
   const db = yield massive({
-    connectionString: connectionString,
     enhancedFunctions: true,
     scripts: scriptsDir,
     noWarnings: true
-  });
+  }, connectionString);
 
   const schemata = yield db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'");
 

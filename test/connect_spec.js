@@ -4,12 +4,23 @@ describe("Connecting", function () {
     return resetDb("loader");
   });
 
-  it("connects with a connectionString", function* () {
+  it("connects with a connectionString property", function* () {
     const db = yield massive({
-      connectionString: connectionString,
       scripts: `${__dirname}/db`,
       noWarnings: true
+    }, {
+      connectionString: connectionString
     });
+
+    assert.isOk(db);
+    assert.isOk(db.t1);
+  });
+
+  it("connects with a connection string literal", function* () {
+    const db = yield massive({
+      scripts: `${__dirname}/db`,
+      noWarnings: true
+    }, connectionString);
 
     assert.isOk(db);
     assert.isOk(db.t1);
@@ -17,9 +28,10 @@ describe("Connecting", function () {
 
   it("builds a connectionString if given a database name", function* () {
     const db = yield massive({
-      db: "massive",
       scripts: `${__dirname}/db`,
       noWarnings: true
+    }, {
+      db: "massive"
     });
 
     assert.isOk(db);
@@ -28,13 +40,14 @@ describe("Connecting", function () {
 
   it("connects with pool configuration", function* () {
     const db = yield massive({
-      user: "postgres",
-      database: "massive",
-      host: "localhost",
-      port: 5432,
       poolSize: 5,
       scripts: `${__dirname}/db`,
       noWarnings: true
+    }, {
+      user: "postgres",
+      database: "massive",
+      host: "localhost",
+      port: 5432
     });
 
     assert.isOk(db);
@@ -43,9 +56,10 @@ describe("Connecting", function () {
 
   it("rejects with connection errors", function () {
     return massive({
-      database: 'doesntexist',
       scripts: `${__dirname}/db`,
       noWarnings: true
+    }, {
+      database: 'doesntexist'
     }).then(
       () => { assert.fail(); },
       err => {
@@ -57,25 +71,33 @@ describe("Connecting", function () {
 
   it("allows undefined scripts directories", function () {
     return massive({
-      db: "massive",
       noWarnings: true
+    }, {
+      db: "massive"
     });
   });
 
   it("overrides and applies defaults", function* () {
     const db = yield massive({
-      connectionString: connectionString,
       scripts: `${__dirname}/db`,
       defaults: {
         parseInt8: true
       },
       noWarnings: true
-    });
+    }, connectionString);
 
     return assert.eventually.strictEqual(db.t1.count(), 0);
   });
 
-  it("rejects connection blocks without a connstr or db", function () {
+  it("rejects undefined connections", function () {
     assert.isRejected(massive({}), 'No connection information specified.');
+  });
+
+  it("rejects empty connection blocks", function () {
+    assert.isRejected(massive({}, {}), 'No connection information specified.');
+  });
+
+  it("rejects empty connection strings", function () {
+    assert.isRejected(massive({}, ''), 'No connection information specified.');
   });
 });
