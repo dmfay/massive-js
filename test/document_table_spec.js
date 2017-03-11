@@ -141,7 +141,14 @@ describe('Document queries', function () {
 
     it('updates the document', function() {
       return db.docs.setAttribute(newDoc.id, "vaccinated", true).then(doc => {
-        assert.equal(doc.vaccinated, true);
+        assert.isTrue(doc.vaccinated);
+      });
+    });
+
+    it.skip('nulls out a field', function() {
+      // TODO it's trying to null out the entire body; jsonb_set doesn't seem to respect path
+      return db.docs.setAttribute(newDoc.id, "vaccinated", null).then(doc => {
+        assert.isNull(doc.vaccinated);
       });
     });
 

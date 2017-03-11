@@ -157,7 +157,7 @@ describe('Tables', function () {
       assert.equal(deleted[0].id, 4);
 
       const found = yield db.products.find(4);
-      assert.isUndefined(found);
+      assert.isNull(found);
     });
 
     it('deletes all products', function* () {
@@ -216,7 +216,7 @@ describe('Tables', function () {
       assert.equal(deleted[0].Id, 2);
 
       const found = yield db.Users.find(2);
-      assert.isUndefined(found);
+      assert.isNull(found);
     });
   });
 
