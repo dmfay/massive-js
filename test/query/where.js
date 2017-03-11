@@ -26,7 +26,7 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[1], 'value2');
     });
 
-    // todo add conditions check below
+    // TODO add conditions check below
     it('should return predicates and parameters', function () {
       const result = where({field1: 'value1', field2: 'value2'});
 
@@ -36,6 +36,57 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
+    });
+
+    describe('JSON value formatting', function () {
+      it('should stringify numbers', function () {
+        const result = where({'json->>field': 123});
+
+        assert.lengthOf(result.predicates, 1);
+        assert.equal(result.predicates[0], '"json"->>\'field\' = $1');
+        assert.lengthOf(result.params, 1);
+        assert.equal(result.params[0], '123');
+        assert.typeOf(result.params[0], 'string');
+      });
+
+      it('should stringify booleans', function () {
+        const result = where({'json->>field': true});
+
+        assert.lengthOf(result.predicates, 1);
+        assert.equal(result.predicates[0], '"json"->>\'field\' = $1');
+        assert.lengthOf(result.params, 1);
+        assert.equal(result.params[0], 'true');
+        assert.typeOf(result.params[0], 'string');
+      });
+
+      it('should stringify dates', function () {
+        const date = new Date();
+        const result = where({'json->>field': date});
+
+        assert.lengthOf(result.predicates, 1);
+        assert.equal(result.predicates[0], '"json"->>\'field\' = $1');
+        assert.lengthOf(result.params, 1);
+        assert.equal(result.params[0], date.toString());
+        assert.typeOf(result.params[0], 'string');
+      });
+
+      it('should stringify individual items in arrays', function () {
+        const result = where({'json->>field': [1, 2, 3]});
+
+        assert.lengthOf(result.predicates, 1);
+        assert.equal(result.predicates[0], '"json"->>\'field\' IN ($1, $2, $3)');
+        assert.lengthOf(result.params, 3);
+        assert.deepEqual(result.params, ['1', '2', '3']);
+        assert.typeOf(result.params[0], 'string');
+      });
+
+      it('should not stringify nulls', function () {
+        const result = where({'json->>field': null});
+
+        assert.lengthOf(result.predicates, 1);
+        assert.equal(result.predicates[0], '"json"->>\'field\' IS null');
+        assert.lengthOf(result.params, 0);
+      });
     });
 
     describe('with subgroups', function () {
