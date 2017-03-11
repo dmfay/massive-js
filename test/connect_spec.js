@@ -77,14 +77,13 @@ describe("Connecting", function () {
     });
   });
 
-  it.skip("overrides and applies defaults", function* () {
+  it("overrides and applies defaults", function* () {
     const db = yield massive({
       scripts: `${__dirname}/db`,
-      defaults: {
-        parseInt8: true
-      },
       noWarnings: true
     }, connectionString);
+
+    db.pgp.pg.defaults.parseInt8 = true;
 
     return assert.eventually.strictEqual(db.t1.count(), 0);
   });
