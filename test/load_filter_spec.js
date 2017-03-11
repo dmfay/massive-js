@@ -7,7 +7,8 @@ describe('Loading entities (these tests may be slow!)', function () {
   it('loads everything it can by default', function () {
     return massive({
       connectionString: connectionString,
-      scripts: `${__dirname}/db`
+      scripts: `${__dirname}/db`,
+      noWarnings: true
     }).then(db => {
       assert.isOk(db);
       assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -25,7 +26,8 @@ describe('Loading entities (these tests may be slow!)', function () {
   it('does not load tables without primary keys', function () {
     return massive({
       connectionString: connectionString,
-      scripts: `${__dirname}/db`
+      scripts: `${__dirname}/db`,
+      noWarnings: true
     }).then(db => {
       assert(!db.t3); // tables without primary keys aren't loaded
     });
@@ -36,7 +38,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        schema: "one, two"
+        schema: "one, two",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
@@ -56,7 +59,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         schema: "two",
-        exceptions: "t1, v1, one.v2"
+        exceptions: "t1, v1, one.v2",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -77,7 +81,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        blacklist: "%1, one.%2"
+        blacklist: "%1, one.%2",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -96,7 +101,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        blacklist: "one.%1"
+        blacklist: "one.%1",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -116,7 +122,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         blacklist: "%1",
-        exceptions: "one.%1"
+        exceptions: "one.%1",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -137,7 +144,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        whitelist: "t1, one.t1"
+        whitelist: "t1, one.t1",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -158,7 +166,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         scripts: `${__dirname}/db`,
         schema: "one",
         blacklist: "t1",
-        whitelist: "t1"
+        whitelist: "t1",
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -179,7 +188,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        excludeFunctions: true
+        excludeFunctions: true,
+        noWarnings: true
       }).then(db => {
         assert.equal(db.functions.length, 0);
       });
@@ -189,7 +199,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        excludeFunctions: false
+        excludeFunctions: false,
+        noWarnings: true
       }).then(db => {
         assert(db.functions.length > 0);
       });
@@ -201,7 +212,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        functionBlacklist: "%1, one.f2"
+        functionBlacklist: "%1, one.f2",
+        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
@@ -212,7 +224,8 @@ describe('Loading entities (these tests may be slow!)', function () {
       return massive({
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
-        functionWhitelist: "%1, one.f2"
+        functionWhitelist: "%1, one.f2",
+        noWarnings: true
       }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
@@ -224,7 +237,8 @@ describe('Loading entities (these tests may be slow!)', function () {
         connectionString: connectionString,
         scripts: `${__dirname}/db`,
         functionBlacklist: "one.%1",
-        functionWhitelist: "one.%"
+        functionWhitelist: "one.%",
+        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);

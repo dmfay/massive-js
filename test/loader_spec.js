@@ -10,7 +10,6 @@ describe("On spin up", function () {
     assert.isOk(db);
     assert.isOk(db.tables);
     assert.isOk(db.queryFiles);
-    assert.isOk(db.connectionString);
   });
 
   it("loads non-public schemata as namespace properties", function () {
