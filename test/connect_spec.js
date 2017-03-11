@@ -72,8 +72,6 @@ describe("Connecting", function () {
       noWarnings: true
     });
 
-    assert.equal(db.defaults.parseInt8, true);
-
     return assert.eventually.strictEqual(db.t1.count(), 0);
   });
 
