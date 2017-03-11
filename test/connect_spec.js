@@ -77,7 +77,7 @@ describe("Connecting", function () {
     });
   });
 
-  it("overrides and applies defaults", function* () {
+  it.skip("overrides and applies defaults", function* () {
     const db = yield massive({
       scripts: `${__dirname}/db`,
       defaults: {
