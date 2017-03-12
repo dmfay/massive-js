@@ -3,7 +3,7 @@
 const co = require('co');
 const path = require('path');
 const connectionString = 'postgres://postgres@localhost/massive';
-const scriptsDir = path.join(__dirname, '..', 'db');
+const scriptsDir = path.join(__dirname, 'scripts');
 
 require('co-mocha');
 

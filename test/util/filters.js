@@ -1,8 +1,9 @@
 'use strict';
-const filters = require("../lib/filters");
 
-describe("Filter generation", function () {
-  describe("schema filtering", function () {
+const filters = require("../../lib/util/filters");
+
+describe("filters", function () {
+  describe("schema", function () {
     it("allows all schemata", function () {
       assert.equal(filters.schema("all"), "");
       assert.equal(filters.schema("*"), "");
@@ -21,7 +22,7 @@ describe("Filter generation", function () {
     });
   });
 
-  describe("entity filtering", function () {
+  describe("entity", function () {
     it("allows all entities", function () {
       assert.equal(filters.entity(), "");
     });
