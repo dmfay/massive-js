@@ -20,6 +20,10 @@ describe("filters", function () {
       assert.equal(filters.schema(["one"]), "one");
       assert.equal(filters.schema(["one", "two"]), "one, two");
     });
+
+    it('throws on invalid input', function () {
+      assert.throws(() => filters.schema({}));
+    });
   });
 
   describe("entity", function () {
@@ -35,6 +39,10 @@ describe("filters", function () {
     it("joins array filters", function () {
       assert.equal(filters.entity(["one"]), "one");
       assert.equal(filters.entity(["one", "two"]), "one, two");
+    });
+
+    it('throws on invalid input', function () {
+      assert.throws(() => filters.entity({}));
     });
   });
 });
