@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const Massive = require('./lib/massive');
+const Database = require('./lib/database');
 
 exports = module.exports = (config, connection) => {
   if (!connection || _.isEmpty(connection)) {
@@ -10,6 +10,6 @@ exports = module.exports = (config, connection) => {
     connection = `postgres://localhost:5432/${connection.database || connection.db}`;
   }
 
-  return (new Massive(config, connection)).reload();
+  return (new Database(config, connection)).reload();
 };
 
