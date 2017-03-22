@@ -5,7 +5,6 @@ const Table = require('../../lib/table');
 describe('createDocumentTable', function () {
   const schema = 'spec';
   const tableName = 'doggies';
-  const schemaTableName = `${schema}.${tableName}`;
   let db;
 
   before(function* () {
@@ -22,11 +21,14 @@ describe('createDocumentTable', function () {
       return db.createDocumentTable(tableName).then(() => {
         assert.isOk(db[tableName]);
         assert.instanceOf(db[tableName], Table);
+        assert.lengthOf(db.tables, 1);
       });
     });
   });
 
   describe('with schema', function() {
+    const schemaTableName = `${schema}.${tableName}`;
+
     before(function() {
       return db.createSchema(schema);
     });
@@ -39,6 +41,7 @@ describe('createDocumentTable', function () {
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);
         assert.instanceOf(db[schema][tableName], Table);
+        assert.lengthOf(db.tables, 1);
       });
     });
   });

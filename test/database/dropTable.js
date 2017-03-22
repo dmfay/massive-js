@@ -1,10 +1,8 @@
 'use strict';
 
-
 describe('dropTable', function () {
   const schema = 'spec';
   const tableName = 'doggies';
-  const schemaTableName = `${schema}.${tableName}`;
   let db;
 
   before(function* () {
@@ -17,23 +15,31 @@ describe('dropTable', function () {
       return db.createDocumentTable(tableName);
     });
 
-    it('removes the table from public schema', function() {
-      return db.dropTable(tableName, {cascade: true}).then(() => {
-        assert.isUndefined(db[tableName]);
-      });
+    it('removes the table from public schema', function* () {
+      assert.lengthOf(db.tables, 1);
+
+      yield db.dropTable(tableName, {cascade: true});
+
+      assert.isUndefined(db[tableName]);
+      assert.lengthOf(db.tables, 0);
     });
   });
 
   describe('with schema', function() {
+    const schemaTableName = `${schema}.${tableName}`;
+
     before(function* () {
       yield db.createSchema(schema);
       yield db.createDocumentTable(schemaTableName);
     });
 
-    it('removes the table from the specified schema', function() {
-      return db.dropTable(schemaTableName, {cascade: true}).then(() => {
-        assert.isUndefined(db[schema][tableName]);
-      });
+    it('removes the table from the specified schema', function* () {
+      assert.lengthOf(db.tables, 1);
+
+      yield db.dropTable(schemaTableName, {cascade: true});
+
+      assert.isUndefined(db[schema][tableName]);
+      assert.lengthOf(db.tables, 0);
     });
   });
 });
