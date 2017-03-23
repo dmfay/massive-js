@@ -15,62 +15,35 @@ describe('connecting', function () {
 
   describe('variations', function () {
     it('connects with a connectionString property', function* () {
-      const db = yield massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, {
-        connectionString: connectionString
-      });
+      const db = yield massive({ connectionString: connectionString }, {}, { noWarnings: true });
 
       assert.isOk(db);
       assert.isOk(db.t1);
     });
 
     it('connects with a connection string literal', function* () {
-      const db = yield massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, connectionString);
+      const db = yield massive(connectionString, {}, { noWarnings: true });
+
+      assert.isOk(db);
+      assert.isOk(db.t1);
+    });
+
+    it('connects with a property map', function* () {
+      const db = yield massive({ host: 'localhost', database: 'massive' }, {}, { noWarnings: true });
 
       assert.isOk(db);
       assert.isOk(db.t1);
     });
 
     it('connects to localhost with a database name', function* () {
-      const db = yield massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, {
-        db: 'massive'
-      });
-
-      assert.isOk(db);
-      assert.isOk(db.t1);
-    });
-
-    it('connects with pool configuration', function* () {
-      const db = yield massive({
-        poolSize: 5,
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, {
-        user: 'postgres',
-        database: 'massive',
-        host: 'localhost',
-        port: 5432
-      });
+      const db = yield massive({ db: 'massive' }, {}, { noWarnings: true });
 
       assert.isOk(db);
       assert.isOk(db.t1);
     });
 
     it('rejects with connection errors', function () {
-      return massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, {
-        database: 'doesntexist'
-      }).then(
+      return massive({ database: 'doesntexist' }, {}, { noWarnings: true }).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
@@ -80,32 +53,27 @@ describe('connecting', function () {
     });
 
     it('rejects undefined connections', function () {
-      assert.isRejected(massive({}), 'No connection information specified.');
+      assert.isRejected(massive(), 'No connection information specified.');
     });
 
     it('rejects empty connection blocks', function () {
-      assert.isRejected(massive({}, {}), 'No connection information specified.');
+      assert.isRejected(massive({}), 'No connection information specified.');
     });
 
     it('rejects empty connection strings', function () {
-      assert.isRejected(massive({}, ''), 'No connection information specified.');
+      assert.isRejected(massive(''), 'No connection information specified.');
     });
   });
 
   describe('configuration', function () {
-    it('allows undefined scripts directories', function () {
-      return massive({
-        noWarnings: true
-      }, {
-        db: 'massive'
-      });
+    it('allows undefined scripts directories', function* () {
+      const db = yield massive(connectionString, {}, { noWarnings: true });
+
+      assert.lengthOf(db.functions, 4);
     });
 
     it('exposes driver defaults through pg-promise', function* () {
-      const db = yield massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, connectionString);
+      const db = yield massive(connectionString, {}, { noWarnings: true });
 
       assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
     });
@@ -141,10 +109,11 @@ describe('connecting', function () {
     });
 
     it('loads everything it can by default', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert.isOk(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -160,10 +129,7 @@ describe('connecting', function () {
     });
 
     it('does not load tables without primary keys', function () {
-      return massive({
-        scripts: `${__dirname}/helpers/scripts`,
-        noWarnings: true
-      }, connectionString).then(db => {
+      return massive(connectionString, {}, { noWarnings: true }).then(db => {
         assert(!db.t3); // tables without primary keys aren't loaded
       });
     });
@@ -171,11 +137,12 @@ describe('connecting', function () {
 
   describe('schema filters', function () {
     it('applies filters', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        schema: 'one, two',
+        allowedSchemas: 'one, two'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -191,12 +158,13 @@ describe('connecting', function () {
     });
 
     it('allows exceptions', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        schema: 'two',
-        exceptions: 't1, v1, one.v2',
+        allowedSchemas: 'two',
+        exceptions: 't1, v1, one.v2'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!!db.v1 && !db.v2);
@@ -214,11 +182,12 @@ describe('connecting', function () {
 
   describe('table blacklists', function () {
     it('applies blacklists to tables and views', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        blacklist: '%1, one.%2',
+        blacklist: '%1, one.%2'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -234,11 +203,12 @@ describe('connecting', function () {
     });
 
     it('checks schema names in the pattern', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        blacklist: 'one.%1',
+        blacklist: 'one.%1'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -254,12 +224,13 @@ describe('connecting', function () {
     });
 
     it('allows exceptions', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
         blacklist: '%1',
-        exceptions: 'one.%1',
+        exceptions: 'one.%1'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -277,11 +248,12 @@ describe('connecting', function () {
 
   describe('table whitelists', function () {
     it('applies a whitelist with exact matching', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        whitelist: 't1, one.t1',
+        whitelist: 't1, one.t1'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -297,13 +269,14 @@ describe('connecting', function () {
     });
 
     it('overrides other filters', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        schema: 'one',
+        allowedSchemas: 'one',
         blacklist: 't1',
-        whitelist: 't1',
+        whitelist: 't1'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -321,22 +294,24 @@ describe('connecting', function () {
 
   describe('function exclusion', function () {
     it('skips loading functions when set', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        excludeFunctions: true,
+        excludeFunctions: true
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert.lengthOf(db.functions, 11);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 0);
       });
     });
 
     it('loads all functions when false', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        excludeFunctions: false,
+        excludeFunctions: false
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert.lengthOf(db.functions, 15);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
@@ -345,34 +320,37 @@ describe('connecting', function () {
 
   describe('function filtering', function () {
     it('blacklists functions', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        functionBlacklist: '%1, one.f2',
+        functionBlacklist: '%1, one.f2'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
       });
     });
 
     it('whitelists functions', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
-        functionWhitelist: '%1, one.f2',
+        functionWhitelist: '%1, one.f2'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
       });
     });
 
     it('overlaps whitelists and blacklists', function () {
-      return massive({
+      return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts`,
         functionBlacklist: 'one.%1',
-        functionWhitelist: 'one.%',
+        functionWhitelist: 'one.%'
+      }, {
         noWarnings: true
-      }, connectionString).then(db => {
+      }).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
       });

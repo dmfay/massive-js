@@ -11,7 +11,7 @@ describe('scripts', function () {
   });
 
   it('should query for a list of scripts', function* () {
-    const scripts = yield loader(db, {scriptsDir: path.resolve(__dirname, '../helpers/scripts')});
+    const scripts = yield loader(db, {scripts: path.resolve(__dirname, '../helpers/scripts')});
 
     assert.isArray(scripts);
     assert.lengthOf(scripts, 11);
