@@ -58,14 +58,14 @@ describe('destroy', function () {
   });
 
   it('deletes a record with a UUID key', function* () {
-    const found = yield db.orders.findOne({});
-    assert.isOk(found);
+    const foundBefore = yield db.orders.findOne({});
+    assert.isOk(foundBefore);
 
-    const deleted = yield db.orders.destroy({id: found.id});
+    const deleted = yield db.orders.destroy({id: foundBefore.id});
     assert.lengthOf(deleted, 1);
-    assert.equal(deleted[0].id, found.id);
+    assert.equal(deleted[0].id, foundBefore.id);
 
-    const remaining = yield db.orders.findOne({id: found.id});
-    assert.lengthOf(remaining, 0);
+    const foundAfter = yield db.orders.findOne({id: foundBefore.id});
+    assert.notOk(foundAfter);
   });
 });

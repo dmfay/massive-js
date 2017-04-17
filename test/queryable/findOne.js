@@ -29,4 +29,10 @@ describe('findOne', function () {
       assert.equal(res.id, order.id);
     });
   });
+
+  describe('no records', function () {
+    it('returns undefined', function () {
+      return db.products.findOne({id: 35565}).then(res => assert.isUndefined(res));
+    });
+  });
 });
