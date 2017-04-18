@@ -32,7 +32,7 @@ describe('On spin up', function () {
   });
 
   it('loads all tables', function () {
-    assert.equal(db.tables.length, 6);
+    assert.equal(db.tables.length, 7);
   });
 
   it('loads all views', function () {
@@ -44,7 +44,7 @@ describe('On spin up', function () {
   });
 
   it('loads functions', function () {
-    assert.equal(db.functions.length, 4);
+    assert.equal(db.functions.length, 6);
   });
 });
 
@@ -76,7 +76,7 @@ describe('Synchronous Load', function () {
   });
 
   it('loads all tables', function () {
-    assert.equal(syncLoaded.tables.length, 6);
+    assert.equal(syncLoaded.tables.length, 7);
   });
 
   it('loads all views', function () {
@@ -88,6 +88,6 @@ describe('Synchronous Load', function () {
   });
 
   it('loads functions', function () {
-    assert.equal(db.functions.length, 4);
+    assert.equal(db.functions.length, 6);
   });
 });

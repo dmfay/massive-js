@@ -28,3 +28,9 @@ CREATE OR REPLACE FUNCTION one.f2() RETURNS int AS $$ SELECT * FROM one.t2 $$ LA
 CREATE SCHEMA two;
 
 CREATE TABLE two.t1 (id serial PRIMARY KEY);
+
+CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+
+CREATE SERVER loopback FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname 'massive', port '5432');
+
+CREATE FOREIGN TABLE foreigntable (id serial) SERVER loopback OPTIONS (schema_name 'public', table_name 't1');

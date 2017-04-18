@@ -151,6 +151,29 @@ Massive.prototype.loadDescendantTables = function(next) {
   });
 };
 
+Massive.prototype.loadForeignTables = function(next) {
+  var tableSql = __dirname + "/lib/scripts/foreign_tables.sql";
+  var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
+  var self = this;
+
+  this.executeSqlFile({file : tableSql, params: parameters}, function(err, foreignTables) {
+    if (err) { return next(err, null); }
+
+    _.each(foreignTables, function (table) {
+      var _table = new Table({
+        schema : table.schema,
+        name : table.name,
+        is_insertable: table.is_insertable_into,
+        db : self
+      });
+
+      MapToNamespace(_table);
+    });
+
+    next(null, self);
+  });
+};
+
 Massive.prototype.loadViews = function(next) {
   var viewSql = __dirname + "/lib/scripts/views.sql";
   var parameters = [this.allowedSchemas, this.blacklist, this.exceptions];
@@ -508,15 +531,19 @@ exports.connect = function(args, next) {
     massive.loadDescendantTables(function () {
       if (err) { return next(err); }
 
-      massive.loadViews(function() {
+      massive.loadForeignTables(function () {
         if (err) { return next(err); }
 
-        massive.loadFunctions(function(err, db) {
+        massive.loadViews(function() {
           if (err) { return next(err); }
 
-          db.loadQueries(); // synchronous
+          massive.loadFunctions(function(err, db) {
+            if (err) { return next(err); }
 
-          next(null, db);
+            db.loadQueries(); // synchronous
+
+            next(null, db);
+          });
         });
       });
     });
