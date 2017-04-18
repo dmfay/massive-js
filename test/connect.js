@@ -110,7 +110,7 @@ describe('connecting', function () {
 
     it('loads everything it can by default', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts`
       }, {
         noWarnings: true
       }).then(db => {
