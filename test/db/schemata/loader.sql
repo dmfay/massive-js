@@ -33,4 +33,8 @@ CREATE EXTENSION IF NOT EXISTS postgres_fdw;
 
 CREATE SERVER loopback FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname 'massive', port '5432');
 
+CREATE USER MAPPING FOR postgres
+        SERVER loopback
+        OPTIONS (user 'postgres');
+
 CREATE FOREIGN TABLE foreigntable (id serial) SERVER loopback OPTIONS (schema_name 'public', table_name 't1');
