@@ -18,9 +18,9 @@ describe('Loading entities (these tests may be slow!)', function () {
       assert(!!db.f1 && !!db.f2);
       assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
       assert(!!db.two && !! db.two.t1);
-      assert.equal(db.tables.length, 6);
+      assert.equal(db.tables.length, 7);
       assert.equal(db.views.length, 6);
-      assert.equal(db.functions.length, 4);
+      assert.equal(db.functions.length, 6);
 
       done();
     });
@@ -48,9 +48,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !! db.two.t1);
-        assert.equal(db.tables.length, 6);
+        assert.equal(db.tables.length, 7);
         assert.equal(db.views.length, 6);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -69,7 +69,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -88,7 +88,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -107,7 +107,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -126,7 +126,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -145,9 +145,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 3);
+        assert.equal(db.tables.length, 4);
         assert.equal(db.views.length, 3);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -164,9 +164,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.equal(db.tables.length, 5);
+        assert.equal(db.tables.length, 6);
         assert.equal(db.views.length, 5);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -183,9 +183,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 2);
+        assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -202,9 +202,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 2);
+        assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -221,9 +221,9 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 4);
+        assert.equal(db.tables.length, 5);
         assert.equal(db.views.length, 4);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -244,7 +244,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -263,7 +263,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -282,7 +282,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
@@ -301,7 +301,7 @@ describe('Loading entities (these tests may be slow!)', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
-        assert.equal(db.functions.length, 4);
+        assert.equal(db.functions.length, 6);
 
         done();
       });
