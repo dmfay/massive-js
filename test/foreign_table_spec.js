@@ -28,4 +28,20 @@ describe('Loading entities (these tests may be slow!)', function () {
       });
     });
   });
+
+  it('cannot save to foreign tables', function (done) {
+    db.foreigntable.save({id: 1}, function (err) {
+      assert.equal(err.message, 'No primary key, use insert or update to write to this table');
+
+      return done();
+    });
+  });
+
+  it('cannot use the single-object update with foreign tables', function (done) {
+    db.foreigntable.update({id: 1}, function (err) {
+      assert.equal(err.message, 'No primary key, use the (criteria, updates) signature');
+
+      return done();
+    });
+  });
 });

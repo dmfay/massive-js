@@ -106,6 +106,8 @@ db.users.find(1, function(err,res){
 
 The goal with this API is expressiveness and terseness - allowing you to think as little as possible about accessing your data.
 
+Massive looks for a primary key in order to enable simpler writes, and ignores tables without primary keys. The only exception is foreign tables, which cannot have primary keys.
+
 ## Full Text Search Built In
 
 If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc` and we'll build the index on the fly:
