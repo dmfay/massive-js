@@ -130,4 +130,32 @@ describe('saveDoc', function () {
       return db.dropSchema('myschema', {cascade: true});
     });
   });
+
+  describe('with a validator', function () {
+    before(function() {
+      return db.createDocumentTable('doggies');
+    });
+
+    it('applies validation to a document', function* () {
+      db.getTable('doggies').validate = function(doc) {
+        if (!doc.name) throw 'Dogs must have a name';
+      };
+
+      var doc;
+      try {
+        doc = yield db.saveDoc('doggies', {age: 10});
+        assert(false)
+      } catch (err) {
+        // this is in fact OK
+      }
+
+      doc = yield db.saveDoc('doggies', {name: 'Fido', age: 10});
+
+      assert.isOk(db.doggies);
+    });
+
+    after(function() {
+      return db.query('DROP TABLE doggies;');
+    });
+  });
 });
