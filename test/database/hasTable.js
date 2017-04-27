@@ -27,7 +27,7 @@ describe('hasTable', function () {
 
   describe('with schema', function() {
     const schemaTableName = `${schema}.${tableName}`;
-    const missingSchemaTableName = `${schema}.${tableName}`;
+    const missingSchemaTableName = `${schema}.${missingTableName}`;
 
     before(function* () {
       yield db.createSchema(schema);
