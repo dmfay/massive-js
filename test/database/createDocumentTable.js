@@ -39,6 +39,7 @@ describe('createDocumentTable', function () {
 
     it('creates a table on the specified schema', function() {
       return db.createDocumentTable(schemaTableName).then(() => {
+        assert.isOk(db.hasDocumentTable(schemaTableName));
         assert.isOk(db[schema][tableName]);
         assert.instanceOf(db[schema][tableName], Table);
         assert.lengthOf(db.tables, 1);
