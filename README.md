@@ -27,11 +27,7 @@ Once Massive is installed, you can use it by calling `connect` and passing in a 
 ```javascript
 var massive = require("massive");
 
-//you can use db for 'database name' running on localhost
-//or send in everything using 'connectionString'
-massive.connect({db : "myDb"}, function(err,db){
-  db.myTable.find();
-});
+var conn = massive("postgres://localhost/massive");
 ```
 ## Usage
 
@@ -46,19 +42,25 @@ var http = require('http');
 var massive = require("massive");
 var connectionString = "postgres://massive:password@localhost/chinook";
 
-// connect to Massive and get the db instance. You can safely use the
-// convenience sync method here because its on app load
-// you can also use loadSync - it's an alias
-var massiveInstance = massive.connectSync({connectionString : connectionString})
+// connect to Massive and get the db instance.
+var db = massive(connectionString);
 
 // Set a reference to the massive instance on Express' app:
-app.set('db', massiveInstance);
+app.set('db', db);
 http.createServer(app).listen(8080);
 ```
+
 From there, accessing the db is just:
 
 ```javascript
-var db = app.get('db');
+var db = app.get('db')
+
+co.wrap(function* {
+  var conn = yield db;
+
+  //user with ID 1
+  var user = yield conn.users.find(1);
+})()
 ```
 
 ## SQL Files as Functions
@@ -67,14 +69,13 @@ Massive supports SQL files as root-level functions. By default, if you have a `d
 
 ```javascript
 var massive = require("massive");
+var db = massive("postgres://localhost/massive")
 
-massive.connect({
-  connectionString: "postgres://localhost/massive"}, function(err, db){
-  //call the productsInStock.sql file in the db/queries directory
-  db.productsInStock(function(err,products){
-    //products is a results array
-  });
-});
+co.wrap(function* {
+  var conn = yield db;
+  var products = yield conn.productsInStock();
+  //products is a results array
+})()
 ```
 
 You can use arguments right in your SQL file as well. Just format your parameters in SQL
@@ -82,14 +83,13 @@ using `$1`, `$2`, etc:
 
 ```javascript
 var massive = require("massive");
+var db = massive("postgres://localhost/massive")
 
-massive.connect({db : "myDb"}, function(err, db){
-  //just pass in the sku as an argument
-  //your SQL would be 'select * from products where sku=$1'
-  db.productsBySku("XXXYYY", function(err,products){
-    //products is a results array
-  });
-});
+co.wrap(function* {
+  var conn = yield db;
+  var products = yield conn.productsBySku("XXXYYY");
+  //products is a results array
+})()
 ```
 
 The SQL above is, of course, rather simplistic but hopefully you get the idea: *use SQL to its fullest, we'll execute it safely for you*.
@@ -99,9 +99,8 @@ The SQL above is, of course, rather simplistic but hopefully you get the idea: *
 When Massive starts up it scans your tables as well and drops a queryable function on the root namespace. This means you can query your tables as if they were objects right on your db instance:
 
 ```javascript
-db.users.find(1, function(err,res){
-  //user with ID 1
-});
+//user with ID 1
+var user = yield conn.users.find(1)
 ```
 
 The goal with this API is expressiveness and terseness - allowing you to think as little as possible about accessing your data.
@@ -111,20 +110,17 @@ The goal with this API is expressiveness and terseness - allowing you to think a
 If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc` and we'll build the index on the fly:
 
 ```javascript
-db.users.search({columns :["email"], term: "rob"}, function(err,users){
-  //all users with the word 'rob' in their email
-});
+//all users with the word 'rob' in their email
+yield conn.users.search({columns :["email"], term: "rob"});
 ```
 
 This works the same for documents as well (more on documents in next section):
 
 ```javascript
 //full text search...
-db.my_documents.searchDoc({
+yield conn.my_documents.searchDoc({
   keys : ["title", "description"],
   term : "Kauai"
-}, function(err,docs){
-  //docs returned with an on-the-fly Full Text Search for 'Kauai'
 });
 ```
 
@@ -144,74 +140,44 @@ var newDoc = {
   ]
 };
 
-db.saveDoc("my_documents", newDoc, function(err,res){
-  //the table my_documents was created on the fly
-  //res is the new document with an ID created for you
-});
+yield conn.saveDoc("my_documents", newDoc);
 
 //you can now access the document right on the root
-db.my_documents.findDoc(1, function(err,doc){
-  //you now have access to the doc
-});
+yield conn.my_documents.findDoc(1);
 
-//run a 'contains' query which flexes the index we created for you
-db.my_documents.findDoc({price : 99.00}, function(err,docs){
-  //1 or more documents returned
-});
+//run a 'contains' query which flexes the index we created for you; 1 or more documents returned
+yield conn.my_documents.findDoc({price : 99.00});
 
 //run a deep match passing an array of objects
-//again flexing the index we created for you
-db.my_documents.findDoc({tags: [{slug : "simple"}]}, function(err,docs){
-  //1 or more documents returned
-});
+//again flexing the index we created for you; 1 or more documents returned
+yield conn.my_documents.findDoc({tags: [{slug : "simple"}]});
 
-//comparative queries - these don't use indexing
-db.my_documents.findDoc({"price >": 50.00}, function(err,docs){
-  //1 or more documents returned with a price > 50
-});
+//comparative queries - these don't use indexing; 1 or more documents returned with a price > 50
+yield conn.my_documents.findDoc({"price >": 50.00});
 
-//IN queries by passing arrays
-db.my_documents.findDoc({id : [1,3,9]}, function(err,docs){
-  //documents with ID 1, 3, and 9
-});
+//IN queries by passing arrays; returns documents with ID 1, 3, and 9
+yield conn.my_documents.findDoc({id : [1,3,9]});
 
-//NOT IN
-db.my_documents.findDoc({"id <>": [3,5]}, function(err,docs){
-  //documents without ID 3 and 5
-});
+//NOT IN; returns documents without ID 3 and 5
+yield conn.my_documents.findDoc({"id <>": [3,5]});
 
 // Create an empty schema
-db.createSchema('my_schema', function(err, res) {
-  // empty array
-});
+yield conn.createSchema('my_schema');
 
 // Drop schema
-db.dropSchema('my_schema', {cascade: true|false}, function(err, res) {
-  // empty array
-});
+yield conn.dropSchema('my_schema', {cascade: true|false});
 
 // Create a new table
-db.createDocumentTable('my_table', function(err, res) {
-  // empty array
-});
+yield conn.createDocumentTable('my_table');
 
 // Create a new table on explicit schema
-db.createDocumentTable('my_schema.my_table', function(err, res) {
-  // empty array
-});
+yield conn.createDocumentTable('my_schema.my_table');
 
 // Drop table
-db.dropTable('my_table', {cascade: true|false}, function(err, res) {
-  // empty array
-});
+yield conn.dropTable('my_table', {cascade: true|false});
 
 // Drop table on explicit schema
-db.dropTable('my_schema.my_table', {cascade: true|false}, function(err, res) {
-  // empty array
-});
-
-
-
+yield conn.dropTable('my_schema.my_table');
 ```
 
 #### A Word About IDs in Document Tables
@@ -227,50 +193,37 @@ When you run `connect` massive executes a quick `INFORMATION_SCHEMA` query and a
 The API is as close to Massive 1.0 as we could make it - but there's no need for `execute` - just run the query directly:
 
 ```javascript
-//connect massive, get db instance
+//connect massive, get db instance and connection
 
-//straight up SQL
-db.run("select * from products where id=$1", [1], function(err,product){
-  //product 1
-});
+//straight up SQL; returns product 1
+yield conn.run("select * from products where id=$1", [1]);
 
-//simplified SQL with a where
-db.products.where("id=$1 OR id=$2", [10,21], function(err,products){
-  //products 10 and 21
-});
+//simplified SQL with a where; returns products 10 and 21
+yield conn.products.where("id=$1 OR id=$2", [10,21]);
 
-//an IN query
-db.products.find({id : [10,21]}, function(err,products){
-  //products 10 and 21
-});
+//an IN query; returns products 10 and 21
+yield conn.products.find({id : [10,21]});
 
-//a NOT IN query
-db.products.find({"id <>": [10,21]}, function(err,products){
-  //products other than 10 and 21
-});
+//a NOT IN query; returns products other than 10 and 21
+yield conn.products.find({"id <>": [10,21]});
 
 //match a JSON field
-db.products.find({"specs->>weight": 30}, function(err, products) {
-  //products where the 'specs' field is a JSON document containing {weight: 30}
-  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
-})
+//returns products where the 'specs' field is a JSON document containing {weight: 30}
+//note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
+yield conn.products.find({"specs->>weight": 30})
 
 //match a JSON field with an IN list (note NOT IN is not supported for JSON fields at this time)
-db.products.find({"specs->>weight": [30, 35]}, function(err, products) {
-  //products where the 'specs' field is a JSON document containing {weight: 30}
-  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
-})
+//returns products where the 'specs' field is a JSON document containing {weight: 30}
+//note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
+yield conn.products.find({"specs->>weight": [30, 35]})
 
 //drill down a JSON path
-db.products.find({"specs#>>{dimensions,length}": 15}, function(err, products) {
-  //products where the 'specs' field is a JSON document having a nested 'dimensions' object containing {length: 15}
-  //note that the corresponding SQL query would be phrased specs->>'{dimensions,length}'; Massive adds the quotes for you
-})
+//returns products where the 'specs' field is a JSON document having a nested 'dimensions' object containing {length: 15}
+//note that the corresponding SQL query would be phrased specs->>'{dimensions,length}'; Massive adds the quotes for you
+yield conn.products.find({"specs#>>{dimensions,length}": 15})
 
-//Send in an ORDER clause by passing in a second argument
-db.products.find({},{order: "price desc"}, function(err,products){
-  //products ordered in descending fashion
-});
+//Send in an ORDER clause by passing in a second argument; returns products ordered in descending fashion
+yield conn.products.find({},{order: "price desc"});
 
 //Send in an ORDER clause and a LIMIT with OFFSET
 var options = {
@@ -278,48 +231,33 @@ var options = {
   order : "id",
   offset: 20
 }
-db.products.find({}, options, function(err,products){
-  //products ordered in descending fashion
-});
+//returns products ordered in descending fashion
+yield conn.products.find({}, options);
 
-//You only want the sku and name back
+//You only want the sku and name back; returns an array of sku and name
 var options = {
   limit : 10,
   columns : ["sku", "name"]
 }
-db.products.find({}, options, function(err,products){
-  // an array of sku and name
-});
+yield conn.products.find({}, options);
 
-//find a single user by id
-db.users.findOne(1, function(err,user){
-  //returns user with id (or whatever your PK is) of 1
-});
+//find a single user by id; returns user with id (or whatever your PK is) of 1
+yield conn.users.findOne(1);
 
-//another way to do the above
-db.users.find(1, function(err,user){
-  //returns user with id (or whatever your PK is) of 1
-});
+//another way to do the above; returns user with id (or whatever your PK is) of 1
+yield conn.users.find(1);
 
 //find first match
-db.users.findOne({email : "test@test.com"}, function(err,user){
-  //returns the first match
-});
+yield conn.users.findOne({email : "test@test.com"});
 
-//simple query
-db.users.find({active: true}, function(err,users){
-  //all users who are active
-});
+//simple query; returns all users who are active
+yield conn.users.find({active: true});
 
-//include the PK in the criteria for an update
-db.users.save({id : 1, email : "test@example.com"}, function(err,updated){
-  //the updated record for the new user
-});
+//include the PK in the criteria for an update; returns the updated record for the new user
+yield conn.users.save({id : 1, email : "test@example.com"});
 
-//no PK does an INSERT
-db.users.save({email : "new@example.com"}, function(err,inserted){
-  //the new record with the ID
-});
+//no PK does an INSERT; returns the new record with the ID
+yield conn.users.save({email : "new@example.com"});
 ```
 
 ## Streams
@@ -327,16 +265,15 @@ db.users.save({email : "new@example.com"}, function(err,inserted){
 To improve performance over large result sets, you might want to consider using a stream. This has the upside of returning reads right away, but the downside of leaving a connection open until you close it. To use a stream, just send in `{stream: true}` in the options:
 
 ```js
-db.users.find({company_id : 12}, {stream:true}, function(err,stream){
+var stream = yield conn.users.find({company_id : 12}, {stream:true})
 
-  stream.on('readable', function(){
-    var user = stream.read();
-    //do your thing
-  });
+stream.on('readable', function(){
+  var user = stream.read();
+  //do your thing
+});
 
-  stream.on('end', function(){
-    //deal with results here
-  });
+stream.on('end', function(){
+  //deal with results here
 });
 ```
 
@@ -345,13 +282,11 @@ db.users.find({company_id : 12}, {stream:true}, function(err,stream){
 Massive understands the notion of database schemas and treats any Postgres schema other than `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. To steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
 
 ```javascript
-db.membership.users.save({email : "new@example.com"}, function(err,inserted){
-  //the new record with the ID
-});
+// returns the new record with the ID
+yield conn.membership.users.save({email : "new@example.com"});
 
-db.membership.users.find({active: true}, function(err,users){
-  //all users who are active
-});
+// returns all users who are active
+yield conn.membership.users.find({active: true});
 
 ```
 
@@ -376,8 +311,8 @@ language sql;
 Massive will load up and attach the `all_products` function, and any other Postgres function as JS functions on the root massive namespace (or on an appropriate schema-based namespace, as we just saw), which you can then access directly as functions:
 
 ```javascript
-db.all_products(function(err,res) {
-  // returns the result of the function (all the product records, in this case...)
+// returns the result of the function (all the product records, in this case...)
+yield conn.all_products(function(err,res) {
 });
 ```
 Obviously, this was a trivial example, but you get the idea. You can perform complex logic deep in your database, and massive will make it accessible directly. For a deeper dive on this, see [pg-auth](https://github.com/robconery/pg-auth), which basically [rolls common membership up into a box](http://rob.conery.io/2015/03/17/membership-in-a-box-with-pg-auth/) and tucks the auth pain away behind a pleasing facade of Postgres functions. Guaranteed to stir up spirited discussions with your friends and neighbors.
@@ -385,9 +320,8 @@ Obviously, this was a trivial example, but you get the idea. You can perform com
 If you're using a function that takes multiple parameters, you'll need to wrap your arguments in an array:
 
 ```js
-db.myFunction(['thing1', 'thing2'], function(err,res){
-  //result is always an array
-})
+//result is always an array
+yield conn.myFunction(['thing1', 'thing2'])
 ```
 
 ## REPL
