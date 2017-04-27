@@ -1,6 +1,6 @@
 'use strict';
 
-describe('hasTable', function () {
+describe('getTable', function () {
   const schema = 'spec';
   const tableName = 'doggies';
   const missingTableName = 'doges';
@@ -20,8 +20,8 @@ describe('hasTable', function () {
     });
 
     it('verifies the presence of the table in public schema', function () {
-      assert.equal(db.hasTable(tableName), true);
-      assert.equal(db.hasTable(missingTableName), false);
+      assert.isOk(db.getTable(tableName));
+      assert.isNotOk(db.getTable(missingTableName));
     });
   });
 
@@ -39,8 +39,8 @@ describe('hasTable', function () {
     });
 
     it('verifies the presence of the table in the specified schema', function () {
-      assert.equal(db.hasTable(schemaTableName), true);
-      assert.equal(db.hasTable(missingSchemaTableName), false);
+      assert.isOk(db.getTable(schemaTableName));
+      assert.isNotOk(db.getTable(missingSchemaTableName));
     });
   });
 });
