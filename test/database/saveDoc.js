@@ -141,15 +141,15 @@ describe('saveDoc', function () {
         if (!doc.name) throw 'Dogs must have a name';
       };
 
-      var doc;
       try {
-        doc = yield db.saveDoc('doggies', {age: 10});
-        assert(false)
+        yield db.saveDoc('doggies', {age: 10});
+        // we should not get here
+        assert(false);
       } catch (err) {
         // this is in fact OK
       }
 
-      doc = yield db.saveDoc('doggies', {name: 'Fido', age: 10});
+      yield db.saveDoc('doggies', {name: 'Fido', age: 10});
 
       assert.isOk(db.doggies);
     });
