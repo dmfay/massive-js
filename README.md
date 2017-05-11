@@ -182,6 +182,22 @@ db.my_documents.findDoc({"id <>": [3,5]}, function(err,docs){
   //documents without ID 3 and 5
 });
 
+// save a document; will insert if there is no id field
+newDoc.author = "Jane Smith";
+db.my_documents.saveDoc(newDoc, function (err, doc) {
+  // updated document record
+});
+
+// set a single document attribute
+db.my_documents.setAttribute(1, "price", 95.95, function (err, doc) {
+  // updated document record
+});
+
+// set multiple attributes
+db.my_documents.setAttributes(1, {"price": 90.00, "stock": 12}, function (err, doc) {
+  // updated document record
+});
+
 // Create an empty schema
 db.createSchema('my_schema', function(err, res) {
   // empty array
