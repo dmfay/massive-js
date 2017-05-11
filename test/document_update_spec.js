@@ -67,6 +67,15 @@ describe('Document updates,', function(){
       });
     });
 
+    skipBelow95('updates many document properties', function(done) {
+      db.docs.setAttributes(newDoc.id, {score:10, field:'someothervalue'}, function(err, doc){
+        assert.ifError(err);
+        assert.equal(doc.score, 10);
+        assert.equal(doc.field, 'someothervalue');
+        done();
+      });
+    });
+
     after(function (done) {
       db.docs.destroy({id: newDoc.id}, done);
     });
