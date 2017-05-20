@@ -1,454 +1,407 @@
-<img src="http://rob.conery.io/img/2015/03/massive-logo.png" width=450 />
-
-## Massive 2.0: A Postgres-centric Data Access Tool
+# Massive.js 3.0: A Postgres-centric Data Access Tool
 
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 
-*This is the repository for MassiveJS 2.0. If you're looking for < 2, [you can find it here](https://github.com/dmfay/massive-js/releases/tag/1.0)*
+Massive.js is a data mapper for Node.js and PostgreSQL that fully embraces the power and flexibility of SQL. Unlike traditional object-relational mappers which hide your schema under an abstracted data model, Massive's goal is to facilitate data storage and access through the interfaces and tools you already use: tables, views, functions, and scripts.
 
-Massive's goal is to **help** you get data from your database. This is not an ORM, it's a bit more than a query tool - our goal is to do just enough, then get out of your way. [I'm a huge fan of Postgres](http://rob.conery.io/category/postgres/) and the inspired, creative way you can use it's modern SQL functionality to work with your data.
+When you need to run complex queries that have no hope of being expressed in any way other than SQL, Massive accepts prepared statements and returns results. When you just don't feel like writing yet another `SELECT *` or `UPDATE` by hand, it provides simple, intuitive interfaces to bridge the gap between your database entities and your JavaScript code in ways that make sense. Postgres is an amazing relational database with a vast array of capabilities, from document storage with `jsonb` to array fields to inheritance and beyond, and Massive takes full advantage of its commitment to Postgres to give you the freedom to work with your data the way you need it.
 
-ORMs abstract this away, and it's silly. Postgres is an amazing database with a rich ability to act as a document storage engine (using `jsonb`) as well as a cracking relational engine.
+## Full Documentation
 
-Massive embraces SQL completely, and helps you out when you don't feel like writing another mundane `select * from` statement.
-
-## Documentation
-Full documentation is available [here](http://massive-js.readthedocs.org/en/latest/).
-
+> TODO
 
 ## Installation
 
 ```
-npm install massive --save
+npm i massive --save
 ```
 
-Once Massive is installed, you can use it by calling `connect` and passing in a callback which will give you your database instance:
+**Starting with version 3, Massive uses Promises exclusively. If you need a callback-based API, use [version 2.x](https://github.com/dmfay/massive-js/releases).**
+
+Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
+
+## Quickstart
+
+Once installed, `require` the library and connect to your database with a parameter object or connection string:
 
 ```javascript
-var massive = require("massive");
+const massive = require('massive');
 
-//you can use db for 'database name' running on localhost
-//or send in everything using 'connectionString'
-massive.connect({db : "myDb"}, function(err,db){
-  db.myTable.find();
-});
-```
-## Usage
-
-One of the key features of Massive is that it loads all of your tables, Postgres functions, and local query files up as functions (this is really cool, you want this. See below for more info). Massive is fast, and does this quickly. However, there is a one-time execution penalty at intialization while all this happens. In most situations it makes sense to do this once, at application load. From there, maintain a reference to the Massive instance (Massive was conceived with this usage in mind). For example, if you are using Express as your application framework, you might do something like this:
-
-####Express Example
-
-```javascript
-var express = require("express");
-var app = express();
-var http = require('http');
-var massive = require("massive");
-var connectionString = "postgres://massive:password@localhost/chinook";
-
-// connect to Massive and get the db instance. You can safely use the
-// convenience sync method here because its on app load
-// you can also use loadSync - it's an alias
-var massiveInstance = massive.connectSync({connectionString : connectionString})
-
-// Set a reference to the massive instance on Express' app:
-app.set('db', massiveInstance);
-http.createServer(app).listen(8080);
-```
-From there, accessing the db is just:
-
-```javascript
-var db = app.get('db');
+massive({
+  host: '127.0.0.1',
+  port: 5432,
+  database: 'appdb',
+  username: 'appuser',
+  password: 'apppwd'
+}).then(db => {...});
 ```
 
-## SQL Files as Functions
+When you instantiate Massive, it introspects your database for tables, views, and functions. Along with files in your scripts directory (`/db` by default), these become an API that allows you to query database objects and execute scripts and functions. This initialization process is fast, but not instantaneous, and you don't want to be doing it every time you run a new query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application. In Express, you can store it with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; otherwise, you can take advantage of Node's module caching to require the object as necessary.
 
-Massive supports SQL files as root-level functions. By default, if you have a `db` directory in your project (you can override this by passing in a `scripts` setting), Massive will read each SQL file therein and create a query function with the same name. If you use subdirectories, Massive will namespace your queries in the exact same way:
+### Raw SQL
+
+Need to get weird? Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.run`.
 
 ```javascript
-var massive = require("massive");
-
-massive.connect({
-  connectionString: "postgres://localhost/massive"}, function(err, db){
-  //call the productsInStock.sql file in the db/queries directory
-  db.productsInStock(function(err,products){
-    //products is a results array
-  });
+db.run('select * from tests where id > $1', [1]).then(tests => {
+  // all tests matching the criteria
 });
 ```
 
-You can use arguments right in your SQL file as well. Just format your parameters in SQL
-using `$1`, `$2`, etc:
+### Tables and Views
+
+Massive loads all views (including materialized views) and all tables having primary key constraints. Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.
+
+#### Schemas
+
+Massive understands database schemas and treats any schema other than the default `public` as a namespace. Objects bound to the `public` schema are attached directly to the database object, while other schemas will be represented by a namespace attached to the database object, with their respective tables and views bound to the namespace.
 
 ```javascript
-var massive = require("massive");
+// query a table on the public schema
+db.tests.find(...).then(...);
 
-massive.connect({db : "myDb"}, function(err, db){
-  //just pass in the sku as an argument
-  //your SQL would be 'select * from products where sku=$1'
-  db.productsBySku("XXXYYY", function(err,products){
-    //products is a results array
-  });
+// query a table on another schema
+db.auth.users.find(...).then(...);
+```
+
+#### Criteria Objects
+
+Many functions use criteria objects to build a query WHERE clause. A criteria object is a JavaScript map matching database fields to values. Unless otherwise specified in the field name, the predicate operation is assumed to be equality. Massive's query builder is extremely flexible and accommodates both standard and Postgres-specific predicates, including JSON object traversal and array and regexp operations.
+
+```javascript
+{
+  'field': 'value',               // equality
+  'field <>': 'value',            // inequality
+  'field': [1, 2, 3],             // IN (x, y, z) tests
+  'field >': 1,                   // greater than
+  'field <=': 1,                  // less than or equal
+  'field LIKE': 'val%',           // LIKE
+  'field NOT ILIKE': 'Val%',      // NOT LIKE (case-insensitive)
+  'field ~': 'val[ue]+',          // regexp match
+  'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
+  'field @>': ['value', 'Value'], // array contains
+  'field ->> attr': 'value'       // JSON traversal
+}
+```
+
+There are many more; [view the full list of criteria operations here](TODO).
+
+#### Query Options
+
+Some functions take options objects which alter query behavior. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed.
+
+```javascript
+{
+  document: true,                 // query is against a document table (see below)
+  order: 'id desc',               // creates an ORDER BY clause to enforce sorting
+  orderBody: true,                // force order to apply to fields in a document body instead of the table fields
+  offset: 20,                     // adds an OFFSET to skip the first n rows
+  limit: 10,                      // adds a LIMIT to restrict the number of rows returned
+  single: false,                  // force returning the first result object instead of a results array
+  stream: true,                   // return results as a readable stream (see below)
+  only: true                      // restrict the query to the target table, ignoring descendant tables
+}
+```
+
+#### Querying
+
+`findOne` finds a single object with a primary key or a criteria object.
+
+```javascript
+db.tests.findOne(1).then(test1 => {
+  // the test with ID 1
+});
+
+db.tests.findOne({
+  is_active: true,
+  'version >': 1,
+  'name ilike': 'home%'
+}).then(tests => {
+  // all active tests with higher versions and a name matching ILIKE criteria
 });
 ```
 
-The SQL above is, of course, rather simplistic but hopefully you get the idea: *use SQL to its fullest, we'll execute it safely for you*.
-
-## Attached Tables
-
-When Massive starts up it scans your tables as well and drops a queryable function on the root namespace. This means you can query your tables as if they were objects right on your db instance:
+`find` is a general-purpose query function which returns a result list.
 
 ```javascript
-db.users.find(1, function(err,res){
-  //user with ID 1
+db.tests.find({
+  is_active: true,
+  'version >': 1,
+  'name ilike': 'home%'
+}, {
+  columns: ['name', 'version'],
+  order: 'created_at desc',
+  offset: 20,
+  limit: 10
+}).then(tests => {
+  // all active tests with higher versions and a name matching ILIKE criteria
+  // options are not required; these set the select list and results ordering, offset, and limit
 });
 ```
 
-The goal with this API is expressiveness and terseness - allowing you to think as little as possible about accessing your data.
-
-## Full Text Search Built In
-
-If you need to query a table or a document store using Postgres' built-in Full Text Indexing, you certainly can. Just use `search` or `searchDoc` and we'll build the index on the fly:
+`count` returns the resultset length.
 
 ```javascript
-db.users.search({columns :["email"], term: "rob"}, function(err,users){
-  //all users with the word 'rob' in their email
+db.tests.count({
+  is_active: true,
+  'version >': 1,
+  'name ilike': 'home%'
+}).then(count => {
+  // 
 });
 ```
 
-This works the same for documents as well (more on documents in next section):
+`search` performs full-text searches.
 
 ```javascript
-//full text search...
-db.my_documents.searchDoc({
+db.tests.search({
+  columns: ["name"],
+  term: "home"}
+).then(tests => {
+  // all tests with 'home' in the name
+});
+```
+
+`where` allows you to write your own WHERE clause instead of using a criteria object.
+
+```javascript
+db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
+  // all active tests with higher versions
+});
+```
+
+#### Persisting
+
+`insert` creates a new row or rows (if passed an array).
+
+```javascript
+db.tests.insert({
+  name: 'homepage',
+  version: 1
+}).then(tests => {
+  // an array containing the newly-inserted test
+});
+
+db.tests.insert([{
+  name: 'homepage',
+  version: 1
+}, {
+  name: 'about us',
+  version: 1
+}]).then(tests => {
+  // an array containing both newly-inserted tests
+});
+```
+
+`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
+
+```javascript
+db.tests.update({
+  id: 1,
+  version: 2,
+  priority: 'high'
+}).then(tests => {
+  // an array containing the updated test
+});
+
+db.tests.update({
+  priority: 'high'
+}, {
+  priority: 'moderate'
+}).then(tests => {
+  // an array containing all tests which formerly had priority 'high'
+  // since this issues a prepared statement note that the version field cannot be incremented here!
+});
+```
+
+`save` performs an upsert, inserting if the object has no primary key value and updating if it does.
+
+```javascript
+db.tests.save({
+  version: 1,
+  name: 'homepage'
+}).then(tests => {
+  // an array containing the newly-inserted test
+});
+
+db.tests.save({
+  id: 1,
+  version: 2,
+  priority: 'high'
+}).then(tests => {
+  // an array containing the updated test
+});
+```
+
+#### Documents
+
+Postgres' JSONB functionality allows for a more free-form approach to data than relational databases otherwise support. Working with JSONB fields is certainly possible with the suite of standard table functions, but Massive also allows the dynamic creation and usage of dedicated document tables with a separate set of functions.
+
+Document tables consist of some metadata, including the primary key, and a `body` JSONB field. A GIN index is also created for the document body and a full-text search vector to speed up queries. When querying a document table, the primary key is added to the `body`; when persisting, it is pulled off and used to locate the record.
+
+`saveDoc` writes a document to the database. It may be invoked from the database object itself in order to create the table on the fly.
+
+```javascript
+db.saveDoc('reports', {
+  title: 'Week 12 Throughput',
+  lines: [{
+    name: '1 East',
+    numbers: [5, 4, 6, 6, 4]
+  }, {
+    name: '2 East',
+    numbers: [4, 4, 4, 3, 7]
+  }]
+}).then(report => {
+  // the reports table has been created and the initial document is assigned a primary key value and returned
+});
+```
+
+If the document table already exists, `saveDoc` can be invoked on it just as the standard table functions are.
+
+```javascript
+db.reports.saveDoc({
+  title: 'Week 12 Throughput',
+  lines: [{
+    name: '1 East',
+    numbers: [5, 4, 6, 6, 4]
+  }, {
+    name: '2 East',
+    numbers: [4, 4, 4, 3, 7]
+  }]
+}).then(report => {
+  // the newly created report
+});
+```
+
+`saveDoc` also updates documents if an `id` is provided. Since the document body is JSON, fields can be added or removed at will.
+
+```javascript
+db.reports.saveDoc({
+  id: 1,
+  title: 'Week 12 Throughput v2',
+  version: 2,
+  lines: [{
+    name: '1 East',
+    numbers: [5, 4, 6, 6, 5]
+  }, {
+    name: '2 East',
+    numbers: [4, 4, 4, 3, 7]
+  }]
+}).then(report => {
+  // the newly created report
+});
+```
+
+Locate documents with `findDoc`, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
+
+```javascript
+db.reports.findDoc(1).then(report => {
+  // the report document body with the primary key included
+});
+
+db.reports.findDoc({
+  'title ilike': '%throughput%'
+}).then(reports => {
+  // all report documents matching the criteria
+});
+```
+
+`searchDoc` performs a full-text search on the document body fields.
+
+```javascript
+db.reports.searchDoc({
   keys : ["title", "description"],
   term : "Kauai"
-}, function(err,docs){
-  //docs returned with an on-the-fly Full Text Search for 'Kauai'
+}.then(docs => {
+  // reports returned with an on-the-fly full text search for 'Kauai'
 });
 ```
 
-## Full JSONB Document Support
+#### Deleting
 
-Another thing that is great about Postgres is the `jsonb` functionality. The queries are simple enough to write - but if you just want to encapsulate it all - we've got your back!
+There's only one function to delete data: `destroy`, which takes a criteria object. To destroy a document, use the primary key or specify JSON traversal operations in the criteria object.
 
 ```javascript
-//connect massive as above
-var newDoc = {
-  title : "Chicken Ate Nine",
-  description: "A book about chickens of Kauai",
-  price : 99.00,
-  tags : [
-    {name : "Simplicity", slug : "simple"},
-    {name : "Fun for All", slug : "fun-for-all"}
-  ]
-};
-
-db.saveDoc("my_documents", newDoc, function(err,res){
-  //the table my_documents was created on the fly
-  //res is the new document with an ID created for you
+db.tests.destroy({
+  priority: 'high'
+}).then(tests => {
+  // an array containing all removed tests
 });
-
-//you can now access the document right on the root
-db.my_documents.findDoc(1, function(err,doc){
-  //you now have access to the doc
-});
-
-//run a 'contains' query which flexes the index we created for you
-db.my_documents.findDoc({price : 99.00}, function(err,docs){
-  //1 or more documents returned
-});
-
-//run a deep match passing an array of objects
-//again flexing the index we created for you
-db.my_documents.findDoc({tags: [{slug : "simple"}]}, function(err,docs){
-  //1 or more documents returned
-});
-
-//comparative queries - these don't use indexing
-db.my_documents.findDoc({"price >": 50.00}, function(err,docs){
-  //1 or more documents returned with a price > 50
-});
-
-//IN queries by passing arrays
-db.my_documents.findDoc({id : [1,3,9]}, function(err,docs){
-  //documents with ID 1, 3, and 9
-});
-
-//NOT IN
-db.my_documents.findDoc({"id <>": [3,5]}, function(err,docs){
-  //documents without ID 3 and 5
-});
-
-// Create an empty schema
-db.createSchema('my_schema', function(err, res) {
-  // empty array
-});
-
-// Drop schema
-db.dropSchema('my_schema', {cascade: true|false}, function(err, res) {
-  // empty array
-});
-
-// Create a new table
-db.createDocumentTable('my_table', function(err, res) {
-  // empty array
-});
-
-// Create a new table on explicit schema
-db.createDocumentTable('my_schema.my_table', function(err, res) {
-  // empty array
-});
-
-// Drop table
-db.dropTable('my_table', {cascade: true|false}, function(err, res) {
-  // empty array
-});
-
-// Drop table on explicit schema
-db.dropTable('my_schema.my_table', {cascade: true|false}, function(err, res) {
-  // empty array
-});
-
-
-
 ```
 
-#### A Word About IDs in Document Tables
+### Functions
 
-We store IDs in their own column and treat them as a normal Primary Key. These values are **not** duplicated in the database - instead they are pulled off during writes and readded during reads.
+Object-relational mappers tend to ignore functions. For many, the database exists solely as a repository, with data manipulation reserved for application logic and external jobs.
 
-## Helpful Relational Bits
+To be fair, this setup is perfectly sufficient for many use cases. But when it isn't, it _hurts_. With functions, you can perform complex operations on your data at a scope and speed unrivaled by anything else. Why go to the trouble of querying bulk data into another system and manipulating it -- only to put it back where it was with a second trip across the wire? Especially when there's a powerful, flexible language purpose-built for set operations _right there_? You wouldn't work that way, and Massive won't make you: functions are first-class citizens as far as it's concerned.
 
-The entire API above works the same with relational tables, just remove "Doc" from the function name (`find`, `search`, `save`);
+Massive actually loads functions from two locations: the database itself, and a /db directory in your project root which contains prepared statements in .sql script files (the location may be changed by passing a `scripts` parameter on initialization). Subdirectories in /db are, like schemas, treated as namespaces; although, unlike schemas, they may be nested.
 
-When you run `connect` massive executes a quick `INFORMATION_SCHEMA` query and attaches each table to the main namespace (called `db` in these examples). You can use this to query your tables with a bit less noise.
-
-The API is as close to Massive 1.0 as we could make it - but there's no need for `execute` - just run the query directly:
+Functions and scripts are loaded onto the database object and can be invoked directly:
 
 ```javascript
-//connect massive, get db instance
-
-//straight up SQL
-db.run("select * from products where id=$1", [1], function(err,product){
-  //product 1
+db.uuid_generate_v1mc().then(arr => {
+  // an array containing the generated UUID (requires the uuid-ossp extension)
 });
 
-//simplified SQL with a where
-db.products.where("id=$1 OR id=$2", [10,21], function(err,products){
-  //products 10 and 21
-});
-
-//an IN query
-db.products.find({id : [10,21]}, function(err,products){
-  //products 10 and 21
-});
-
-//a NOT IN query
-db.products.find({"id <>": [10,21]}, function(err,products){
-  //products other than 10 and 21
-});
-
-//match a JSON field
-db.products.find({"specs->>weight": 30}, function(err, products) {
-  //products where the 'specs' field is a JSON document containing {weight: 30}
-  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
-})
-
-//match a JSON field with an IN list (note NOT IN is not supported for JSON fields at this time)
-db.products.find({"specs->>weight": [30, 35]}, function(err, products) {
-  //products where the 'specs' field is a JSON document containing {weight: 30}
-  //note that the corresponding SQL query would be phrased specs->>'weight'; Massive adds the quotes for you
-})
-
-//drill down a JSON path
-db.products.find({"specs#>>{dimensions,length}": 15}, function(err, products) {
-  //products where the 'specs' field is a JSON document having a nested 'dimensions' object containing {length: 15}
-  //note that the corresponding SQL query would be phrased specs->>'{dimensions,length}'; Massive adds the quotes for you
-})
-
-//Send in an ORDER clause by passing in a second argument
-db.products.find({},{order: "price desc"}, function(err,products){
-  //products ordered in descending fashion
-});
-
-//Send in an ORDER clause and a LIMIT with OFFSET
-var options = {
-  limit : 10,
-  order : "id",
-  offset: 20
-}
-db.products.find({}, options, function(err,products){
-  //products ordered in descending fashion
-});
-
-//You only want the sku and name back
-var options = {
-  limit : 10,
-  columns : ["sku", "name"]
-}
-db.products.find({}, options, function(err,products){
-  // an array of sku and name
-});
-
-//find a single user by id
-db.users.findOne(1, function(err,user){
-  //returns user with id (or whatever your PK is) of 1
-});
-
-//another way to do the above
-db.users.find(1, function(err,user){
-  //returns user with id (or whatever your PK is) of 1
-});
-
-//find first match
-db.users.findOne({email : "test@test.com"}, function(err,user){
-  //returns the first match
-});
-
-//simple query
-db.users.find({active: true}, function(err,users){
-  //all users who are active
-});
-
-//include the PK in the criteria for an update
-db.users.save({id : 1, email : "test@example.com"}, function(err,updated){
-  //the updated record for the new user
-});
-
-//no PK does an INSERT
-db.users.save({email : "new@example.com"}, function(err,inserted){
-  //the new record with the ID
+db.myTestQueries.restartTests([5, true]).then(results => {
+  // this runs the prepared statement in db/myTestQueries/restartTests.sql with the above parameters and returns any output from a RETURNING clause
 });
 ```
 
-## Streams
+### Streams
 
-To improve performance over large result sets, you might want to consider using a stream. This has the upside of returning reads right away, but the downside of leaving a connection open until you close it. To use a stream, just send in `{stream: true}` in the options:
+To improve performance with large result sets, you might want to consider using a stream instead of getting your results in an array all at once. This has the upside of returning _something_ to read right away (which can be a big deal for slow queries too!), but the price is that the connection remains open until you're done. To turn on streaming, add `{stream: true}` to your options object.
 
 ```js
-db.users.find({company_id : 12}, {stream:true}, function(err,stream){
+db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
+  const tests = [];
 
-  stream.on('readable', function(){
-    var user = stream.read();
-    //do your thing
+  stream.on('readable', () => {
+    tests.push(stream.read());
   });
 
-  stream.on('end', function(){
-    //deal with results here
+  stream.on('end', () => {
+    // do something with tests here
   });
 });
-```
-
-## Database Schema
-
-Massive understands the notion of database schemas and treats any Postgres schema other than `public` as a namespace. Objects bound to the `public` schema (the default in Postgres) are attached directly to the root db namespace. Schemas other than `public` will be represented by binding a namespace object to the root reflecting the name of the schema. To steal a previous example, let's say the `users` table was located in a back-end schema named `membership`. Massive will load up the database objects bound to the membership schema, and you can access them from code like so:
-
-```javascript
-db.membership.users.save({email : "new@example.com"}, function(err,inserted){
-  //the new record with the ID
-});
-
-db.membership.users.find({active: true}, function(err,users){
-  //all users who are active
-});
-
-```
-
-## We <3 Functions
-
-Got a ~~tightly-wound~~ super-concientous DBA who ~~micro-manages~~ carefully limits developer access to the back end store? Feel bold, adventurous, and [unconstrained by popular dogma](http://rob.conery.io/2015/02/21/its-time-to-get-over-that-stored-procedure-aversion-you-have/) about database functions/stored procedures? Unafraid to be called names by your less-enlightened friends?
-
-Massive treats Postgres functions ("sprocs") as first-class citizens.
-
-Say your database schema introduces a complex piece of logic in a Postgres function:
-
-```sql
-create or replace function all_products()
-returns setof products
-as
-$$
-select * from products;
-$$
-language sql;
-```
-
-Massive will load up and attach the `all_products` function, and any other Postgres function as JS functions on the root massive namespace (or on an appropriate schema-based namespace, as we just saw), which you can then access directly as functions:
-
-```javascript
-db.all_products(function(err,res) {
-  // returns the result of the function (all the product records, in this case...)
-});
-```
-Obviously, this was a trivial example, but you get the idea. You can perform complex logic deep in your database, and massive will make it accessible directly. For a deeper dive on this, see [pg-auth](https://github.com/robconery/pg-auth), which basically [rolls common membership up into a box](http://rob.conery.io/2015/03/17/membership-in-a-box-with-pg-auth/) and tucks the auth pain away behind a pleasing facade of Postgres functions. Guaranteed to stir up spirited discussions with your friends and neighbors.
-
-If you're using a function that takes multiple parameters, you'll need to wrap your arguments in an array:
-
-```js
-db.myFunction(['thing1', 'thing2'], function(err,res){
-  //result is always an array
-})
 ```
 
 ## REPL
 
-Massive has a REPL (Read Evaluate Print Loop - aka "console") and you can fire it up to play with your DB in the console. The easiest way to access the REPL is to install Massive globally:
+Massive.js ships with a REPL (read-evaluate-print loop), an interactive console that lets you connect to a database and execute JavaScript code. The easiest way to run it is to install globally:
 
 ```
-npm install --global massive
+npm i -g massive
 ```
 
-You can then connect to your database using the `massive` command:
+You can then fire up a connection and start writing JavaScript:
 
 ```
-# connect to local server, database my_database
-massive -d my_database
-db >
+massive -d appdb
+
+db > db.tables.map(table => table.name);
+[ 'tests',
+  'users' ]
+
+db > db.tests.find({priority: 'low'}).then(...);
 ```
 
-From here you can see your tables if you like:
+In addition to the `tables` collection, the `views` and `functions` collections are also exposed on the database object.
 
-```
-db > db.tables
-[ { name: 'docs',
-    pk: 'id',
-    db: { connectionString: 'postgres://localhost/massive' } },
-  { name: 'products',
-    pk: 'id',
-    db: { connectionString: 'postgres://localhost/massive' } },
-  { name: 'users',
-    pk: 'id',
-    db: { connectionString: 'postgres://localhost/massive' } } ]
-db >
-```
+When invoking functions, you may omit the `then` if you just want to see output -- Massive provides a resolver which logs the results to make it easy to query with the REPL.
 
-Or just list out your queries to be sure they're being loaded:
+### Older Versions
 
-```
-db > db.queries
-[ { [Function]
-    sql: 'select * from users where email=$1;',
-    db: { connectionString: 'postgres://localhost/massive' } } ]
-db >
-```
+Release versions are tagged and available [here](https://github.com/dmfay/massive-js/releases).
 
-Execute your query to make sure it returns what you expect:
+Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedocs.org/en/latest/).
 
-```
-db > db.queries.productById(1);
-[ {sku : 'x', name : "Product 1", id : '1'}]
-```
+## Contributing
 
-By default, Massive provides a callback for you if you don't pass one in. This automatic callback outputs the results using `console.log` so you can play with things easily.
+Issues and especially pull requests are welcome! If you've found a bug, please include a minimal code sample I can use to hunt the problem down.
 
-
-There's more to do with the massive REPL - such as generating query files for you (if you're not accomplished at SQL just yet) as well as a better way to play with the results.
-
-## Development
-
-The tests are run against a local `massive` database.
-
-First create the database:
+To run the tests, first create an empty `massive` database:
 
 ```
 createdb massive
@@ -459,25 +412,3 @@ You can then run the tests:
 ```
 npm test
 ```
-
-To check your code for linting errors, run:
-
-```
-npm run lint
-```
-
-To generate a test coverage report, run:
-
-```
-npm run coverage
-```
-
-## Want to help?
-
-This project is just getting off the ground and could use some help with DRYing things up and refactoring.
-
-If you want to contribute - I'd love it! Just open an issue to work against so you get full credit for your fork. You can open the issue first so we can discuss and you can work your fork as we go along.
-
-The code is rather hideous - I wrote it in a fit of inspiration and if you see things that could be done better, yay!
-
-If you see a bug, please be so kind as to show how it's failing, and I'll do my best to get it fixed quickly.
