@@ -401,13 +401,13 @@ Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedo
 
 Issues and especially pull requests are welcome! If you've found a bug, please include a minimal code sample I can use to hunt the problem down.
 
-To run the tests, first create an empty `massive` database:
+To run the tests, first create an empty `massive` database. The `postgres` superuser should have `trust` authentication enabled for local socket connections.
 
 ```
 createdb massive
 ```
 
-You can then run the tests:
+Run the tests with npm:
 
 ```
 npm test
