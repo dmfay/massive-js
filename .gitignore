@@ -15,3 +15,6 @@ play.js
 coverage
 out
 .nyc_output
+docs/_site
+docs/api
+docs/.sass-cache

@@ -1,3 +1,9 @@
+---
+title: Index - MassiveJS
+permalink: /index
+category: stuff
+---
+
 ![MassiveJS](http://rob.conery.io/img/2015/03/massive-logo.png)
 
 ## What Is Massive?

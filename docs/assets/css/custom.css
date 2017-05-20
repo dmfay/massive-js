@@ -1,0 +1,15 @@
+header ul.toc {
+  background: #fff;
+  border: none;
+}
+
+header ul.toc li {
+  width: 100%;
+  float: none;
+  border: none;
+}
+
+header ul.toc a {
+  font-size: 12pt;
+  text-align: left;
+}
