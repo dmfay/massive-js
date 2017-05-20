@@ -88,7 +88,7 @@ There are many more; [view the full list of criteria operations here](TODO).
 
 #### Query Options
 
-Some functions take options objects which alter query behavior. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed.
+The finder functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` -- allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed.
 
 ```javascript
 {
@@ -117,7 +117,7 @@ db.tests.findOne({
   'version >': 1,
   'name ilike': 'home%'
 }).then(tests => {
-  // all active tests with higher versions and a name matching ILIKE criteria
+  // the first active test with a higher version and a name matching ILIKE criteria
 });
 ```
 
@@ -390,6 +390,8 @@ db > db.tests.find({priority: 'low'}).then(...);
 In addition to the `tables` collection, the `views` and `functions` collections are also exposed on the database object.
 
 When invoking functions, you may omit the `then` if you just want to see output -- Massive provides a resolver which logs the results to make it easy to query with the REPL.
+
+Exit the REPL by pressing Ctrl-C twice.
 
 ### Older Versions
 
