@@ -2,9 +2,16 @@
 
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 
-Massive.js is a data mapper for Node.js and PostgreSQL that fully embraces the power and flexibility of SQL. Unlike traditional object-relational mappers which hide your schema under an abstracted data model, Massive's goal is to facilitate data storage and access through the interfaces and tools you already use: tables, views, functions, and scripts.
+Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.
 
-When you need to run complex queries that have no hope of being expressed in any way other than SQL, Massive accepts prepared statements and returns results. When you just don't feel like writing yet another `SELECT *` or `UPDATE` by hand, it provides simple, intuitive interfaces to bridge the gap between your database entities and your JavaScript code in ways that make sense. Postgres is an amazing relational database with a vast array of capabilities, from document storage with `jsonb` to array fields to inheritance and beyond, and Massive takes full advantage of its commitment to Postgres to give you the freedom to work with your data the way you need it.
+Massive is _not_ an object-relational mapper (ORM)! It doesn't use models, it doesn't track state, and it doesn't limit you to a single entity-based metaphor for accessing and persisting data. You've already got a data model: your schema. Massive introspects your database at runtime and returns a connected instance with your tables, views, functions, and scripts attached and ready to query, write, or execute.
+
+Here are some of the high points:
+
+* **Dynamic query generation**: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.
+* **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. As long as you don't run afoul of `NOT NULL` constraints, you can emit inserts and updates which affect only the columns you actually need to write and make up the data on the spot.
+* **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
+* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields, JSON storage, pattern matching with regular expressions, and many, many more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation
 
@@ -16,7 +23,7 @@ When you need to run complex queries that have no hope of being expressed in any
 npm i massive --save
 ```
 
-**Starting with version 3, Massive uses Promises exclusively. If you need a callback-based API, use [version 2.x](https://github.com/dmfay/massive-js/releases).**
+**Starting with version 3, Massive uses Promises exclusively. If you need a callback-based API, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
@@ -31,7 +38,7 @@ massive({
   host: '127.0.0.1',
   port: 5432,
   database: 'appdb',
-  username: 'appuser',
+  user: 'appuser',
   password: 'apppwd'
 }).then(db => {...});
 ```
@@ -60,7 +67,7 @@ Massive understands database schemas and treats any schema other than the defaul
 // query a table on the public schema
 db.tests.find(...).then(...);
 
-// query a table on another schema
+// query a table on the auth schema
 db.auth.users.find(...).then(...);
 ```
 
@@ -105,7 +112,7 @@ The finder functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` 
 
 #### Querying
 
-`findOne` finds a single object with a primary key or a criteria object.
+**findOne** finds a single object with a primary key or a criteria object.
 
 ```javascript
 db.tests.findOne(1).then(test1 => {
@@ -121,7 +128,7 @@ db.tests.findOne({
 });
 ```
 
-`find` is a general-purpose query function which returns a result list.
+**find** is a general-purpose query function which returns a result list.
 
 ```javascript
 db.tests.find({
@@ -139,7 +146,7 @@ db.tests.find({
 });
 ```
 
-`count` returns the resultset length.
+**count** returns the resultset length.
 
 ```javascript
 db.tests.count({
@@ -151,7 +158,7 @@ db.tests.count({
 });
 ```
 
-`search` performs full-text searches.
+**search** performs full-text searches.
 
 ```javascript
 db.tests.search({
@@ -162,7 +169,7 @@ db.tests.search({
 });
 ```
 
-`where` allows you to write your own WHERE clause instead of using a criteria object.
+**where** allows you to write your own WHERE clause instead of using a criteria object.
 
 ```javascript
 db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
@@ -172,7 +179,7 @@ db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
 
 #### Persisting
 
-`insert` creates a new row or rows (if passed an array).
+**insert** creates a new row or rows (if passed an array).
 
 ```javascript
 db.tests.insert({
@@ -193,7 +200,7 @@ db.tests.insert([{
 });
 ```
 
-`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
+**update** has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
 
 ```javascript
 db.tests.update({
@@ -214,7 +221,7 @@ db.tests.update({
 });
 ```
 
-`save` performs an upsert, inserting if the object has no primary key value and updating if it does.
+**save** performs an upsert, inserting if the object has no primary key value and updating if it does.
 
 ```javascript
 db.tests.save({
@@ -239,7 +246,7 @@ Postgres' JSONB functionality allows for a more free-form approach to data than 
 
 Document tables consist of some metadata, including the primary key, and a `body` JSONB field. A GIN index is also created for the document body and a full-text search vector to speed up queries. When querying a document table, the primary key is added to the `body`; when persisting, it is pulled off and used to locate the record.
 
-`saveDoc` writes a document to the database. It may be invoked from the database object itself in order to create the table on the fly.
+**saveDoc** writes a document to the database. It may be invoked from the database object itself in order to create the table on the fly.
 
 ```javascript
 db.saveDoc('reports', {
@@ -256,7 +263,7 @@ db.saveDoc('reports', {
 });
 ```
 
-If the document table already exists, `saveDoc` can be invoked on it just as the standard table functions are.
+If the document table already exists, **saveDoc** can be invoked on it just as the standard table functions are.
 
 ```javascript
 db.reports.saveDoc({
@@ -273,7 +280,7 @@ db.reports.saveDoc({
 });
 ```
 
-`saveDoc` also updates documents if an `id` is provided. Since the document body is JSON, fields can be added or removed at will.
+**saveDoc** also updates documents if an `id` is provided. Since the document body is JSON, fields can be added or removed at will.
 
 ```javascript
 db.reports.saveDoc({
@@ -292,7 +299,7 @@ db.reports.saveDoc({
 });
 ```
 
-Locate documents with `findDoc`, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
+Locate documents with **findDoc**, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
 
 ```javascript
 db.reports.findDoc(1).then(report => {
@@ -306,7 +313,7 @@ db.reports.findDoc({
 });
 ```
 
-`searchDoc` performs a full-text search on the document body fields.
+**searchDoc** performs a full-text search on the document body fields.
 
 ```javascript
 db.reports.searchDoc({
@@ -319,7 +326,7 @@ db.reports.searchDoc({
 
 #### Deleting
 
-There's only one function to delete data: `destroy`, which takes a criteria object. To destroy a document, use the primary key or specify JSON traversal operations in the criteria object.
+There's only one function to delete data: **destroy**, which takes a criteria object. To destroy a document, use the primary key or specify JSON traversal operations in the criteria object.
 
 ```javascript
 db.tests.destroy({

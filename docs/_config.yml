@@ -16,11 +16,11 @@
 title: Massive.js
 email: dian.m.fay@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  Massive.js is a data mapper for Node.js and PostgreSQL that fully embraces
-  the power and flexibility of SQL. Unlike traditional object-relational
-  mappers which hide your schema under an abstracted data model, Massive's goal
-  is to facilitate data storage and access through the interfaces and tools you
-  already use: tables, views, functions, and scripts.
+  Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and
+  fully embraces the power and flexibility of the SQL language and relational
+  metaphors. Providing minimal abstractions for the interfaces and tools you
+  already use, its goal is to do just enough to make working with your data as
+  easy and intuitive as possible, then get out of your way.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
