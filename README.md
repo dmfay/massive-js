@@ -179,6 +179,25 @@ db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
 
 #### Persisting
 
+**save** performs an upsert, inserting if the object has no primary key value and updating if it does.
+
+```javascript
+db.tests.save({
+  version: 1,
+  name: 'homepage'
+}).then(tests => {
+  // an array containing the newly-inserted test
+});
+
+db.tests.save({
+  id: 1,
+  version: 2,
+  priority: 'high'
+}).then(tests => {
+  // an array containing the updated test
+});
+```
+
 **insert** creates a new row or rows (if passed an array).
 
 ```javascript
@@ -218,25 +237,6 @@ db.tests.update({
 }).then(tests => {
   // an array containing all tests which formerly had priority 'high'
   // since this issues a prepared statement note that the version field cannot be incremented here!
-});
-```
-
-**save** performs an upsert, inserting if the object has no primary key value and updating if it does.
-
-```javascript
-db.tests.save({
-  version: 1,
-  name: 'homepage'
-}).then(tests => {
-  // an array containing the newly-inserted test
-});
-
-db.tests.save({
-  id: 1,
-  version: 2,
-  priority: 'high'
-}).then(tests => {
-  // an array containing the updated test
 });
 ```
 

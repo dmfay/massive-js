@@ -31,11 +31,19 @@ const connectionInfo =
 
 ## Introspection
 
-On connection (and subsequently if the `reload` function is invoked), Massive introspects your schema to find tables, views, and functions. Along with script files, these are attached to the instance object and form your database's API.
+On connection, Massive introspects your schema to find tables, views, and functions. Along with script files, these are attached to the instance object and form your database's API.
 
 Tables and views, including materialized views, are attached as objects with a set of standard access and persistence functions. See [Queries](/queries) and [Persistence](/persistence) for more details.
 
 Database functions and scripts are attached as invocable functions. See [Functions](/functions) for more.
+
+### Refreshing the API
+
+If you're changing your database's schema on the go by issuing `CREATE`, `ALTER`, and `DROP` statements at runtime, the connected Massive instance will eventually be out of date since it is generated at the time of connection. The `reload` function cleans out your database's API and performs the introspection again, ensuring you can access dynamically instantiated objects.
+
+```javascript
+db.reload().then(refreshedInstance => {...});
+```
 
 ### Schemas
 
