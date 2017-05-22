@@ -106,6 +106,7 @@ db.users.search(
   {columns: ['email', 'name'], term: 'rob'},
   {stream: true}
 ).then(stream => {
-  // a readable stream of users matching the full-text search condition
+  // a readable stream of users matching the full-text
+  // search condition
 });
 ```

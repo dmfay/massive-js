@@ -19,7 +19,8 @@ db.tests.save({
   version: 2,
   priority: 'high'
 }).then(tests => {
-  // an array containing the updated test; note that the name will not have changed!
+  // an array containing the updated test; note that the name
+  // will not have changed!
 });
 ```
 
@@ -70,8 +71,10 @@ db.tests.update({
 }, {
   priority: 'moderate'
 }).then(tests => {
-  // an array containing all tests which formerly had priority 'high'
-  // since this issues a prepared statement note that the version field cannot be incremented here!
+  // an array containing all tests which formerly had
+  // priority 'high'. Since this issues a prepared
+  // statement, note that the version field cannot
+  // be incremented here!
 });
 ```
 
