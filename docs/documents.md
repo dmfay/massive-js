@@ -10,7 +10,9 @@ The JSONB type is a great solution to this problem, and Massive takes care of th
 
 Document tables exist for the sole purpose of storing JSONB data. Query them through Massive's API, and you get a JSON document which you can modify and persist, all seamlessly. You don't even need to create them ahead of time until you know you need them.
 
-Standard table functions still work on document tables, and can be quite useful! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body ->> myField`.
+Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
+
+Standard table functions still work on document tables, and can be quite useful especially for extended document tables! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body ->> myField`.
 
 ### db.saveDoc
 
