@@ -57,7 +57,7 @@ db.tests.find(...).then(...);
 db.auth.users.find(...).then(...);
 ```
 
-## Filters
+## Loader Configuration and Filtering
 
 If you don't want to load _every_ table, view, or function your user can access, Massive lets you restrict which objects are loaded through a set of white- and blacklist options on initialization. Any, all, or none of the loader configuration fields may be specified, or the object may be omitted entirely as long as driver configuration is also omitted.
 
@@ -65,6 +65,9 @@ Blacklists and whitelists may use SQL `LIKE` wildcarding.
 
 ```javascript
 massive(connectionInfo, {
+  // change the scripts directory
+  scripts: './myscripts',
+
   // ignore objects in any other schema
   allowedSchemas: ['public', 'auth'],   
 
@@ -81,7 +84,14 @@ massive(connectionInfo, {
   functionWhitelist: ['%user%'],
 
   // never load functions on the blacklist
-  functionBlacklist: ['authorizeUser']
+  functionBlacklist: ['authorizeUser'],
+
+  // don't load database functions at all
+  excludeFunctions: true,
+
+  // streamline function return values: a function with a scalar
+  // value will return just the scalar instead of an array, etc.
+  enhancedFunctions: true
 }).then(instance => {...});
 ```
 

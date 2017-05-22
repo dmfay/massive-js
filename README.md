@@ -194,7 +194,7 @@ db.tests.save({
   version: 2,
   priority: 'high'
 }).then(tests => {
-  // an array containing the updated test
+  // an array containing the updated test; note that the name will not have changed!
 });
 ```
 
