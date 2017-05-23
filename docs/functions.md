@@ -14,6 +14,8 @@ Massive doesn't stop at the functions present in the database itself: on startup
 
 By default, Massive searches the `/db` directory, but this can be customized by setting the `scripts` property in the loader configuration. The scripts directory can contain further subdirectories; like schemas, these are treated as namespaces. Unlike schemas, they can be nested to arbitrary depth.
 
+Like `run`, prepared statements in script files can use named parameters instead of `$1`-style indexed parameters. Named parameters are formatted `${name}`. Other delimiters besides braces are supported; consult the pg-promise documentation for a full accounting.
+
 Prepared statement scripts must consist of one and only one SQL statement. Common table expressions or CTEs can take some of the sting out of this requirement, but if you need to execute multiple statements with arbitrary parameters it's time to turn it into a proper function.
 
 ## Invocation
@@ -32,5 +34,9 @@ db.myTestQueries.restartTests(5, true).then(results => {
   // this runs the prepared statement in
   // db/myTestQueries/restartTests.sql with the above
   // parameters and returns any output from a RETURNING clause
+});
+
+db.myTestQueries.restartTests({category: 5, force: true}).then(results => {
+  // as above; the prepared statement should use ${category} and ${force} instead of $1 and $2.
 });
 ```

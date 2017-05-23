@@ -55,6 +55,14 @@ db.run('select * from tests where id > $1', [1]).then(tests => {
 });
 ```
 
+`run` takes named parameters as well:
+
+```javascript
+db.run('select * from tests where id > ${something}', {something: 1}).then(tests => {
+  // all tests matching the criteria
+});
+```
+
 ### Tables and Views
 
 Massive loads all views (including materialized views) and all tables having primary key constraints. Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.
@@ -353,6 +361,14 @@ db.uuid_generate_v1mc().then(arr => {
 
 db.myTestQueries.restartTests([5, true]).then(results => {
   // this runs the prepared statement in db/myTestQueries/restartTests.sql with the above parameters and returns any output from a RETURNING clause
+});
+```
+
+Like `run`, prepared statements in script files can use named parameters instead of `$1`-style indexed parameters. Named parameters are formatted `${name}`. Other delimiters besides braces are supported; consult the pg-promise documentation for a full accounting.
+
+```javascript
+db.myTestQueries.restartTests({category: 5, force: true}).then(results => {
+  // as above; the prepared statement should use ${category} and ${force} instead of $1 and $2.
 });
 ```
 
