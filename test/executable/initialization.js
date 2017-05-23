@@ -32,12 +32,10 @@ describe('initialization', function () {
   });
 
   it('loads script files', function () {
-    assert.isOk(db.inStockProducts);
-    assert.isOk(db.productByName);
+    assert.isOk(db.namedParam);
   });
 
   it('preserves directory structure', function () {
-    assert.isOk(db.commands.newProduct);
-    assert.isOk(db.queries.users.allUsers);
+    assert.isOk(db.one.two.nestedScript);
   });
 });

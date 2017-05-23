@@ -14,7 +14,7 @@ Massive doesn't stop at the functions present in the database itself: on startup
 
 By default, Massive searches the `/db` directory, but this can be customized by setting the `scripts` property in the loader configuration. The scripts directory can contain further subdirectories; like schemas, these are treated as namespaces. Unlike schemas, they can be nested to arbitrary depth.
 
-Since scripts are loaded and executed as prepared statements, they must consist of one and only one SQL statement. Common table expressions or CTEs can take some of the sting out of this requirement, but if you need to run multiple statements it's time to turn it into a proper function.
+Prepared statement scripts must consist of one and only one SQL statement. Common table expressions or CTEs can take some of the sting out of this requirement, but if you need to execute multiple statements with arbitrary parameters it's time to turn it into a proper function.
 
 ## Invocation
 

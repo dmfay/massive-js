@@ -18,4 +18,10 @@ describe('run', function () {
       assert.equal(1, res[0].id);
     });
   });
+
+  it('uses named parameters', function () {
+    return db.run("select * from products where id=${id}", {id: 1}).then(res => {
+      assert.equal(1, res[0].id);
+    });
+  });
 });

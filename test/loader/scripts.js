@@ -11,10 +11,10 @@ describe('scripts', function () {
   });
 
   it('should query for a list of scripts', function* () {
-    const scripts = yield loader(db, {scripts: path.resolve(__dirname, '../helpers/scripts')});
+    const scripts = yield loader(db, {scripts: path.resolve(__dirname, '../helpers/scripts/loader')});
 
     assert.isArray(scripts);
-    assert.lengthOf(scripts, 11);
+    assert.lengthOf(scripts, 1);
     assert.isTrue(scripts[0].hasOwnProperty('name'));
     assert.isTrue(scripts[0].hasOwnProperty('schema'));
     assert.isTrue(scripts[0].hasOwnProperty('sql'));

@@ -37,6 +37,12 @@ describe('invoke', function () {
         assert.equal(res, 3);
       });
     });
+
+    it('uses named parameters for scripts', function () {
+      return db.namedParam({value: 2}, {single: true}).then(res => {
+        assert.equal(res[0][Object.keys(res[0])[0]], 3);
+      });
+    });
   });
 
   describe('return types', function () {

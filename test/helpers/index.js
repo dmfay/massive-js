@@ -3,7 +3,6 @@
 const co = require('co');
 const path = require('path');
 const connectionString = 'postgres://postgres@localhost/massive';
-const scriptsDir = path.join(__dirname, 'scripts');
 
 require('co-mocha');
 
@@ -17,7 +16,7 @@ global.resetDb = co.wrap(function* (schema) {
 
   const db = yield massive(connectionString, {
     enhancedFunctions: true,
-    scripts: scriptsDir
+    scripts: path.join(__dirname, 'scripts', schema)
   }, {
     noWarnings: true
   });
@@ -26,7 +25,7 @@ global.resetDb = co.wrap(function* (schema) {
 
   yield Promise.all(schemata.map(schema => db.run(`drop schema ${schema.schema_name} cascade`)));
 
-  yield db.schemata[schema]();
+  yield db.schema();
 
   return yield db.reload();
 });

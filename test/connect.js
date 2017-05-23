@@ -100,17 +100,17 @@ describe('connecting', function () {
 
     it('loads query files', function () {
       assert.ok(db.functions.length > 0);
-      assert.lengthOf(db.functions.filter(f => !!f.filePath), 11);
+      assert.lengthOf(db.functions.filter(f => !!f.filePath), 1); // just the schema script
     });
 
     it('loads functions', function () {
-      assert.equal(db.functions.length, 15);
+      assert.equal(db.functions.length, 5);
       assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
     });
 
     it('loads everything it can by default', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`
+        scripts: `${__dirname}/helpers/scripts/loader`
       }, {
         noWarnings: true
       }).then(db => {
@@ -123,7 +123,7 @@ describe('connecting', function () {
         assert(!!db.two && !! db.two.t1);
         assert.lengthOf(db.tables, 6);
         assert.lengthOf(db.views, 6);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
@@ -138,7 +138,7 @@ describe('connecting', function () {
   describe('schema filters', function () {
     it('applies filters', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one, two'
       }, {
         noWarnings: true
@@ -152,14 +152,14 @@ describe('connecting', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
     it('allows exceptions', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'two',
         exceptions: 't1, v1, one.v2'
       }, {
@@ -174,7 +174,7 @@ describe('connecting', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
@@ -183,7 +183,7 @@ describe('connecting', function () {
   describe('table blacklists', function () {
     it('applies blacklists to tables and views', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1, one.%2'
       }, {
         noWarnings: true
@@ -197,14 +197,14 @@ describe('connecting', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
     it('checks schema names in the pattern', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: 'one.%1'
       }, {
         noWarnings: true
@@ -218,14 +218,14 @@ describe('connecting', function () {
         assert(!!db.two && !!db.two.t1);
         assert.equal(db.tables.length, 5);
         assert.equal(db.views.length, 5);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
     it('allows exceptions', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1',
         exceptions: 'one.%1'
       }, {
@@ -240,7 +240,7 @@ describe('connecting', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 4);
         assert.equal(db.views.length, 4);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
@@ -249,7 +249,7 @@ describe('connecting', function () {
   describe('table whitelists', function () {
     it('applies a whitelist with exact matching', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         whitelist: 't1, one.t1'
       }, {
         noWarnings: true
@@ -263,14 +263,14 @@ describe('connecting', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
 
     it('overrides other filters', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one',
         blacklist: 't1',
         whitelist: 't1'
@@ -286,7 +286,7 @@ describe('connecting', function () {
         assert(!db.two);
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
@@ -295,24 +295,24 @@ describe('connecting', function () {
   describe('function exclusion', function () {
     it('skips loading functions when set', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: true
       }, {
         noWarnings: true
       }).then(db => {
-        assert.lengthOf(db.functions, 11);
+        assert.lengthOf(db.functions, 1);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 0);
       });
     });
 
     it('loads all functions when false', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: false
       }, {
         noWarnings: true
       }).then(db => {
-        assert.lengthOf(db.functions, 15);
+        assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
       });
     });
@@ -321,7 +321,7 @@ describe('connecting', function () {
   describe('function filtering', function () {
     it('blacklists functions', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: '%1, one.f2'
       }, {
         noWarnings: true
@@ -333,7 +333,7 @@ describe('connecting', function () {
 
     it('whitelists functions', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         functionWhitelist: '%1, one.f2'
       }, {
         noWarnings: true
@@ -345,7 +345,7 @@ describe('connecting', function () {
 
     it('overlaps whitelists and blacklists', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts`,
+        scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: 'one.%1',
         functionWhitelist: 'one.%'
       }, {
