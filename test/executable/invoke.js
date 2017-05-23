@@ -54,7 +54,7 @@ describe('invoke', function () {
 
     it('gets json', function () {
       return db.get_json().then(res => {
-        assert(_.isObject(res));
+        assert.isObject(res);
         assert.equal(res.hello, 'world');
       });
     });

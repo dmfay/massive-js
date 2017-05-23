@@ -97,6 +97,17 @@ db.tests.where(
 });
 ```
 
+`where` can use named parameters; just pass in an object instead of an array for the function's second argument.
+
+```javascript
+db.tests.where(
+  'id IN (SELECT test_id FROM user_tests WHERE user_id = ${id})',
+  {id: 1}
+).then(tests => {
+  // all of user 1's tests
+});
+```
+
 ## search
 
 `search` enables full-text searching across multiple columns. The first argument is a search object with an array of `columns` and a `term` to search for. The function also takes a query options object as an optional second argument.

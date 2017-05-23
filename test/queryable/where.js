@@ -18,4 +18,8 @@ describe('where', function () {
   it('returns Product 1 with params as not array', function () {
     return db.products.where('id=$1', 1).then(res => assert.lengthOf(res, 1));
   });
+
+  it('uses named parameters', function () {
+    return db.products.where('id=${id}', {id: 1}).then(res => assert.lengthOf(res, 1));
+  });
 });
