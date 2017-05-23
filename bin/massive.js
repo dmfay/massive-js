@@ -2,40 +2,47 @@
 
 /* eslint-disable no-console */
 
-var repl = require("repl");
-var massive = require("../index");
-var program = require('commander');
+const program = require('commander');
+const repl = require('repl');
+const massive = require('../index');
 
 program
   .version('0.0.1')
-  .option('-d, --database', 'The local db you want to connect to ')
-  .option('-c, --connection', 'The full connection string')
+  .option('-d, --database', 'Quick connect with just a local database name')
+  .option('-c, --connection', 'Provide a full connection string (postgres://user:password@server/db)')
   .parse(process.argv);
 
-var connectionString;
-if(program.database){
-  connectionString = "postgres://localhost/" + program.args[0]; //assume local user has rights
-}else if(program.connection) {
+let connectionString;
+
+if (program.database) {
+  connectionString = `postgres://localhost/${program.args[0]}`; //assume local user has rights
+} else if (program.connection) {
   connectionString = program.args[0];
-}else{
-  console.log("The options to pass in are:");
-  console.log(" -d or --database to connect locally to a database");
-  console.log(" -c or --connection to enter the full connection string: postgres://user:password@server/tablename");
+} else {
+  return program.help();
 }
 
-if (connectionString) {
-  massive.connect({connectionString: connectionString}, function(err, db) {
-    if (err) {
-      console.log("Failed loading Massive: "+err);
-      process.exit(1);
+massive({connectionString: connectionString}).then(db => {
+  console.log('Massive loaded and listening');
+
+  const r = repl.start({
+    prompt: 'db > ',
+    eval: (cmd, ctx, f, callback) => {
+      const result = eval(cmd);
+
+      if (result && result.then) {
+        return result.then(val => callback(null, val)).catch(err => callback(err));
+      }
+
+      return callback(null, result);
     }
-
-    var context = repl.start({
-      prompt: "db > "
-    }).context;
-
-    context.db = db;
-
-    console.log("Massive loaded and listening");
   });
-}
+
+  r.context.db = db;
+  r.on('exit', () => {
+    process.exit(0);
+  });
+}).catch(err => {
+  console.log(`Failed loading Massive: ${err}`);
+  process.exit(1);
+});
