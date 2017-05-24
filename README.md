@@ -107,12 +107,13 @@ The finder functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` 
 
 ```javascript
 {
+  build: true,                    // return query text and parameters without executing anything
   document: true,                 // query is against a document table (see below)
   order: 'id desc',               // creates an ORDER BY clause to enforce sorting
   orderBody: true,                // force order to apply to fields in a document body instead of the table fields
   offset: 20,                     // adds an OFFSET to skip the first n rows
   limit: 10,                      // adds a LIMIT to restrict the number of rows returned
-  single: false,                  // force returning the first result object instead of a results array
+  single: true,                   // force returning the first result object instead of a results array
   stream: true,                   // return results as a readable stream (see below)
   only: true                      // restrict the query to the target table, ignoring descendant tables
 }

@@ -6,9 +6,9 @@ The `find`, `findOne`, and `count` functions form a consistent API for data retr
 
 ## Query Options
 
-The options object modifies query behavior, either by applying additional clauses to the query itself or by modifying the shape of the returned results.
+The options object modifies query behavior, either by applying additional clauses to the query itself or by altering the results.
 
-### Clauses
+### SQL Clauses
 
 | Option key | Description |
 |------------|-------------|
@@ -25,6 +25,7 @@ The options object modifies query behavior, either by applying additional clause
 
 | Option key | Description |
 |------------|-------------|
+| build      | Set to `true` to return the query text and parameters *without* executing anything. |
 | document   | Set to `true` to invoke document table handling. |
 | single     | Set to `true` to return the first result as an object instead of a results array. |
 | stream     | Set to `true` to return results as a stream instead of an array. |
