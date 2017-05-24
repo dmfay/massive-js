@@ -2,27 +2,27 @@
 
 /* eslint-disable no-console */
 
+const path = require('path');
 const program = require('commander');
 const repl = require('repl');
 const massive = require('../index');
 
 program
-  .version('0.0.1')
-  .option('-d, --database', 'Quick connect with just a local database name')
-  .option('-c, --connection', 'Provide a full connection string (postgres://user:password@server/db)')
+  .version('3.0.0')
+  .option('-d, --database [name]', 'Quick connect with just a local database name')
+  .option('-c, --connection [string]', 'Provide a full connection string (postgres://user:password@server/db)')
+  .option('-s, --scripts [dir]', 'Change the scripts directory (default ./db)', 'db')
   .parse(process.argv);
 
-let connectionString;
-
 if (program.database) {
-  connectionString = `postgres://localhost/${program.args[0]}`; //assume local user has rights
-} else if (program.connection) {
-  connectionString = program.args[0];
-} else {
+  program.connection = `postgres://localhost/${program.database}`;  // assume local user has rights
+} else if (!program.connection) {
   return program.help();
 }
 
-massive({connectionString: connectionString}).then(db => {
+console.log(path.resolve(program.scripts));
+
+massive({connectionString: program.connection}, {scripts: path.resolve(program.scripts)}).then(db => {
   console.log('Massive loaded and listening');
 
   const r = repl.start({
