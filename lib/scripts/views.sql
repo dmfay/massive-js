@@ -1,25 +1,25 @@
 -- REQUIRES THREE ARGUMENTS:
 -- $1, $2, $2 all must be empty string, or comma-delimited string, or array of string:
-select * from (
-  select schemaname as schema, viewname as name
-  from pg_views
-  where schemaname <> 'pg_catalog' and schemaname <> 'information_schema'
-  union
-  select schemaname as schema, matviewname as name
-  from pg_matviews
-) v where (
-      (case -- allow specific schemas (none or '' assumes all):
-        when $1 ='' then 1=1
-        else v.schema = any(string_to_array(replace($1, ' ', ''), ',')) end)
-      and
-      (case -- blacklist tables using LIKE by fully-qualified name (no schema assumes public):
-        when $2 = '' then 1=1
-        else replace((v.schema || '.'|| v.name), 'public.', '') not like all(string_to_array(replace($2, ' ', ''), ',')) end)
-    ) or (
-      case -- make exceptions for specific tables, with fully-qualified name or wildcard pattern (no schema assumes public).
-        when $3 = '' then 1=0
-        -- Below can use '%' as wildcard. Change 'like' to '=' to require exact names:
-        else replace((v.schema || '.'|| v.name), 'public.', '') like any(string_to_array(replace($3, ' ', ''), ',')) end
-    )
-order by v.schema,
-         v.name;
+SELECT * FROM (
+  SELECT schemaname AS schema, viewname AS name
+  FROM pg_views
+  WHERE schemaname <> 'pg_catalog' AND schemaname <> 'information_schema'
+  UNION
+  SELECT schemaname AS schema, matviewname AS name
+  FROM pg_matviews
+) v WHERE ((
+    -- allow specific schemas (none or '' assumes all):
+    CASE WHEN $1 ='' THEN 1=1
+    ELSE schema = ANY(string_to_array(replace($1, ' ', ''), ','))
+    END
+  ) AND (
+    -- blacklist tables using LIKE by fully-qualified name (no schema assumes public):
+    CASE WHEN $2 = '' THEN 1=1
+    ELSE replace((schema || '.'|| name), 'public.', '') NOT LIKE ALL(string_to_array(replace($2, ' ', ''), ','))
+    END
+  )
+) OR (-- make exceptions for specific tables, with fully-qualified name or wildcard pattern (no schema assumes public).
+  CASE WHEN $3 = '' THEN 1=0
+  ELSE replace((schema || '.'|| name), 'public.', '') LIKE ANY(string_to_array(replace($3, ' ', ''), ','))
+  END
+);

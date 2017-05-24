@@ -1,16 +1,16 @@
 -- REQUIRES ONE ARGUMENT:
 -- $1 must be empty string, or comma-delimited string, or array of string as schema names to INCLUDE.
-select tc.table_schema as schema, tc.table_name as name, kc.column_name as pk
-from information_schema.table_constraints tc
-join information_schema.key_column_usage kc
-    on kc.table_name = tc.table_name and
-       kc.constraint_schema = tc.table_schema and
+SELECT tc.table_schema AS schema, tc.table_name AS name, kc.column_name AS pk
+FROM information_schema.table_constraints tc
+JOIN information_schema.key_column_usage kc
+    ON kc.table_name = tc.table_name AND
+       kc.constraint_schema = tc.table_schema AND
        kc.constraint_name = tc.constraint_name
-where tc.constraint_type = 'PRIMARY KEY'
-  and (
+WHERE tc.constraint_type = 'PRIMARY KEY'
+  AND (
     -- whitelist specific tables, with fully-qualified name (no schema assumes public).
-    case when $1 = '' then 1=1
-    else replace((tc.table_schema || '.'|| tc.table_name), 'public.', '') like any(string_to_array(replace($1, ' ', ''), ','))
-    end
+    CASE WHEN $1 = '' THEN 1=1
+    ELSE replace((tc.table_schema || '.'|| tc.table_name), 'public.', '') LIKE ANY(string_to_array(replace($1, ' ', ''), ','))
+    END
   )
-order by tc.table_schema, tc.table_name, kc.position_in_unique_constraint;
+ORDER BY tc.table_schema, tc.table_name, kc.position_in_unique_constraint;
