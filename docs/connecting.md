@@ -33,7 +33,7 @@ const connectionInfo =
 
 On connection, Massive introspects your schema to find tables, views, and functions. Along with script files, these are attached to the instance object and form your database's API.
 
-Tables and views, including materialized views, are attached as objects with a set of standard access and persistence functions. See [Queries](/queries) and [Persistence](/persistence) for more details.
+Tables and views, including foreign tables and materialized views, are attached as objects with a set of standard access and persistence functions. See [Queries](/queries) and [Persistence](/persistence) for more details.
 
 Database functions and scripts are attached as invocable functions. See [Functions](/functions) for more.
 

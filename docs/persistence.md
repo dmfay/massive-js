@@ -6,6 +6,8 @@ Massive's lack of entity modeling means it retrieves your data in the form of pl
 
 `save` performs an upsert. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. The promise `save` returns will resolve to the created or modified data.
 
+`save` may not be used with foreign tables, since they do not have primary keys to test.
+
 ```javascript
 db.tests.save({
   version: 1,
@@ -53,7 +55,7 @@ db.tests.insert([{
 
 ## update
 
-`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
+`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the criteria-changes variant can be used with foreign tables.
 
 Both `update` functions return promises for arrays containing the updated data.
 

@@ -88,7 +88,7 @@ db.run('select * from tests where id > ${something}', {something: 1}).then(tests
 
 ### Tables and Views
 
-Massive loads all views (including materialized views) and all tables having primary key constraints. Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.
+Massive loads all views (including materialized views), all tables having primary key constraints, and foreign tables (which cannot have primary keys). Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.
 
 #### Schemas
 
@@ -211,7 +211,7 @@ db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
 
 #### Persisting
 
-`save` performs an upsert, inserting if the object has no primary key value and updating if it does.
+`save` performs an upsert, inserting if the object has no primary key value and updating if it does. `save` can only be used with local tables, since foreign tables do not have primary keys to test.
 
 ```javascript
 db.tests.save({
@@ -251,7 +251,7 @@ db.tests.insert([{
 });
 ```
 
-`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
+`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the latter variant can be used with foreign tables.
 
 ```javascript
 db.tests.update({
