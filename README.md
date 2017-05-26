@@ -389,6 +389,10 @@ db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
 });
 ```
 
+### Accessing the Driver
+
+Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise](https://github.com/vitaly-t/pg-promise) driver as `db.driver` so client code can easily use its lower-level functions when necessary.
+
 ## REPL
 
 Massive.js ships with a REPL (read-evaluate-print loop), an interactive console that lets you connect to a database and execute JavaScript code. The easiest way to run it is to install globally:
