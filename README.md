@@ -137,7 +137,7 @@ db.tests.findOne({
 });
 ```
 
-**find** is a general-purpose query function which returns a result list.
+`find` is a general-purpose query function which returns a result list.
 
 ```javascript
 db.tests.find({
@@ -155,7 +155,7 @@ db.tests.find({
 });
 ```
 
-**count** returns the resultset length.
+`count` returns the resultset length.
 
 ```javascript
 db.tests.count({
@@ -167,7 +167,7 @@ db.tests.count({
 });
 ```
 
-**search** performs full-text searches.
+`search` performs full-text searches.
 
 ```javascript
 db.tests.search({
@@ -178,7 +178,7 @@ db.tests.search({
 });
 ```
 
-**where** allows you to write your own WHERE clause instead of using a criteria object.
+`where` allows you to write your own WHERE clause instead of using a criteria object.
 
 ```javascript
 db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
@@ -188,7 +188,7 @@ db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
 
 #### Persisting
 
-**save** performs an upsert, inserting if the object has no primary key value and updating if it does.
+`save` performs an upsert, inserting if the object has no primary key value and updating if it does.
 
 ```javascript
 db.tests.save({
@@ -207,7 +207,7 @@ db.tests.save({
 });
 ```
 
-**insert** creates a new row or rows (if passed an array).
+`insert` creates a new row or rows (if passed an array).
 
 ```javascript
 db.tests.insert({
@@ -228,7 +228,7 @@ db.tests.insert([{
 });
 ```
 
-**update** has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
+`update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.
 
 ```javascript
 db.tests.update({
@@ -255,7 +255,7 @@ Postgres' JSONB functionality allows for a more free-form approach to data than 
 
 Document tables consist of some metadata, including the primary key, and a `body` JSONB field. A GIN index is also created for the document body and a full-text search vector to speed up queries. When querying a document table, the primary key is added to the `body`; when persisting, it is pulled off and used to locate the record.
 
-**saveDoc** writes a document to the database. It may be invoked from the database object itself in order to create the table on the fly.
+`saveDoc` writes a document to the database. It may be invoked from the database object itself in order to create the table on the fly.
 
 ```javascript
 db.saveDoc('reports', {
@@ -272,7 +272,7 @@ db.saveDoc('reports', {
 });
 ```
 
-If the document table already exists, **saveDoc** can be invoked on it just as the standard table functions are. This function performs an insert if no `id` is provided, or an update otherwise. The entire document will be added or modified; for partial changes, use `modify`.
+If the document table already exists, `saveDoc` can be invoked on it just as the standard table functions are. This function performs an insert if no `id` is provided, or an update otherwise. The entire document will be added or modified; for partial changes, use `modify`.
 
 ```javascript
 db.reports.saveDoc({
@@ -290,7 +290,7 @@ db.reports.saveDoc({
 });
 ```
 
-**modify** adds and updates fields in an existing document (or any JSON/JSONB column) _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
+`modify` adds and updates fields in an existing document (or any JSON/JSONB column) _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
 
 ```javascript
 db.reports.modify(1, {
@@ -306,7 +306,7 @@ db.products.modify(1, {
 });
 ```
 
-Locate documents with **findDoc**, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
+Locate documents with `findDoc`, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
 
 ```javascript
 db.reports.findDoc(1).then(report => {
@@ -320,7 +320,7 @@ db.reports.findDoc({
 });
 ```
 
-**searchDoc** performs a full-text search on the document body fields.
+`searchDoc` performs a full-text search on the document body fields.
 
 ```javascript
 db.reports.searchDoc({
@@ -333,7 +333,7 @@ db.reports.searchDoc({
 
 #### Deleting
 
-There's only one function to delete data: **destroy**, which takes a criteria object. To destroy a document, use the primary key or specify JSON traversal operations in the criteria object.
+There's only one function to delete data: `destroy`, which takes a criteria object. To destroy a document, use the primary key or specify JSON traversal operations in the criteria object.
 
 ```javascript
 db.tests.destroy({
