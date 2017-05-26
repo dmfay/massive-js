@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 const path = require('path');
 const connectionString = 'postgres://postgres@localhost/massive';
 
@@ -11,22 +10,22 @@ global.assert = require('chai').use(require('chai-as-promised')).assert;
 global.massive = require('../../index');
 global.connectionString = connectionString;
 
-global.resetDb = co.wrap(function* (schema) {
+global.resetDb = function (schema) {
   schema = schema || 'default';
 
-  const db = yield massive(connectionString, {
+  return massive(connectionString, {
     enhancedFunctions: true,
     scripts: path.join(__dirname, 'scripts', schema)
   }, {
     noWarnings: true
+  }).then(db => {
+    return db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'").then(schemata =>
+      Promise.all(schemata.map(schema => db.run(`drop schema ${schema.schema_name} cascade`)))
+    ).then(() =>
+      db.schema()
+    ).then(() =>
+      db.reload()
+    );
   });
-
-  const schemata = yield db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'");
-
-  yield Promise.all(schemata.map(schema => db.run(`drop schema ${schema.schema_name} cascade`)));
-
-  yield db.schema();
-
-  return yield db.reload();
-});
+};
 
