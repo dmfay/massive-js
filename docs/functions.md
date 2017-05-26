@@ -36,7 +36,11 @@ db.myTestQueries.restartTests(5, true).then(results => {
   // parameters and returns any output from a RETURNING clause
 });
 
-db.myTestQueries.restartTests({category: 5, force: true}).then(results => {
-  // as above; the prepared statement should use ${category} and ${force} instead of $1 and $2.
+db.myTestQueries.restartTests({
+  category: 5,
+  force: true
+}).then(results => {
+  // as above; the prepared statement should use ${category}
+  // and ${force} instead of $1 and $2.
 });
 ```
