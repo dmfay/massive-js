@@ -405,50 +405,6 @@ describe('find', function () {
     });
   });
 
-  describe('full text search', function () {
-    it('returns 4 products for term \'product\'', function () {
-      return db.products.search({columns: ['name'], term: 'Product'}).then(res => {
-        assert.lengthOf(res, 4);
-      });
-    });
-    it('returns 1 products for term \'3\'', function () {
-      return db.products.search({columns: ['name'], term: '3'}).then(res => {
-        assert.lengthOf(res, 1);
-      });
-    });
-    it('returns 1 Users for term \'test\'', function () {
-      return db.Users.search({columns: ['Name'], term: 'test'}).then(res => {
-        assert.lengthOf(res, 1);
-      });
-    });
-    it('returns 4 products for term \'description\' using multiple columns', function () {
-      return db.products.search({columns: ['Name', 'description'], term: 'description'}).then(res => {
-        assert.lengthOf(res, 4);
-      });
-    });
-    it('returns 0 products for term \'none\' using multiple columns', function () {
-      return db.products.search({columns: ['Name', 'description'], term: 'none'}).then(res => {
-        assert.lengthOf(res, 0);
-      });
-    });
-    it('returns 2 products for term \'description\' using multiple columns when limit is set to 2', function () {
-      return db.products.search({columns: ['Name', 'description'], term: 'description'}, {limit: 2}).then(res => {
-        assert.lengthOf(res, 2);
-      });
-    });
-    it('returns same correct element when offset is set', function* () {
-      const one = yield db.products.search({columns: ['Name', 'description'], term: 'description'});
-      const two = yield db.products.search({columns: ['Name', 'description'], term: 'description'}, {offset: 1});
-
-      assert.equal(one[1].id, two[0].id);
-    });
-    it('returns results filtered by where', function () {
-      return db.docs.search({columns: ['body->>\'description\''], term: 'C:*', where: {'body->>is_good': 'true'}}).then(res => {
-        assert.lengthOf(res, 1);
-      });
-    });
-  });
-
   describe('view queries', function () {
     it('returns all records on find with no args', function () {
       return db.popular_products.find().then(res => assert.lengthOf(res, 3));

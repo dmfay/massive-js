@@ -194,7 +194,7 @@ db.tests.count({
 
 ```javascript
 db.tests.search({
-  columns: ["name"],
+  fields: ["name"],
   term: "home"}
 ).then(tests => {
   // all tests with 'home' in the name
@@ -347,7 +347,7 @@ db.reports.findDoc({
 
 ```javascript
 db.reports.searchDoc({
-  keys : ["title", "description"],
+  fields : ["title", "description"],
   term : "Kauai"
 }.then(docs => {
   // reports returned with an on-the-fly full text search for 'Kauai'

@@ -235,7 +235,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line19">line 19</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -335,7 +335,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line128">line 128</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line125">line 125</a>
     </li></ul></dd>
     
 
@@ -466,7 +466,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line155">line 155</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line152">line 152</a>
     </li></ul></dd>
     
 
@@ -489,6 +489,208 @@
 
 
 
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="findDoc"><span class="type-signature"></span>findDoc<span class="signature">(conditions<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Find a document by searching in the body.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A criteria object, prebuilt predicate,
+or raw ID value.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Query options.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line211">line 211</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Query results.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -600,7 +802,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line35">line 35</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -623,6 +825,253 @@
 
 
 
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="modify"><span class="type-signature"></span>modify<span class="signature">(id, changes, field<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Update a document, adding new information and changing existing information.
+This function can be used with any JSON field, not just document tables.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Primary key of the document or row to modify.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Changes to apply.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>field</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    body
+                
+                </td>
+            
+
+            <td class="description last">Document field name.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line196">line 196</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    If modifying a document table, the document; otherwise, the modified row.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -732,7 +1181,7 @@ record.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line139">line 139</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -755,6 +1204,160 @@ record.
 
 
 
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="saveDoc"><span class="type-signature"></span>saveDoc<span class="signature">(doc)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Save a document to the database. This function replaces the entire document
+body.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>doc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The document to write.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line168">line 168</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The updated document.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -891,7 +1494,7 @@ to their new values.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line75">line 75</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line72">line 72</a>
     </li></ul></dd>
     
 
@@ -933,13 +1536,13 @@ to their new values.</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#findDoc">findDoc</a></li><li><a href="global.html#modify">modify</a></li><li><a href="global.html#saveDoc">saveDoc</a></li><li><a href="global.html#searchDoc">searchDoc</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu May 25 2017 23:13:11 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -111,11 +111,11 @@ db.tests.where(
 
 ## search
 
-`search` enables full-text searching across multiple columns. The first argument is a search object with an array of `columns` and a `term` to search for. The function also takes a query options object as an optional second argument.
+`search` enables full-text searching across multiple columns. The first argument is a search plan with an array of `columns` and a `term` to search for. The function also takes a query options object as an optional second argument.
 
 ```javascript
 db.users.search(
-  {columns: ['email', 'name'], term: 'rob'},
+  {fields: ['email', 'name'], term: 'rob'},
   {stream: true}
 ).then(stream => {
   // a readable stream of users matching the full-text

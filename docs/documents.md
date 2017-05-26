@@ -60,8 +60,8 @@ db.reports.findDoc({
 
 ```javascript
 db.reports.searchDoc({
-  keys : ["title", "description"],
-  term : "Kauai"
+  fields: ["title", "description"],
+  term: "Kauai"
 }.then(docs => {
   // reports returned with an on-the-fly full text search
   // for 'Kauai'

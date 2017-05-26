@@ -53,10 +53,8 @@
 <li><strong>Document storage</strong>: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.</li>
 <li><strong>Postgres everything</strong>: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields, JSON storage, pattern matching with regular expressions, and many, many more features found in PostgreSQL but not in other databases.</li>
 </ul>
-<h2>Full Documentation</h2><blockquote>
-<p>TODO</p>
-</blockquote>
-<!-- vim-markdown-toc GFM -->
+<h2>Full Documentation</h2><p><a href="https://dmfay.github.io/massive-js/">Full documentation including API docs is available on GitHub Pages.</a></p>
+<h2>Table of Contents</h2><!-- vim-markdown-toc GFM -->
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#quickstart">Quickstart</a><ul>
@@ -71,7 +69,7 @@
 <li><a href="#deleting">Deleting</a></li>
 </ul>
 </li>
-<li><a href="#functions">Functions</a></li>
+<li><a href="#functions-and-scripts">Functions and Scripts</a></li>
 <li><a href="#streams">Streams</a></li>
 <li><a href="#accessing-the-driver">Accessing the Driver</a></li>
 </ul>
@@ -118,7 +116,7 @@ db.auth.users.find(...).then(...);</code></pre><h4>Criteria Objects</h4><p>Many 
   'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
   'field @>': ['value', 'Value'], // array contains
   'field ->> attr': 'value'       // JSON traversal
-}</code></pre><p>There are many more; <a href="TODO">view the full list of criteria operations here</a>.</p>
+}</code></pre><p>There are many more; see the full documentation for the complete list.</p>
 <h4>Query Options</h4><p>The finder functions -- <code>find</code>, <code>findOne</code>, <code>findDoc</code>, <code>search</code>, and <code>searchDoc</code> -- allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed.</p>
 <pre class="prettyprint source lang-javascript"><code>{
   build: true,                    // return query text and parameters without executing anything
@@ -163,7 +161,7 @@ db.tests.findOne({
   // 
 });</code></pre><p><code>search</code> performs full-text searches.</p>
 <pre class="prettyprint source lang-javascript"><code>db.tests.search({
-  columns: [&quot;name&quot;],
+  fields: [&quot;name&quot;],
   term: &quot;home&quot;}
 ).then(tests => {
   // all tests with 'home' in the name
@@ -265,7 +263,7 @@ db.reports.findDoc({
   // all report documents matching the criteria
 });</code></pre><p><code>searchDoc</code> performs a full-text search on the document body fields.</p>
 <pre class="prettyprint source lang-javascript"><code>db.reports.searchDoc({
-  keys : [&quot;title&quot;, &quot;description&quot;],
+  fields : [&quot;title&quot;, &quot;description&quot;],
   term : &quot;Kauai&quot;
 }.then(docs => {
   // reports returned with an on-the-fly full text search for 'Kauai'
@@ -274,7 +272,7 @@ db.reports.findDoc({
   priority: 'high'
 }).then(tests => {
   // an array containing all removed tests
-});</code></pre><h3>Functions</h3><p>Object-relational mappers tend to ignore functions. For many, the database exists solely as a repository, with data manipulation reserved for application logic and external jobs.</p>
+});</code></pre><h3>Functions and Scripts</h3><p>Object-relational mappers tend to ignore functions. For many, the database exists solely as a repository, with data manipulation reserved for application logic and external jobs.</p>
 <p>To be fair, this setup is perfectly sufficient for many use cases. But when it isn't, it <em>hurts</em>. With functions, you can perform complex operations on your data at a scope and speed unrivaled by anything else. Why go to the trouble of querying bulk data into another system and manipulating it -- only to put it back where it was with a second trip across the wire? Especially when there's a powerful, flexible language purpose-built for set operations <em>right there</em>? You wouldn't work that way, and Massive won't make you: functions are first-class citizens as far as it's concerned.</p>
 <p>Massive actually loads functions from two locations: the database itself, and a /db directory in your project root which contains prepared statements in .sql script files (the location may be changed by passing a <code>scripts</code> parameter on initialization). Subdirectories in /db are, like schemas, treated as namespaces; although, unlike schemas, they may be nested.</p>
 <p>Functions and scripts are loaded onto the database object and can be invoked directly:</p>
@@ -326,13 +324,13 @@ db > db.tests.find({priority: 'low'}).then(...);</code></pre><p>In addition to t
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#findDoc">findDoc</a></li><li><a href="global.html#modify">modify</a></li><li><a href="global.html#saveDoc">saveDoc</a></li><li><a href="global.html#searchDoc">searchDoc</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu May 25 2017 23:13:11 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

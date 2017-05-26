@@ -414,7 +414,7 @@ predicates.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line66">line 66</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -616,7 +616,209 @@ or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line105">line 105</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Query results.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="findDoc"><span class="type-signature"></span>findDoc<span class="signature">(conditions<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Find a document by searching in the body.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A criteria object, prebuilt predicate,
+or raw ID value.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Query options.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -812,7 +1014,7 @@ or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line46">line 46</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -866,14 +1068,15 @@ undefined if no records match.
 
     
 
-    <h4 class="name" id="search"><span class="type-signature"></span>search<span class="signature">(fields, options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="search"><span class="type-signature"></span>search<span class="signature">(plan, options)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Perform a full-text search on queryable columns.
+    Perform a full-text search on queryable fields. If options.document is true,
+looks in the document body fields instead of the table columns.
 </div>
 
 
@@ -909,7 +1112,7 @@ undefined if no records match.
 
         <tr>
             
-                <td class="name"><code>fields</code></td>
+                <td class="name"><code>plan</code></td>
             
 
             <td class="type">
@@ -951,7 +1154,7 @@ undefined if no records match.
 
         <tr>
             
-                <td class="name"><code>columns</code></td>
+                <td class="name"><code>fields</code></td>
             
 
             <td class="type">
@@ -967,7 +1170,7 @@ undefined if no records match.
 
             
 
-            <td class="description last">List of the columns to search.</td>
+            <td class="description last">List of the fields to search.</td>
         </tr>
 
     
@@ -1061,7 +1264,233 @@ undefined if no records match.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line119">line 119</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line117">line 117</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="searchDoc"><span class="type-signature"></span>searchDoc<span class="signature">(plan, options)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Shortcut to perform a full text search on a document table.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>plan</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Search definition.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">List of the document keys to search.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>term</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Search term.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Query options.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line165">line 165</a>
     </li></ul></dd>
     
 
@@ -1217,7 +1646,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line89">line 89</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line180">line 180</a>
     </li></ul></dd>
     
 
@@ -1281,13 +1710,13 @@ db.mytable.where('id=$1', [123]).then(...);
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#findDoc">findDoc</a></li><li><a href="global.html#modify">modify</a></li><li><a href="global.html#saveDoc">saveDoc</a></li><li><a href="global.html#searchDoc">searchDoc</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu May 25 2017 23:13:11 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
