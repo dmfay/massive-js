@@ -72,7 +72,7 @@ db.reports.searchDoc({
 
 ### saveDoc
 
-`saveDoc` inserts or updates a document. If an `id` field is present in the document, the corresponding record will be updated; otherwise, it's inserted.
+`saveDoc` inserts or updates a document. If an `id` field is present in the document, the corresponding record will be updated; otherwise, it's inserted. `saveDoc` will replace the entire document and does not update individual fields; to do that, see `modify`.
 
 ```javascript
 db.reports.saveDoc({
@@ -89,6 +89,22 @@ db.reports.saveDoc({
 });
 ```
 
-### setAttribute
+### modify
 
-> TODO
+`modify` adds and updates fields in an existing document _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
+
+This function may be used with any JSON or JSONB column, not just with document tables. If used on a document table, it returns a promise for the updated document; otherwise, it will return the entire row.
+
+```javascript
+db.reports.modify(1, {
+  title: 'Week 11 Throughput'
+}).then(report => {
+  // the updated report, with a changed 'title' attribute
+});
+
+db.products.modify(1, {
+  colors: ['gray', 'purple', 'red']
+}, 'info').then(widget => {
+  // the product with an 'info' field containing the colors array
+});
+```

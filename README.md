@@ -272,10 +272,11 @@ db.saveDoc('reports', {
 });
 ```
 
-If the document table already exists, **saveDoc** can be invoked on it just as the standard table functions are.
+If the document table already exists, **saveDoc** can be invoked on it just as the standard table functions are. This function performs an insert if no `id` is provided, or an update otherwise. The entire document will be added or modified; for partial changes, use `modify`.
 
 ```javascript
 db.reports.saveDoc({
+  id: 1,  // omit in order to insert
   title: 'Week 12 Throughput',
   lines: [{
     name: '1 East',
@@ -289,22 +290,19 @@ db.reports.saveDoc({
 });
 ```
 
-**saveDoc** also updates documents if an `id` is provided. Since the document body is JSON, fields can be added or removed at will.
+**modify** adds and updates fields in an existing document (or any JSON/JSONB column) _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
 
 ```javascript
-db.reports.saveDoc({
-  id: 1,
-  title: 'Week 12 Throughput v2',
-  version: 2,
-  lines: [{
-    name: '1 East',
-    numbers: [5, 4, 6, 6, 5]
-  }, {
-    name: '2 East',
-    numbers: [4, 4, 4, 3, 7]
-  }]
+db.reports.modify(1, {
+  title: 'Week 11 Throughput'
 }).then(report => {
-  // the newly created report
+  // the updated report, with a changed 'title' attribute
+});
+
+db.products.modify(1, {
+  colors: ['gray', 'purple', 'red']
+}, 'info').then(widget => {
+  // the product with an 'info' field containing the colors array
 });
 ```
 

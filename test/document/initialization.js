@@ -14,12 +14,12 @@ describe('initialization', function () {
     assert.isFunction(db.docs.findDoc);
     assert.isFunction(db.docs.saveDoc);
     assert.isFunction(db.docs.searchDoc);
-    assert.isFunction(db.docs.setAttribute);
+    assert.isFunction(db.docs.modify);
 
     assert.instanceOf(db.myschema.docs, Table);
     assert.isFunction(db.myschema.docs.findDoc);
     assert.isFunction(db.myschema.docs.saveDoc);
     assert.isFunction(db.myschema.docs.searchDoc);
-    assert.isFunction(db.myschema.docs.setAttribute);
+    assert.isFunction(db.myschema.docs.modify);
   });
 });
