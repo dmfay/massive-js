@@ -5,9 +5,8 @@ describe('dropTable', function () {
   const tableName = 'doggies';
   let db;
 
-  before(function* () {
-    db = yield resetDb('empty');
-    yield db.createSchema('public');
+  before(function () {
+    return resetDb('empty').then(instance => db = instance);
   });
 
   describe('without schema', function() {

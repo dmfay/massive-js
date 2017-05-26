@@ -1,14 +1,13 @@
 'use strict';
 
-describe('getTable', function () {
+describe('getObject', function () {
   const schema = 'spec';
   const tableName = 'doggies';
   const missingTableName = 'doges';
   let db;
 
-  before(function* () {
-    db = yield resetDb('empty');
-    yield db.createSchema('public');
+  before(function () {
+    return resetDb('empty').then(instance => db = instance);
   });
 
   describe('without schema', function() {
@@ -19,9 +18,13 @@ describe('getTable', function () {
       return db.dropTable(tableName, {cascade: true});
     });
 
-    it('verifies the presence of the table in public schema', function () {
-      assert.isOk(db.getTable(tableName));
-      assert.isNotOk(db.getTable(missingTableName));
+    it('verifies the presence of a table in public schema', function () {
+      assert.isOk(db.getObject(tableName, 'tables'));
+      assert.isNotOk(db.getObject(missingTableName, 'tables'));
+    });
+
+    it('defaults to searching tables', function () {
+      assert.isOk(db.getObject(tableName));
     });
   });
 
@@ -39,8 +42,8 @@ describe('getTable', function () {
     });
 
     it('verifies the presence of the table in the specified schema', function () {
-      assert.isOk(db.getTable(schemaTableName));
-      assert.isNotOk(db.getTable(missingSchemaTableName));
+      assert.isOk(db.getObject(schemaTableName, 'tables'));
+      assert.isNotOk(db.getObject(missingSchemaTableName, 'tables'));
     });
   });
 });

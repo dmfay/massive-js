@@ -4,8 +4,8 @@ describe('dropSchema', function() {
   let db;
   const schemaName = 'spec';
 
-  before(function* () {
-    db = yield resetDb('empty');
+  before(function () {
+    return resetDb('empty').then(instance => db = instance);
   });
 
   beforeEach(function() {

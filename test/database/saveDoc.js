@@ -3,9 +3,8 @@
 describe('saveDoc', function () {
   let db;
 
-  before(function* () {
-    db = yield resetDb('empty');
-    yield db.createSchema('public');
+  before(function () {
+    return resetDb('empty').then(instance => db = instance);
   });
 
   describe('with an existing table', function () {
