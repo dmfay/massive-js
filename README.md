@@ -31,7 +31,7 @@ Here are some of the high points:
     * [Persisting](#persisting)
     * [Documents](#documents)
     * [Deleting](#deleting)
-  * [Functions](#functions)
+  * [Functions and Scripts](#functions-and-scripts)
   * [Streams](#streams)
   * [Accessing the Driver](#accessing-the-driver)
 * [REPL](#repl)
@@ -366,7 +366,7 @@ db.tests.destroy({
 });
 ```
 
-### Functions
+### Functions and Scripts
 
 Object-relational mappers tend to ignore functions. For many, the database exists solely as a repository, with data manipulation reserved for application logic and external jobs.
 
