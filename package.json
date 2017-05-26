@@ -21,11 +21,11 @@
     "pg",
     "postgresql"
   ],
-  "author": "Rob Conery <robconery@gmail.com>",
+  "author": "Dian Fay <dian.m.fay@gmail.com>",
   "contributors": [
     "Karl Seguin <karl@openmymind.net>",
     "John Atten <xivsolutions@gmail.com>",
-    "Dian Fay <dian.m.fay@gmail.com>"
+    "Rob Conery <robconery@gmail.com>"
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
@@ -34,8 +34,7 @@
     "lodash": "^4.17.4",
     "mz": "^2.6.0",
     "pg-promise": "^5.7.1",
-    "pg-query-stream": "^1.0.0",
-    "strip-bom": "^3.0.0"
+    "pg-query-stream": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -47,7 +46,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/robconery/massive-js.git"
+    "url": "https://github.com/dmfay/massive-js.git"
   },
   "jshintConfig": {
     "esversion": 6
