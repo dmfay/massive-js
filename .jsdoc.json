@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": ["index.js", "lib"]
+    "include": ["index.js", "lib", "README.md"]
   },
   "opts": {
     "recurse": true

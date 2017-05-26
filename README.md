@@ -17,6 +17,27 @@ Here are some of the high points:
 
 > TODO
 
+<!-- vim-markdown-toc GFM -->
+* [Installation](#installation)
+* [Quickstart](#quickstart)
+  * [Raw SQL](#raw-sql)
+  * [Tables and Views](#tables-and-views)
+    * [Schemas](#schemas)
+    * [Criteria Objects](#criteria-objects)
+    * [Query Options](#query-options)
+    * [Querying](#querying)
+    * [Persisting](#persisting)
+    * [Documents](#documents)
+    * [Deleting](#deleting)
+  * [Functions](#functions)
+  * [Streams](#streams)
+  * [Accessing the Driver](#accessing-the-driver)
+* [REPL](#repl)
+* [Older Versions](#older-versions)
+* [Contributing](#contributing)
+
+<!-- vim-markdown-toc -->
+
 ## Installation
 
 ```
@@ -43,7 +64,7 @@ massive({
 }).then(db => {...});
 ```
 
-When you instantiate Massive, it introspects your database for tables, views, and functions. Along with files in your scripts directory (`/db` by default), these become an API that allows you to query database objects and execute scripts and functions. This initialization process is fast, but not instantaneous, and you don't want to be doing it every time you run a new query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application. In Express, you can store it with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; otherwise, you can take advantage of Node's module caching to require the object as necessary.
+When you instantiate Massive, it introspects your database for tables, views, and functions. Along with files in your scripts directory (`/db` by default), these become an API that allows you to query database objects and execute scripts and functions. This initialization process is fast, but not instantaneous, and you don't want to be doing it every time you run a new query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application. In Express, you can store it with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
 
 ### Raw SQL
 
@@ -99,7 +120,7 @@ Many functions use criteria objects to build a query WHERE clause. A criteria ob
 }
 ```
 
-There are many more; [view the full list of criteria operations here](TODO).
+There are many more; see the full documentation for the complete list.
 
 #### Query Options
 
@@ -419,7 +440,7 @@ When invoking functions, you may omit the `then` if you just want to see output 
 
 Exit the REPL by pressing Ctrl-C twice.
 
-### Older Versions
+## Older Versions
 
 Release versions are tagged and available [here](https://github.com/dmfay/massive-js/releases).
 
