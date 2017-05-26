@@ -15,7 +15,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1><a href="/">{{ site.title | default: site.github.repository_name }}</a></h1>
+        <h1><a href="{{ site.baseurl }}">{{ site.title | default: site.github.repository_name }}</a></h1>
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
         {% if site.github.is_project_page %}
@@ -24,14 +24,14 @@
 
         <h2>Contents</h2>
         <ul class="toc">
-          <li><a href="/connecting.html">Connecting</a></li>
-          <li><a href="/criteria.html">Criteria Objects</a></li>
-          <li><a href="/queries.html">Queries</a></li>
-          <li><a href="/persistence.html">Persistence</a></li>
-          <li><a href="/documents.html">Working with Documents</a></li>
-          <li><a href="/functions.html">Functions and Scripts</a></li>
-          <li><a href="/run.html">Raw SQL</a></li>
-          <li><a href="/api/index.html">API Docs</a></li>
+          <li><a href="{{ site.baseurl }}/connecting.html">Connecting</a></li>
+          <li><a href="{{ site.baseurl }}/criteria.html">Criteria Objects</a></li>
+          <li><a href="{{ site.baseurl }}/queries.html">Queries</a></li>
+          <li><a href="{{ site.baseurl }}/persistence.html">Persistence</a></li>
+          <li><a href="{{ site.baseurl }}/documents.html">Working with Documents</a></li>
+          <li><a href="{{ site.baseurl }}/functions.html">Functions and Scripts</a></li>
+          <li><a href="{{ site.baseurl }}/run.html">Raw SQL</a></li>
+          <li><a href="{{ site.baseurl }}/api/index.html">API Docs</a></li>
         </ul>
 
         {% if site.github.is_user_page %}

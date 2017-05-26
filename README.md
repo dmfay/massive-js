@@ -15,7 +15,7 @@ Here are some of the high points:
 
 ## Full Documentation
 
-> TODO
+[Full documentation including API docs is available on GitHub Pages.](https://dmfay.github.io/massive-js/)
 
 <!-- vim-markdown-toc GFM -->
 * [Installation](#installation)
