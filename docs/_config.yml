@@ -21,7 +21,7 @@ description: > # this means to ignore newlines until "baseurl:"
   metaphors. Providing minimal abstractions for the interfaces and tools you
   already use, its goal is to do just enough to make working with your data as
   easy and intuitive as possible, then get out of your way.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/massive-js" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username:  dmfay
