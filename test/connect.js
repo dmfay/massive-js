@@ -14,32 +14,32 @@ describe('connecting', function () {
   });
 
   describe('variations', function () {
-    it('connects with a connectionString property', function* () {
-      const db = yield massive({ connectionString: connectionString }, {}, { noWarnings: true });
-
-      assert.isOk(db);
-      assert.isOk(db.t1);
+    it('connects with a connectionString property', function () {
+      return massive({ connectionString: connectionString }, {}, { noWarnings: true }).then(db => {
+        assert.isOk(db);
+        assert.isOk(db.t1);
+      });
     });
 
-    it('connects with a connection string literal', function* () {
-      const db = yield massive(connectionString, {}, { noWarnings: true });
-
-      assert.isOk(db);
-      assert.isOk(db.t1);
+    it('connects with a connection string literal', function () {
+      return massive(connectionString, {}, { noWarnings: true }).then(db => {
+        assert.isOk(db);
+        assert.isOk(db.t1);
+      });
     });
 
-    it('connects with a property map', function* () {
-      const db = yield massive({ host: 'localhost', database: 'massive' }, {}, { noWarnings: true });
-
-      assert.isOk(db);
-      assert.isOk(db.t1);
+    it('connects with a property map', function () {
+      massive({ host: 'localhost', database: 'massive' }, {}, { noWarnings: true }).then(db => {
+        assert.isOk(db);
+        assert.isOk(db.t1);
+      });
     });
 
-    it('connects to localhost with a database name', function* () {
-      const db = yield massive({ db: 'massive' }, {}, { noWarnings: true });
-
-      assert.isOk(db);
-      assert.isOk(db.t1);
+    it('connects to localhost with a database name', function () {
+      massive({ db: 'massive' }, {}, { noWarnings: true }).then(db => {
+        assert.isOk(db);
+        assert.isOk(db.t1);
+      });
     });
 
     it('rejects with connection errors', function () {
@@ -66,16 +66,16 @@ describe('connecting', function () {
   });
 
   describe('configuration', function () {
-    it('allows undefined scripts directories', function* () {
-      const db = yield massive(connectionString, {}, { noWarnings: true });
-
-      assert.lengthOf(db.functions, 4);
+    it('allows undefined scripts directories', function () {
+      massive(connectionString, {}, { noWarnings: true }).then(db => {
+        assert.lengthOf(db.functions, 4);
+      });
     });
 
-    it('exposes driver defaults through pg-promise', function* () {
-      const db = yield massive(connectionString, {}, { noWarnings: true });
-
-      assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
+    it('exposes driver defaults through pg-promise', function () {
+      massive(connectionString, {}, { noWarnings: true }).then(db => {
+        assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
+      });
     });
   });
 
