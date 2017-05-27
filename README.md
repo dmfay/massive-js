@@ -329,9 +329,15 @@ db.products.modify(1, {
 });
 ```
 
-Locate documents with `findDoc`, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.
+Much of the standard queryable API has corresponding functionality with document tables. Document query functions only use criteria objects and (in the case of `findDoc`) primary key values. Simple criteria objects, testing equality only, can leverage the GIN index on the document table for improved performance.
 
 ```javascript
+db.reports.countDoc({
+  'title ilike': '%throughput%'
+}).then(count => {
+  // number of matching documents
+});
+
 db.reports.findDoc(1).then(report => {
   // the report document body with the primary key included
 });
@@ -341,11 +347,7 @@ db.reports.findDoc({
 }).then(reports => {
   // all report documents matching the criteria
 });
-```
 
-`searchDoc` performs a full-text search on the document body fields.
-
-```javascript
 db.reports.searchDoc({
   fields : ["title", "description"],
   term : "Kauai"
