@@ -9,7 +9,7 @@ describe('findDoc', function () {
 
   it('returns results in document format', function () {
     return db.docs.findDoc('*').then(docs => {
-      assert.lengthOf(docs, 3);
+      assert.lengthOf(docs, 4);
       assert.equal(docs[0].id, 1);
       assert.equal(docs[0].title, 'A Document');
       assert.equal(docs[0].description, 'lorem ipsum etc');

@@ -30,7 +30,7 @@ describe('searchDoc', function () {
       fields: ['title'],
       term: 'Document'
     }).then(docs => {
-      assert.lengthOf(docs, 2);
+      assert.lengthOf(docs, 3);
     });
   });
 
@@ -91,9 +91,25 @@ describe('searchDoc', function () {
       order: [{field: 'title', direction: 'desc', type: 'varchar'}],
       orderBody: true
     }).then(docs => {
-      assert.lengthOf(docs, 2);
+      assert.lengthOf(docs, 3);
+      assert.equal(docs[0].title, 'A Third Document');
+      assert.equal(docs[1].title, 'Another Document');
+      assert.equal(docs[2].title, 'A Document');
+    });
+  });
+
+  it('applies offset and limit', function () {
+    return db.docs.searchDoc({
+      fields: ['title'],
+      term: 'Document'
+    }, {
+      order: [{field: 'title', direction: 'desc', type: 'varchar'}],
+      orderBody: true,
+      offset: 1,
+      limit: 1
+    }).then(docs => {
+      assert.lengthOf(docs, 1);
       assert.equal(docs[0].title, 'Another Document');
-      assert.equal(docs[1].title, 'A Document');
     });
   });
 });

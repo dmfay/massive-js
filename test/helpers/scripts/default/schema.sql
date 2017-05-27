@@ -59,6 +59,7 @@ values ('Product 1', 12.00, 'Product 1 description', null, null, true),
 insert into docs(body)
 values('{"title":"A Document","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Another Document","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
+('{"title":"A Third Document","price":18,"description":"something or other","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Starsky and Hutch","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}]}');
 
 insert into uuid_docs(body) values ('{"things": "stuff"}');

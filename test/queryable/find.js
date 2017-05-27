@@ -52,13 +52,13 @@ describe('find', function () {
 
     it('finds docs with > comparison on primary key', function () {
       return db.docs.find({'id >': 1}, {document: true}).then(docs => {
-        assert.lengthOf(docs, 2);
+        assert.lengthOf(docs, 3);
       });
     });
 
     it('finds docs with >= comparison on primary key', function () {
       return db.docs.find({'id >=': 2}, {document: true}).then(docs => {
-        assert.lengthOf(docs, 2);
+        assert.lengthOf(docs, 3);
       });
     });
   });
@@ -284,20 +284,22 @@ describe('find', function () {
 
     it('orders by fields in the table', function () {
       return db.docs.find('*', {order: 'id desc', document: true, generator: 'docGenerator'}).then(docs => {
-        assert.lengthOf(docs, 3);
-        assert.equal(docs[0].id, 3);
-        assert.equal(docs[1].id, 2);
-        assert.equal(docs[2].id, 1);
+        assert.lengthOf(docs, 4);
+        assert.equal(docs[0].id, 4);
+        assert.equal(docs[1].id, 3);
+        assert.equal(docs[2].id, 2);
+        assert.equal(docs[3].id, 1);
       });
     });
 
     it('orders by fields in the document body', function () {
       // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
       return db.docs.find('*', {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
-        assert.lengthOf(docs, 3);
+        assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Starsky and Hutch');
-        assert.equal(docs[1].title, 'Another Document');
-        assert.equal(docs[2].title, 'A Document');
+        assert.equal(docs[1].title, 'A Third Document');
+        assert.equal(docs[2].title, 'Another Document');
+        assert.equal(docs[3].title, 'A Document');
       });
     });
 
@@ -308,10 +310,11 @@ describe('find', function () {
         document: true,
         generator: 'docGenerator'
       }).then(docs => {
-        assert.lengthOf(docs, 3);
+        assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Starsky and Hutch');
-        assert.equal(docs[1].title, 'Another Document');
-        assert.equal(docs[2].title, 'A Document');
+        assert.equal(docs[1].title, 'A Third Document');
+        assert.equal(docs[2].title, 'Another Document');
+        assert.equal(docs[3].title, 'A Document');
       });
     });
   });
