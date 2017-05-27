@@ -274,16 +274,16 @@ describe('find', function () {
     });
   });
 
-  describe('documents', function () {
+  describe('document generator', function () {
     it('finds a doc by title', function () {
-      return db.docs.find({title: 'A Document'}, {document: true}).then(docs => {
+      return db.docs.find({title: 'A Document'}, {document: true, generator: 'docGenerator'}).then(docs => {
         //find will return multiple if id not specified... confusing?
         assert.equal(docs[0].title, 'A Document');
       });
     });
 
     it('orders by fields in the table', function () {
-      return db.docs.find('*', {order: 'id desc', document: true}).then(docs => {
+      return db.docs.find('*', {order: 'id desc', document: true, generator: 'docGenerator'}).then(docs => {
         assert.lengthOf(docs, 3);
         assert.equal(docs[0].id, 3);
         assert.equal(docs[1].id, 2);
@@ -293,7 +293,7 @@ describe('find', function () {
 
     it('orders by fields in the document body', function () {
       // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
-      return db.docs.find('*', {order: 'body->>\'title\' desc', document: true}).then(docs => {
+      return db.docs.find('*', {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
         assert.lengthOf(docs, 3);
         assert.equal(docs[0].title, 'Starsky and Hutch');
         assert.equal(docs[1].title, 'Another Document');
@@ -305,7 +305,8 @@ describe('find', function () {
       return db.docs.find('*', {
         order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true,
-        document: true
+        document: true,
+        generator: 'docGenerator'
       }).then(docs => {
         assert.lengthOf(docs, 3);
         assert.equal(docs[0].title, 'Starsky and Hutch');

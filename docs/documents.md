@@ -38,6 +38,18 @@ If the table already exists, you can still use `db.saveDoc`, but you can also in
 
 ## Querying Documents
 
+### countDoc
+
+Like its counterpart, `countDoc` returns the number of extant documents matching a criteria object. Unlike `count`, `countDoc` does not accept a raw SQL `WHERE` definition.
+
+```javascript
+db.reports.countDoc({
+  'title ilike': '%throughput%'
+}).then(reports => {
+  // number of matching documents
+});
+```
+
 ### findDoc
 
 `findDoc` locates documents with either a criteria object or a primary key. Simple criteria objects (testing equality only) can leverage the GIN index on the table to improve query speed.
