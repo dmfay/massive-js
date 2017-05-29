@@ -74,7 +74,7 @@ describe('WHERE clause generation', function () {
         const result = where({'json->>field': [1, 2, 3]});
 
         assert.lengthOf(result.predicates, 1);
-        assert.equal(result.predicates[0], '"json"->>\'field\' IN ($1, $2, $3)');
+        assert.equal(result.predicates[0], '"json"->>\'field\' IN ($1,$2,$3)');
         assert.lengthOf(result.params, 3);
         assert.deepEqual(result.params, ['1', '2', '3']);
         assert.typeOf(result.params[0], 'string');
@@ -390,7 +390,7 @@ describe('WHERE clause generation', function () {
     it('should create IN clauses for array parameters', function () {
       const condition = {field: '"field"', operation: ops('='), value: ['value1', 'value2'], offset: 1, params: []};
       const result = where.generator(condition);
-      assert.equal(result.predicate, '"field" IN ($1, $2)');
+      assert.equal(result.predicate, '"field" IN ($1,$2)');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
@@ -449,7 +449,7 @@ describe('WHERE clause generation', function () {
     it('should create IN clauses for array parameters', function () {
       const condition = {rawField: 'field', operation: ops('='), value: ['value1', 'value2'], offset: 1, params: []};
       const result = where.docGenerator(condition, {field: ['value1', 'value2']});
-      assert.equal(result.predicate, '("body" ->> \'field\') IN ($1, $2)');
+      assert.equal(result.predicate, '("body" ->> \'field\') IN ($1,$2)');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
