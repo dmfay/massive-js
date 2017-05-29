@@ -28,10 +28,11 @@ Text operators are case-insensitive.
 |--------|--------------|------------|
 | nothing or `=` | `=` | Equality |
 | `!`, `!=`, `<>` | `<>` | Inequality |
-| `<` | `<`|Less than |
+| `<` | `<`| Less than |
 | `<=` | `<=` | Less than or equal |
 | `>` | `>` | Greater than |
 | `>=` | `>=` | Greater than or equal |
+| `BETWEEN` | `BETWEEN` | Test whether value is between a lower and upper bound |
 | `IS DISTINCT FROM` | `IS DISTINCT FROM` | Difference test with `NULL` considered a fixed value |
 | `IS NOT DISTINCT FROM` | `IS NOT DISTINCT FROM` | Equality test with `NULL` considered a fixed value |
 

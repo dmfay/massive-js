@@ -113,6 +113,7 @@ Many functions use criteria objects to build a query WHERE clause. A criteria ob
   'field': [1, 2, 3],             // IN (x, y, z) tests
   'field >': 1,                   // greater than
   'field <=': 1,                  // less than or equal
+  'field BETWEEN': [1, 100],      // BETWEEN
   'field LIKE': 'val%',           // LIKE
   'field NOT ILIKE': 'Val%',      // NOT LIKE (case-insensitive)
   'field ~': 'val[ue]+',          // regexp match
