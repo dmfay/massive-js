@@ -245,7 +245,7 @@ describe('find', function () {
     });
 
     it('allows falling back to a postgres-formatted array literal', function () {
-      return db.products.find({'tags @>': '{tag2}'}).then(res => {
+      return db.products.find({'tags @>': '{tag2}'}, {build: false}).then(res => {
         assert.lengthOf(res, 2);
         assert.equal(res[0].id, 2);
         assert.equal(res[1].id, 3);
