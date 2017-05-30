@@ -19,7 +19,7 @@ The options object modifies query behavior, either by applying additional clause
 | order      | An array of strings (`['column1', 'column2 DESC']`) which is processed into an `ORDER BY` clause. |
 | orderBody  | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
 
-*nb. The `columns` and `order` properties allow comma-delimited string as well as array values. Take care in either case, but especially if using raw strings since the values are interpolated directly into the emitted SQL. If user input is included in the values, you open yourself up to SQL injection attacks.*
+*nb. The `columns` and `order` properties allow comma-delimited string as well as array values. Take care when using raw strings since the values are interpolated directly into the emitted SQL. If user input is included in the values, you open yourself up to SQL injection attacks.*
 
 ### Results Processing
 
