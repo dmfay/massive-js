@@ -14,7 +14,8 @@
     "test": "nyc --reporter=html --reporter=text mocha",
     "lint": "eslint '.'",
     "posttest": "npm run lint",
-    "preversion": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r"
+    "apidocs": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r",
+    "preversion": "npm run apidocs && git add docs/api && git commit -m 'update api docs'"
   },
   "keywords": [
     "postgres",
