@@ -43,7 +43,7 @@ Here are some of the high points:
 ## Installation
 
 ```
-npm i massive --save
+npm i massive@3.0.0-rc1 --save
 ```
 
 **Starting with version 3, Massive uses Promises exclusively. If you need a callback-based API, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
