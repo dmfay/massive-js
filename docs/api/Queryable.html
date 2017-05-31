@@ -467,6 +467,160 @@ predicates.</td>
 
     
 
+    <h4 class="name" id="countDoc"><span class="type-signature"></span>countDoc<span class="signature">(conditions)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Count documents matching criteria. Unlike count, this function only supports
+criteria objects.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>conditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A criteria object.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line70">line 70</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Number of matching documents.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="find"><span class="type-signature"></span>find<span class="signature">(conditions<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
@@ -616,7 +770,7 @@ or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line71">line 71</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -818,7 +972,7 @@ or raw ID value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line85">line 85</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -1014,7 +1168,7 @@ or raw ID value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line99">line 99</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1264,7 +1418,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line117">line 117</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -1490,7 +1644,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line165">line 165</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line179">line 179</a>
     </li></ul></dd>
     
 
@@ -1646,7 +1800,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line180">line 180</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line194">line 194</a>
     </li></ul></dd>
     
 
@@ -1710,13 +1864,13 @@ db.mytable.where('id=$1', [123]).then(...);
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 30 2017 22:31:06 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

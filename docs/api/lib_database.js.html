@@ -29,16 +29,14 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 const _ = require('lodash');
-const co = require('co');
-const fs = require('mz/fs');
 const pgp = require('pg-promise');
-const util = require('util');
 const QueryStream = require('pg-query-stream');
 const Query = require('./query/query');
 const Executable = require('./executable');
 const Queryable = require('./queryable');
 const Table = require('./table');
 const docify = require('./util/docify');
+const queryFile = require('./util/query-file');
 
 /**
  * A database connection.
@@ -142,17 +140,17 @@ Massive.prototype.detach = function (entity, collection='tables') {
  *
  * @function
  */
-Massive.prototype.reload = co.wrap(function* () {
+Massive.prototype.reload = function () {
   if (this.tables) { this.tables.forEach(t => this.detach(t.name, 'tables')); }
   if (this.views) { this.views.forEach(v => this.detach(v.name, 'views')); }
   if (this.functions) { this.functions.forEach(f => this.detach(f.name, 'functions')); }
 
-  this.tables = yield this.attach(Table, require('./loader/tables'));
-  this.views = yield this.attach(Queryable, require('./loader/views'));
-  this.functions = yield this.attach(Executable, require('./loader/functions'), require('./loader/scripts'));
-
-  return this;
-});
+  return Promise.all([
+    this.attach(Table, require('./loader/tables')).then(tables => this.tables = tables),
+    this.attach(Queryable, require('./loader/views')).then(views => this.views = views),
+    this.attach(Executable, require('./loader/functions'), require('./loader/scripts')).then(functions => this.functions = functions)
+  ]).then(() => this);
+};
 
 /**
  * Execute a query.
@@ -221,17 +219,15 @@ Massive.prototype.query = function (query, params = [], options = {}) {
  * already exist, it will be created.
  * @param {Object} doc - A JSON document.
  */
-Massive.prototype.saveDoc = co.wrap(function* (collection, doc) {
+Massive.prototype.saveDoc = function (collection, doc) {
   let potentialTable = this.getObject(collection);
 
   if (potentialTable) {
-    return yield potentialTable.saveDoc(doc);
+    return potentialTable.saveDoc(doc);
   } else {
-    yield this.createDocumentTable(collection);
-
-    return yield this.saveDoc(collection, doc);
+    return this.createDocumentTable(collection).then(() => this.saveDoc(collection, doc));
   }
-});
+};
 
 /**
  * Create a new document table and attach it to the Database for usage.
@@ -241,21 +237,25 @@ Massive.prototype.saveDoc = co.wrap(function* (collection, doc) {
  * specified in a qualified path, 'public' is assumed.
  * @return {Promise} The added table.
  */
-Massive.prototype.createDocumentTable = co.wrap(function* (path) {
-  const sql = yield fs.readFile(`${__dirname}/scripts/create_document_table.sql`, "UTF-8");
-  const splits = path.split(".");
+Massive.prototype.createDocumentTable = function (path) {
+  const sql = queryFile('document-table.sql');
+  const splits = path.split('.');
   const tableName = splits.pop();
-  const schemaName = splits.pop() || "public";
-  const indexName = tableName.replace(".", "_");
+  const schemaName = splits.pop() || 'public';
+  const indexName = tableName.replace('.', '_');
 
-  yield this.query(util.format(sql, path, indexName, path, indexName, path));
+  return this.query(sql, {
+    schema: schemaName,
+    table: tableName,
+    index: indexName
+  }).then(() =>
+    this.attach(Table, Promise.resolve([{schema: schemaName, pk: 'id', name: tableName}]))
+  ).then(added => {
+    this.tables.push(added[0]);
 
-  const added = yield this.attach(Table, Promise.resolve([{schema: schemaName, pk: 'id', name: tableName}]));
-
-  this.tables.push(added[0]);
-
-  return added[0];
-});
+    return added[0];
+  });
+};
 
 /**
  * Find a database object, if attached.
@@ -347,13 +347,13 @@ exports = module.exports = Massive;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 30 2017 22:31:06 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

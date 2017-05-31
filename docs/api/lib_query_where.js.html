@@ -31,69 +31,10 @@
 /** @module where */
 
 const _ = require('lodash');
-const traversers = new RegExp(/[-#]>>/);
+const ops = require('./operations');
 const cast = new RegExp(/(::\w+)/);
 const sanitizeForRegexp = new RegExp(/([^a-zA-Z0-9\s])/g);
-
-/**
- * Transform an array into a safe comma-delimited string literal.
- */
-const literalizeArray = (arr) => {
-  if (!_.isArray(arr)) { return arr; }
-
-  const sanitizedValues = arr.map(function (v) {
-    if (v.search(/[,{}]/) !== -1) { return `"${v}"`; }
-
-    return v;
-  });
-
-  return `{${sanitizedValues.join(',')}}`;
-};
-
-/**
- * Operation definitions for parsing criteria objects.
- *
- * Keys are search strings in criteria keys. Values define an output SQL
- * operator and an optional mutator which will be applied to the appropriate
- * parameter value for the prepared statement.
- *
- * @enum
- * @readonly
- */
-const ops = {
-  // basic comparison
-  '=': {operator: '='},
-  '!': {operator: '&lt;>'},
-  '>': {operator: '>'},
-  '&lt;': {operator: '&lt;'},
-  '>=': {operator: '>='},
-  '&lt;=': {operator: '&lt;='},
-  '!=': {operator: '&lt;>'},
-  '&lt;>': {operator: '&lt;>'},
-  // array
-  '@>': {operator: '@>', mutator: literalizeArray},
-  '&lt;@': {operator: '&lt;@', mutator: literalizeArray},
-  '&amp;&amp;': {operator: '&amp;&amp;', mutator: literalizeArray},
-  // pattern matching
-  '~~': {operator: 'LIKE'},
-  'like': {operator: 'LIKE'},
-  '!~~': {operator: 'NOT LIKE'},
-  'not like': {operator: 'NOT LIKE'},
-  '~~*': {operator: 'ILIKE'},
-  'ilike': {operator: 'ILIKE'},
-  '!~~*': {operator: 'NOT ILIKE'},
-  'not ilike': {operator: 'NOT ILIKE'},
-  // regex
-  'similar to': {operator: 'SIMILAR TO'},
-  'not similar to': {operator: 'NOT SIMILAR TO'},
-  '~': {operator: '~'},
-  '!~': {operator: '!~'},
-  '~*': {operator: '~*'},
-  '!~*': {operator: '!~*'},
-  // distinct
-  'is distinct from': {operator: 'IS DISTINCT FROM'},
-  'is not distinct from': {operator: 'IS NOT DISTINCT FROM'}
-};
+const traversers = new RegExp(/[-#]>>/);
 
 /**
  * Remove whitespace from an array of token strings.
@@ -118,30 +59,6 @@ const getMatch = (str, regex, outputIndex) => {
   if (match) { return match[outputIndex]; }
 
   return '';
-};
-
-/**
- * Find the operation specified in a predicate key.
- *
- * @param {String} str - A predicate key from a criteria object.
- * @return Operation info.
- * @default Equality
- */
-const getOperation = (str) => {
-  str = str.toLowerCase().replace(traversers, '');  // remove JSON pathing and make case consistent
-
-  return _.reduce(ops, function (found, val, key) {
-    // if we matched something (eg '!' for 'not equal') previously and now have
-    // matched a longer operator (eg '!~~' for 'not like'), the more specific
-    // operator is the correct one.
-    if (str.indexOf(key) > -1 &amp;&amp; val.operator.length > found.key.length) {
-      // save the operation key as originally entered for splitting -- we
-      // don't want to be looking for '&lt;>' when the user gave us '!='.
-      return _.assign(val, { key: key });
-    }
-
-    return found;
-  }, {key: ''});
 };
 
 /**
@@ -171,7 +88,7 @@ const unquote = (str, delim='"') => {
  */
 const getCondition = function (key) {
   const traverser = getMatch(key, traversers, 0);
-  const operation = getOperation(key);
+  const operation = ops(key.toLowerCase().replace(traversers, '')); // remove JSON pathing and make case consistent
 
   const splitOn = ['::'];
 
@@ -198,49 +115,24 @@ const getCondition = function (key) {
   return {
     rawField: rawField,
     field: `${field}${traverser}${jsonPath}${castTo}`,
-    operator: operation.operator || '=',
-    mutator: operation.mutator,
+    operation: operation,
     isJSON: !!traverser
   };
-};
-
-/**
- * Build an IN (x, y, z) predicate.
- */
-const buildIn = function (condition) {
-  condition.operator = condition.operator === '=' ? 'IN' : 'NOT IN';
-
-  const inList = _.reduce(condition.value, (list, v) => {
-    condition.params.push(v);
-
-    return list.concat([`$${condition.offset++}`]);
-  }, []);
-
-  condition.value = `(${inList.join(', ')})`;
-
-  return condition;
 };
 
 /**
  * Generate a predicate for a normal query.
  */
 const generator = function (condition) {
-  if (condition.value === null) {
-    //interpolate nulls directly with is/is not
-    condition.operator = condition.operator === '=' ? 'IS' : 'IS NOT';
-  } else if (condition.mutator || !_.isArray(condition.value)) {
-    //parameterize any non-array or mutatey values
-    if (condition.mutator) { condition.value = condition.mutator(condition.value); }
-
+  if (condition.operation.mutator) {
+    condition = condition.operation.mutator(condition);
+  } else if (condition.value) {
     condition.params.push(condition.value);
-
     condition.value = `$${condition.offset}`;
-  } else if (_.isArray(condition.value)) {
-    condition = buildIn(condition);
   }
 
   return {
-    predicate: `${condition.field} ${condition.operator} ${condition.value}`,
+    predicate: `${condition.field} ${condition.operation.operator} ${condition.value}`,
     params: condition.params
   };
 };
@@ -253,18 +145,18 @@ const docGenerator = function (condition, conditions) {
   //we'll need to use a contains query to be sure we flex the index
   if(_.isArray(condition.value) &amp;&amp; _.isPlainObject(condition.value[0])) {
     condition.rawField = '"body"';
-    condition.operator = '@>';
+    condition.operation.operator = '@>';
     condition.params.push(JSON.stringify(conditions));
     condition.value = `$${condition.offset}`;
   }
 
   //if we have equality here, just use a JSON contains
-  else if (condition.operator === '=' &amp;&amp; !_.isArray(condition.value)) {
+  else if (condition.operation.operator === '=' &amp;&amp; !_.isArray(condition.value)) {
     const param = {};
     param[condition.rawField] = condition.value;
     condition.params.push(JSON.stringify(param));
     condition.rawField = '"body"';
-    condition.operator = '@>';
+    condition.operation.operator = '@>';
     condition.value = `$${condition.offset}`;
   }
 
@@ -284,18 +176,18 @@ const docGenerator = function (condition, conditions) {
     }
 
     //anything non-array handling
-    else if (!_.isArray(condition.value)) {
+    else if (condition.operation.mutator) {
+      condition = condition.operation.mutator(condition);
+    } else {
       condition.params.push(condition.value);
       condition.value = `$${condition.offset}`;
-    } else {
-      condition = buildIn(condition);
     }
 
     condition.rawField = `("body" ->> '${condition.rawField}')${cast}`;
   }
 
   return {
-    predicate: `${condition.rawField} ${condition.operator} ${condition.value}`,
+    predicate: `${condition.rawField} ${condition.operation.operator} ${condition.value}`,
     params: condition.params
   };
 };
@@ -428,13 +320,13 @@ exports.getCondition = getCondition;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 30 2017 22:31:06 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -97,7 +97,7 @@ massive({
 });</code></pre><p><code>run</code> takes named parameters as well:</p>
 <pre class="prettyprint source lang-javascript"><code>db.run('select * from tests where id > ${something}', {something: 1}).then(tests => {
   // all tests matching the criteria
-});</code></pre><h3>Tables and Views</h3><p>Massive loads all views (including materialized views) and all tables having primary key constraints. Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.</p>
+});</code></pre><h3>Tables and Views</h3><p>Massive loads all views (including materialized views), all tables having primary key constraints, and foreign tables (which cannot have primary keys). Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex result objects is a potential future consideration, but if you need to correlate data from multiple tables using a view is recommended.</p>
 <h4>Schemas</h4><p>Massive understands database schemas and treats any schema other than the default <code>public</code> as a namespace. Objects bound to the <code>public</code> schema are attached directly to the database object, while other schemas will be represented by a namespace attached to the database object, with their respective tables and views bound to the namespace.</p>
 <pre class="prettyprint source lang-javascript"><code>// query a table on the public schema
 db.tests.find(...).then(...);
@@ -110,6 +110,7 @@ db.auth.users.find(...).then(...);</code></pre><h4>Criteria Objects</h4><p>Many 
   'field': [1, 2, 3],             // IN (x, y, z) tests
   'field >': 1,                   // greater than
   'field &lt;=': 1,                  // less than or equal
+  'field BETWEEN': [1, 100],      // BETWEEN
   'field LIKE': 'val%',           // LIKE
   'field NOT ILIKE': 'Val%',      // NOT LIKE (case-insensitive)
   'field ~': 'val[ue]+',          // regexp match
@@ -168,7 +169,7 @@ db.tests.findOne({
 });</code></pre><p><code>where</code> allows you to write your own WHERE clause instead of using a criteria object.</p>
 <pre class="prettyprint source lang-javascript"><code>db.tests.where('is_active = $1 AND version > $2', [true, 1]).then(tests => {
   // all active tests with higher versions
-});</code></pre><h4>Persisting</h4><p><code>save</code> performs an upsert, inserting if the object has no primary key value and updating if it does.</p>
+});</code></pre><h4>Persisting</h4><p><code>save</code> performs an upsert, inserting if the object has no primary key value and updating if it does. <code>save</code> can only be used with local tables, since foreign tables do not have primary keys to test.</p>
 <pre class="prettyprint source lang-javascript"><code>db.tests.save({
   version: 1,
   name: 'homepage'
@@ -198,7 +199,7 @@ db.tests.insert([{
   version: 1
 }]).then(tests => {
   // an array containing both newly-inserted tests
-});</code></pre><p><code>update</code> has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria.</p>
+});</code></pre><p><code>update</code> has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the latter variant can be used with foreign tables.</p>
 <pre class="prettyprint source lang-javascript"><code>db.tests.update({
   id: 1,
   version: 2,
@@ -252,8 +253,14 @@ db.products.modify(1, {
   colors: ['gray', 'purple', 'red']
 }, 'info').then(widget => {
   // the product with an 'info' field containing the colors array
-});</code></pre><p>Locate documents with <code>findDoc</code>, which takes a primary key or a criteria object. Simple criteria objects (testing equality only) can leverage the GIN index on the table.</p>
-<pre class="prettyprint source lang-javascript"><code>db.reports.findDoc(1).then(report => {
+});</code></pre><p>Much of the standard queryable API has corresponding functionality with document tables. Document query functions only use criteria objects and (in the case of <code>findDoc</code>) primary key values. Simple criteria objects, testing equality only, can leverage the GIN index on the document table for improved performance.</p>
+<pre class="prettyprint source lang-javascript"><code>db.reports.countDoc({
+  'title ilike': '%throughput%'
+}).then(count => {
+  // number of matching documents
+});
+
+db.reports.findDoc(1).then(report => {
   // the report document body with the primary key included
 });
 
@@ -261,8 +268,9 @@ db.reports.findDoc({
   'title ilike': '%throughput%'
 }).then(reports => {
   // all report documents matching the criteria
-});</code></pre><p><code>searchDoc</code> performs a full-text search on the document body fields.</p>
-<pre class="prettyprint source lang-javascript"><code>db.reports.searchDoc({
+});
+
+db.reports.searchDoc({
   fields : [&quot;title&quot;, &quot;description&quot;],
   term : &quot;Kauai&quot;
 }.then(docs => {
@@ -324,13 +332,13 @@ db > db.tests.find({priority: 'low'}).then(...);</code></pre><p>In addition to t
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri May 26 2017 00:22:22 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue May 30 2017 22:31:06 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
