@@ -424,7 +424,7 @@ Massive is focused on convenience and simplicity, not completeness. There will a
 Massive.js ships with a REPL (read-evaluate-print loop), an interactive console that lets you connect to a database and execute JavaScript code. The easiest way to run it is to install globally:
 
 ```
-npm i -g massive
+npm i -g massive@3.0.0-rc1
 ```
 
 You can then fire up a connection and start writing JavaScript:
