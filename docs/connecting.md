@@ -10,7 +10,7 @@ const massive = require('massive');
 massive(connectionInfo).then(instance => {...});
 ```
 
-You can connect Massive to your database with a [pg-promise configuration object](https://github.com/vitaly-t/pg-promise/wiki/Connection-Syntax#configuration-object) or a connection string. Using the former is recommended since connection strings provide no mechanism for configuring the pool size and other options.
+You can connect Massive to your database with a [pg-promise configuration object](https://github.com/vitaly-t/pg-promise/wiki/Connection-Syntax#configuration-object) or a connection string. Using the former is recommended for application code since connection strings provide no mechanism for configuring the pool size and other options.
 
 ```javascript
 const connectionInfo = {
@@ -92,16 +92,5 @@ massive(connectionInfo, {
   // streamline function return values: a function with a scalar
   // value will return just the scalar instead of an array, etc.
   enhancedFunctions: true
-}).then(instance => {...});
-```
-
-## Driver Configuration
-
-Direct configuration of the pg-promise driver is supported by passing [initialization options](https://github.com/vitaly-t/pg-promise#initialization-options) as the third argument when connecting Massive.
-
-```javascript
-massive(connectionInfo, {}, {
-  pgNative: true,
-  capSQL: true
 }).then(instance => {...});
 ```
