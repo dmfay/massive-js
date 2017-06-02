@@ -3,7 +3,7 @@ title: Index - MassiveJS
 permalink: /
 ---
 
-## Get Started
+# Get Started
 
 ```
 npm install massive --save
@@ -42,5 +42,50 @@ massive({
   });
 
   http.createServer(app).listen(3000);
+});
+```
+
+## Driver Configuration
+
+Direct configuration of the pg-promise driver is supported by passing an initialization options object as the third argument when connecting Massive.
+
+```javascript
+massive(connectionInfo, {}, {
+  pgNative: true,
+  capSQL: true
+}).then(instance => {
+  // driver options cannot be modified but are available
+  // as db.driverConfig
+});
+```
+
+For a full accounting of options please see the [pg-promise documentation](https://github.com/vitaly-t/pg-promise#initialization-options). Some especially useful configurations are listed below.
+
+### Changing the Promise Library
+
+Massive uses ES6 promises by default. To use a different promise implementation such as Bluebird to enable long stack traces, pass the `required` promise module in the driver options.
+
+```javascript
+const promise = require('bluebird');
+
+massive(connectionInfo, {}, {
+  promiseLib: promise
+}).then(instance => {...});
+```
+
+### Monitoring Queries
+
+`pg-monitor` can help diagnose bugs and performance issues by showing all queries Massive emits to the database as they happen in realtime. Note that while the driver options are not required while initializing Massive, `db.driverConfig` still contains the read-only `pg-promise` configuration.
+
+```javascript
+const massive = require('massive');
+const monitor = require('pg-monitor');
+
+massive('postgres://localhost:5432/massive').then(db => {
+  monitor.attach(db.driverConfig);
+
+  db.run('select 1').then(data => {
+    // monitor output appears in the console
+  });
 });
 ```

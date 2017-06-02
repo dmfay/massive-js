@@ -11,6 +11,8 @@ describe('connecting', function () {
     assert.isOk(db);
     assert.isOk(db.tables);
     assert.isOk(db.functions);
+    assert.isOk(db.loaderConfig);
+    assert.isOk(db.driverConfig);
   });
 
   describe('variations', function () {
