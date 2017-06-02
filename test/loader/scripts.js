@@ -18,6 +18,6 @@ describe('scripts', function () {
     assert.isTrue(scripts[0].hasOwnProperty('name'));
     assert.isTrue(scripts[0].hasOwnProperty('schema'));
     assert.isTrue(scripts[0].hasOwnProperty('sql'));
-    assert.isTrue(scripts[0].hasOwnProperty('filePath'));
+    assert.instanceOf(scripts[0].sql, pgp.QueryFile);
   });
 });

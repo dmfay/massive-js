@@ -1,6 +1,7 @@
 {
   "globals": {
     "_": true,
+    "pgp": true,
     "assert": true,
     "massive": true,
     "connectionString": true,

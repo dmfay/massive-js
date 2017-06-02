@@ -98,14 +98,9 @@ describe('connecting', function () {
       assert.equal(db.views.length, 6);
     });
 
-    it('loads query files', function () {
-      assert.ok(db.functions.length > 0);
-      assert.lengthOf(db.functions.filter(f => !!f.filePath), 1); // just the schema script
-    });
-
-    it('loads functions', function () {
-      assert.equal(db.functions.length, 5);
-      assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+    it('loads query files and functions', function () {
+      assert.ok(db.functions.length > 1);
+      assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
     });
 
     it('loads everything it can by default', function () {
@@ -124,7 +119,7 @@ describe('connecting', function () {
         assert.lengthOf(db.tables, 6);
         assert.lengthOf(db.views, 6);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -153,7 +148,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 3);
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -175,7 +170,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
   });
@@ -198,7 +193,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -219,7 +214,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 5);
         assert.equal(db.views.length, 5);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -241,7 +236,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 4);
         assert.equal(db.views.length, 4);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
   });
@@ -264,7 +259,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 2);
         assert.equal(db.views.length, 0);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -287,7 +282,7 @@ describe('connecting', function () {
         assert.equal(db.tables.length, 1);
         assert.equal(db.views.length, 0);
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
   });
@@ -301,7 +296,7 @@ describe('connecting', function () {
         noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 1);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 0);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
 
@@ -313,7 +308,7 @@ describe('connecting', function () {
         noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => !f.filePath), 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
       });
     });
   });
