@@ -100,6 +100,12 @@ describe('invoke', function () {
     });
   });
 
+  describe('comments', function () {
+    it('runs a script file containing a commented arg without providing it', function () {
+      return db.comment();  // we don't care about the result, just that it executes without error
+    });
+  });
+
   describe('streaming function results', function () {
     it('executes citext-added function regexp_matches and returns stream of matches', function (done) {
       db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}).then(stream => {
