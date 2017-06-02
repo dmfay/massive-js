@@ -6,6 +6,7 @@ const connectionString = 'postgres://postgres@localhost/massive';
 require('co-mocha');
 
 global._ = require('lodash');
+global.pgp = require('pg-promise');
 global.assert = require('chai').use(require('chai-as-promised')).assert;
 global.massive = require('../../index');
 global.connectionString = connectionString;
