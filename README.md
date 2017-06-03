@@ -401,7 +401,7 @@ db.myTestQueries.restartTests({category: 5, force: true}).then(results => {
 
 To improve performance with large result sets, you might want to consider using a stream instead of getting your results in an array all at once. This has the upside of returning _something_ to read right away (which can be a big deal for slow queries too!), but the price is that the connection remains open until you're done. To turn on streaming, add `{stream: true}` to your options object.
 
-```js
+```javascript
 db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
   const tests = [];
 
@@ -417,7 +417,7 @@ db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
 
 ### Accessing the Driver
 
-Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise](https://github.com/vitaly-t/pg-promise) driver as `db.driver` so client code can easily use its lower-level functions when necessary.
+Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise](https://github.com/vitaly-t/pg-promise) driver (as `db.pgp`) and connected instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
 
 ## REPL
 
