@@ -1,6 +1,7 @@
 # Massive.js 3.0: A Postgres-centric Data Access Tool
 
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
+[![Coverage Status](https://coveralls.io/repos/github/dmfay/massive-js/badge.svg)](https://coveralls.io/github/dmfay/massive-js)
 
 Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.
 
