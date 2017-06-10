@@ -67,6 +67,53 @@ describe('connecting', function () {
     });
   });
 
+  describe('pooling', function () {
+    it('connects a pool', function () {
+      return massive({ connectionString: connectionString, poolSize: 5 }, {}, { noWarnings: true }).then(db => {
+        assert.isOk(db);
+        assert.isOk(db.t1);
+        assert.equal(db.instance.$config.pgp.pg.pools.all['{"connectionString":"postgres://postgres@localhost/massive","poolSize":5}']._factory.max, 5);
+      });
+    });
+
+    it.only('connects multiple pools', function* () {
+      const db = yield massive({
+        connectionString: connectionString
+      }, {
+        pools: {
+          high: 15,
+          low: 2
+        }
+      }, {
+        noWarnings: true
+      });
+
+      assert.isOk(db);
+      assert.isOk(db.t1);
+      assert.isUndefined(db.instance.$cn.poolSize); // uses the default
+      assert.isOk(db.high);
+      assert.isOk(db.high.t1);
+      assert.equal(db.high.instance.$cn.poolSize, 15);
+      assert.isOk(db.low);
+      assert.isOk(db.low.t1);
+      assert.equal(db.low.instance.$cn.poolSize, 2);
+      console.log('\nhigh run');
+      yield db.high.run('select 1');
+      console.log('\nhigh query');
+      yield db.high.t1.find({});
+      console.log('\nhigh query w/ options');
+      yield db.high.t1.where('$1', [true], {single: true});
+      console.log('\nhigh query in namespace');
+      yield db.high.one.t1.find({});
+      console.log('\ncached');
+      yield db.high.one.t1.find({});
+      console.log('\nregular old query');
+      yield db.one.t1.find({});
+      console.log('\nfunction');
+      yield db.high.f1();
+    });
+  });
+
   describe('configuration', function () {
     it('allows undefined scripts directories', function () {
       massive(connectionString, {}, { noWarnings: true }).then(db => {
