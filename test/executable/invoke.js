@@ -107,7 +107,31 @@ describe('invoke', function () {
   });
 
   describe('streaming function results', function () {
-    it('executes citext-added function regexp_matches and returns stream of matches', function (done) {
+    it('streams a non-single-valued function', function (done) {
+      db.get_record({stream: true}).then(stream => {
+        const result = [];
+
+        stream.on('readable', function() {
+          const res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.deepEqual(result, [{
+            id: 1,
+            field1: 'two',
+            field2: 'three'
+          }]);
+
+          done();
+        });
+      });
+    });
+
+    it('pipes a single-valued function through SingleValueStream', function (done) {
       db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}).then(stream => {
         const result = [];
 
