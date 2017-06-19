@@ -10,4 +10,8 @@ describe('findDoc', function () {
   it('counts documents', function () {
     return db.docs.countDoc({'title like': '_ Document'}).then(res => assert.equal(res, 1));
   });
+
+  it('counts all documents', function () {
+    return db.docs.countDoc().then(res => assert.equal(res, 4));
+  });
 });
