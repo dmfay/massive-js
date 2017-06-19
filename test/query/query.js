@@ -23,22 +23,22 @@ describe("Query", function () {
   describe("queryOptions", function () {
     it("should emit an order by", function () {
       const result = new Query();
-      assert.equal(result.queryOptions(), " order by 1");
+      assert.equal(result.queryOptions(), " ORDER BY 1");
     });
 
     it("should add an offset", function () {
       const result = new Query({}, {offset: 10});
-      assert.equal(result.queryOptions(), " order by 1 offset 10");
+      assert.equal(result.queryOptions(), " ORDER BY 1 OFFSET 10");
     });
 
     it("should add a limit", function () {
       const result = new Query({}, {limit: 10});
-      assert.equal(result.queryOptions(), " order by 1 limit 10");
+      assert.equal(result.queryOptions(), " ORDER BY 1 LIMIT 10");
     });
 
     it("should add both offset and limit", function () {
       const result = new Query({}, {offset: 10, limit: 10});
-      assert.equal(result.queryOptions(), " order by 1 offset 10 limit 10");
+      assert.equal(result.queryOptions(), " ORDER BY 1 OFFSET 10 LIMIT 10");
     });
 
     it("should accept an array of sort criteria", function () {
@@ -50,7 +50,7 @@ describe("Query", function () {
         ]
       });
 
-      assert.equal(result.queryOptions(), " order by col1 asc,(body->>'col2')::varchar desc,col3 + col4 asc");
+      assert.equal(result.queryOptions(), " ORDER BY col1 asc,(body->>'col2')::varchar desc,col3 + col4 asc");
     });
 
     it("should build an order clause for a document table", function () {
@@ -62,7 +62,7 @@ describe("Query", function () {
         orderBody: true
       });
 
-      assert.equal(result.queryOptions(), " order by (body->>'col1')::int asc,(body->>'col2')::varchar desc");
+      assert.equal(result.queryOptions(), " ORDER BY (body->>'col1')::int asc,(body->>'col2')::varchar desc");
     });
   });
 });

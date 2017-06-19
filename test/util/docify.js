@@ -15,4 +15,10 @@ describe('docify', function () {
     assert.lengthOf(docs, 2);
     assert.deepEqual(docs, [{id: 1, val: 'val1'}, {id: 2, val: 'val2'}]);
   });
+
+  it('returns null if there is no row', function* () {
+    const doc = yield docify(null);
+
+    assert.isNull(doc);
+  });
 });
