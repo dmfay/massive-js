@@ -14,6 +14,12 @@ describe('invoke', function () {
       });
     });
 
+    it('invokes a function with no arguments in an empty array', function () {
+      return db.get_number([]).then(res => {
+        assert.equal(res, 1);
+      });
+    });
+
     it('invokes a function with one argument directly', function () {
       return db.single_arg(1).then(res => {
         assert.equal(res, 1);
@@ -38,9 +44,77 @@ describe('invoke', function () {
       });
     });
 
-    it('uses named parameters for scripts', function () {
-      return db.namedParam({value: 2}, {single: true}).then(res => {
+    it('invokes a script function with no parameters', function () {
+      return db.noParam().then(res => {
+        assert.deepEqual(res, [{'?column?': 1}]);
+      });
+    });
+
+    it('invokes a script function with no parameters in an empty array', function () {
+      return db.noParam([]).then(res => {
+        assert.deepEqual(res, [{'?column?': 1}]);
+      });
+    });
+
+    it('invokes a script function with named parameters', function () {
+      return db.namedParam({value: 2}).then(res => {
         assert.equal(res[0][Object.keys(res[0])[0]], 3);
+      });
+    });
+  });
+
+  describe('options', function () {
+    it('invokes a function with no arguments plus options', function () {
+      return db.get_number({single: true}).then(res => {
+        assert.equal(res, 1);
+      });
+    });
+
+    it('invokes a function with no arguments in an empty array plus options', function () {
+      return db.get_number([], {single: true}).then(res => {
+        assert.equal(res, 1);
+      });
+    });
+
+    it('invokes a function with one argument directly plus options', function () {
+      return db.single_arg(1, {single: true}).then(res => {
+        assert.equal(res, 1);
+      });
+    });
+
+    it('invokes a function with one argument in an array plus options', function () {
+      return db.single_arg([ 1 ], {single: true}).then(res => {
+        assert.equal(res, 1);
+      });
+    });
+
+    it('invokes a function with multiple arguments directly plus options', function () {
+      return db.multi_arg(1, 2, {single: true}).then(res => {
+        assert.equal(res, 3);
+      });
+    });
+
+    it('invokes a function with multiple arguments in an array plus options', function () {
+      return db.multi_arg([ 1, 2 ], {single: true}).then(res => {
+        assert.equal(res, 3);
+      });
+    });
+
+    it('invokes a script function with no parameters plus options', function () {
+      return db.noParam({single: true}).then(res => {
+        assert.deepEqual(res, {'?column?': 1});
+      });
+    });
+
+    it('invokes a script function with no parameters in an empty array plus options', function () {
+      return db.noParam([], {single: true}).then(res => {
+        assert.deepEqual(res, {'?column?': 1});
+      });
+    });
+
+    it('invokes a script function with named parameters plus options', function () {
+      return db.namedParam({value: 2}, {single: true}).then(res => {
+        assert.equal(res[Object.keys(res)[0]], 3);
       });
     });
   });
@@ -107,7 +181,31 @@ describe('invoke', function () {
   });
 
   describe('streaming function results', function () {
-    it('executes citext-added function regexp_matches and returns stream of matches', function (done) {
+    it('streams a non-single-valued function', function (done) {
+      db.get_record({stream: true}).then(stream => {
+        const result = [];
+
+        stream.on('readable', function() {
+          const res = stream.read();
+
+          if (res) {
+            result.push(res);
+          }
+        });
+
+        stream.on('end', function () {
+          assert.deepEqual(result, [{
+            id: 1,
+            field1: 'two',
+            field2: 'three'
+          }]);
+
+          done();
+        });
+      });
+    });
+
+    it('pipes a single-valued function through SingleValueStream', function (done) {
       db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}).then(stream => {
         const result = [];
 

@@ -2,10 +2,10 @@
 -- inclusion/exclusion is schema - aspecific, no schema assumes 'public'
 SELECT DISTINCT
   n.nspname AS schema,
-  (NOT p.proretset) AS return_single_row,
-  (t.typtype IN ('b', 'd', 'e', 'r')) AS return_single_value,
+  (NOT p.proretset) AS "singleRow",
+  (t.typtype IN ('b', 'd', 'e', 'r')) AS "singleValue",
   p.proname AS name,
-  p.pronargs AS param_count
+  p.pronargs AS "paramCount"
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 JOIN pg_type t on p.prorettype = t.oid
