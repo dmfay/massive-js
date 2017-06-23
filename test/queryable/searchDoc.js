@@ -10,7 +10,7 @@ describe('searchDoc', function () {
   it('works on single key', function () {
     return db.docs.searchDoc({
       fields: ['title'],
-      term: 'Starsky'
+      term: 'Something'
     }).then(docs => {
       assert.lengthOf(docs, 1);
     });
@@ -19,7 +19,7 @@ describe('searchDoc', function () {
   it('works on multiple fields', function () {
     return db.docs.searchDoc({
       fields: ['title', 'description'],
-      term: 'Starsky'
+      term: 'Else'
     }).then(docs => {
       assert.lengthOf(docs, 1);
     });
@@ -37,9 +37,9 @@ describe('searchDoc', function () {
   it('returns properly formatted documents with id etc', function () {
     return db.docs.searchDoc({
       fields: ['title', 'description'],
-      term: 'Starsky'
+      term: 'Else'
     }).then(docs => {
-      assert.equal(docs[0].title, 'Starsky and Hutch');
+      assert.equal(docs[0].title, 'Something Else');
     });
   });
 
@@ -92,9 +92,9 @@ describe('searchDoc', function () {
       orderBody: true
     }).then(docs => {
       assert.lengthOf(docs, 3);
-      assert.equal(docs[0].title, 'A Third Document');
-      assert.equal(docs[1].title, 'Another Document');
-      assert.equal(docs[2].title, 'A Document');
+      assert.equal(docs[0].title, 'Document 3');
+      assert.equal(docs[1].title, 'Document 2');
+      assert.equal(docs[2].title, 'Document 1');
     });
   });
 
@@ -109,7 +109,7 @@ describe('searchDoc', function () {
       limit: 1
     }).then(docs => {
       assert.lengthOf(docs, 1);
-      assert.equal(docs[0].title, 'Another Document');
+      assert.equal(docs[0].title, 'Document 2');
     });
   });
 });
