@@ -14,8 +14,8 @@
     "test": "nyc --reporter=html --reporter=text mocha",
     "lint": "eslint '.'",
     "posttest": "npm run lint",
-    "apidocs": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r",
-    "preversion": "npm run apidocs && git add docs/api && git commit -m 'update api docs'",
+    "preversion": "sh build/apidocs.sh",
+    "postversion": "sh build/update-gh-pages.sh",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
