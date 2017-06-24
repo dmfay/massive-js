@@ -1,0 +1,25 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+header {
+  position: initial;
+}
+
+header ul.toc {
+  background: #fff;
+  border: none;
+  height: initial;
+}
+
+header ul.toc li {
+  width: 100%;
+  float: none;
+  border: none;
+}
+
+header ul.toc a {
+  font-size: 12pt;
+  text-align: left;
+}
