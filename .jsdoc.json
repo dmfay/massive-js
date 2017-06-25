@@ -1,8 +1,0 @@
-{
-  "source": {
-    "include": ["index.js", "lib", "README.md"]
-  },
-  "opts": {
-    "recurse": true
-  }
-}
