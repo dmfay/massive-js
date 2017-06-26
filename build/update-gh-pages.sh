@@ -10,9 +10,10 @@ echo "using version $VERSION"
 
 echo "preparing gh-pages branch"
 
-# get the current branch name
+# get the current branch name and commit SHA
 
 BRANCH=$(git symbolic-ref --short HEAD)
+COMMIT=$(git rev-parse --short "$BRANCH")
 
 git checkout gh-pages
 
@@ -35,7 +36,7 @@ rm -r docs
 
 git add .
 
-git commit -m "regenerate documentation for $VERSION"
+git commit -m "regenerate documentation for $VERSION ($BRANCH $COMMIT)"
 
 # return to pre-version state
 
