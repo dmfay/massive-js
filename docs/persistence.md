@@ -13,7 +13,7 @@ db.tests.save({
   version: 1,
   name: 'homepage'
 }).then(tests => {
-  // an array containing the newly-inserted test
+  // the newly-inserted test
 });
 
 db.tests.save({
@@ -21,21 +21,20 @@ db.tests.save({
   version: 2,
   priority: 'high'
 }).then(tests => {
-  // an array containing the updated test; note that the name
-  // will not have changed!
+  // the updated test, still with the name 'homepage'
 });
 ```
 
 ### insert
 
-`insert` takes an object and returns a promise for an array containing the inserted data.
+`insert` writes an object into your table. The object's keys should match your column names exactly. You do not have to perform a complete insert and specify every single field in your object; as long as you ensure that no `NOT NULL` constraints will be violated, you can include as many or as few fields as you need.
 
 ```javascript
 db.tests.insert({
   name: 'homepage',
   version: 1,
-}).then(tests => {
-  // an array containing the newly-inserted test
+}).then(test => {
+  // the newly-inserted test
 });
 ```
 
@@ -57,15 +56,15 @@ db.tests.insert([{
 
 `update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the criteria-changes variant can be used with foreign tables.
 
-Both `update` functions return promises for arrays containing the updated data.
+Both `update` functions return promises for the updated data. If given an object, the promise will resolve to the updated object; if given an array, the promise will resolve to an array containing all updated objects.
 
 ```javascript
 db.tests.update({
   id: 1,
   version: 2,
   priority: 'high'
-}).then(tests => {
-  // an array containing the updated test
+}).then(test => {
+  // the updated test
 });
 
 db.tests.update({
