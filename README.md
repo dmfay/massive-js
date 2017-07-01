@@ -47,7 +47,7 @@ Here are some of the high points:
 npm i massive --save
 ```
 
-**Starting with version 3, Massive uses Promises exclusively. If you need a callback-based API, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
+**Starting with version 3, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
