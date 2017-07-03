@@ -157,7 +157,7 @@ db.tests.findOne({
   is_active: true,
   'version >': 1,
   'name ilike': 'home%'
-}).then(tests => {
+}).then(test1 => {
   // the first active test with a higher version and a name matching ILIKE criteria
 });
 ```
