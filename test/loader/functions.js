@@ -14,7 +14,7 @@ describe('functions', function () {
   });
 
   it('should query for a list of functions', function* () {
-    const functions = yield loader(db, {functionBlacklist: '', functionWhitelist: ''});
+    const functions = yield loader(db, db.loader);
 
     assert.isArray(functions);
     assert.lengthOf(functions, 39);

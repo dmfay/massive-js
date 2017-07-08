@@ -14,7 +14,8 @@ describe('views', function () {
   });
 
   it('should query for a list of views', function* () {
-    const views = yield loader(db, {allowedSchemas: '', blacklist: '', exceptions: ''});
+    const config = _.defaults({allowedSchemas: '', blacklist: '', exceptions: ''}, db.loader);
+    const views = yield loader(db, config);
 
     assert.isArray(views);
     assert.lengthOf(views, 3);

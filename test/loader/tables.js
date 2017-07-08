@@ -14,7 +14,8 @@ describe('tables', function () {
   });
 
   it('should query for a list of tables', function* () {
-    const tables = yield loader(db, {allowedSchemas: '', blacklist: '', exceptions: ''});
+    const config = _.defaults({allowedSchemas: '', blacklist: '', exceptions: ''}, db.loader);
+    const tables = yield loader(db, config);
 
     assert.isArray(tables);
     assert.lengthOf(tables, 10);

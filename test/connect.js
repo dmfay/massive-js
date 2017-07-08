@@ -1,18 +1,22 @@
 'use strict';
 
 describe('connecting', function () {
+  let loader;
+
   before(function () {
     return resetDb('loader').then(db => {
+      loader = db.loader;
+
       return db.instance.$pool.end();
     });
   });
 
   it('returns a database connection', function () {
-    return massive({ connectionString: connectionString }).then(db => {
+    return massive({ connectionString: connectionString }, loader).then(db => {
       assert.isOk(db);
       assert.isOk(db.tables);
       assert.isOk(db.functions);
-      assert.isOk(db.loaderConfig);
+      assert.isOk(db.loader);
       assert.isOk(db.driverConfig);
 
       return db.instance.$pool.end();
@@ -21,7 +25,7 @@ describe('connecting', function () {
 
   describe('variations', function () {
     it('connects with a connectionString property', function () {
-      return massive({ connectionString: connectionString }).then(db => {
+      return massive({ connectionString: connectionString }, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -30,7 +34,7 @@ describe('connecting', function () {
     });
 
     it('connects with a connection string literal', function () {
-      return massive(connectionString).then(db => {
+      return massive(connectionString, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -39,7 +43,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({ host: 'localhost', database: 'massive' }).then(db => {
+      return massive({ host: 'localhost', database: 'massive' }, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -48,7 +52,7 @@ describe('connecting', function () {
     });
 
     it('connects to localhost with a database name', function () {
-      return massive({ db: 'massive' }).then(db => {
+      return massive({ db: 'massive' }, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -57,7 +61,7 @@ describe('connecting', function () {
     });
 
     it('rejects with connection errors', function () {
-      return massive({ database: 'doesntexist' }).then(
+      return massive({ database: 'doesntexist' }, loader).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
@@ -80,7 +84,11 @@ describe('connecting', function () {
 
   describe('configuration', function () {
     it('allows undefined scripts directories', function () {
-      return massive(connectionString, {}, {}).then(db => {
+      const testLoader = _.defaults({}, loader);  // lodash quirk: defaults works, cloneDeep doesn't
+
+      delete testLoader.scripts;
+
+      return massive(connectionString, testLoader).then(db => {
         assert.lengthOf(db.functions, 4);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 0);
 
@@ -89,7 +97,7 @@ describe('connecting', function () {
     });
 
     it('exposes driver defaults through pg-promise', function () {
-      return massive(connectionString, {}, {}).then(db => {
+      return massive(connectionString, loader).then(db => {
         assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
 
         return db.instance.$pool.end();
@@ -99,7 +107,7 @@ describe('connecting', function () {
 
   describe('object loading', function () {
     it('loads non-public schemata as namespace properties', function () {
-      return massive({ connectionString: connectionString }, {}, {}).then(db => {
+      return massive({ connectionString: connectionString }, loader).then(db => {
         assert.isOk(db.one);
         assert.isOk(db.two);
         assert.isOk(db.one.t1);
@@ -113,7 +121,7 @@ describe('connecting', function () {
     });
 
     it('loads all tables', function () {
-      return massive({ connectionString: connectionString }).then(db => {
+      return massive({ connectionString: connectionString }, loader).then(db => {
         assert.equal(db.tables.length, 6);
 
         return db.instance.$pool.end();
@@ -121,7 +129,7 @@ describe('connecting', function () {
     });
 
     it('loads all views', function () {
-      return massive({ connectionString: connectionString }).then(db => {
+      return massive({ connectionString: connectionString }, loader).then(db => {
         assert.equal(db.views.length, 6);
 
         return db.instance.$pool.end();
@@ -129,10 +137,12 @@ describe('connecting', function () {
     });
 
     it('loads query files and functions', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert.ok(db.functions.length > 1);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
 
@@ -141,10 +151,12 @@ describe('connecting', function () {
     });
 
     it('loads everything it can by default', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert.isOk(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -162,7 +174,7 @@ describe('connecting', function () {
     });
 
     it('does not load tables without primary keys', function () {
-      return massive(connectionString).then(db => {
+      return massive(connectionString, loader).then(db => {
         assert(!db.t3); // tables without primary keys aren't loaded
 
         return db.instance.$pool.end();
@@ -172,11 +184,13 @@ describe('connecting', function () {
 
   describe('schema filters', function () {
     it('applies filters', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one, two',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -194,12 +208,14 @@ describe('connecting', function () {
     });
 
     it('allows exceptions', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'two',
         exceptions: 't1, v1, one.v2',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!!db.v1 && !db.v2);
@@ -219,11 +235,13 @@ describe('connecting', function () {
 
   describe('table blacklists', function () {
     it('applies blacklists to tables and views', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1, one.%2',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -241,11 +259,13 @@ describe('connecting', function () {
     });
 
     it('checks schema names in the pattern', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: 'one.%1',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
         assert(!!db.v1 && !!db.v2);
@@ -263,12 +283,14 @@ describe('connecting', function () {
     });
 
     it('allows exceptions', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1',
         exceptions: 'one.%1',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
         assert(!db.v1 && !!db.v2);
@@ -288,11 +310,13 @@ describe('connecting', function () {
 
   describe('table whitelists', function () {
     it('applies a whitelist with exact matching', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         whitelist: 't1, one.t1',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -310,13 +334,15 @@ describe('connecting', function () {
     });
 
     it('overrides other filters', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one',
         blacklist: 't1',
         whitelist: 't1',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
@@ -336,11 +362,13 @@ describe('connecting', function () {
 
   describe('function exclusion', function () {
     it('skips loading functions when set', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: true,
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert.lengthOf(db.functions, 1);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
 
@@ -349,11 +377,13 @@ describe('connecting', function () {
     });
 
     it('loads all functions when false', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: false,
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
 
@@ -364,11 +394,13 @@ describe('connecting', function () {
 
   describe('function filtering', function () {
     it('blacklists functions', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: '%1, one.f2',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
 
@@ -377,11 +409,13 @@ describe('connecting', function () {
     });
 
     it('whitelists functions', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionWhitelist: '%1, one.f2',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
 
@@ -390,12 +424,14 @@ describe('connecting', function () {
     });
 
     it('overlaps whitelists and blacklists', function () {
-      return massive(connectionString, {
+      const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: 'one.%1',
         functionWhitelist: 'one.%',
         noWarnings: true
-      }).then(db => {
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
 
