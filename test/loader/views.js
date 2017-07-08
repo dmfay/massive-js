@@ -9,8 +9,13 @@ describe('views', function () {
     db = yield resetDb();
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('should query for a list of views', function* () {
-    const views = yield loader(db, {allowedSchemas: '', blacklist: '', exceptions: ''});
+    const config = _.defaults({allowedSchemas: '', blacklist: '', exceptions: ''}, db.loader);
+    const views = yield loader(db, config);
 
     assert.isArray(views);
     assert.lengthOf(views, 3);

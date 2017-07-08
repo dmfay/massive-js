@@ -7,6 +7,10 @@ describe('search', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('returns 4 products for term \'product\'', function () {
     return db.products.search({fields: ['name'], term: 'Product'}).then(res => {
       assert.lengthOf(res, 4);

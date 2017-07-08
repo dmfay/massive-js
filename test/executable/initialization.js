@@ -7,6 +7,10 @@ describe('initialization', function () {
     return resetDb('functions').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('wires an invocation function', function () {
     assert.isFunction(db.get_number);
   });

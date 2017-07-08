@@ -7,6 +7,10 @@ describe('foreign tables', function () {
     return resetDb('foreign-tables').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('loads foreign tables', function () {
     assert.isOk(db.foreigntable);
   });

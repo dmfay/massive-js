@@ -7,6 +7,10 @@ describe('insert', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('inserts a record', function () {
     return db.products.insert({name: "A Product"}).then(res => {
       assert.equal(res.name, "A Product");

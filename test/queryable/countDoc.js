@@ -7,6 +7,10 @@ describe('findDoc', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('counts documents', function () {
     return db.docs.countDoc({'title like': 'Document _'}).then(res => assert.equal(res, 3));
   });

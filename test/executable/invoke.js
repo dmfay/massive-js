@@ -7,6 +7,10 @@ describe('invoke', function () {
     return resetDb('functions').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('arguments', function () {
     it('invokes a function with no arguments', function () {
       return db.get_number().then(res => {

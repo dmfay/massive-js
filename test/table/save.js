@@ -7,6 +7,10 @@ describe('save', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('inserts a new product', function () {
     return db.products.save({name: "Gibson Les Paul", description: "Lester's brain child", price: 3500}).then(res => {
       assert.equal(res.id, 5);
