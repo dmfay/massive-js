@@ -16,6 +16,7 @@ global.resetDb = function (schema) {
 
   return massive(connectionString, {
     enhancedFunctions: true,
+    noWarnings: true,
     scripts: path.join(__dirname, 'scripts', schema)
   }).then(db => {
     return db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'").then(schemata =>

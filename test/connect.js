@@ -130,7 +130,8 @@ describe('connecting', function () {
 
     it('loads query files and functions', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts/loader`
+        scripts: `${__dirname}/helpers/scripts/loader`,
+        noWarnings: true
       }).then(db => {
         assert.ok(db.functions.length > 1);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
@@ -141,7 +142,8 @@ describe('connecting', function () {
 
     it('loads everything it can by default', function () {
       return massive(connectionString, {
-        scripts: `${__dirname}/helpers/scripts/loader`
+        scripts: `${__dirname}/helpers/scripts/loader`,
+        noWarnings: true
       }).then(db => {
         assert.isOk(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -172,7 +174,8 @@ describe('connecting', function () {
     it('applies filters', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        allowedSchemas: 'one, two'
+        allowedSchemas: 'one, two',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
@@ -194,7 +197,8 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'two',
-        exceptions: 't1, v1, one.v2'
+        exceptions: 't1, v1, one.v2',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -217,7 +221,8 @@ describe('connecting', function () {
     it('applies blacklists to tables and views', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        blacklist: '%1, one.%2'
+        blacklist: '%1, one.%2',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -238,7 +243,8 @@ describe('connecting', function () {
     it('checks schema names in the pattern', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        blacklist: 'one.%1'
+        blacklist: 'one.%1',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -260,7 +266,8 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1',
-        exceptions: 'one.%1'
+        exceptions: 'one.%1',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -283,7 +290,8 @@ describe('connecting', function () {
     it('applies a whitelist with exact matching', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        whitelist: 't1, one.t1'
+        whitelist: 't1, one.t1',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -306,7 +314,8 @@ describe('connecting', function () {
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one',
         blacklist: 't1',
-        whitelist: 't1'
+        whitelist: 't1',
+        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -329,7 +338,8 @@ describe('connecting', function () {
     it('skips loading functions when set', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        excludeFunctions: true
+        excludeFunctions: true,
+        noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 1);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
@@ -341,7 +351,8 @@ describe('connecting', function () {
     it('loads all functions when false', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        excludeFunctions: false
+        excludeFunctions: false,
+        noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
@@ -355,7 +366,8 @@ describe('connecting', function () {
     it('blacklists functions', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        functionBlacklist: '%1, one.f2'
+        functionBlacklist: '%1, one.f2',
+        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
@@ -367,7 +379,8 @@ describe('connecting', function () {
     it('whitelists functions', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
-        functionWhitelist: '%1, one.f2'
+        functionWhitelist: '%1, one.f2',
+        noWarnings: true
       }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
@@ -380,7 +393,8 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: 'one.%1',
-        functionWhitelist: 'one.%'
+        functionWhitelist: 'one.%',
+        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
