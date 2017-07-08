@@ -30,4 +30,3 @@ global.resetDb = function (schema) {
     );
   });
 };
-
