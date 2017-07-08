@@ -9,6 +9,10 @@ describe('views', function () {
     db = yield resetDb();
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('should query for a list of views', function* () {
     const views = yield loader(db, {allowedSchemas: '', blacklist: '', exceptions: ''});
 

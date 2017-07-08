@@ -4,12 +4,18 @@ describe('modify', function () {
   let db;
   let newDoc = {};
 
-  before(function(){
-    return resetDb().then(instance => db = instance);
+  before(function() {
+    return resetDb()
+      .then(instance => db = instance)
+      .then(() => {
+        return db.saveDoc('docs', {name: 'foo'});
+      }).then(doc => newDoc = doc);
   });
 
-  before(function() {
-    return db.saveDoc('docs', {name: 'foo'}).then(doc => newDoc = doc);
+  after(function () {
+    return db.docs.destroy({id: newDoc.id}).then(() => {
+      return db.instance.$pool.end();
+    });
   });
 
   it('adds new information to the document', function() {
@@ -48,9 +54,5 @@ describe('modify', function () {
     return db.docs.modify(newDoc.id, {obj: {field: 'value'}}).then(doc => {
       assert.deepEqual(doc.obj, {field: 'value'});
     });
-  });
-
-  after(function () {
-    return db.docs.destroy({id: newDoc.id});
   });
 });

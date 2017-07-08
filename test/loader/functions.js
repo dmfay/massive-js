@@ -9,6 +9,10 @@ describe('functions', function () {
     db = yield resetDb();
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('should query for a list of functions', function* () {
     const functions = yield loader(db, {functionBlacklist: '', functionWhitelist: ''});
 

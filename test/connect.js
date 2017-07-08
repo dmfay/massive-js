@@ -1,55 +1,66 @@
 'use strict';
 
-let db;
-
 describe('connecting', function () {
-  before(function() {
-    return resetDb('loader').then(instance => db = instance);
+  before(function () {
+    return resetDb('loader').then(db => {
+      return db.instance.$pool.end();
+    });
   });
 
   it('returns a database connection', function () {
-    assert.isOk(db);
-    assert.isOk(db.tables);
-    assert.isOk(db.functions);
-    assert.isOk(db.loaderConfig);
-    assert.isOk(db.driverConfig);
+    return massive({ connectionString: connectionString }).then(db => {
+      assert.isOk(db);
+      assert.isOk(db.tables);
+      assert.isOk(db.functions);
+      assert.isOk(db.loaderConfig);
+      assert.isOk(db.driverConfig);
+
+      return db.instance.$pool.end();
+    });
   });
 
   describe('variations', function () {
     it('connects with a connectionString property', function () {
-      return massive({ connectionString: connectionString }, {}, { noWarnings: true }).then(db => {
+      return massive({ connectionString: connectionString }).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('connects with a connection string literal', function () {
-      return massive(connectionString, {}, { noWarnings: true }).then(db => {
+      return massive(connectionString).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('connects with a property map', function () {
-      massive({ host: 'localhost', database: 'massive' }, {}, { noWarnings: true }).then(db => {
+      return massive({ host: 'localhost', database: 'massive' }).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('connects to localhost with a database name', function () {
-      massive({ db: 'massive' }, {}, { noWarnings: true }).then(db => {
+      return massive({ db: 'massive' }).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('rejects with connection errors', function () {
-      return massive({ database: 'doesntexist' }, {}, { noWarnings: true }).then(
+      return massive({ database: 'doesntexist' }).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
-          return Promise.resolve();
         }
       );
     });
@@ -69,47 +80,68 @@ describe('connecting', function () {
 
   describe('configuration', function () {
     it('allows undefined scripts directories', function () {
-      massive(connectionString, {}, { noWarnings: true }).then(db => {
+      return massive(connectionString, {}, {}).then(db => {
         assert.lengthOf(db.functions, 4);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 0);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('exposes driver defaults through pg-promise', function () {
-      massive(connectionString, {}, { noWarnings: true }).then(db => {
+      return massive(connectionString, {}, {}).then(db => {
         assert.isDefined(db.pgp.pg.defaults.parseInputDatesAsUTC);
+
+        return db.instance.$pool.end();
       });
     });
   });
 
   describe('object loading', function () {
     it('loads non-public schemata as namespace properties', function () {
-      assert.isOk(db.one);
-      assert.isOk(db.two);
-      assert.isOk(db.one.t1);
-      assert.isOk(db.one.v1);
-      assert.isOk(db.one.f1);
+      return massive({ connectionString: connectionString }, {}, {}).then(db => {
+        assert.isOk(db.one);
+        assert.isOk(db.two);
+        assert.isOk(db.one.t1);
+        assert.isOk(db.one.v1);
+        assert.isOk(db.one.f1);
 
-      assert.eventually.equal(db.one.t1.count(), 0);
+        assert.eventually.equal(db.one.t1.count(), 0);
+
+        return db.instance.$pool.end();
+      });
     });
 
     it('loads all tables', function () {
-      assert.equal(db.tables.length, 6);
+      return massive({ connectionString: connectionString }).then(db => {
+        assert.equal(db.tables.length, 6);
+
+        return db.instance.$pool.end();
+      });
     });
 
     it('loads all views', function () {
-      assert.equal(db.views.length, 6);
+      return massive({ connectionString: connectionString }).then(db => {
+        assert.equal(db.views.length, 6);
+
+        return db.instance.$pool.end();
+      });
     });
 
     it('loads query files and functions', function () {
-      assert.ok(db.functions.length > 1);
-      assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
+      return massive(connectionString, {
+        scripts: `${__dirname}/helpers/scripts/loader`
+      }).then(db => {
+        assert.ok(db.functions.length > 1);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
+
+        return db.instance.$pool.end();
+      });
     });
 
     it('loads everything it can by default', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`
-      }, {
-        noWarnings: true
       }).then(db => {
         assert.isOk(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -122,12 +154,16 @@ describe('connecting', function () {
         assert.lengthOf(db.views, 6);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
     it('does not load tables without primary keys', function () {
-      return massive(connectionString, {}, { noWarnings: true }).then(db => {
+      return massive(connectionString).then(db => {
         assert(!db.t3); // tables without primary keys aren't loaded
+
+        return db.instance.$pool.end();
       });
     });
   });
@@ -137,8 +173,6 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'one, two'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !db.t2 && !db.tA);
@@ -151,6 +185,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -159,8 +195,6 @@ describe('connecting', function () {
         scripts: `${__dirname}/helpers/scripts/loader`,
         allowedSchemas: 'two',
         exceptions: 't1, v1, one.v2'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -173,6 +207,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
   });
@@ -182,8 +218,6 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1, one.%2'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -196,6 +230,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 2);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -203,8 +239,6 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: 'one.%1'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !!db.t2 && !!db.tA);
@@ -217,6 +251,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 5);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -225,8 +261,6 @@ describe('connecting', function () {
         scripts: `${__dirname}/helpers/scripts/loader`,
         blacklist: '%1',
         exceptions: 'one.%1'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!db.t1 && !!db.t2 && !!db.tA);
@@ -239,6 +273,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 4);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
   });
@@ -248,8 +284,6 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         whitelist: 't1, one.t1'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -262,6 +296,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 0);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -271,8 +307,6 @@ describe('connecting', function () {
         allowedSchemas: 'one',
         blacklist: 't1',
         whitelist: 't1'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(db);
         assert(!!db.t1 && !db.t2 && !db.tA);
@@ -285,6 +319,8 @@ describe('connecting', function () {
         assert.equal(db.views.length, 0);
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
   });
@@ -294,11 +330,11 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: true
-      }, {
-        noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 1);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -306,11 +342,11 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         excludeFunctions: false
-      }, {
-        noWarnings: true
       }).then(db => {
         assert.lengthOf(db.functions, 5);
         assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
       });
     });
   });
@@ -320,11 +356,11 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: '%1, one.f2'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.f1 && !db.one.f2);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -332,11 +368,11 @@ describe('connecting', function () {
       return massive(connectionString, {
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionWhitelist: '%1, one.f2'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(!!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.f1 && !!db.one.f2);
+
+        return db.instance.$pool.end();
       });
     });
 
@@ -345,11 +381,11 @@ describe('connecting', function () {
         scripts: `${__dirname}/helpers/scripts/loader`,
         functionBlacklist: 'one.%1',
         functionWhitelist: 'one.%'
-      }, {
-        noWarnings: true
       }).then(db => {
         assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.f1 && !!db.one.f2);
+
+        return db.instance.$pool.end();
       });
     });
   });

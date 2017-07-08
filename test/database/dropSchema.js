@@ -12,8 +12,10 @@ describe('dropSchema', function() {
     return db.createSchema(schemaName);
   });
 
-  after(function() {
-    return db.dropSchema(schemaName, {cascade: true});
+  after(function () {
+    return db.dropSchema(schemaName, {cascade: true}).then(() => {
+      return db.instance.$pool.end();
+    });
   });
 
   it('removes a schema', function () {

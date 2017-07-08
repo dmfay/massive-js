@@ -11,6 +11,10 @@ describe('createDocumentTable', function () {
     return resetDb('empty').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('without schema', function() {
     after(function() {
       return db.dropTable(tableName, {cascade: true});

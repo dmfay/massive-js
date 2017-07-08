@@ -9,6 +9,10 @@ describe('initialization', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('loads document tables in public and in other schemata', function () {
     assert.instanceOf(db.docs, Table);
     assert.isFunction(db.docs.findDoc);
