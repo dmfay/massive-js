@@ -10,6 +10,10 @@ describe('getObject', function () {
     return resetDb('empty').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('without schema', function() {
     before(function() {
       return db.createDocumentTable(tableName);

@@ -10,6 +10,10 @@ describe('scripts', function () {
     db = yield resetDb();
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('should query for a list of scripts', function* () {
     const scripts = yield loader(db, {scripts: path.resolve(__dirname, '../helpers/scripts/loader')});
 

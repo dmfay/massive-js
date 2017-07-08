@@ -7,6 +7,10 @@ describe('run', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('runs raw unparameterized SQL', function () {
     return db.run("select * from products").then(res => {
       assert.equal(4, res.length);

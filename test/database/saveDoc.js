@@ -7,6 +7,10 @@ describe('saveDoc', function () {
     return resetDb('empty').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('with an existing table', function () {
     before(function() {
       return db.createDocumentTable('docs');

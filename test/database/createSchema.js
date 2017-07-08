@@ -11,6 +11,8 @@ describe("createSchema", function() {
   after(function() {
     return db.dropSchema(schemaName, {cascade: true}).then(() => {
       assert.equal(db[schemaName], undefined);
+
+      return db.instance.$pool.end();
     });
   });
 

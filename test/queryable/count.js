@@ -7,6 +7,10 @@ describe('count', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('where syntax', function () {
     it('returns 2 for OR id 1 or 2', function () {
       return db.products.count('id=$1 OR id=$2', [1,2]).then(res => assert.equal(res,2));

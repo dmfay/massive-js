@@ -7,6 +7,10 @@ describe('destroy', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('deletes a product', function* () {
     const deleted = yield db.products.destroy({id: 4});
     assert.lengthOf(deleted, 1);

@@ -9,6 +9,10 @@ describe('query', function() {
     return resetDb('empty').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('runs a simple query', function() {
     return db.query('select $1 as val', ['hi']).then(result => assert.equal(result[0].val, 'hi'));
   });

@@ -7,6 +7,10 @@ describe('searchDoc', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('works on single key', function () {
     return db.docs.searchDoc({
       fields: ['title'],

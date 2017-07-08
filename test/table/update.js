@@ -7,6 +7,10 @@ describe('update', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('updates a product by the primary key of a single record', function () {
     return db.products.update({id: 4, name: 'new and improved product 4'}).then(res => {
       assert.equal(res.id, 4);

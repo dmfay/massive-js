@@ -7,6 +7,10 @@ describe('findDoc', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   it('returns results in document format', function () {
     return db.docs.findDoc().then(docs => {
       assert.lengthOf(docs, 4);

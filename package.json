@@ -35,7 +35,7 @@
     "glob": "^7.1.1",
     "lodash": "^4.17.4",
     "mz": "^2.6.0",
-    "pg-promise": "^5.9.6",
+    "pg-promise": "^6.3.1",
     "pg-query-stream": "^1.0.0"
   },
   "devDependencies": {

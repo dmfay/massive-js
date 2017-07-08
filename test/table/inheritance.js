@@ -7,6 +7,10 @@ describe('Table Inheritance', function () {
     return resetDb('inheritance').then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('Querying', function () {
     it('includes descendant rows with the parent schema by default', function () {
       return db.cities.find().then(res => {

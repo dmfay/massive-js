@@ -7,6 +7,10 @@ describe('findOne', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('all records', function () {
     it('returns first record with findOne no args', function () {
       return db.products.findOne().then(res => assert.equal(res.id, 1));

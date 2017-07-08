@@ -7,6 +7,10 @@ describe('find', function () {
     return resetDb().then(instance => db = instance);
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('all records', function () {
     it('returns all records on find with no args', function () {
       return db.products.find().then(res => assert.lengthOf(res, 4));
