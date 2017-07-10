@@ -390,7 +390,7 @@ db.myTestQueries.restartTests([5, true]).then(results => {
 });
 ```
 
-Like `run`, prepared statements in script files can use named parameters instead of `$1`-style indexed parameters. Named parameters are formatted `${name}`. Other delimiters besides braces are supported; consult the pg-promise documentation for a full accounting.
+Like `run`, prepared statements in script files can use [Named Parameters] instead of `$1`-style indexed parameters. [Named Parameters] support syntax `${name}`, `$(name)`, `$[name]`, `<name>` and `$/name/`.
 
 ```javascript
 db.myTestQueries.restartTests({category: 5, force: true}).then(results => {
@@ -418,7 +418,7 @@ db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
 
 ### Accessing the Driver
 
-Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise](https://github.com/vitaly-t/pg-promise) driver (as `db.pgp`) and connected instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
+Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise] driver (as `db.pgp`) and connected [Database] instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
 
 ## REPL
 
@@ -467,3 +467,7 @@ Run the tests with npm:
 ```
 npm test
 ```
+
+[pg-promise]:https://github.com/vitaly-t/pg-promise
+[Database]:http://vitaly-t.github.io/pg-promise/Database.html
+[Named Parameters]:https://github.com/vitaly-t/pg-promise#named-parameters
