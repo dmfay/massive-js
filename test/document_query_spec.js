@@ -137,6 +137,14 @@ describe('Document queries', function () {
       });
     });
 
+    it('check if field exists with IS NOT', function (done) {
+      db.docs.findDoc({"price is not" : null}, function(err,docs){
+        assert.ifError(err);
+        assert.equal(docs.length, 3);
+        done();
+      });
+    });
+
     it('executes a contains if passed an array of objects', function (done) {
       db.docs.findDoc({studios : [{name : "Warner"}]}, function(err,docs){
         assert.ifError(err);

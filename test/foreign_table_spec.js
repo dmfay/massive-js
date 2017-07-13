@@ -10,8 +10,14 @@ describe('Loading entities (these tests may be slow!)', function () {
     });
   });
 
+  it('loads foreign tables', function (done) {
+      assert.ok(db.foreigntable);
+      done();
+  });
+
   it('queries foreign tables', function (done) {
     db.foreigntable.find({}, function (err, res) {
+      assert.ifError(err);
       assert.equal(res.length, 0);
 
       done();
@@ -21,6 +27,7 @@ describe('Loading entities (these tests may be slow!)', function () {
   it('sees updated information in foreign tables', function (done) {
     db.t1.insert({id: 1}, function () {
       db.foreigntable.find({}, function (err, res) {
+        assert.ifError(err);
         assert.equal(res.length, 1);
         assert.equal(res[0].id, 1);
 
@@ -33,7 +40,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     db.foreigntable.save({id: 1}, function (err) {
       assert.equal(err.message, 'No primary key, use insert or update to write to this table');
 
-      return done();
+      done();
     });
   });
 
@@ -41,7 +48,7 @@ describe('Loading entities (these tests may be slow!)', function () {
     db.foreigntable.update({id: 1}, function (err) {
       assert.equal(err.message, 'No primary key, use the (criteria, updates) signature');
 
-      return done();
+      done();
     });
   });
 });

@@ -180,6 +180,22 @@ describe('Queryables', function () {
         done();
       });
     });
+    it('returns products using is null', function (done) {
+      db.products.find({"tags is": null}, function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length, 1);
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
+    it('returns products using is not null', function (done) {
+      db.products.find({"id is not": null}, function(err,res){
+        assert.ifError(err);
+        assert.equal(res.length, 4);
+        assert.equal(res[0].id, 1);
+        done();
+      });
+    });
     it('returns products using distinct from', function (done) {
       db.products.find({"tags is distinct from": '{tag1,tag2}'}, function(err,res){
         assert.ifError(err);
@@ -637,9 +653,9 @@ describe('Queryables', function () {
       });
     });
     it('returns results filtered by where', function (done) {
-      db.docs.search({columns : ["body->>'description'"], term: "C:*", where: {"body->>'is_good'": 'true'}}, function(err,res){
+      db.products.search({columns : ["description"], term: "description", where: {"in_stock": true}}, function(err,res){
         assert.ifError(err);
-        assert.equal(res.length,1);
+        assert.equal(res.length, 2);
         done();
       });
     });
