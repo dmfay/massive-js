@@ -318,6 +318,14 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params.length, 0);
     });
 
+    it('should accept IS NOT explicitly', function () {
+      var condition = {quotedField: '"field"', operator: 'IS NOT'};
+      var result = where.predicate({params: [], predicates: [], offset: 0}, condition, null);
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '"field" IS NOT null');
+      assert.equal(result.params.length, 0);
+    });
+
     it('should apply operation mutators', function () {
       var condition = {
         quotedField: '"field"',
@@ -348,6 +356,14 @@ describe('WHERE clause generation', function () {
   });
 
   describe('docPredicate', function () {
+    it('should create IS comparison predicate', function () {
+      var condition = {field: 'field', operator: 'IS'};
+      var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, null, {'field is': null});
+      assert.equal(result.predicates.length, 1);
+      assert.equal(result.predicates[0], '(body ->> \'field\') IS null');
+      assert.equal(result.params.length, 0);
+    });
+
     it('should build an equality predicate using the JSON contains op', function () {
       var condition = {field: 'field', operator: '='};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, 'value', {field: 'value'});

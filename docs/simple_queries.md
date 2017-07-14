@@ -76,8 +76,8 @@ valid.
 * `>=` (greater than or equal): `{"price >=": 20}`
 
 #### Null values
-* `IS NULL`: `{description: null}`, `{"description =": null}`
-* `IS NOT NULL`: `{"description <>": null}`, `{"description !=": null}`, `{"description !": null}`
+* `IS NULL`: `{description: null}`, `{"description =": null}`, `{"description is": null}`
+* `IS NOT NULL`: `{"description <>": null}`, `{"description !=": null}`, `{"description !": null}`, `{"description is not": null}`
 * `IS DISTINCT FROM` (null-sensitive `<>`): `{"color is distinct from": "red"}`
 * `IS NOT DISTINCT FROM` (null-sensitive `=`): `{"color is not distinct from": "red"}`
 
