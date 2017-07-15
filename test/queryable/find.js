@@ -92,6 +92,18 @@ describe('find', function () {
         assert.equal(res[0].id, 1);
       });
     });
+    it('returns products using is null', function () {
+      return db.products.find({'tags is': null}).then(res => {
+        assert.lengthOf(res, 1);
+        assert.equal(res[0].id, 1);
+      });
+    });
+    it('returns products using is not null', function () {
+      return db.products.find({'id is not': null}).then(res => {
+        assert.lengthOf(res, 4);
+        assert.equal(res[0].id, 1);
+      });
+});
     it('returns products using distinct from', function () {
       return db.products.find({'tags is distinct from': '{tag1,tag2}'}).then(res => assert.lengthOf(res, 3));
     });
