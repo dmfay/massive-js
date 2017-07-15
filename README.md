@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 [![Coverage Status](https://coveralls.io/repos/github/dmfay/massive-js/badge.svg)](https://coveralls.io/github/dmfay/massive-js)
+[![npm](https://img.shields.io/npm/dw/massive.svg)](https://npmjs.org/package/massive)
 
 Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.
 
@@ -133,14 +134,14 @@ The finder functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` 
 ```javascript
 {
   build: true,                    // return query text and parameters without executing anything
-  document: true,                 // query is against a document table (see below)
+  document: true,                 // treat table as a document store (see 'Documents')
   order: 'id desc',               // creates an ORDER BY clause to enforce sorting
-  orderBody: true,                // force order to apply to fields in a document body instead of the table fields
+  orderBody: true,                // order applies to document body fields instead of table columns
   offset: 20,                     // adds an OFFSET to skip the first n rows
   limit: 10,                      // adds a LIMIT to restrict the number of rows returned
-  single: true,                   // force returning the first result object instead of a results array
+  single: true,                   // return the first result row as an object instead of all rows
   stream: true,                   // return results as a readable stream (see below)
-  only: true                      // restrict the query to the target table, ignoring descendant tables
+  only: true                      // ignore tables inheriting from the target table
 }
 ```
 
@@ -293,7 +294,8 @@ db.saveDoc('reports', {
     numbers: [4, 4, 4, 3, 7]
   }]
 }).then(report => {
-  // the reports table has been created and the initial document is assigned a primary key value and returned
+  // the reports table has been created and the initial document
+  // is assigned a primary key value and returned
 });
 ```
 
@@ -301,7 +303,7 @@ If the document table already exists, `saveDoc` can be invoked on it just as the
 
 ```javascript
 db.reports.saveDoc({
-  id: 1,  // omit in order to insert
+  id: 1,                          // omit in order to insert
   title: 'Week 12 Throughput',
   lines: [{
     name: '1 East',
@@ -392,7 +394,8 @@ db.uuid_generate_v1mc().then(arr => {
 });
 
 db.myTestQueries.restartTests([5, true]).then(results => {
-  // this runs the prepared statement in db/myTestQueries/restartTests.sql with the above parameters and returns any output from a RETURNING clause
+  // this runs the prepared statement in db/myTestQueries/restartTests.sql with
+  // the above parameters and returns any output from a RETURNING clause
 });
 ```
 
@@ -456,7 +459,7 @@ Exit the REPL by pressing Ctrl-C twice.
 
 Release versions are tagged and available [here](https://github.com/dmfay/massive-js/releases).
 
-Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedocs.org/en/latest/).
+Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedocs.org/en/v2/).
 
 ## Contributing
 

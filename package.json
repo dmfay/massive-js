@@ -21,7 +21,13 @@
   "keywords": [
     "postgres",
     "pg",
-    "postgresql"
+    "postgresql",
+    "sql",
+    "database",
+    "datamapper",
+    "data-mapper",
+    "promise",
+    "promises"
   ],
   "author": "Dian Fay <dian.m.fay@gmail.com>",
   "contributors": [
