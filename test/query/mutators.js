@@ -68,15 +68,15 @@ describe('mutators', function () {
       assert.isNull(condition.value);
     });
 
-    it('interpolates values with NOT IS', function () {
+    it('interpolates values with IS NOT', function () {
       const condition = mutators.buildIs({
-        operation: ops('<>'),
+        operation: ops('is not'),
         offset: 1,
         value: true,
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
+      assert.equal(condition.operation.key, 'is not');
       assert.equal(condition.operation.operator, 'IS NOT');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
@@ -102,7 +102,7 @@ describe('mutators', function () {
 
     it('passes nulls and booleans to buildIs', function () {
       assert.equal(mutators.equality({
-        operation: ops('='),
+        operation: ops('is'),
         offset: 1,
         value: null,
         params: []

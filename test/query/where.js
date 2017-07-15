@@ -373,6 +373,13 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params.length, 0);
     });
 
+    it('should accept IS NOT explicitly', function () {
+      const condition = {field: '"field"', operation: ops('is not'), value: null, offset: 1, params: []};
+      const result = where.generator(condition);
+      assert.equal(result.predicate, '"field" IS NOT null');
+      assert.equal(result.params.length, 0);
+    });
+
     it('should apply operation mutators', function () {
       const condition = {
         field: '"field"',
@@ -405,6 +412,13 @@ describe('WHERE clause generation', function () {
       assert.equal(result.predicate, '"body" @> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], JSON.stringify(obj));
+    });
+
+    it('should create IS comparison predicate', function () {
+      const condition = {rawField: 'field', operation: ops('is'), value: true, offset: 1, params: []};
+      const result = where.docGenerator(condition, {'field is': true});
+      assert.equal(result.predicate, '("body" ->> \'field\') IS true');
+      assert.equal(result.params.length, 0);
     });
 
     it('should build an equality predicate using the JSON contains op', function () {
