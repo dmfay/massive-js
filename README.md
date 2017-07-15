@@ -315,7 +315,7 @@ db.reports.saveDoc({
 });
 ```
 
-`modify` adds and updates fields in an existing document (or any JSON/JSONB column) _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
+`modify` adds and updates fields in an existing document or documents (via id or criteria object) _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `modify` may be used with any JSON or JSONB column, not just with document tables, but there are some behavioral differences; for more information, see the full documentation.
 
 ```javascript
 db.reports.modify(1, {
@@ -324,10 +324,16 @@ db.reports.modify(1, {
   // the updated report, with a changed 'title' attribute
 });
 
-db.products.modify(1, {
+db.products.modify({
+  type: 'widget'
+}, {
   colors: ['gray', 'purple', 'red']
-}, 'info').then(widget => {
-  // the product with an 'info' field containing the colors array
+}, 'info').then(widgets => {
+  // an array of widgets, now in at least three colors.
+  // since products is not a document table (note the
+  // 'info' field was specified to update), the 'type'
+  // is tested against a column named type rather than
+  // a key in the info JSON or JSONB column.
 });
 ```
 
