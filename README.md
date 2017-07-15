@@ -1,5 +1,7 @@
 # Massive.js 3.0: A Postgres-centric Data Access Tool
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/dmfay/massive-js.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 [![Coverage Status](https://coveralls.io/repos/github/dmfay/massive-js/badge.svg)](https://coveralls.io/github/dmfay/massive-js)
 [![npm](https://img.shields.io/npm/dw/massive.svg)](https://npmjs.org/package/massive)
