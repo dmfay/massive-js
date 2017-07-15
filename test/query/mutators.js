@@ -177,7 +177,7 @@ describe('mutators', function () {
 
       assert.deepEqual(mutators.literalizeArray(condition), {
         offset: 1,
-        params: ['{"{one}","two three","four,five","\\\"six\\\"","\\\\seven","","null"}'],
+        params: ['{"{one}","two three","four,five","\\"six\\"","\\\\seven","","null"}'],
         value: '$1'
       });
     });
