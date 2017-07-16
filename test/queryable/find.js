@@ -447,8 +447,8 @@ describe('find', function () {
         assert.equal(res[0].id, 4);
       });
     });
-    it('runs with an empty WHERE clause if you try to search by pk', function () {
-      return db.popular_products.find(1).then(res => assert.lengthOf(res, 3));
+    it('rejects if you try to search by pk', function () {
+      return db.popular_products.find(1).then(() => { assert.fail(); }).catch(() => {});
     });
   });
 

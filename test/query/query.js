@@ -2,67 +2,54 @@
 
 const Query = require('../../lib/query/query');
 
-describe("Query", function () {
-  describe("selectList", function () {
-    it("should join arrays", function () {
-      const result = new Query({}, {columns: ["col1", "col2"]});
-      assert.equal(result.selectList(), "col1,col2");
-    });
+describe('Query', function () {
+  const source = {
+    delimitedFullName: 'testsource',
+    isPkSearch: () => false
+  };
 
-    it("should leave anything else alone", function () {
-      const result = new Query({}, {columns: "count(1)"});
-      assert.equal(result.selectList(), "count(1)");
-    });
+  describe('ctor', function () {
+    it('should have defaults', function () {
+      const query = new Query(source);
 
-    it("should default to *", function () {
-      const result = new Query();
-      assert.equal(result.selectList(), "*");
+      assert.equal(query.source, 'testsource');
+      assert.equal(query.columns, '*');
+      assert.equal(query.generator, 'generator');
+      assert.isFalse(query.only);
+      assert.isFalse(query.single);
+      assert.equal(query.order, ' ORDER BY 1');
     });
   });
 
-  describe("queryOptions", function () {
-    it("should emit an order by", function () {
-      const result = new Query();
-      assert.equal(result.queryOptions(), " ORDER BY 1");
+  describe('format', function () {
+    it('should join arrays', function () {
+      const result = new Query(source, {}, {columns: ['col1', 'col2']});
+      assert.equal(result.format(), 'SELECT col1,col2 FROM testsource WHERE TRUE ORDER BY 1');
     });
 
-    it("should add an offset", function () {
-      const result = new Query({}, {offset: 10});
-      assert.equal(result.queryOptions(), " ORDER BY 1 OFFSET 10");
+    it('should leave anything else alone', function () {
+      const result = new Query(source, {}, {columns: 'count(1)'});
+      assert.equal(result.format(), 'SELECT count(1) FROM testsource WHERE TRUE ORDER BY 1');
     });
 
-    it("should add a limit", function () {
-      const result = new Query({}, {limit: 10});
-      assert.equal(result.queryOptions(), " ORDER BY 1 LIMIT 10");
+    it('should add an offset', function () {
+      const result = new Query(source, {}, {offset: 10});
+      assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1 OFFSET 10');
     });
 
-    it("should add both offset and limit", function () {
-      const result = new Query({}, {offset: 10, limit: 10});
-      assert.equal(result.queryOptions(), " ORDER BY 1 OFFSET 10 LIMIT 10");
+    it('should limit single queries to one result', function () {
+      const result = new Query(source, {}, {single: true});
+      assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1 LIMIT 1');
     });
 
-    it("should accept an array of sort criteria", function () {
-      const result = new Query({}, {
-        order: [
-          {field: "col1", direction: "asc"},
-          {field: "body->>'col2'", direction: "desc", type: "varchar"},
-          {field: "col3 + col4"}
-        ]
-      });
-
-      assert.equal(result.queryOptions(), " ORDER BY col1 asc,(body->>'col2')::varchar desc,col3 + col4 asc");
+    it('should add a limit', function () {
+      const result = new Query(source, {}, {limit: 10});
+      assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1 LIMIT 10');
     });
 
-    it("should build an order clause for a document table", function () {
-      const result = new Query({}, {
-        order: [
-          {field: "col1", direction: "asc", type: "int"},
-          {field: "col2", direction: "desc", type: "varchar"}
-        ],
-        orderBody: true
-      });
-
-      assert.equal(result.queryOptions(), " ORDER BY (body->>'col1')::int asc,(body->>'col2')::varchar desc");
+    it('should add both offset and limit', function () {
+      const result = new Query(source, {}, {offset: 10, limit: 10});
+      assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1 OFFSET 10 LIMIT 10');
     });
   });
 });
