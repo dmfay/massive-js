@@ -4,7 +4,8 @@ const Query = require('../../lib/query/query');
 
 describe('Query', function () {
   const source = {
-    delimitedFullName: 'testsource'
+    delimitedFullName: 'testsource',
+    isPkSearch: () => false
   };
 
   describe('ctor', function () {

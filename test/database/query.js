@@ -25,7 +25,11 @@ describe('query', function() {
   });
 
   it('runs a query', function() {
-    const query = new Query({delimitedFullName: `(values ('hi'), ('ih')) temp`}, {column1: 'hi'}, {columns: ['column1']});
+    const query = new Query(
+      {delimitedFullName: `(values ('hi'), ('ih')) temp`, isPkSearch: () => false},
+      {column1: 'hi'},
+      {columns: ['column1']}
+    );
 
     return db.query(query).then(result => {
       assert.lengthOf(result, 1);
@@ -35,7 +39,7 @@ describe('query', function() {
 
   it('builds a query without executing', function() {
     const query = new Query(
-      {delimitedFullName: "(values ('hi'), ('ih')) temp"},
+      {delimitedFullName: "(values ('hi'), ('ih')) temp", isPkSearch: () => false},
       {column1: 'hi'},
       {columns: ['column1'], build: true}
     );
