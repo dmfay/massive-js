@@ -26,7 +26,6 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[1], 'value2');
     });
 
-    // TODO add conditions check below
     it('should return conditions and parameters', function () {
       const result = where({field1: 'value1', field2: 'value2'});
 
