@@ -43,7 +43,7 @@ describe('query', function() {
     return db.query(query).then(result => {
       assert.isObject(result);
       assert.deepEqual(result, {
-        sql: `SELECT column1 FROM (values ('hi'), ('ih')) temp\nWHERE "column1" = $1 ORDER BY 1`,
+        sql: `SELECT column1 FROM (values ('hi'), ('ih')) temp WHERE "column1" = $1 ORDER BY 1`,
         params: ['hi']
       });
     });

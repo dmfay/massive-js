@@ -171,7 +171,7 @@ describe('findDoc', function () {
 
     it('orders by fields in the document body with criteria', function () {
       return db.docs.findDoc('*', {
-        order: [{field: 'title', direction: 'desc', type: 'varchar'}], 
+        order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true
       }).then(docs => {
         assert.lengthOf(docs, 4);
@@ -185,7 +185,7 @@ describe('findDoc', function () {
     it('applies options', function () {
       return db.docs.findDoc({title: 'Document 1'}, {build: true}).then(query => {
         assert.deepEqual(query, {
-          sql: 'SELECT * FROM "docs"\nWHERE "body" @> $1 ORDER BY "id"',
+          sql: 'SELECT * FROM "docs" WHERE "body" @> $1 ORDER BY "id"',
           params: ['{"title":"Document 1"}']
         });
       });
