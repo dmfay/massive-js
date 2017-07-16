@@ -25,7 +25,7 @@ describe('query', function() {
   });
 
   it('runs a query', function() {
-    const query = new Query({column1: 'hi'}, {columns: ['column1']}, {delimitedFullName: `(values ('hi'), ('ih')) temp`});
+    const query = new Query({delimitedFullName: `(values ('hi'), ('ih')) temp`}, {column1: 'hi'}, {columns: ['column1']});
 
     return db.query(query).then(result => {
       assert.lengthOf(result, 1);
@@ -35,10 +35,10 @@ describe('query', function() {
 
   it('builds a query without executing', function() {
     const query = new Query(
+      {delimitedFullName: "(values ('hi'), ('ih')) temp"},
       {column1: 'hi'},
-      {columns: ['column1'], build: true},
-      {delimitedFullName: "(values ('hi'), ('ih')) temp"
-    });
+      {columns: ['column1'], build: true}
+    );
 
     return db.query(query).then(result => {
       assert.isObject(result);

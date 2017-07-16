@@ -1,6 +1,6 @@
 'use strict';
 
-const isPkSearch = require('../../lib/query/isPkSearch');
+const isPkSearch = require('../../lib/query/is-pk-search');
 
 describe('isPkSearch', function () {
   it('should assume a default options object', function () {
