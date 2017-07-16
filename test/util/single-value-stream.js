@@ -29,4 +29,33 @@ describe('SingleValueStream', function () {
       r.push(null);
     });
   });
+
+  it('asserts on errors', function () {
+    return new Promise((resolve, reject) => {
+      let count = 0;
+
+      const r = new stream.Readable({objectMode: true});
+      r.on('error', reject);
+
+      const w = new stream.Writable({objectMode: true});
+      w.on('error', reject);
+      w.on('finish', () => {
+        assert.equal(count, 1);
+        resolve();
+      });
+
+      w._write = (chunk, enc, next) => {
+        assert.equal(chunk, 'value');
+        count++;
+        next();
+      };
+
+      const t = new SingleValueStream();
+      t.on('error', reject);
+
+      r.pipe(t).pipe(w);
+      r.push({field: 'value', otherfield: 'othervalue'});
+      r.push(null);
+    }).then(() => { assert.fail(); }).catch(() => {});
+  });
 });
