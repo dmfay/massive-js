@@ -148,7 +148,7 @@ The finder functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` 
 
 #### Querying
 
-**findOne** finds a single object with a primary key or a criteria object.
+`findOne` finds a single object with a primary key or a criteria object.
 
 ```javascript
 db.tests.findOne(1).then(test1 => {
