@@ -1,6 +1,6 @@
 'use strict';
 
-const Query = require('../../lib/query/query');
+const Query = require('../../lib/statement/query');
 
 describe('Query', function () {
   const source = {

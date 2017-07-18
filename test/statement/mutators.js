@@ -1,7 +1,7 @@
 'use strict';
 
-const mutators = require('../../lib/query/mutators');
-const ops = require('../../lib/query/operations');
+const mutators = require('../../lib/statement/mutators');
+const ops = require('../../lib/statement/operations');
 
 describe('mutators', function () {
   describe('buildBetween', function () {

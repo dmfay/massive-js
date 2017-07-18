@@ -1,6 +1,6 @@
 'use strict';
 
-const orderBy = require('../../lib/query/order-by');
+const orderBy = require('../../lib/statement/order-by');
 
 describe('orderBy', function () {
   it('should return an empty string if order is null', function () {
