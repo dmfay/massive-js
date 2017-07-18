@@ -1,6 +1,6 @@
 'use strict';
 
-const Query = require('../../lib/statement/query');
+const Select = require('../../lib/statement/select');
 
 describe('query', function() {
   let db;
@@ -25,7 +25,7 @@ describe('query', function() {
   });
 
   it('runs a query', function() {
-    const query = new Query(
+    const query = new Select(
       {delimitedFullName: `(values ('hi'), ('ih')) temp`, isPkSearch: () => false},
       {column1: 'hi'},
       {columns: ['column1']}
@@ -38,7 +38,7 @@ describe('query', function() {
   });
 
   it('builds a query without executing', function() {
-    const query = new Query(
+    const query = new Select(
       {delimitedFullName: "(values ('hi'), ('ih')) temp", isPkSearch: () => false},
       {column1: 'hi'},
       {columns: ['column1'], build: true}
