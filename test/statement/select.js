@@ -17,11 +17,21 @@ describe('Select', function () {
       assert.equal(query.generator, 'generator');
       assert.isFalse(query.only);
       assert.isFalse(query.single);
-      assert.equal(query.order, ' ORDER BY 1');
+      assert.equal(query.order, 'ORDER BY 1');
     });
   });
 
   describe('format', function () {
+    it('should return a basic select', function () {
+      const result = new Select(source);
+      assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1');
+    });
+
+    it('should add an ONLY', function () {
+      const result = new Select(source, {}, {only: true});
+      assert.equal(result.format(), 'SELECT * FROM ONLY testsource WHERE TRUE ORDER BY 1');
+    });
+
     it('should join arrays', function () {
       const result = new Select(source, {}, {columns: ['col1', 'col2']});
       assert.equal(result.format(), 'SELECT col1,col2 FROM testsource WHERE TRUE ORDER BY 1');
