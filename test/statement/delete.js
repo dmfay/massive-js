@@ -17,6 +17,13 @@ describe('Delete', function () {
       assert.isTrue(query.only);
       assert.isFalse(query.single);
     });
+
+    it('should apply options', function () {
+      const query = new Delete(source, {}, {build: true});
+
+      assert.equal(query.source, 'testsource');
+      assert.isTrue(query.build);
+    });
   });
 
   describe('format', function () {

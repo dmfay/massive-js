@@ -17,6 +17,13 @@ describe('Update', function () {
       assert.isTrue(query.only);
       assert.isFalse(query.single);
     });
+
+    it('should apply options', function () {
+      const query = new Update(source, {}, {}, {build: true});
+
+      assert.equal(query.source, 'testsource');
+      assert.isTrue(query.build);
+    });
   });
 
   describe('format', function () {
