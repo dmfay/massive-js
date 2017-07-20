@@ -14,7 +14,7 @@ describe('Delete', function () {
 
       assert.equal(query.source, 'testsource');
       assert.equal(query.generator, 'generator');
-      assert.isTrue(query.only);
+      assert.isFalse(query.only);
       assert.isFalse(query.single);
     });
 
@@ -29,12 +29,12 @@ describe('Delete', function () {
   describe('format', function () {
     it('should return a basic delete statement for the specified criteria', function () {
       const result = new Delete(source);
-      assert.equal(result.format(), 'DELETE FROM ONLY testsource WHERE TRUE RETURNING *');
+      assert.equal(result.format(), 'DELETE FROM testsource WHERE TRUE RETURNING *');
     });
 
     it('should build a WHERE clause with criteria', function () {
       const result = new Delete(source, {field1: 'value1'});
-      assert.equal(result.format(), 'DELETE FROM ONLY testsource WHERE "field1" = $1 RETURNING *');
+      assert.equal(result.format(), 'DELETE FROM testsource WHERE "field1" = $1 RETURNING *');
     });
 
     it('should build a WHERE clause with a pk', function () {
@@ -43,12 +43,12 @@ describe('Delete', function () {
         isPkSearch: () => true,
         pk: 'id'
       }, 1);
-      assert.equal(result.format(), 'DELETE FROM ONLY testsource WHERE "id" = $1 RETURNING *');
+      assert.equal(result.format(), 'DELETE FROM testsource WHERE "id" = $1 RETURNING *');
     });
 
-    it('should turn off ONLY', function () {
-      const result = new Delete(source, {field1: 'value1'}, {only: false});
-      assert.equal(result.format(), 'DELETE FROM testsource WHERE "field1" = $1 RETURNING *');
+    it('should set ONLY', function () {
+      const result = new Delete(source, {field1: 'value1'}, {only: true});
+      assert.equal(result.format(), 'DELETE FROM ONLY testsource WHERE "field1" = $1 RETURNING *');
     });
   });
 });

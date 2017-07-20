@@ -32,6 +32,15 @@ describe('update', function () {
         assert.equal(res.Email, "bar@foo.com");
       });
     });
+
+    it('applies options', function () {
+      return db.products.update({id: 1, name: 'another kind of product'}, null, {build: true}).then(res => {
+        assert.deepEqual(res, {
+          sql: 'UPDATE "products" SET "name" = $1 WHERE "id" = $2 RETURNING *',
+          params: ['another kind of product', 1]
+        });
+      });
+    });
   });
 
   describe('bulk updates', function () {
@@ -85,6 +94,15 @@ describe('update', function () {
       return db.products.update({id: [1, 2]}, {}).then(res => {
         assert.equal(res[0].id, 1);
         assert.equal(res[0].name, 'Product 1');
+      });
+    });
+
+    it('applies options', function () {
+      return db.products.update({id: [1, 2]}, {name: 'another kind of product'}, {build: true}).then(res => {
+        assert.deepEqual(res, {
+          sql: 'UPDATE "products" SET "name" = $1 WHERE "id" IN ($2,$3) RETURNING *',
+          params: ['another kind of product', 1, 2]
+        });
       });
     });
   });

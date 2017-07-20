@@ -72,4 +72,13 @@ describe('destroy', function () {
     const foundAfter = yield db.orders.findOne({id: foundBefore.id});
     assert.notOk(foundAfter);
   });
+
+  it('applies options', function () {
+    return db.products.destroy({id: 1}, {build: true}).then(res => {
+      assert.deepEqual(res, {
+        sql: 'DELETE FROM "products" WHERE "id" = $1 RETURNING *',
+        params: [1]
+      });
+    });
+  });
 });
