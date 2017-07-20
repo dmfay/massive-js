@@ -52,6 +52,17 @@ db.tests.insert([{
 });
 ```
 
+Either version of `insert` may be passed additional options:
+
+```javascript
+db.tests.insert({
+  name: 'homepage',
+  version: 1,
+}, {build: true}).then(test => {
+  // builds the query without executing it
+});
+```
+
 ## update
 
 `update` has two variants. Passed an object with a value for the table's primary key field, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the criteria-changes variant can be used with foreign tables.
@@ -76,6 +87,18 @@ db.tests.update({
   // priority 'high'. Since this issues a prepared
   // statement, note that the version field cannot
   // be incremented here!
+});
+```
+
+As with `insert`, either signature of `update` can be passed options:
+
+```javascript
+db.tests.update({
+  id: 1,
+  version: 2,
+  priority: 'high'
+}, {build: true}).then(test => {
+  // builds the query without executing it
 });
 ```
 
