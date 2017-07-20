@@ -1,7 +1,7 @@
 'use strict';
 
-const where = require('../../lib/query/where');
-const ops = require('../../lib/query/operations');
+const where = require('../../lib/statement/where');
+const ops = require('../../lib/statement/operations');
 
 describe('WHERE clause generation', function () {
   describe('module', function () {
