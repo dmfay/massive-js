@@ -130,6 +130,30 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
+      it('should match > properly', function () {
+        var result = where.parseKey('field >');
+        assert.equal(result.field, 'field');
+        assert.equal(result.quotedField, '"field"');
+        assert.equal(result.operator, '>');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should match >= properly', function () {
+        var result = where.parseKey('field >=');
+        assert.equal(result.field, 'field');
+        assert.equal(result.quotedField, '"field"');
+        assert.equal(result.operator, '>=');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should distinguish > in traversers and operations', function () {
+        var result = where.parseKey('field->>key >=');
+        assert.equal(result.field, 'field');
+        assert.equal(result.quotedField, '"field"->>\'key\'');
+        assert.equal(result.operator, '>=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should match the longest possible operator', function () {
         var result = where.parseKey('field ~~*'); // ~ and ~* are also operators
         assert.equal(result.field, 'field');
@@ -145,9 +169,33 @@ describe('WHERE clause generation', function () {
         assert.equal(result.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
+
+      it('should not clobber a field with an operator in the name', function () {
+        var result = where.parseKey('is_field is');
+        assert.equal(result.field, 'is_field');
+        assert.equal(result.quotedField, '"is_field"');
+        assert.equal(result.operator, 'IS');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should not clobber a quoted field with an operator in the name', function () {
+        var result = where.parseKey('"this is a field" is');
+        assert.equal(result.field, 'this is a field');
+        assert.equal(result.quotedField, '"this is a field"');
+        assert.equal(result.operator, 'IS');
+        assert.equal(result.mutator, undefined);
+      });
     });
 
     describe('casting', function () {
+      it('should cast fields without an operator', function () {
+        var result = where.parseKey('field::text');
+        assert.equal(result.field, 'field::text');
+        assert.equal(result.quotedField, '"field"::text');
+        assert.equal(result.operator, '=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should cast fields', function () {
         var result = where.parseKey('field::text LIKE');
         assert.equal(result.field, 'field::text');
@@ -156,10 +204,34 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
+      it.skip('should cast fields with JSON operations', function () {
+        var result = where.parseKey('field->>element::boolean LIKE');
+        assert.equal(result.field, '(field->>\'element\')::text');
+        assert.equal(result.quotedField, '("field"->>\'element\')::boolean');
+        assert.equal(result.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should cast quoted fields without an operator', function () {
+        var result = where.parseKey('"field"::text');
+        assert.equal(result.field, 'field::text');
+        assert.equal(result.quotedField, '"field"::text');
+        assert.equal(result.operator, '=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should cast quoted fields', function () {
         var result = where.parseKey('"field"::text LIKE');
         assert.equal(result.field, 'field::text');
         assert.equal(result.quotedField, '"field"::text');
+        assert.equal(result.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it.skip('should cast quoted fields with JSON operations', function () {
+        var result = where.parseKey('"field"->>element::boolean LIKE');
+        assert.equal(result.field, '(field->>\'element\')::text');
+        assert.equal(result.quotedField, '("field"->>\'element\')::boolean');
         assert.equal(result.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
