@@ -49,7 +49,7 @@ Here are some of the high points:
 npm i massive --save
 ```
 
-**Starting with version 3, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
+**Starting with version 3, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, install massive@2 or download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
@@ -69,7 +69,11 @@ massive({
 }).then(db => {...});
 ```
 
-When you instantiate Massive, it introspects your database for tables, views, and functions. Along with files in your scripts directory (`/db` by default), these become an API that allows you to query database objects and execute scripts and functions. This initialization process is fast, but not instantaneous, and you don't want to be doing it every time you run a new query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application. In Express, you can store it with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
+When you instantiate Massive, it introspects your database for tables, views, and functions. Along with files in your scripts directory (`/db` by default), these become an API that allows you to query database objects and execute scripts and functions. This initialization process is fast, but not instantaneous, and you don't want to be doing it every time you run a new query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.
+
+In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
+
+If you ever need to run the introspection again, use `db.reload()` to get a promise for an up-to-date instance.
 
 ### Raw SQL
 
