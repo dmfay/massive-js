@@ -29,7 +29,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, 'IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -44,7 +43,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
       assert.equal(condition.operation.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -61,7 +59,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, 'IS');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
@@ -76,7 +73,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, 'is not');
       assert.equal(condition.operation.operator, 'IS NOT');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
@@ -93,7 +89,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
       assert.equal(condition.operation.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -131,7 +126,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, '=');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, [123]);

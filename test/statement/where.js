@@ -292,6 +292,30 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
+      it('should match > properly', function () {
+        var result = where.getCondition('field >');
+        assert.equal(result.rawField, 'field');
+        assert.equal(result.field, '"field"');
+        assert.equal(result.operation.operator, '>');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should match >= properly', function () {
+        var result = where.getCondition('field >=');
+        assert.equal(result.rawField, 'field');
+        assert.equal(result.field, '"field"');
+        assert.equal(result.operation.operator, '>=');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should distinguish > in traversers and operations', function () {
+        var result = where.getCondition('field->>key >=');
+        assert.equal(result.rawField, 'field');
+        assert.equal(result.field, '"field"->>\'key\'');
+        assert.equal(result.operation.operator, '>=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should match the longest possible operator', function () {
         const result = where.getCondition('field ~~*'); // ~ and ~* are also operators
         assert.equal(result.rawField, 'field');
@@ -307,21 +331,69 @@ describe('WHERE clause generation', function () {
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
+
+      it('should not clobber a field with an operator in the name', function () {
+        var result = where.getCondition('is_field is');
+        assert.equal(result.rawField, 'is_field');
+        assert.equal(result.field, '"is_field"');
+        assert.equal(result.operation.operator, 'IS');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should not clobber a quoted field with an operator in the name', function () {
+        var result = where.getCondition('"this is a field" is');
+        assert.equal(result.rawField, 'this is a field');
+        assert.equal(result.field, '"this is a field"');
+        assert.equal(result.operation.operator, 'IS');
+        assert.equal(result.mutator, undefined);
+      });
     });
 
     describe('casting', function () {
+      it('should cast fields without an operator', function () {
+        var result = where.getCondition('field::text');
+        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.field, '"field"::text');
+        assert.equal(result.operation.operator, '=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should cast fields', function () {
         const result = where.getCondition('field::text LIKE');
-        assert.equal(result.rawField, 'field');
+        assert.equal(result.rawField, 'field::text');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
 
+      it.skip('should cast fields with JSON operations', function () {
+        var result = where.getCondition('field->>element::boolean LIKE');
+        assert.equal(result.rawField, '(field->>\'element\')::text');
+        assert.equal(result.field, '("field"->>\'element\')::boolean');
+        assert.equal(result.operation.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should cast quoted fields without an operator', function () {
+        var result = where.getCondition('"field"::text');
+        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.field, '"field"::text');
+        assert.equal(result.operation.operator, '=');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should cast quoted fields', function () {
         const result = where.getCondition('"field"::text LIKE');
-        assert.equal(result.rawField, 'field');
+        assert.equal(result.rawField, 'field::text');
         assert.equal(result.field, '"field"::text');
+        assert.equal(result.operation.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it.skip('should cast quoted fields with JSON operations', function () {
+        var result = where.getCondition('"field"->>element::boolean LIKE');
+        assert.equal(result.rawField, '(field->>\'element\')::text');
+        assert.equal(result.field, '("field"->>\'element\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
