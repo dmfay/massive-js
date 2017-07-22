@@ -32,7 +32,7 @@ mv docs/* .
 
 rm -r docs
 
-# finally commit the updated docs. pushing is still manual
+# finally commit the updated docs
 
 git add .
 
@@ -41,3 +41,5 @@ git commit -m "regenerate documentation for $VERSION ($BRANCH $COMMIT)"
 # return to pre-version state
 
 git checkout "$BRANCH"
+
+echo "docs updated, remember to push the gh-pages branch!"
