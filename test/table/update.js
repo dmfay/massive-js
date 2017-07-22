@@ -12,6 +12,12 @@ describe('update', function () {
   });
 
   describe('single-object updates', function () {
+    it('returns null when updating a record with an invalid primary key', function () {
+      return db.products.update({id: 99999, name: 'new and improved product 4'}).then(res => {
+        assert.isNull(res);
+      });
+    });
+
     it('updates a product by the primary key of a single record', function () {
       return db.products.update({id: 4, name: 'new and improved product 4'}).then(res => {
         assert.equal(res.id, 4);
