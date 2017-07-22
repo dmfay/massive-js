@@ -33,6 +33,8 @@ Text operators are case-insensitive.
 | `>` | `>` | Greater than |
 | `>=` | `>=` | Greater than or equal |
 | `BETWEEN` | `BETWEEN` | Test whether value is between the [lower, upper] bounds of a 2-element array |
+| `IS` | `IS` | Explicit equality test for `NULL` and boolean values |
+| `IS NOT` | `IS NOT` | Explicit inequality test for `NULL` and boolean values |
 | `IS DISTINCT FROM` | `IS DISTINCT FROM` | Difference test with `NULL` considered a fixed value |
 | `IS NOT DISTINCT FROM` | `IS NOT DISTINCT FROM` | Equality test with `NULL` considered a fixed value |
 
