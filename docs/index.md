@@ -89,3 +89,21 @@ massive('postgres://localhost:5432/massive').then(db => {
   });
 });
 ```
+
+### Streaming Results
+
+To improve performance with large result sets, you might want to consider using a stream instead of getting your results in an array all at once. This has the upside of returning _something_ to read right away (which can be a big deal for slow queries too!), but the price is that the connection remains open until you're done. To turn on streaming, add `{stream: true}` to your options object.
+
+```javascript
+db.tests.find({priority: 'low'}, {stream: true}).then(stream => {
+  const tests = [];
+
+  stream.on('readable', () => {
+    tests.push(stream.read());
+  });
+
+  stream.on('end', () => {
+    // do something with tests here
+  });
+});
+```
