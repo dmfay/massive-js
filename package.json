@@ -2,13 +2,19 @@
   "name": "massive",
   "version": "3.1.0",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
+  "homepage": "https://dmfay.github.io/massive-js/",
+  "bugs": "https://github.com/dmfay/massive-js/issues",
   "main": "index.js",
   "bin": {
     "massive": "bin/massive.js"
   },
   "directories": {
-    "example": "example",
+    "bin": "bin",
+    "lib": "lib",
     "test": "test"
+  },
+  "engines": {
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha",
@@ -51,7 +57,7 @@
     "coveralls": "^2.13.1",
     "eslint": "^4.2.0",
     "mocha": "^3.2.0",
-    "nyc": "^11.0.3"
+    "nyc": "^11.1.0"
   },
   "repository": {
     "type": "git",

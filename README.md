@@ -1,5 +1,6 @@
 # Massive.js 3.0: A Postgres-centric Data Access Tool
 
+[![node](https://img.shields.io/node/v/massive.svg)](https://npmjs.org/package/massive)
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 [![Coverage Status](https://coveralls.io/repos/github/dmfay/massive-js/badge.svg)](https://coveralls.io/github/dmfay/massive-js)
 [![Greenkeeper badge](https://badges.greenkeeper.io/dmfay/massive-js.svg)](https://greenkeeper.io/)
@@ -113,7 +114,7 @@ There are many more; see [the full documentation](https://dmfay.github.io/massiv
 
 ### Query Options
 
-The query functions -- `find`, `findOne`, `findDoc`, `search`, and `searchDoc` -- allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed. The options object may be omitted entirely if not needed.
+Some functions, particularly the query functions (`find`, `findOne`, `findDoc`, `search`, and `searchDoc`) allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed. The options object may be omitted entirely if not needed.
 
 ```javascript
 {
@@ -198,7 +199,11 @@ db.issues.count({test_id: 1}).then(total => {...});
 Since Postgres' `count` returns a 64-bit integer and JavaScript only handles up to 53 bits, `total` will actually be a string. But thanks to JavaScript's weak typing this generally doesn't matter. Next, let's actually pull out the issue data:
 
 ```javascript
-db.issues.find({test_id: 1}, {order: [{field: 'created_at', direction: 'desc'}]}).then(issues => {...});
+db.issues.find({
+  test_id: 1
+}, {
+  order: [{field: 'created_at', direction: 'desc'}]
+}).then(issues => {...});
 ```
 
 The second object we passed defines query options; here, we're sorting the issues most recent first. There are many other options which affect query shape and results processing, and the options object can be used with many of the retrieval and persistence functions. The output of our `find` call is the `issues` array, which contains all records in that table matching the criteria we passed to `find`.
@@ -249,12 +254,13 @@ db.test_stats.find({
 Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a `hash` database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:
 
 ```javascript
-db.run('update users set password = hash(password) where id < $1', [3]).then(tests => {
-  // an array of tests matching the criteria
-});
+db.run(
+  'update users set password = hash(password) where id < $1 returning *',
+  [3]
+).then(users => {...});
 ```
 
-`run` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
+The value returned is an array of rows, assuming the query returns anything. `run` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
 
 #### Documents
 
