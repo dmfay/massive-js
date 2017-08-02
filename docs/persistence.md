@@ -58,8 +58,10 @@ Either version of `insert` may be passed additional options:
 db.tests.insert({
   name: 'homepage',
   version: 1,
-}, {build: true}).then(test => {
-  // builds the query without executing it
+}, {
+  onConflictIgnore: true, // add ON CONFLICT DO NOTHING to the query
+}).then(test => {
+  // the inserted row, or `null` if there was a conflict and nothing was inserted
 });
 ```
 
