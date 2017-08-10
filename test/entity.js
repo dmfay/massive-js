@@ -22,21 +22,21 @@ describe('Entity', function () {
     });
   });
 
-  it('should default to the public schema', function () {
+  it('should default to the current schema', function () {
     const e = new Entity({
-      db: 'connected instance',
+      db: { currentSchema: 'other' },
       path: 'one.two',
       name: 'test_entity'
     });
 
     assert.deepEqual(e, {
-      db: 'connected instance',
+      db: { currentSchema: 'other' },
       path: 'one.two',
       name: 'test_entity',
-      schema: 'public',
+      schema: 'other',
       delimitedName: '"test_entity"',
-      delimitedSchema: '"public"',
-      delimitedFullName: '"public"."test_entity"'
+      delimitedSchema: '"other"',
+      delimitedFullName: '"other"."test_entity"'
     });
   });
 });
