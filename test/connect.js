@@ -43,16 +43,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({ host: 'localhost', database: 'massive' }, loader).then(db => {
-        assert.isOk(db);
-        assert.isOk(db.t1);
-
-        return db.instance.$pool.end();
-      });
-    });
-
-    it('connects to localhost with a database name', function () {
-      return massive({ db: 'massive' }, loader).then(db => {
+      return massive({ host: 'localhost', database: 'massive', user: 'postgres' }, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -61,7 +52,7 @@ describe('connecting', function () {
     });
 
     it('rejects with connection errors', function () {
-      return massive({ database: 'doesntexist' }, loader).then(
+      return massive({ database: 'doesntexist', user: 'postgres' }, loader).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');

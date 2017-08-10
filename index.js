@@ -35,6 +35,7 @@ exports = module.exports = (connection, loader = {}, driverConfig = {}) => {
   if (!connection || _.isEmpty(connection)) {
     return Promise.reject('No connection information specified.');
   } else if (Object.keys(connection).length === 1 && (!!connection.database || !!connection.db)) {
+    // TODO db is deprecated and undocumented, remove for 4.0.0
     connection = `postgres://localhost:5432/${connection.database || connection.db}`;
   }
 
