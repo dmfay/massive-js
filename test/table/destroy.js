@@ -29,15 +29,7 @@ describe('destroy', function () {
   });
 
   it('deletes by matching json', function* () {
-    const deleted = yield db.docs.destroy({'body->>title': 'Document 1'});
-    assert.equal(deleted.length, 1);
-
-    const found = yield db.docs.find({id: deleted[0].id});
-    assert.equal(found.length, 0);
-  });
-
-  it('deletes by matching json with whitespace', function* () {
-    const deleted = yield db.docs.destroy({'body ->> title': 'Document 2'});
+    const deleted = yield db.docs.destroy({'body.title': 'Document 1'});
     assert.equal(deleted.length, 1);
 
     const found = yield db.docs.find({id: deleted[0].id});
@@ -45,7 +37,7 @@ describe('destroy', function () {
   });
 
   it('deletes by matching json with quotes', function* () {
-    const deleted = yield db.docs.destroy({'"body" ->> \'title\'': 'Document 3'});
+    const deleted = yield db.docs.destroy({'"body".title': 'Document 3'});
     assert.equal(deleted.length, 1);
 
     const found = yield db.docs.find({id: deleted[0].id});
