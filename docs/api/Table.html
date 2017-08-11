@@ -166,7 +166,30 @@
 
             
 
-            <td class="description last">The entity's name.</td>
+            <td class="description last">The table's name.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pk</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The table's primary key column.</td>
         </tr>
 
     
@@ -189,7 +212,7 @@
 
             
 
-            <td class="description last">Entity's owning schema.</td>
+            <td class="description last">The name of the schema owning the table.</td>
         </tr>
 
     
@@ -237,7 +260,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line21">line 21</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -267,6 +290,17 @@
 
     
     </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Entity.html">Entity</a></li>
+    </ul>
+
 
     
 
@@ -394,205 +428,7 @@
 
             
 
-            <td class="description last">Delete options.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>only</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">False to propagate delete to descendant
-tables.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>build</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return the SQL *instead of* running
-it.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>document</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">This is a query against a document
-table.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>single</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a single object instead of
-an array.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stream</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a stream instead of a
-resultset.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Delete options</a>.</td>
         </tr>
 
     
@@ -633,7 +469,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line161">line 161</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -697,7 +533,7 @@ resultset.</td>
 
 
 <div class="description">
-    Insert a record into the table.
+    Insert a record or records into the table.
 </div>
 
 
@@ -762,8 +598,7 @@ resultset.</td>
 
             
 
-            <td class="description last">A record or records to insert.
-tables.</td>
+            <td class="description last">A record or records to insert.</td>
         </tr>
 
     
@@ -796,103 +631,7 @@ tables.</td>
 
             
 
-            <td class="description last">Insert options.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>build</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return the SQL *instead of* running
-it.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stream</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a stream instead of a
-resultset.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Insert options</a>.</td>
         </tr>
 
     
@@ -933,7 +672,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line43">line 43</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -1196,7 +935,7 @@ criteria object.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line203">line 203</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -1359,171 +1098,7 @@ returned.
 
             
 
-            <td class="description last">An options object.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>only</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">False to propagate update to descendant
-tables.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>build</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return the SQL *instead of* running
-it.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>single</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a single object instead of
-an array.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stream</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a stream instead of a
-resultset.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Insert/update options</a>.</td>
         </tr>
 
     
@@ -1564,7 +1139,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line130">line 130</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line109">line 109</a>
     </li></ul></dd>
     
 
@@ -1722,7 +1297,7 @@ body.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line172">line 172</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line141">line 141</a>
     </li></ul></dd>
     
 
@@ -1917,205 +1492,7 @@ a hash of column names to their new values.</td>
 
             
 
-            <td class="description last">Update options.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>only</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">False to propagate update to descendant
-tables.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>build</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return the SQL *instead of* running
-it.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>document</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">This is a query against a document
-table.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>single</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a single object instead of
-an array.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stream</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">True to return a stream instead of a
-resultset.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Update options</a>.</td>
         </tr>
 
     
@@ -2156,7 +1533,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line81">line 81</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -2229,7 +1606,7 @@ modified record; otherwise, an array containing any modified records.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Sat Jul 22 2017 02:09:31 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
