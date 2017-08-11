@@ -12,7 +12,7 @@ A criteria object is a "plain old JavaScript object" where keys represent the fi
 const criteria = {
   is_active: true,
   'name like': '%homepage%',
-  'stats ->> runs >': 5
+  'stats.runs >': 5
 };
 ```
 
@@ -78,10 +78,4 @@ const criteria = {
 
 ## JSON Traversal
 
-Massive supports searching in JSON and JSONB fields using the common traversal operators. You can quote fields yourself or leave it up to the parser.
-
-JSON traversal operators and SQL operations may be combined.
-
-`field ->> key` generates a predicate in the `WHERE` clause testing the value at `field.key`. 
-
-`field #>> {one, two, three}` generates a predicate in the `WHERE` clause testing the deeply-nested value at `field.one.two.three`.
+Massive supports searching in JSON and JSONB fields using idiomatic JavaScript paths. Use dots to traverse fields, and [] brackets to denote array indices. JSON traversal may be combined with SQL operations and casts (the cast applies to the value in the JSON field at the specified path, not to the JSON field itself).

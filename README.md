@@ -106,7 +106,7 @@ Many functions use criteria objects to build a query WHERE clause. A criteria ob
   'field ~': 'val[ue]+',          // regexp match
   'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
   'field @>': ['value', 'Value'], // array contains
-  'field ->> attr': 'value'       // JSON traversal
+  'field.arr[1].item': 'value'    // JSON traversal
 }
 ```
 
