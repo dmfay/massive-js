@@ -200,6 +200,12 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '"json"#>>\'{123,456}\'');
       });
+
+      it('should format mixed JSON paths', function () {
+        const result = where.getCondition('json.array[1].field.array[2]');
+        assert.equal(result.rawField, 'json');
+        assert.equal(result.field, '"json"#>>\'{array,1,field,array,2}\'');
+      });
     });
 
     describe('operations', function () {
@@ -362,6 +368,14 @@ describe('WHERE clause generation', function () {
         assert.equal(result.mutator, undefined);
       });
 
+      it('should format mixed JSON paths', function () {
+        const result = where.getCondition('json.array[1].field.array[2]::boolean LIKE');
+        assert.equal(result.rawField, 'json');
+        assert.equal(result.field, '("json"#>>\'{array,1,field,array,2}\')::boolean');
+        assert.equal(result.operation.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
       it('should cast quoted fields without an operator', function () {
         var result = where.getCondition('"field"::text');
         assert.equal(result.rawField, 'field');
@@ -398,6 +412,14 @@ describe('WHERE clause generation', function () {
         var result = where.getCondition('"field"[123]::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>123)::boolean');
+        assert.equal(result.operation.operator, 'LIKE');
+        assert.equal(result.mutator, undefined);
+      });
+
+      it('should format quoted fields with mixed JSON paths', function () {
+        const result = where.getCondition('"json".array[1].field.array[2]::boolean LIKE');
+        assert.equal(result.rawField, 'json');
+        assert.equal(result.field, '("json"#>>\'{array,1,field,array,2}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
       });
