@@ -22,14 +22,15 @@ db.tests.find({
 
 Certain SQL clauses are used with different types of query. For example, a `LIMIT` clause can only be used with a function which emits a `SELECT` such as `find` or `count`.
 
-| Option key | Use in | Description |
-|------------|--------|-------------|
-| columns    | `SELECT` | Change the `SELECT` list by specifying an array of columns to include in the resultset. |
-| limit      | `SELECT` | Set the number of rows to take. |
-| offset     | `SELECT` | Set the number of rows to skip. |
-| only       | `SELECT`, `UPDATE`, `DELETE` | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
-| order      | `SELECT` | An array of strings (`['column1', 'column2 DESC']`) which is processed into an `ORDER BY` clause. |
-| orderBody  | `SELECT` | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
+| Option key       | Use in | Description |
+|------------------|--------|-------------|
+| columns          | `SELECT` | Change the `SELECT` list by specifying an array of columns to include in the resultset. |
+| limit            | `SELECT` | Set the number of rows to take. |
+| offset           | `SELECT` | Set the number of rows to skip. |
+| only             | `SELECT`, `UPDATE`, `DELETE` | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
+| order            | `SELECT` | An array of strings (`['column1', 'column2 DESC']`) which is processed into an `ORDER BY` clause. |
+| orderBody        | `SELECT` | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
+| onConflictIgnore | `INSERT` | If the inserted data would violate a unique constraint, do nothing. |
 
 *nb. The `columns` and `order` properties allow comma-delimited string as well as array values. Take care when using raw strings since the values are interpolated directly into the emitted SQL. If user input is included in the values, you open yourself up to SQL injection attacks.*
 
