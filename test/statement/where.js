@@ -195,10 +195,10 @@ describe('WHERE clause generation', function () {
         assert.equal(result.field, '"json field"#>>\'{outer,inner}\'');
       });
 
-      it('should format a deep JSON path with numeric object keys', function () {
+      it('should format a deep JSON path with numeric keys', function () {
         const result = where.getCondition('json.123.456');
         assert.equal(result.rawField, 'json');
-        assert.equal(result.field, '"json"#>>\'123\'.\'456\'');
+        assert.equal(result.field, '"json"#>>\'{123,456}\'');
       });
     });
 
@@ -267,7 +267,7 @@ describe('WHERE clause generation', function () {
       it('should get operations for a JSON array', function () {
         const result = where.getCondition('json[1] <=');
         assert.equal(result.rawField, 'json');
-        assert.equal(result.field, '"json"#>>\'{outer,inner}\'');
+        assert.equal(result.field, '"json"->>1');
         assert.equal(result.operation.operator, '<=');
         assert.equal(result.mutator, undefined);
       });
@@ -284,14 +284,6 @@ describe('WHERE clause generation', function () {
         var result = where.getCondition('field >=');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"');
-        assert.equal(result.operation.operator, '>=');
-        assert.equal(result.mutator, undefined);
-      });
-
-      it('should distinguish > in traversers and operations', function () {
-        var result = where.getCondition('field->>key >=');
-        assert.equal(result.rawField, 'field');
-        assert.equal(result.field, '"field"->>\'key\'');
         assert.equal(result.operation.operator, '>=');
         assert.equal(result.mutator, undefined);
       });
@@ -332,7 +324,7 @@ describe('WHERE clause generation', function () {
     describe('casting', function () {
       it('should cast fields without an operator', function () {
         var result = where.getCondition('field::text');
-        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, '=');
         assert.equal(result.mutator, undefined);
@@ -340,7 +332,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast fields', function () {
         const result = where.getCondition('field::text LIKE');
-        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -348,7 +340,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast fields with shallow JSON paths', function () {
         var result = where.getCondition('field.element::boolean LIKE');
-        assert.equal(result.rawField, '(field->>\'element\')::boolean');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>\'element\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -356,7 +348,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast fields with deep JSON paths', function () {
         var result = where.getCondition('field.one.two::boolean LIKE');
-        assert.equal(result.rawField, '(field#>>\'{one,two}\')::boolean');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"#>>\'{one,two}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -364,7 +356,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast fields with JSON arrays', function () {
         var result = where.getCondition('field[123]::boolean LIKE');
-        assert.equal(result.rawField, '(field->>123)::boolean');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>123)::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -372,7 +364,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast quoted fields without an operator', function () {
         var result = where.getCondition('"field"::text');
-        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, '=');
         assert.equal(result.mutator, undefined);
@@ -380,7 +372,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast quoted fields', function () {
         const result = where.getCondition('"field"::text LIKE');
-        assert.equal(result.rawField, 'field::text');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -388,7 +380,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast quoted fields with JSON operations', function () {
         var result = where.getCondition('"field".element::boolean LIKE');
-        assert.equal(result.rawField, '(field->>\'element\')::text');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>\'element\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -396,7 +388,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast quoted fields with deep JSON paths', function () {
         var result = where.getCondition('"field".one.two::boolean LIKE');
-        assert.equal(result.rawField, '(field#>>\'{one,two}\')::boolean');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"#>>\'{one,two}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);
@@ -404,7 +396,7 @@ describe('WHERE clause generation', function () {
 
       it('should cast quoted fields with JSON arrays', function () {
         var result = where.getCondition('"field"[123]::boolean LIKE');
-        assert.equal(result.rawField, '(field->>123)::boolean');
+        assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>123)::boolean');
         assert.equal(result.operation.operator, 'LIKE');
         assert.equal(result.mutator, undefined);

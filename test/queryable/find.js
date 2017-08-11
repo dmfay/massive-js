@@ -205,31 +205,31 @@ describe('find', function () {
 
   describe('JSON queries', function () {
     it('finds a product matching the desired spec field in JSON', function () {
-      return db.products.findOne({'specs->>weight': 30}).then(product => {
+      return db.products.findOne({'specs.weight': 30}).then(product => {
         assert.equal(product.id, 3);
         assert.equal(product.specs.weight, 30);
       });
     });
     it('finds a product matching the desired spec index in JSON', function () {
-      return db.products.findOne({'specs->>4': 'array'}).then(product => {
+      return db.products.findOne({'specs[4]': 'array'}).then(product => {
         assert.equal(product.id, 4);
         assert.equal(product.specs[4], 'array');
       });
     });
     it('finds a product matching the desired spec path in JSON', function () {
-      return db.products.findOne({'specs#>>{dimensions,length}': 15}).then(product => {
+      return db.products.findOne({'specs.dimensions.length': 15}).then(product => {
         assert.equal(product.id, 2);
         assert.equal(product.specs.dimensions.length, 15);
       });
     });
     it('finds a product with a spec matching an IN list', function () {
-      return db.products.findOne({'specs->>weight': [30, 35]}).then(product => {
+      return db.products.findOne({'specs.weight': [30, 35]}).then(product => {
         assert.equal(product.id, 3);
         assert.equal(product.specs.weight, 30);
       });
     });
     it('mixes JSON and non-JSON predicates', function () {
-      return db.products.findOne({price: 35.00, 'specs->>weight': 30}).then(product => {
+      return db.products.findOne({price: 35.00, 'specs.weight': 30}).then(product => {
         assert.equal(product.id, 3);
         assert.equal(product.specs.weight, 30);
       });
@@ -308,7 +308,7 @@ describe('find', function () {
       });
     });
 
-    it('orders by fields in the document body', function () {
+    it('orders by fields in the document body with raw traversal', function () {
       // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
       return db.docs.find('*', {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
         assert.lengthOf(docs, 4);
@@ -319,7 +319,7 @@ describe('find', function () {
       });
     });
 
-    it('orders by fields in the document body with criteria', function () {
+    it('orders by fields in the document body with a field spec', function () {
       return db.docs.find('*', {
         order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true,
