@@ -12,7 +12,7 @@ Document tables exist for the sole purpose of storing JSONB data. Query them thr
 
 Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
 
-Standard table functions still work on document tables, and can be quite useful especially for extended document tables! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body ->> myField`. `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
+Standard table functions still work on document tables, and can be quite useful especially for extended document tables! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body.myField.anArray[1].aField`. `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
 
 ### db.saveDoc
 
@@ -103,9 +103,9 @@ db.reports.saveDoc({
 
 ### modify
 
-`modify` adds and updates fields in an existing document _without_ replacing the entire body. Fields not defined in the `changes` object are not modified.
+`modify` adds and updates fields in an existing document or documents _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `modify` takes an ID or criteria object, a changes object, and an optional name for the JSON or JSONB column.
 
-This function may be used with any JSON or JSONB column, not just with document tables. If used on a document table, it returns a promise for the updated document; otherwise, it will return the entire row.
+This function may be used with any JSON or JSONB column, not just with document tables, but the behavior is slightly different. With document tables, criteria objects will be tested against the document body; with other tables, they will be tested against the row. Likewise, the promise returned will be for the updated document with a document table, or for the entire row with another table.
 
 ```javascript
 db.reports.modify(1, {
@@ -114,9 +114,15 @@ db.reports.modify(1, {
   // the updated report, with a changed 'title' attribute
 });
 
-db.products.modify(1, {
+db.products.modify({
+  type: 'widget'
+}, {
   colors: ['gray', 'purple', 'red']
-}, 'info').then(widget => {
-  // the product with an 'info' field containing the colors array
+}, 'info').then(widgets => {
+  // an array of widgets, now in at least three colors.
+  // since products is not a document table (note the
+  // 'info' field was specified to update), the 'type'
+  // is tested against a column named type rather than
+  // a key in the info JSON or JSONB column.
 });
 ```

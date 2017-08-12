@@ -1,6 +1,6 @@
 'use strict';
 
-const Query = require('../../lib/query/query');
+const Select = require('../../lib/statement/select');
 
 describe('query', function() {
   let db;
@@ -25,7 +25,11 @@ describe('query', function() {
   });
 
   it('runs a query', function() {
-    const query = new Query({column1: 'hi'}, {columns: ['column1']}, {delimitedFullName: `(values ('hi'), ('ih')) temp`});
+    const query = new Select(
+      {delimitedFullName: `(values ('hi'), ('ih')) temp`, isPkSearch: () => false},
+      {column1: 'hi'},
+      {columns: ['column1']}
+    );
 
     return db.query(query).then(result => {
       assert.lengthOf(result, 1);
@@ -34,16 +38,16 @@ describe('query', function() {
   });
 
   it('builds a query without executing', function() {
-    const query = new Query(
+    const query = new Select(
+      {delimitedFullName: "(values ('hi'), ('ih')) temp", isPkSearch: () => false},
       {column1: 'hi'},
-      {columns: ['column1'], build: true},
-      {delimitedFullName: "(values ('hi'), ('ih')) temp"
-    });
+      {columns: ['column1'], build: true}
+    );
 
     return db.query(query).then(result => {
       assert.isObject(result);
       assert.deepEqual(result, {
-        sql: `SELECT column1 FROM (values ('hi'), ('ih')) temp\nWHERE "column1" = $1 ORDER BY 1`,
+        sql: `SELECT column1 FROM (values ('hi'), ('ih')) temp WHERE "column1" = $1 ORDER BY 1`,
         params: ['hi']
       });
     });

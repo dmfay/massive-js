@@ -25,4 +25,22 @@ describe('save', function () {
       assert.equal(res.name, "Fender Stratocaster");
     });
   });
+
+  it('applies options to inserts', function () {
+    return db.products.save({name: 'another kind of product'}, {build: true}).then(res => {
+      assert.deepEqual(res, {
+        sql: 'INSERT INTO "products" ("name") VALUES ($1) RETURNING *',
+        params: ['another kind of product']
+      });
+    });
+  });
+
+  it('applies options to updates', function () {
+    return db.products.save({id: 1, name: 'another kind of product'}, {build: true}).then(res => {
+      assert.deepEqual(res, {
+        sql: 'UPDATE "products" SET "name" = $1 WHERE "id" = $2 RETURNING *',
+        params: ['another kind of product', 1]
+      });
+    });
+  });
 });

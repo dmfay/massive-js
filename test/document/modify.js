@@ -55,4 +55,25 @@ describe('modify', function () {
       assert.deepEqual(doc.obj, {field: 'value'});
     });
   });
+
+  it('uses criteria objects', function() {
+    return db.docs.modify({name: 'foo'}, {appliedCriteria: true}).then(docs => {
+      assert.lengthOf(docs, 1);
+      assert.isTrue(docs[0].appliedCriteria);
+    });
+  });
+
+  it('works with non-document json fields by id', function() {
+    return db.products.modify(2, {appliedCriteria: true}, 'specs').then(product => {
+      assert.isOk(product);
+      assert.isTrue(product.specs.appliedCriteria);
+    });
+  });
+
+  it('works with non-document json fields by *row* criteria', function() {
+    return db.products.modify({name: 'Product 3'}, {appliedCriteria: true}, 'specs').then(products => {
+      assert.lengthOf(products, 1);
+      assert.isTrue(products[0].specs.appliedCriteria);
+    });
+  });
 });

@@ -48,8 +48,8 @@ describe('search', function () {
     assert.equal(one[1].id, two[0].id);
   });
   it('returns results filtered by where', function () {
-    return db.docs.search({fields: ['body->>\'description\''], term: 'C:*', where: {'body->>is_good': 'true'}}).then(res => {
-      assert.lengthOf(res, 1);
+    return db.products.search({fields: ['description'], term: 'description', where: {'in_stock': true}}).then(res => {
+      assert.lengthOf(res, 2);
     });
   });
 });

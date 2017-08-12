@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2>Table</h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Table<span class="signature">(args)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -40,7 +40,9 @@
 
     
 
+    
     <h4 class="name" id="Table"><span class="type-signature"></span>new Table<span class="signature">(args)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -164,7 +166,30 @@
 
             
 
-            <td class="description last">The entity's name.</td>
+            <td class="description last">The table's name.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pk</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The table's primary key column.</td>
         </tr>
 
     
@@ -187,7 +212,7 @@
 
             
 
-            <td class="description last">Entity's owning schema.</td>
+            <td class="description last">The name of the schema owning the table.</td>
         </tr>
 
     
@@ -235,7 +260,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line18">line 18</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -245,6 +270,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -265,12 +292,25 @@
     </div>
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Entity.html">Entity</a></li>
+    </ul>
+
 
     
 
     
 
-     
+    
+
+    
+
+    
 
     
 
@@ -284,89 +324,9 @@
 
     
 
-    <h4 class="name" id="containsPk"><span class="type-signature"></span>containsPk<span class="signature">()</span><span class="type-signature"></span></h4>
-
     
-
-
-
-<div class="description">
-    Test whether args contains this table's primary key.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
+    <h4 class="name" id="destroy"><span class="type-signature"></span>destroy<span class="signature">(criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line125">line 125</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="destroy"><span class="type-signature"></span>destroy<span class="signature">(args)</span><span class="type-signature"></span></h4>
 
     
 
@@ -397,6 +357,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -409,7 +371,7 @@
 
         <tr>
             
-                <td class="name"><code>args</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -422,10 +384,51 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">Deletion criteria object.</td>
+            <td class="description last">A criteria object or primary key.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Delete options</a>.</td>
         </tr>
 
     
@@ -466,7 +469,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line152">line 152</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -489,6 +492,30 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of deleted records.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -497,14 +524,16 @@
 
     
 
-    <h4 class="name" id="insert"><span class="type-signature"></span>insert<span class="signature">(data)</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="insert"><span class="type-signature"></span>insert<span class="signature">(data, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
 
 
 <div class="description">
-    Insert a record into the table.
+    Insert a record or records into the table.
 </div>
 
 
@@ -527,6 +556,8 @@
 
         <th>Type</th>
 
+        
+        <th>Attributes</th>
         
 
         
@@ -556,10 +587,51 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">A record or records to insert.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Insert options</a>.</td>
         </tr>
 
     
@@ -600,7 +672,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line32">line 32</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line40">line 40</a>
     </li></ul></dd>
     
 
@@ -623,6 +695,30 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array containing the newly inserted row or rows.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -631,7 +727,9 @@
 
     
 
-    <h4 class="name" id="modify"><span class="type-signature"></span>modify<span class="signature">(id, changes, field<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="modify"><span class="type-signature"></span>modify<span class="signature">(criteria, changes, field<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -639,7 +737,15 @@
 
 <div class="description">
     Update a document, adding new information and changing existing information.
-This function can be used with any JSON field, not just document tables.
+This function can be used with any JSON field, not just document tables;
+however, only document tables can use criteria objects which directly
+reference document fields.
+
+If calling modify with a criteria object for a non-document table, the
+criteria will be tested against the entire row (as opposed to the document
+body as it is for document tables). To test elements of the JSON field in a
+non-document table with a criteria object, use the JSON traversal operators
+->> and #>>.
 </div>
 
 
@@ -679,7 +785,7 @@ This function can be used with any JSON field, not just document tables.
 
         <tr>
             
-                <td class="name"><code>id</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -689,6 +795,9 @@ This function can be used with any JSON field, not just document tables.
 |
 
 <span class="param-type">Number</span>
+|
+
+<span class="param-type">Object</span>
 
 
             
@@ -710,7 +819,8 @@ This function can be used with any JSON field, not just document tables.
                 </td>
             
 
-            <td class="description last">Primary key of the document or row to modify.</td>
+            <td class="description last">Primary key of the document, or a
+criteria object.</td>
         </tr>
 
     
@@ -825,7 +935,7 @@ This function can be used with any JSON field, not just document tables.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line196">line 196</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -852,7 +962,8 @@ This function can be used with any JSON field, not just document tables.
 
         
 <div class="param-desc">
-    If modifying a document table, the document; otherwise, the modified row.
+    If modifying a document table, the document; otherwise, the
+modified row.
 </div>
 
 
@@ -873,20 +984,26 @@ This function can be used with any JSON field, not just document tables.
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(args)</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">(record, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
 
 
 <div class="description">
-    Insert (if it does not have a primary key value) or update (otherwise) a
-record.
+    Performs an upsert. If the record does not include a value for the primary
+key column, it will be inserted and the persisted record (including primary
+key) returned; if it does, the row will be updated and the modified record
+returned.
 </div>
 
 
@@ -910,6 +1027,8 @@ record.
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -922,7 +1041,7 @@ record.
 
         <tr>
             
-                <td class="name"><code>args</code></td>
+                <td class="name"><code>record</code></td>
             
 
             <td class="type">
@@ -935,10 +1054,51 @@ record.
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">Record to upsert.</td>
+            <td class="description last">The record to upsert.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Insert/update options</a>.</td>
         </tr>
 
     
@@ -979,7 +1139,7 @@ record.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line136">line 136</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line109">line 109</a>
     </li></ul></dd>
     
 
@@ -1002,6 +1162,30 @@ record.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The inserted or updated record object.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -1010,7 +1194,9 @@ record.
 
     
 
+    
     <h4 class="name" id="saveDoc"><span class="type-signature"></span>saveDoc<span class="signature">(doc)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -1111,7 +1297,7 @@ body.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line168">line 168</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line141">line 141</a>
     </li></ul></dd>
     
 
@@ -1159,12 +1345,16 @@ body.
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(conditions, fields)</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(criteria, fields, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -1174,8 +1364,8 @@ body.
     Update a record.
 
 May be invoked with a complete record (including primary key), or with a
-conditions criteria object and a map of fields to new values. Multi-row
-updates are only possible through the latter usage.
+criteria object and a map of fields to new values. Multi-row updates are
+only possible through the latter usage.
 </div>
 
 
@@ -1199,6 +1389,8 @@ updates are only possible through the latter usage.
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1211,7 +1403,7 @@ updates are only possible through the latter usage.
 
         <tr>
             
-                <td class="name"><code>conditions</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -1223,6 +1415,14 @@ updates are only possible through the latter usage.
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1247,11 +1447,52 @@ updates are only possible through the latter usage.
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">If using a criteria object, a hash of column names
-to their new values.</td>
+            <td class="description last">If using a criteria object without a primary key,
+a hash of column names to their new values.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Update options</a>.</td>
         </tr>
 
     
@@ -1292,7 +1533,7 @@ to their new values.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line72">line 72</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -1315,6 +1556,31 @@ to their new values.</td>
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    If updating a single record by its primary key, the
+modified record; otherwise, an array containing any modified records.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -1334,13 +1600,13 @@ to their new values.</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Jun 25 2017 01:08:15 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

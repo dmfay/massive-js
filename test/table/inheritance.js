@@ -43,14 +43,26 @@ describe('Table Inheritance', function () {
   });
 
   describe('Writing via the parent table', function () {
-    it('does not update descendant rows from the parent table', function () {
+    it('updates descendant rows from the parent table by default', function () {
       return db.cities.update({name: 'Phoenix'}, {population: 1563099}).then(res => {
+        assert.equal(res.length, 1);
+      });
+    });
+
+    it('does not update descendant rows from the parent table if only is set', function () {
+      return db.cities.update({name: 'Phoenix'}, {population: 1563099}, {only: true}).then(res => {
         assert.equal(res.length, 0);
       });
     });
 
-    it('does not delete descendant rows from the parent table', function () {
+    it('deletes descendant rows from the parent table by default', function () {
       return db.cities.destroy({name: 'Nashville'}).then(res => {
+        assert.equal(res.length, 1);
+      });
+    });
+
+    it('does not delete descendant rows from the parent table if only is set', function () {
+      return db.cities.destroy({name: 'Phoenix'}, {only: true}).then(res => {
         assert.equal(res.length, 0);
       });
     });

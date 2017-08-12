@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/query/where.js</title>
+    <title>JSDoc: Source: lib/statement/where.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/query/where.js</h1>
+    <h1 class="page-title">Source: lib/statement/where.js</h1>
 
     
 
@@ -32,91 +32,132 @@
 
 const _ = require('lodash');
 const ops = require('./operations');
-const cast = new RegExp(/(::\w+)/);
-const sanitizeForRegexp = new RegExp(/([^a-zA-Z0-9\s])/g);
-const traversers = new RegExp(/[-#]>>/);
 
 /**
- * Remove whitespace from an array of token strings.
- * @param {Array} arr - Array of tokens.
- * @return {Array} The array with leading/trailing whitespace removed from each token.
- */
-const strip = (arr) => {
-  return _.without(arr.map(function (s) { return s.trim(); }), '');
-};
-
-/**
- * Search a string and return a specific element from any output match.
+ * Parse out a criterion key into something more intelligible. Massive is more
+ * flexible than Postgres' query parser, with more alternate aliases for
+ * operations and looser rules about quoting, especially with JSON fields. This
+ * necessitates some pretty gnarly parsing.
  *
- * @param {String} str - Input string.
- * @param {RegExp} regex - Regular expression to test.
- * @param {Number} outputIndex - Match element index we're interested in.
- * @return {String} value at outputIndex of the match, if one exists.
- */
-const getMatch = (str, regex, outputIndex) => {
-  const match = regex.exec(str);
-
-  if (match) { return match[outputIndex]; }
-
-  return '';
-};
-
-/**
- * Quote a string, if it isn't already quoted.
- */
-const quote = (str, delim='"') => {
-  if (str &amp;&amp; !str.startsWith(delim)) {
-    return `${delim}${str}${delim}`;
-  }
-
-  return str;
-};
-
-/**
- * Remove quotes from a string.
- */
-const unquote = (str, delim='"') => {
-  if (str &amp;&amp; str.startsWith(delim) &amp;&amp; str.endsWith(delim)) {
-    return str.slice(1, -1);
-  }
-
-  return str;
-};
-
-/**
- * Tokenize the predicate key and determine the field and operation.
+ * @param  {String} key Key in a format resembling "field [JSON operation+path] operation"
+ * @return {Object}     [description]
  */
 const getCondition = function (key) {
-  const traverser = getMatch(key, traversers, 0);
-  const operation = ops(key.toLowerCase().replace(traversers, '')); // remove JSON pathing and make case consistent
+  key = key.trim();
 
-  const splitOn = ['::'];
+  var i = 0,
+    char = key.charAt(i),
+    parsed = [[]],          // collect token arrays
+    buffer = parsed[0],     // start with the first token
+    inQuotedField = false,  // to turn off token break on whitespace
+    hasTraverser = false,   // final structure depends on presence of a JSON op
+    inTraverser = false,    // distinguish > in traversers from > as an operation
+    isJSONQuoted = false,   // was the JSON element quoted (for numeric keys)?
+    hasCast = false;        // make sure we pull the appropriate token for castType
 
-  if (traverser) { splitOn.push(traverser); }
-  if (operation.key) { splitOn.push(operation.key.replace(sanitizeForRegexp, '\\$1')); }
+  do {
+    switch (char) {
+      case '"':
+        // quoted field
+        if (i === 0) {
+          inQuotedField = true;   // just starting out, use the initial token
+        } else {
+          inQuotedField = false;  // finishing the quoted field, new token
+          buffer = parsed[parsed.push([]) - 1];
+        }
+        break;
+      case "'":
+        //starting or ending a json element; new token
+        buffer = parsed[parsed.push([]) - 1];
+        isJSONQuoted = true;
+        break;
+      case ':':
+        // cast; new token, but we ignore the : characters since we only care about type
+        if (!hasCast) {
+          hasCast = true;
 
-  const tokenizer = new RegExp(`${splitOn.join('|')}`, 'i');
+          buffer = parsed[parsed.push([]) - 1];
+        }
+        break;
+      case '-': case '#':
+        // starting a json traverser; set up tracking and begin a new token
+        hasTraverser = true;
+        inTraverser = true;   // have to track for >
+        buffer = parsed[parsed.push([]) - 1];
+        buffer.push(char);
+        break;
+      case ' ': case '\t': case '\r': case '\n':
+        // whitespace; separates tokens everywhere except in quoted fields
+        if (!inQuotedField) {
+          buffer = parsed[parsed.push([]) - 1];
+          break;  // if this is a quoted field, fall through to default
+        }
+      case '>':   // eslint-disable-line no-fallthrough
+        // could be a json traverser, could be an operator. if the former *and*
+        // it's the third and last character of a traverser, we're done with
+        // this token; otherwise, just append it to the current buffer.
+        if (inTraverser) {
+          buffer.push(char);
 
-  const tokens = strip(key.split(tokenizer));
+          if (buffer.length === 3) {
+            inTraverser = false;
+            buffer = parsed[parsed.push([]) - 1];
+          }
 
-  const rawField = unquote(tokens.shift());
-  const field = quote(rawField);
-  let jsonPath = '';
+          break;
+        }
+      default:    // eslint-disable-line no-fallthrough
+        buffer.push(char);
+        break;
+    }
 
-  if (traverser) {
-    const token = tokens.shift();
+    i++;
+  } while (char = key.charAt(i)); // eslint-disable-line no-cond-assign
 
-    if (!isNaN(parseInt(token))) { jsonPath = token; }
-    else { jsonPath = quote(token, "'"); }
+  parsed = parsed.reduce(function (acc, p) {
+    var str = p.join('').trim();
+
+    if (str) { acc.push(str); }
+
+    return acc;
+  }, []);
+
+  var field = parsed.shift(), traverser, element, castType, operation;
+  var quotedField;
+
+  if (hasTraverser) {
+    traverser = parsed.shift();
+    element = parsed.shift();
+
+    // treat numeric json keys as array indices, otherwise quote it
+    if (isJSONQuoted || isNaN(element)) { element = `'${element}'`; }
   }
 
-  const castTo = getMatch(key, cast, 1);
+  if (hasCast) {
+    castType = parsed.shift();
+
+    quotedField = `"${field}"::${castType}`;
+    field = `${field}::${castType}`;
+  } else {
+    quotedField = `"${field}"`;
+  }
+
+  if (parsed[0]) {
+    // anything remaining is part of an operator
+    operation = ops(parsed.join(' ').toLowerCase());
+  } else {
+    operation = ops('=');
+  }
+
+  if (hasTraverser) {
+    quotedField = `${quotedField}${traverser}${element}`;
+  }
 
   return {
-    rawField: rawField,
-    field: `${field}${traverser}${jsonPath}${castTo}`,
+    rawField: field,
+    field: quotedField,
     operation: operation,
-    isJSON: !!traverser
+    isJSON: hasTraverser
   };
 };
 
@@ -141,9 +182,14 @@ const generator = function (condition) {
  * Generate a predicate for a document query.
  */
 const docGenerator = function (condition, conditions) {
+  //case to check if key exist or not
+  if (condition.operation.operator === 'IS' || condition.operation.operator === 'IS NOT') {
+    condition.rawField = `("body" ->> '${condition.rawField}')`;
+  }
+
   //if we have an array of objects, this is a deep traversal
   //we'll need to use a contains query to be sure we flex the index
-  if(_.isArray(condition.value) &amp;&amp; _.isPlainObject(condition.value[0])) {
+  else if (_.isArray(condition.value) &amp;&amp; _.isPlainObject(condition.value[0])) {
     condition.rawField = '"body"';
     condition.operation.operator = '@>';
     condition.params.push(JSON.stringify(conditions));
@@ -271,15 +317,13 @@ const generateConjunction = (conditions, offset, generator) => {
 /**
  * Query conditions generator.
  *
- * @param {Object} [conditions={}] - Query criteria mapping column names (optionally
+ * @param {Object} criteria - Query criteria mapping column names (optionally
  * including operation eg 'my_field &lt;>') to the parameter values. Predicates
  * generated from a criteria object are joined together with `and`; an `or` key
  * denotes an array of nested criteria objects, the collected predicates from
  * each of which are parenthesized and joined with `or`.
  * @param {Number} [offset=0] - Added to the token index value in the prepared
  * statement (with offset 0, parameters will start $1, $2, $3).
- * @param {String} [prefix='\nWHERE '] - SQL snippet prefixed to the generated
- * predicate string.
  * @param {String} [generator=generator] - Generator functions mutate the SQL
  * output.
  *
@@ -288,19 +332,18 @@ const generateConjunction = (conditions, offset, generator) => {
  * parameters for the prepared statement, and the `predicates` field the raw
  * predicate mapping.
  */
-exports = module.exports = function (conditions = {}, offset = 0, prefix = '\nWHERE ', generator = 'generator') {
-  if ((_.isPlainObject(conditions) &amp;&amp; _.isEmpty(conditions)) || conditions === '*') {
+exports = module.exports = function (criteria, offset = 0, generator = 'generator') {
+  if ((_.isPlainObject(criteria) &amp;&amp; _.isEmpty(criteria)) || criteria === '*') {
     return {
-      conditions: prefix + 'TRUE',
+      conditions: 'TRUE',
       params: []
     };
   }
 
-  const conjunction = generateConjunction(conditions, offset, generator);
+  const conjunction = generateConjunction(criteria, offset, generator);
 
   return {
-    conditions: prefix + conjunction.predicates.join(' \nAND '),
-    predicates: conjunction.predicates,
+    conditions: conjunction.predicates.join(' AND '),
     params: conjunction.params
   };
 };
@@ -318,13 +361,13 @@ exports.getCondition = getCondition;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Jun 25 2017 01:08:15 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

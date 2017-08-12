@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2>Queryable</h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Queryable<span class="signature">(args)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -40,7 +40,9 @@
 
     
 
+    
     <h4 class="name" id="Queryable"><span class="type-signature"></span>new Queryable<span class="signature">(args)</span><span class="type-signature"></span></h4>
+    
 
     
 
@@ -164,7 +166,7 @@
 
             
 
-            <td class="description last">The entity's name.</td>
+            <td class="description last">The table or view's name.</td>
         </tr>
 
     
@@ -187,7 +189,8 @@
 
             
 
-            <td class="description last">Entity's owning schema.</td>
+            <td class="description last">The name of the schema owning the table or
+view.</td>
         </tr>
 
     
@@ -235,7 +238,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line19">line 19</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -261,16 +264,31 @@
 
 
 
+
+
     
     </div>
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Entity.html">Entity</a></li>
+    </ul>
+
 
     
 
     
 
-     
+    
+
+    
+
+    
 
     
 
@@ -284,7 +302,9 @@
 
     
 
+    
     <h4 class="name" id="count"><span class="type-signature"></span>count<span class="signature">(conditions, params)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -414,7 +434,7 @@ predicates.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line49">line 49</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -462,12 +482,16 @@ predicates.</td>
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="countDoc"><span class="type-signature"></span>countDoc<span class="signature">(conditions)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="countDoc"><span class="type-signature"></span>countDoc<span class="signature">(criteria)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -511,7 +535,7 @@ criteria objects.
 
         <tr>
             
-                <td class="name"><code>conditions</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -568,7 +592,7 @@ criteria objects.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line70">line 70</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -616,12 +640,16 @@ criteria objects.
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="find"><span class="type-signature"></span>find<span class="signature">(conditions<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="find"><span class="type-signature"></span>find<span class="signature">(criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -666,7 +694,7 @@ criteria objects.
 
         <tr>
             
-                <td class="name"><code>conditions</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -676,6 +704,9 @@ criteria objects.
 |
 
 <span class="param-type">String</span>
+|
+
+<span class="param-type">Number</span>
 
 
             
@@ -683,8 +714,6 @@ criteria objects.
 
             
                 <td class="attributes">
-                
-                    &lt;optional><br>
                 
 
                 
@@ -695,8 +724,8 @@ criteria objects.
 
             
 
-            <td class="description last">A criteria object, prebuilt predicate,
-or raw primary key value.</td>
+            <td class="description last">A criteria object, prebuilt
+predicate, or raw primary key value.</td>
         </tr>
 
     
@@ -729,7 +758,7 @@ or raw primary key value.</td>
 
             
 
-            <td class="description last">Query options.</td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
         </tr>
 
     
@@ -770,7 +799,7 @@ or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line84">line 84</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -797,7 +826,7 @@ or raw primary key value.</td>
 
         
 <div class="param-desc">
-    Query results.
+    An array containing any query results.
 </div>
 
 
@@ -818,12 +847,16 @@ or raw primary key value.</td>
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="findDoc"><span class="type-signature"></span>findDoc<span class="signature">(conditions<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="findDoc"><span class="type-signature"></span>findDoc<span class="signature">(criteria<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -868,7 +901,7 @@ or raw primary key value.</td>
 
         <tr>
             
-                <td class="name"><code>conditions</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
@@ -931,7 +964,7 @@ or raw ID value.</td>
 
             
 
-            <td class="description last">Query options.</td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
         </tr>
 
     
@@ -972,7 +1005,7 @@ or raw ID value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line98">line 98</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -999,7 +1032,7 @@ or raw ID value.</td>
 
         
 <div class="param-desc">
-    Query results.
+    An array containing any query results.
 </div>
 
 
@@ -1020,12 +1053,16 @@ or raw ID value.</td>
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="findOne"><span class="type-signature"></span>findOne<span class="signature">(conditions, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="findOne"><span class="type-signature"></span>findOne<span class="signature">(criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -1070,13 +1107,19 @@ or raw ID value.</td>
 
         <tr>
             
-                <td class="name"><code>conditions</code></td>
+                <td class="name"><code>criteria</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">Object</span>
+|
+
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Number</span>
 
 
             
@@ -1094,7 +1137,8 @@ or raw ID value.</td>
 
             
 
-            <td class="description last">A criteria object.</td>
+            <td class="description last">A criteria object, prebuilt
+predicate, or raw primary key value.</td>
         </tr>
 
     
@@ -1127,7 +1171,7 @@ or raw ID value.</td>
 
             
 
-            <td class="description last">Query options.</td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
         </tr>
 
     
@@ -1168,7 +1212,7 @@ or raw ID value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line113">line 113</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line118">line 118</a>
     </li></ul></dd>
     
 
@@ -1196,7 +1240,7 @@ or raw ID value.</td>
         
 <div class="param-desc">
     An object representing the (first) record found, or
-undefined if no records match.
+null if no records match.
 </div>
 
 
@@ -1217,20 +1261,25 @@ undefined if no records match.
 
 
 
+
+
         
             
 
     
 
-    <h4 class="name" id="search"><span class="type-signature"></span>search<span class="signature">(plan, options)</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="isPkSearch"><span class="type-signature"></span>isPkSearch<span class="signature">(criteria)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
 
     
 
 
 
 <div class="description">
-    Perform a full-text search on queryable fields. If options.document is true,
-looks in the document body fields instead of the table columns.
+    Determine whether criteria represent a search by primary key. If a number or
+uuid are passed, it is assumed to be a primary key value; if an object, it
+must have only one key, which must specify the primary key column.
 </div>
 
 
@@ -1266,6 +1315,173 @@ looks in the document body fields instead of the table columns.
 
         <tr>
             
+                <td class="name"><code>criteria</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A criteria object or primitive to
+test.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the criteria represent a primary key search.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="search"><span class="type-signature"></span>search<span class="signature">(plan, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Perform a full-text search on queryable fields. If options.document is true,
+looks in the document body fields instead of the table columns.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
                 <td class="name"><code>plan</code></td>
             
 
@@ -1278,6 +1494,14 @@ looks in the document body fields instead of the table columns.
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1374,10 +1598,20 @@ looks in the document body fields instead of the table columns.
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">Query options.</td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
         </tr>
 
     
@@ -1418,7 +1652,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line131">line 131</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line159">line 159</a>
     </li></ul></dd>
     
 
@@ -1441,6 +1675,30 @@ looks in the document body fields instead of the table columns.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array containing any query results.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -1449,7 +1707,9 @@ looks in the document body fields instead of the table columns.
 
     
 
-    <h4 class="name" id="searchDoc"><span class="type-signature"></span>searchDoc<span class="signature">(plan, options)</span><span class="type-signature"></span></h4>
+    
+    <h4 class="name" id="searchDoc"><span class="type-signature"></span>searchDoc<span class="signature">(plan, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -1480,6 +1740,8 @@ looks in the document body fields instead of the table columns.
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1504,6 +1766,14 @@ looks in the document body fields instead of the table columns.
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1600,10 +1870,20 @@ looks in the document body fields instead of the table columns.
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">Query options.</td>
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
         </tr>
 
     
@@ -1644,7 +1924,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line179">line 179</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line212">line 212</a>
     </li></ul></dd>
     
 
@@ -1667,6 +1947,30 @@ looks in the document body fields instead of the table columns.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array containing any query results.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -1675,7 +1979,9 @@ looks in the document body fields instead of the table columns.
 
     
 
-    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(conditions, params)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(conditions, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
 
     
 
@@ -1708,6 +2014,8 @@ db.mytable.where('id=$1', [123]).then(...);
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1733,6 +2041,14 @@ db.mytable.where('id=$1', [123]).then(...);
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -1755,6 +2071,16 @@ db.mytable.where('id=$1', [123]).then(...);
             
             </td>
 
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -1800,7 +2126,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line194">line 194</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line227">line 227</a>
     </li></ul></dd>
     
 
@@ -1827,7 +2153,7 @@ db.mytable.where('id=$1', [123]).then(...);
 
         
 <div class="param-desc">
-    Query results.
+    An array containing any query results.
 </div>
 
 
@@ -1848,6 +2174,8 @@ db.mytable.where('id=$1', [123]).then(...);
 
 
 
+
+
         
     
 
@@ -1864,13 +2192,13 @@ db.mytable.where('id=$1', [123]).then(...);
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Jun 25 2017 01:08:15 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

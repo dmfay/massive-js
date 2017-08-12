@@ -32,17 +32,21 @@ const _ = require('lodash');
 const assert = require('assert');
 const util = require('util');
 const Entity = require('./entity');
-const Query = require('./query/query');
-const where = require('./query/where');
+const Select = require('./statement/select');
+const where = require('./statement/where');
+
+const isUuid = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 /**
  * A queryable database entity (table or view).
  *
  * @class
+ * @extends Entity
  * @param {Object} args
  * @param {Object} args.db - A {@linkcode Database}.
- * @param {String} args.name - The entity's name.
- * @param {String} args.schema - Entity's owning schema.
+ * @param {String} args.name - The table or view's name.
+ * @param {String} args.schema - The name of the schema owning the table or
+ * view.
  */
 const Queryable = function() {
   Entity.apply(this, arguments);
@@ -51,8 +55,8 @@ const Queryable = function() {
   this.delimitedName = "\"" + this.name + "\"";
   this.delimitedSchema = "\"" + this.schema + "\"";
 
-  // handle naming when schema is other than public:
-  if(this.schema !== "public") {
+  // handle naming when schema is other than default:
+  if(this.schema !== this.db.currentSchema) {
     this.fullname = this.schema + "." + this.name;
     this.delimitedFullName = this.delimitedSchema + "." + this.delimitedName;
   } else {
@@ -83,7 +87,7 @@ Queryable.prototype.count = function(conditions = {}, params = []) {
     };
   }
 
-  const query = new Query(conditions, {columns: "COUNT(1)", order: null, single: true}, this);
+  const query = new Select(this, conditions, {columns: "COUNT(1)", order: null, single: true});
 
   return this.db.query(query).then(res => res.count);
 };
@@ -95,8 +99,8 @@ Queryable.prototype.count = function(conditions = {}, params = []) {
  * @param {Object} - A criteria object.
  * @return {Promise} Number of matching documents.
  */
-Queryable.prototype.countDoc = function (conditions = {}) {
-  const query = new Query(conditions, {columns: "COUNT(1)", order: null, single: true, generator: 'docGenerator'}, this);
+Queryable.prototype.countDoc = function (criteria = {}) {
+  const query = new Select(this, criteria, {columns: "COUNT(1)", order: null, single: true, generator: 'docGenerator'});
 
   return this.db.query(query).then(res => res.count);
 };
@@ -104,47 +108,70 @@ Queryable.prototype.countDoc = function (conditions = {}) {
 /**
  * Find rows matching criteria.
  *
- * @param {Object|String} [conditions] - A criteria object, prebuilt predicate,
- * or raw primary key value.
- * @param {Object} [options] - Query options.
- * @return {Promise} Query results.
+ * @param {Object|String|Number} criteria - A criteria object, prebuilt
+ * predicate, or raw primary key value.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
+ * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.find = function(conditions = {}, options = {}) {
-  if (conditions === '*') { conditions = {}; }
+Queryable.prototype.find = function(criteria = {}, options = {}) {
+  if (criteria === '*') { criteria = {}; }
 
-  return this.db.query(new Query(conditions, options, this));
+  return this.db.query(new Select(this, criteria, options));
 };
 
 /**
  * Find a document by searching in the body.
  *
- * @param {Object|String} [conditions] - A criteria object, prebuilt predicate,
+ * @param {Object|String} [criteria] - A criteria object, prebuilt predicate,
  * or raw ID value.
- * @param {Object} [options] - Query options.
- * @return {Promise} Query results.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
+ * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.findDoc = function(conditions = {}, options = {}) {
+Queryable.prototype.findDoc = function(criteria = {}, options = {}) {
   options.document = true;
   options.generator = 'docGenerator';
 
-  return this.find(conditions, options);
+  return this.find(criteria, options);
 };
 
 /**
  * Return a single record.
  *
- * @param {Object} conditions - A criteria object.
- * @param {Object} [options] - Query options.
+ * @param {Object|String|Number} criteria - A criteria object, prebuilt
+ * predicate, or raw primary key value.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  * @return {Promise} An object representing the (first) record found, or
- * undefined if no records match.
+ * null if no records match.
  */
 Queryable.prototype.findOne = function () {
   return this.find.apply(this, arguments).then(results => {
-    if (!results || results.length === 0) { return undefined; }
+    if (!results || results.length === 0) { return null; }
     if (results.length > 0) { return results[0]; }
 
     return results;
   });
+};
+
+/**
+ * Determine whether criteria represent a search by primary key. If a number or
+ * uuid are passed, it is assumed to be a primary key value; if an object, it
+ * must have only one key, which must specify the primary key column.
+ *
+ * @param {Object|String|Number} criteria - A criteria object or primitive to
+ * test.
+ * @return {Boolean} True if the criteria represent a primary key search.
+ */
+Queryable.prototype.isPkSearch = function (criteria) {
+  if (!this.hasOwnProperty('pk')) { return false; }
+
+  if (_.isNumber(criteria) || (_.isString(criteria) &amp;&amp; isUuid.test(criteria))) {
+    // primitive value
+    return true;
+  }
+
+  const keys = _.keys(criteria);
+
+  return keys.length === 1 &amp;&amp; this.pkRegexp.test(keys[0]);
 };
 
 /**
@@ -154,14 +181,13 @@ Queryable.prototype.findOne = function () {
  * @param {Object} plan - Search definition.
  * @param {Array} plan.fields - List of the fields to search.
  * @param {String} plan.term - Search term.
- * @param {Object} options - Query options.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
+ * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.search = function(plan = {}, options = {}) {
+Queryable.prototype.search = function(plan, options = {}) {
   assert(plan.fields &amp;&amp; plan.term, "Need fields as an array and a term string");
 
   let params = [plan.term], tsv;
-
-  if (!_.isArray(plan.fields)) { plan.fields = [plan.fields]; }
 
   // TODO 'where' functionality might be better at processing search params for JSON etc
   if (options.document) {
@@ -185,13 +211,19 @@ Queryable.prototype.search = function(plan = {}, options = {}) {
     }
   }
 
-  const criteria = where(plan.where, 1, ' AND ', options.document ? 'docGenerator' : 'generator');
-  const conditions = {
-    conditions: `to_tsvector(${tsv}) @@ to_tsquery($1) ${criteria.conditions}`,
-    params: params.concat(criteria.params)
+  const criteria = {
+    conditions: `to_tsvector(${tsv}) @@ to_tsquery($1)`,
+    params: params
   };
 
-  const query = new Query(conditions, options, this);
+  if (plan.where) {
+    const searchWhere = where(plan.where, 1, options.document ? 'docGenerator' : 'generator');
+
+    criteria.conditions += ` AND ${searchWhere.conditions}`;
+    criteria.params = criteria.params.concat(searchWhere.params);
+  }
+
+  const query = new Select(this, criteria, options);
 
   return this.db.query(query);
 };
@@ -202,9 +234,10 @@ Queryable.prototype.search = function(plan = {}, options = {}) {
  * @param {Object} plan - Search definition.
  * @param {Array} plan.fields - List of the document keys to search.
  * @param {String} plan.term - Search term.
- * @param {Object} options - Query options.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
+ * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.searchDoc = function(plan = {}, options = {}) {
+Queryable.prototype.searchDoc = function(plan, options = {}) {
   options.document = true;
 
   return this.search(plan, options);
@@ -216,13 +249,13 @@ Queryable.prototype.searchDoc = function(plan = {}, options = {}) {
  * db.mytable.where('id=$1', [123]).then(...);
  *
  * @param {String} conditions - A raw SQL predicate.
- * @param {Array} params - Prepared statement parameters.
- * @return {Promise} Query results.
+ * @param {Array} [params] - Prepared statement parameters.
+ * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.where = function(conditions = "true", params = []) {
+Queryable.prototype.where = function(conditions, params = []) {
   if (!_.isArray(params) &amp;&amp; !_.isPlainObject(params)) { params = [params]; }
 
-  const query = new Query({conditions: conditions, params: params}, {}, this);
+  const query = new Select(this, {conditions: conditions, params: params}, {});
 
   return this.db.query(query);
 };
@@ -238,13 +271,13 @@ module.exports = Queryable;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Query.html">Query</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Sun Jun 25 2017 01:08:15 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

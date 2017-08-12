@@ -1,6 +1,6 @@
 'use strict';
 
-describe('findDoc', function () {
+describe('countDoc', function () {
   let db;
 
   before(function(){

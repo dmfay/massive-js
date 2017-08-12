@@ -1,14 +1,20 @@
 {
   "name": "massive",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
+  "homepage": "https://dmfay.github.io/massive-js/",
+  "bugs": "https://github.com/dmfay/massive-js/issues",
   "main": "index.js",
   "bin": {
     "massive": "bin/massive.js"
   },
   "directories": {
-    "example": "example",
+    "bin": "bin",
+    "lib": "lib",
     "test": "test"
+  },
+  "engines": {
+    "node": ">= 6.0.0"
   },
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha",
@@ -21,7 +27,13 @@
   "keywords": [
     "postgres",
     "pg",
-    "postgresql"
+    "postgresql",
+    "sql",
+    "database",
+    "datamapper",
+    "data-mapper",
+    "promise",
+    "promises"
   ],
   "author": "Dian Fay <dian.m.fay@gmail.com>",
   "contributors": [
@@ -35,17 +47,17 @@
     "glob": "^7.1.1",
     "lodash": "^4.17.4",
     "mz": "^2.6.0",
-    "pg-promise": "^6.3.1",
-    "pg-query-stream": "^1.0.0"
+    "pg-promise": "^6.3.8",
+    "pg-query-stream": "~1.0.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
+    "chai": "^4.1.0",
+    "chai-as-promised": "^7.1.1",
     "co-mocha": "^1.1.3",
     "coveralls": "^2.13.1",
-    "eslint": "^3.12.2",
+    "eslint": "^4.2.0",
     "mocha": "^3.2.0",
-    "nyc": "^10.3.2"
+    "nyc": "^11.1.0"
   },
   "repository": {
     "type": "git",

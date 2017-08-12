@@ -60,4 +60,13 @@ describe('insert', function () {
       assert.notEqual(err.detail, undefined);
     });
   });
+
+  it('applies options', function () {
+    return db.products.insert({name: 'another kind of product'}, {build: true}).then(res => {
+      assert.deepEqual(res, {
+        sql: 'INSERT INTO "products" ("name") VALUES ($1) RETURNING *',
+        params: ['another kind of product']
+      });
+    });
+  });
 });

@@ -1,7 +1,7 @@
 'use strict';
 
-const mutators = require('../../lib/query/mutators');
-const ops = require('../../lib/query/operations');
+const mutators = require('../../lib/statement/mutators');
+const ops = require('../../lib/statement/operations');
 
 describe('mutators', function () {
   describe('buildBetween', function () {
@@ -29,7 +29,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, 'IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -44,7 +43,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
       assert.equal(condition.operation.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -61,22 +59,20 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, 'IS');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
       assert.isNull(condition.value);
     });
 
-    it('interpolates values with NOT IS', function () {
+    it('interpolates values with IS NOT', function () {
       const condition = mutators.buildIs({
-        operation: ops('<>'),
+        operation: ops('is not'),
         offset: 1,
         value: true,
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
       assert.equal(condition.operation.operator, 'IS NOT');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
@@ -93,7 +89,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '<>');
       assert.equal(condition.operation.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
@@ -102,7 +97,7 @@ describe('mutators', function () {
 
     it('passes nulls and booleans to buildIs', function () {
       assert.equal(mutators.equality({
-        operation: ops('='),
+        operation: ops('is'),
         offset: 1,
         value: null,
         params: []
@@ -131,7 +126,6 @@ describe('mutators', function () {
         params: []
       });
 
-      assert.equal(condition.operation.key, '=');
       assert.equal(condition.operation.operator, '=');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, [123]);
@@ -177,7 +171,7 @@ describe('mutators', function () {
 
       assert.deepEqual(mutators.literalizeArray(condition), {
         offset: 1,
-        params: ['{"{one}","two three","four,five","\\\"six\\\"","\\\\seven","","null"}'],
+        params: ['{"{one}","two three","four,five","\\"six\\"","\\\\seven","","null"}'],
         value: '$1'
       });
     });
