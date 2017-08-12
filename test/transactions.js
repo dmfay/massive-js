@@ -7,6 +7,10 @@ describe('transactions', function () {
     return resetDb('loader').then(instance => db = instance);
   });
 
+  afterEach(function () {
+    return db.instance.$pool.end();
+  });
+
   it('does things in a transaction', function () {
     return db.transaction(() => {
       return Promise.all([
