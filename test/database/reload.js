@@ -7,7 +7,7 @@ describe('reload', function () {
     return resetDb('multi-schema')
       .then((db) => Promise.all([
         // reconnect with a pool size of 1 to make it easier to change runtime settings on all connections
-        massive({database: 'massive', poolSize: 1}, db.loader),
+        massive({database: 'massive', poolSize: 1, user: 'postgres'}, db.loader),
         // close original connection
         db.instance.$pool.end(),
       ]))
