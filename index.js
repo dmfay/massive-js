@@ -1,8 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const path = require('path');
-const filters = require('./lib/util/filters');
 const Database = require('./lib/database');
 
 /**
@@ -38,13 +36,6 @@ exports = module.exports = (connection, loader = {}, driverConfig = {}) => {
     // TODO db is deprecated and undocumented, remove for 4.0.0
     connection = `postgres://localhost:5432/${connection.database || connection.db}`;
   }
-
-  ['blacklist', 'whitelist', 'functionBlacklist', 'functionWhitelist', 'exceptions'].forEach(key => {
-    loader[key] = filters.entity(loader[key]);
-  });
-
-  loader.allowedSchemas = filters.schema(loader.allowedSchemas);
-  loader.scripts = loader.scripts || path.join(process.cwd(), 'db');
 
   return (new Database(connection, loader, driverConfig)).reload();
 };
