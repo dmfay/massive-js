@@ -32,8 +32,6 @@ const Database = require('./lib/database');
 exports = module.exports = (connection, loader = {}, driverConfig = {}) => {
   if (!connection || _.isEmpty(connection)) {
     return Promise.reject('No connection information specified.');
-  } else if (Object.keys(connection).length === 1 && (!!connection.database)) {
-    connection = `postgres://localhost:5432/${connection.database}`;
   }
 
   return (new Database(connection, loader, driverConfig)).reload();
