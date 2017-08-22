@@ -11,6 +11,10 @@ describe('connecting', function () {
     });
   });
 
+  it('exposes the Database class from the module', function () {
+    assert.isOk(massive.Database);
+  });
+
   it('returns a database connection', function () {
     return massive({ connectionString: connectionString }, loader).then(db => {
       assert.isOk(db);
