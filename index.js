@@ -2,7 +2,6 @@
 
 /** @module massive */
 
-const _ = require('lodash');
 const Database = require('./lib/database');
 
 /**
@@ -29,11 +28,7 @@ const Database = require('./lib/database');
  *
  * @return {Database} An initialized and connected data mapper.
  */
-exports = module.exports = (connection, loader = {}, driverConfig = {}) => {
-  if (!connection || _.isEmpty(connection)) {
-    return Promise.reject('No connection information specified.');
-  }
-
+module.exports = (connection, loader = {}, driverConfig = {}) => {
   return (new Database(connection, loader, driverConfig)).reload();
 };
 

@@ -64,16 +64,28 @@ describe('connecting', function () {
       );
     });
 
-    it('rejects undefined connections', function () {
-      assert.isRejected(massive(), 'No connection information specified.');
+    it('connects with undefined connections using default configuration', function () {
+      return massive().then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
 
-    it('rejects empty connection blocks', function () {
-      assert.isRejected(massive({}), 'No connection information specified.');
+    it('connects with empty connection block using default configuration', function () {
+      return massive({}).then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
 
-    it('rejects empty connection strings', function () {
-      assert.isRejected(massive(''), 'No connection information specified.');
+    it('connects with empty connection strings using default configuration', function () {
+      return massive('').then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
   });
 
