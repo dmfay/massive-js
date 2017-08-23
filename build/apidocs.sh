@@ -4,7 +4,7 @@ echo "regenerating API docs"
 
 rm -rf ./docs/api
 
-jsdoc -d ./docs/api -c ./.jsdoc.json -r
+node_modules/.bin/jsdoc -d ./docs/api -c ./.jsdoc.json -r
 
 echo "committing updated API docs"
 
