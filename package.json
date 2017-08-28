@@ -75,7 +75,7 @@
     },
     "rules": {
       "semi": 2,
-      "eqeqeq": 2
+      "eqeqeq": [2, "smart"]
     }
   }
 }
