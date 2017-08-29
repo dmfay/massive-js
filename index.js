@@ -1,12 +1,11 @@
 'use strict';
 
-const _ = require('lodash');
+/** @module massive */
+
 const Database = require('./lib/database');
 
 /**
  * Connect to Postgres and initialize the data mapper.
- *
- * @exports massive
  *
  * @param {Object|String} connection - Connection configuration object, or
  * connection string.
@@ -29,14 +28,11 @@ const Database = require('./lib/database');
  *
  * @return {Database} An initialized and connected data mapper.
  */
-exports = module.exports = (connection, loader = {}, driverConfig = {}) => {
-  if (!connection || _.isEmpty(connection)) {
-    return Promise.reject('No connection information specified.');
-  } else if (Object.keys(connection).length === 1 && (!!connection.database || !!connection.db)) {
-    // TODO db is deprecated and undocumented, remove for 4.0.0
-    connection = `postgres://localhost:5432/${connection.database || connection.db}`;
-  }
-
+module.exports = (connection, loader = {}, driverConfig = {}) => {
   return (new Database(connection, loader, driverConfig)).reload();
 };
 
+/**
+ * A database connection.
+ */
+module.exports.Database = Database;
