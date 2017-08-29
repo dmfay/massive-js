@@ -75,7 +75,8 @@
       "es6": true
     },
     "rules": {
-      "semi": 2
+      "semi": 2,
+      "eqeqeq": [2, "smart"]
     }
   }
 }

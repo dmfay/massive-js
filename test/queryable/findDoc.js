@@ -132,6 +132,12 @@ describe('findDoc', function () {
       });
     });
 
+    it('returns null when a single document is\'nt found', function () {
+        return db.docs.findDoc({title: 'Not Dound'}, {single: true}).then(doc => {
+            assert.equal(doc, null);
+        });
+    });
+
     it('applies criteria', function () {
       return db.docs.findDoc({title: 'Document 1'}).then(docs => {
         assert.lengthOf(docs, 1);
