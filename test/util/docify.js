@@ -16,7 +16,7 @@ describe('docify', function () {
     assert.deepEqual(docs, [{id: 1, val: 'val1'}, {id: 2, val: 'val2'}]);
   });
 
-  it('throws if there is no row', function () {
-    assert.throws(() => { docify(); });
+  it('returns null if there is no row', function () {
+    assert.equal(docify(), null);
   });
 });

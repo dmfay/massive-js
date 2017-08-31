@@ -11,13 +11,13 @@ describe('insert', function () {
     return db.instance.$pool.end();
   });
 
-  it('inserts a record', function () {
+  it('inserts a record and returns an object', function () {
     return db.products.insert({name: "A Product"}).then(res => {
       assert.equal(res.name, "A Product");
     });
   });
 
-  it('inserts multiple products', function () {
+  it('inserts multiple products and returns an array', function () {
     return db.products.insert([{name: "A Product"}, {name: "Another Product"}]).then(res => {
       assert.equal(res.length, 2);
       assert.equal(res[0].name, "A Product");

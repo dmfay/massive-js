@@ -106,7 +106,7 @@ Many functions use criteria objects to build a query WHERE clause. A criteria ob
   'field ~': 'val[ue]+',          // regexp match
   'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
   'field @>': ['value', 'Value'], // array contains
-  'field ->> attr': 'value'       // JSON traversal
+  'field.arr[1].item': 'value'    // JSON traversal
 }
 ```
 
@@ -374,7 +374,9 @@ Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedo
 
 Issues and especially pull requests are welcome! If you've found a bug, please include a minimal code sample I can use to hunt the problem down.
 
-To run the tests, first create an empty `massive` database. The `postgres` superuser should have `trust` authentication enabled for local socket connections.
+When submitting pull requests with new features, fixes, or modifications to the code, please ensure first that no existing tests break and second that your change is itself validated by new tests, when applicable. Your pull request will be picked up by continuous integration, but it's more convenient to run the tests yourself locally before you submit.
+
+To run the tests, you'll need to have Postgres installed. First create an empty `massive` database. The `postgres` superuser should have `trust` authentication enabled for local ipv4 connections.
 
 ```
 createdb massive

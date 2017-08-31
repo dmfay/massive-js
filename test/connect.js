@@ -11,6 +11,10 @@ describe('connecting', function () {
     });
   });
 
+  it('exposes the Database class from the module', function () {
+    assert.isOk(massive.Database);
+  });
+
   it('returns a database connection', function () {
     return massive({ connectionString: connectionString }, loader).then(db => {
       assert.isOk(db);
@@ -43,16 +47,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({ host: 'localhost', database: 'massive' }, loader).then(db => {
-        assert.isOk(db);
-        assert.isOk(db.t1);
-
-        return db.instance.$pool.end();
-      });
-    });
-
-    it('connects to localhost with a database name', function () {
-      return massive({ db: 'massive' }, loader).then(db => {
+      return massive({ host: 'localhost', database: 'massive', user: 'postgres' }, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -61,7 +56,7 @@ describe('connecting', function () {
     });
 
     it('rejects with connection errors', function () {
-      return massive({ database: 'doesntexist' }, loader).then(
+      return massive({ database: 'doesntexist', user: 'postgres' }, loader).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
@@ -69,16 +64,28 @@ describe('connecting', function () {
       );
     });
 
-    it('rejects undefined connections', function () {
-      assert.isRejected(massive(), 'No connection information specified.');
+    it('connects with undefined connections using default configuration', function () {
+      return massive().then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
 
-    it('rejects empty connection blocks', function () {
-      assert.isRejected(massive({}), 'No connection information specified.');
+    it('connects with empty connection block using default configuration', function () {
+      return massive({}).then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
 
-    it('rejects empty connection strings', function () {
-      assert.isRejected(massive(''), 'No connection information specified.');
+    it('connects with empty connection strings using default configuration', function () {
+      return massive('').then(db => {
+        assert.isOk(db);
+
+        return db.instance.$pool.end();
+      });
     });
   });
 
