@@ -2,7 +2,7 @@
 
 The options object modifies query behavior, either by applying additional clauses to the query itself or by changing how Massive handles results.
 
-Options can be used with most query functions, and the options object is usually the last parameter passed.
+Options can be passed to most query and persistence functions as the last argument.
 
 ```javascript
 db.tests.find({
@@ -36,7 +36,7 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 
 ## Results Processing
 
-Results processing options are generally applicable to all query types.
+Results processing options are generally applicable to all query types, although `stream` is principally useful with query functions.
 
 | Option key | Description |
 |------------|-------------|

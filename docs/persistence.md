@@ -8,6 +8,8 @@ Massive's lack of entity modeling means it retrieves your data in the form of pl
 
 `save` may not be used with foreign tables, since they do not have primary keys to test.
 
+[Query options](/options) for `INSERT` and `UPDATE` statements, and for results processing, may be used with `save` as a second argument. However, most of these are of limited utility.
+
 ```javascript
 db.tests.save({
   version: 1,
@@ -52,7 +54,7 @@ db.tests.insert([{
 });
 ```
 
-Either version of `insert` may be passed additional options:
+[Query options](/options) for `INSERT` statements and results processing may be used with `insert`:
 
 ```javascript
 db.tests.insert({
@@ -92,7 +94,7 @@ db.tests.update({
 });
 ```
 
-As with `insert`, either signature of `update` can be passed options:
+Both versions of `update` can take [query options](/options) for `UPDATE` statements and for results processing:
 
 ```javascript
 db.tests.update({
@@ -106,12 +108,19 @@ db.tests.update({
 
 ## destroy
 
-`destroy` removes data matching a criteria object, and returns a promise for an array containing the deleted data.
+`destroy` removes data either by primary key or by matching a criteria object. In the former case, it returns a promise for the deleted record object; in the latter, it returns a promise for an array containing all deleted records, even if no or one records were deleted.
+
+[Query options](/options) for `DELETE` statements and results processing may be used with `destroy`.
 
 ```javascript
+db.tests.destroy(1).then(test => {
+  // test #1
+});
+
 db.tests.destroy({
   priority: 'high'
-}).then(tests => {
-  // an array containing all removed tests
+}, {only: true}).then(tests => {
+  // an array containing all removed tests; the 'only' flag
+  // prevents the query from affecting descendant tables
 });
 ```
