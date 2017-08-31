@@ -4,7 +4,7 @@ Since Massive doesn't use models, data is retrieved as plain old JavaScript obje
 
 The `find`, `findOne`, and `count` functions form a consistent API for data retrieval with criteria and options. `where` offers total flexibility if you need to hand-write a `WHERE` clause for cases where criteria objects aren't sufficient (for example, testing concatenation or math on a field). `search` handles full-text search across multiple columns.
 
-All query functions which take [options objects](/options) may use options for `SELECT` statements and general results processing. One especially useful option with query functions is `stream`, which, when true, will return results as a stream instead of an array. This allows you to start reading and handling data immediately, but the connection will remain open until the stream is terminated.
+All query functions except `count` may take [options objects](/options). Valid options are those for `SELECT` statements and general results processing. One especially useful option with query functions is `stream`, which, when true, will return results as a stream instead of an array. This allows you to start reading and handling data immediately, but the connection will remain open until the stream is terminated.
 
 ## find
 
