@@ -11,15 +11,20 @@ describe('where', function () {
     return db.instance.$pool.end();
   });
 
-  it('returns Product 1 OR Product 2', function () {
+  it('executes a handwritten WHERE clause', function () {
     return db.products.where('id=$1 OR id=$2', [1,2]).then(res => assert.lengthOf(res, 2));
   });
 
-  it('returns Product 1 AND Product 2', function () {
-    return db.products.where('id=$1 AND price=$2', [1,12.00]).then(res => assert.lengthOf(res, 1));
+  it('executes a handwritten WHERE clause with options', function () {
+    return db.products.where('id=$1 OR id=$2', [1,2], {order: 'id desc'}).then(res => {
+      assert.lengthOf(res, 2);
+
+      assert.equal(res[0].id, 2);
+      assert.equal(res[1].id, 1);
+    });
   });
 
-  it('returns Product 1 with params as not array', function () {
+  it('executes a handwritten where clause with a raw param', function () {
     return db.products.where('id=$1', 1).then(res => assert.lengthOf(res, 1));
   });
 
