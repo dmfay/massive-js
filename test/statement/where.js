@@ -195,6 +195,12 @@ describe('WHERE clause generation', function () {
         assert.equal(result.field, '"json field"#>>\'{outer,inner}\'');
       });
 
+      it('should format a JSON path with a quoted field containing special characters', function () {
+        const result = where.getCondition('"json.fiel[d]".outer.inner');
+        assert.equal(result.rawField, 'json.fiel[d]');
+        assert.equal(result.field, '"json.fiel[d]"#>>\'{outer,inner}\'');
+      });
+
       it('should format a deep JSON path with numeric keys', function () {
         const result = where.getCondition('json.123.456');
         assert.equal(result.rawField, 'json');
