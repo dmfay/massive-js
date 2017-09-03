@@ -13,13 +13,17 @@ Massive is _not_ an object-relational mapper (ORM)! It doesn't use models, it do
 Here are some of the high points:
 
 * **Dynamic query generation**: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.
-* **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. As long as you don't run afoul of `NOT NULL` constraints, you can emit inserts and updates which affect only the columns you actually need to write and make up the data on the spot.
+* **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are _tables_, and you can insert or update directly into them.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
-* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
+* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation
 
 [Full documentation including API docs is available on GitHub Pages.](https://dmfay.github.io/massive-js/)
+
+## Contributing
+
+[See CONTRIBUTING.md](https://github.com/dmfay/massive-js/blob/master/CONTRIBUTING.md).
 
 ## Table of Contents
 
@@ -40,7 +44,6 @@ Here are some of the high points:
   * [Accessing the Driver](#accessing-the-driver)
 * [REPL](#repl)
 * [Older Versions](#older-versions)
-* [Contributing](#contributing)
 
 <!-- vim-markdown-toc -->
 
@@ -81,7 +84,7 @@ Massive understands database schemas and treats any schema other than `public` a
 
 Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex results to an object graph is a potential future consideration, but if you need to correlate data from multiple tables, using a view is recommended.
 
-The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
+The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; or with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
 
 If you ever need to run the introspection again, use `db.reload()` to get a promise for an up-to-date instance.
 
@@ -129,6 +132,8 @@ Some functions, particularly the query functions (`find`, `findOne`, `findDoc`, 
   only: true                      // ignore tables inheriting from the target table
 }
 ```
+
+Complete documentation for query options is available [here](https://dmfay.github.io/massive-js/options.html).
 
 ### A Brief Example
 
@@ -366,27 +371,11 @@ Exit the REPL by pressing Ctrl-C twice.
 
 ## Older Versions
 
-Release versions are tagged and available [here](https://github.com/dmfay/massive-js/releases).
+Install Massive.js v2: `npm install massive@2`
 
 Documentation for Massive.js 2.x is at [readthedocs](http://massive-js.readthedocs.org/en/v2/).
 
-## Contributing
-
-Issues and especially pull requests are welcome! If you've found a bug, please include a minimal code sample I can use to hunt the problem down.
-
-When submitting pull requests with new features, fixes, or modifications to the code, please ensure first that no existing tests break and second that your change is itself validated by new tests, when applicable. Your pull request will be picked up by continuous integration, but it's more convenient to run the tests yourself locally before you submit.
-
-To run the tests, you'll need to have Postgres installed. First create an empty `massive` database. The `postgres` superuser should have `trust` authentication enabled for local ipv4 connections.
-
-```
-createdb massive
-```
-
-Run the tests with npm:
-
-```
-npm test
-```
+Release versions are tagged and available [here](https://github.com/dmfay/massive-js/releases).
 
 [pg-promise]:https://github.com/vitaly-t/pg-promise
 [Database]:http://vitaly-t.github.io/pg-promise/Database.html
