@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/statement/order-by.js</title>
+    <title>JSDoc: Source: lib/util/get-filter-string.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/statement/order-by.js</h1>
+    <h1 class="page-title">Source: lib/util/get-filter-string.js</h1>
 
     
 
@@ -31,37 +31,23 @@
 const _ = require('lodash');
 
 /**
- * Generate an ORDER BY clause.
+ * Get a filter string or create one from an array of values.
  *
- * @param {Array|String} order - An array of 'field direction' strings, or a
- * string containing all fields and directions.
- * @param {Boolean} [useBody] - If true and using the Array form of order,
- * will generate order based on a document body.
- * @return {String} An ORDER BY clause.
+ * @module getFilterString
+ * @param {String|Array} [allowed] - Source filter data.
+ * @return {String} A comma-separated filter string.
+ * @throws Argument must be an array or string.
  */
-exports = module.exports = (order, useBody) => {
-  if (_.isArray(order)) {
-    return 'ORDER BY ' + _.reduce(order, function (acc, val) {
-      // TODO eliminate direct interpolation
-      val.direction = val.direction || 'asc';
-
-      if (useBody) {
-        val.field = `body->>'${val.field}'`;
-      }
-
-      if (val.type) {
-        acc.push(`(${val.field})::${val.type} ${val.direction}`);
-      } else {
-        acc.push(`${val.field} ${val.direction}`);
-      }
-
-      return acc;
-    }, []).join(',');
-  } else if (order) {
-    return `ORDER BY ${order}`;
+exports = module.exports = function (allowed) {
+  if (!allowed) {
+    return '';
+  } else if (_.isString(allowed)) {
+    return allowed;
+  } else if (_.isArray(allowed)) {
+    return allowed.join(', ');
   }
 
-  return '';
+  throw new Error('Specify allowed values with a comma-delimited string or an array of strings');
 };
 </code></pre>
         </article>

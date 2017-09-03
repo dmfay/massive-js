@@ -40,25 +40,28 @@ const SingleValueStream = require('./util/single-value-stream');
  *
  * @class
  * @extends Entity
- * @param {Object} args
- * @param {String|QueryFile} args.sql - A function invocation statement or a
+ * @param {Object} spec - An expanded {@linkcode Entity} specification:
+ * @param {Object} spec.db - A {@linkcode Database}.
+ * @param {String} spec.name - The table or view's name.
+ * @param {String} spec.schema - The name of the schema owning the table or
+ * @param {String|QueryFile} spec.sql - A function invocation statement or a
  * pg-promise QueryFile.
- * @param {Number} args.paramCount - Number of parameters the executable
+ * @param {Number} spec.paramCount - Number of parameters the executable
  * expects.
- * @param {Boolean} args.enhancedFunctions - True to enable single row/value
+ * @param {Boolean} spec.enhancedFunctions - True to enable single row/value
  * results processing.
- * @param {Boolean} args.singleRow - If true, return the first result row as an
+ * @param {Boolean} spec.singleRow - If true, return the first result row as an
  * object (with enhancedFunctions).
- * @param {Boolean} args.singleValue - If true, return results as a primitive
+ * @param {Boolean} spec.singleValue - If true, return results as a primitive
  * or primitives (with enhancedFunctions).
  */
-const Executable = function (args) {
+const Executable = function (spec) {
   Entity.apply(this, arguments);
 
-  this.sql = args.sql;
-  this.paramCount = args.paramCount;  // this actually only matters for QueryFiles since functions can have overloads
-  this.singleRow = args.enhancedFunctions &amp;&amp; args.singleRow;
-  this.singleValue = args.enhancedFunctions &amp;&amp; args.singleValue;
+  this.sql = spec.sql;
+  this.paramCount = spec.paramCount;  // this actually only matters for QueryFiles since functions can have overloads
+  this.singleRow = spec.enhancedFunctions &amp;&amp; spec.singleRow;
+  this.singleValue = spec.enhancedFunctions &amp;&amp; spec.singleValue;
 };
 
 util.inherits(Executable, Entity);
@@ -66,15 +69,14 @@ util.inherits(Executable, Entity);
 /**
  * Invoke the function or script.
  *
- * @param {Array|...Object} [args] Function arguments or prepared statement
- * parameters.
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Result processing options}.
  * @return {Promise} Execution results as an array, unless options.single is
  * toggled or enhanced functions are enabled and the function returns a single
  * value.
  */
 Executable.prototype.invoke = function () {
-  let args, opts = {single: this.singleRow || false};
+  let args,
+    opts = {single: this.singleRow || false};
 
   if (_.isArray(arguments[0]) || (_.isPlainObject(arguments[0]) &amp;&amp; !_.isString(this.sql) &amp;&amp; !!this.paramCount)) {
     // arrays are always a full parameter list
@@ -95,8 +97,8 @@ Executable.prototype.invoke = function () {
   }
 
   return this.db.query(this.sql, args, opts).then(result => {
-    if (result instanceof EventEmitter &amp;&amp; typeof result.read === "function") {
-      if (this.singleValue) { result = result.pipe(SingleValueStream()); }
+    if (result instanceof EventEmitter &amp;&amp; typeof result.read === 'function') {
+      if (this.singleValue) { result = result.pipe(new SingleValueStream()); }
 
       return result;
     }
@@ -105,7 +107,7 @@ Executable.prototype.invoke = function () {
 
     if (this.singleValue) {
       try {
-        data = _.isArray(data) ? data.map(singleValue): singleValue(data);
+        data = _.isArray(data) ? data.map(singleValue) : singleValue(data);
       } catch (e) {
         return this.db.instance.$config.promise.reject(e);
       }
@@ -126,13 +128,13 @@ module.exports = Executable;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

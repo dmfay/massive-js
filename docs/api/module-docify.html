@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Select</title>
+    <title>JSDoc: Module: docify</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Select</h1>
+    <h1 class="page-title">Module: docify</h1>
 
     
 
@@ -28,7 +28,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Select<span class="signature">(source, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        
+            
         
     
 </header>
@@ -37,20 +38,15 @@
     <div class="container-overview">
     
         
+            <div class="description">Transforms a record or records which contain a "body" field into a document
+object or objects. Metadata is removed and the "id" field is moved into the
+body.</div>
+        
 
-    
-
-    
-    <h4 class="name" id="Select"><span class="type-signature"></span>new Select<span class="signature">(source, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-    
-
-    
-
+        
+            
 
 
-<div class="description">
-    Represents a SELECT query.
-</div>
 
 
 
@@ -73,8 +69,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -87,84 +81,15 @@
 
         <tr>
             
-                <td class="name"><code>source</code></td>
+                <td class="name"><code>result</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="Queryable.html">Queryable</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Database object to query.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>criteria</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
 |
 
-<span class="param-type">String</span>
-|
-
-<span class="param-type">UUID</span>
-|
-
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A criteria object, prebuilt
-predicate, or primitive pk value.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">Object</span>
 
 
@@ -172,20 +97,10 @@ predicate, or primitive pk value.</td>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
+            <td class="description last">A record or list of records to transform.</td>
         </tr>
 
     
@@ -226,7 +141,7 @@ predicate, or primitive pk value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_select.js.html">lib/statement/select.js</a>, <a href="lib_statement_select.js.html#line16">line 16</a>
+        <a href="lib_util_docify.js.html">lib/util/docify.js</a>, <a href="lib_util_docify.js.html#line5">line 5</a>
     </li></ul></dd>
     
 
@@ -249,11 +164,37 @@ predicate, or primitive pk value.</td>
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The transformed record or records.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
 
 
+        
     
     </div>
 
@@ -280,7 +221,7 @@ predicate, or primitive pk value.</td>
     
 
     
-    <h4 class="name" id="format"><span class="type-signature"></span>format<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="~docify"><span class="type-signature">(inner) </span>docify<span class="signature">(row)</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
 
     
@@ -288,7 +229,7 @@ predicate, or primitive pk value.</td>
 
 
 <div class="description">
-    Format this object into a SQL SELECT.
+    Transforms a single record containing a "body" field into a document object.
 </div>
 
 
@@ -297,6 +238,55 @@ predicate, or primitive pk value.</td>
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>row</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A flat object representing a database record.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -332,7 +322,7 @@ predicate, or primitive pk value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_select.js.html">lib/statement/select.js</a>, <a href="lib_statement_select.js.html#line67">line 67</a>
+        <a href="lib_util_docify.js.html">lib/util/docify.js</a>, <a href="lib_util_docify.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -359,7 +349,7 @@ predicate, or primitive pk value.</td>
 
         
 <div class="param-desc">
-    A SQL SELECT statement.
+    A document object generated from the row.
 </div>
 
 
@@ -370,7 +360,7 @@ predicate, or primitive pk value.</td>
     </dt>
     <dd>
         
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
     </dd>

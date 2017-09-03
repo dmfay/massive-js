@@ -37,11 +37,12 @@ const Executable = require('./executable');
 const Queryable = require('./queryable');
 const Table = require('./table');
 const docify = require('./util/docify');
+const getFilterString = require('./util/get-filter-string');
 
 /**
  * A database connection.
  *
- * @class
+ * @class Database
  * @param {Object|String} connection - A pg connection object or a connection
  * string.
  * @param {Object} [loader] - Filter definition for including and
@@ -59,7 +60,24 @@ const docify = require('./util/docify');
  * @param {Boolean} loader.enhancedFunctions - Streamline function return values.
  * @param {Object} [driverConfig] - A pg-promise configuration object.
  */
-const Massive = function (connection, loader = {}, driverConfig = {}) {
+const Database = function (connection = {}, loader = {}, driverConfig = {}) {
+  connection = typeof connection === 'string'
+    ? {connectionString: connection}
+    : connection;
+
+  // If connectionString is defined in the configuration object, these defaults will be ignored
+  _.defaults(connection, {
+    host: 'localhost',
+    port: 5432
+  });
+
+  ['blacklist', 'whitelist', 'functionBlacklist', 'functionWhitelist', 'exceptions'].forEach(key => {
+    loader[key] = getFilterString(loader[key]);
+  });
+
+  loader.allowedSchemas = getFilterString(loader.allowedSchemas);
+  loader.scripts = loader.scripts || path.join(process.cwd(), 'db');
+
   this.loader = loader;
   this.driverConfig = driverConfig;
   this.pgp = pgp(driverConfig);
@@ -78,17 +96,17 @@ const Massive = function (connection, loader = {}, driverConfig = {}) {
  * functions arrays.
  *
  * @param {Function} ctor - Constructor for the object instances.
- * @param {Promise|Function} - Something which resolves to a list of entity
+ * @param {Promise|Function} sources - Something which resolves to a list of entity
  * specifications.
  * @return {Promise} The collection of objects just attached.
  */
-Massive.prototype.attach = function (ctor, ...sources) {
+Database.prototype.attach = function (ctor, ...sources) {
   const sourcePromises = sources.map(source => {
     if (_.isFunction(source)) {
       return source(this.instance, this.loader);
-    } else {
-      return source;
     }
+
+    return source;
   });
 
   return this.$p.all(sourcePromises).then(result => {
@@ -97,11 +115,11 @@ Massive.prototype.attach = function (ctor, ...sources) {
       spec.db = this;
       spec.path = !spec.schema || spec.schema === this.currentSchema ? spec.name : [spec.schema, spec.name].join('.');
 
-      const entity = new (Function.prototype.bind.apply(ctor, [null, spec]));
+      const entity = new (Function.prototype.bind.apply(ctor, [null, spec]))();
       let executor;
 
       if (ctor === Executable) {
-        executor = function() { return entity.invoke(...arguments); };
+        executor = function () { return entity.invoke(...arguments); };
       }
 
       _.set(this, spec.path, executor || entity);
@@ -118,12 +136,12 @@ Massive.prototype.attach = function (ctor, ...sources) {
  * @param {String} [collection] - Name of the collection to which the entity
  * belongs.
  */
-Massive.prototype.detach = function (entity, collection='tables') {
+Database.prototype.detach = function (entity, collection = 'tables') {
   // TODO should be able to determine collection from entity type
   let schema = this.currentSchema;
 
-  if (entity.indexOf(".") > -1) {
-    const tokens = entity.split(".");
+  if (entity.indexOf('.') > -1) {
+    const tokens = entity.split('.');
 
     schema = tokens[0];
     entity = tokens[1];
@@ -143,10 +161,9 @@ Massive.prototype.detach = function (entity, collection='tables') {
  * views, functions, and scripts. Objects and files which no longer exist are
  * cleared and new objects and files added.
  *
- * @function
  * @return {Promise} The refreshed database.
  */
-Massive.prototype.reload = function () {
+Database.prototype.reload = function () {
   if (this.tables) { this.tables.forEach(t => this.detach(t.name, 'tables')); }
   if (this.views) { this.views.forEach(v => this.detach(v.name, 'views')); }
   if (this.functions) { this.functions.forEach(f => this.detach(f.name, 'functions')); }
@@ -156,8 +173,11 @@ Massive.prototype.reload = function () {
   if (!this.loader.queryFiles) {
     filesPromise = this.$p((resolve, reject) => {
       glob(path.join(__dirname, '/scripts/*.sql'), (err, files) => {
-        if (err) { reject(err); }
-        else { resolve(files); }
+        if (err) {
+          reject(err);
+        } else {
+          resolve(files);
+        }
       });
     }).then(files => {
       this.loader.queryFiles = files.reduce((collection, file) => {
@@ -177,9 +197,11 @@ Massive.prototype.reload = function () {
 
   return this.$p.all([schemaPromise, filesPromise]).then(() => {
     return this.$p.all([
+      /* eslint-disable global-require */
       this.attach(Table, require('./loader/tables')).then(tables => this.tables = tables),
       this.attach(Queryable, require('./loader/views')).then(views => this.views = views),
       this.attach(Executable, require('./loader/functions'), require('./loader/scripts')).then(functions => this.functions = functions)
+      /* eslint-enable global-require */
     ]);
   }).then(() => this);
 };
@@ -201,7 +223,7 @@ Massive.prototype.reload = function () {
  * resultset.
  * @return {Promise} Query results.
  */
-Massive.prototype.query = function (query, params = [], options = {}) {
+Database.prototype.query = function (query, params = [], options = {}) {
   let sql;
 
   if (query instanceof this.pgp.QueryFile || _.isString(query)) {
@@ -213,10 +235,7 @@ Massive.prototype.query = function (query, params = [], options = {}) {
   }
 
   if (options.build) {
-    return this.$p.resolve({
-      sql: sql,
-      params: params
-    });
+    return this.$p.resolve({sql, params});
   }
 
   let qrm;
@@ -247,32 +266,30 @@ Massive.prototype.query = function (query, params = [], options = {}) {
 /**
  * Save a document.
  *
- * @function
  * @param {String} collection - Document table name to save to. If it does not
  * already exist, it will be created.
  * @param {Object} doc - A JSON document.
  * @return {Promise} The saved document.
  */
-Massive.prototype.saveDoc = function (collection, doc) {
-  let potentialTable = this.getObject(collection);
+Database.prototype.saveDoc = function (collection, doc) {
+  const potentialTable = this.getObject(collection);
 
   if (potentialTable) {
     return potentialTable.saveDoc(doc);
-  } else {
-    return this.createDocumentTable(collection).then(() => this.saveDoc(collection, doc));
   }
+
+  return this.createDocumentTable(collection).then(() => this.saveDoc(collection, doc));
 };
 
 /**
  * Create a new document table and attach it to the Database for usage.
  *
- * @function
- * @param {String} path - Name of the table to create. Unless the schema is
+ * @param {String} location - Name of the table to create. Unless the schema is
  * specified in a qualified path, current schema (usually 'public') is assumed.
  * @return {Promise} The added table.
  */
-Massive.prototype.createDocumentTable = function (path) {
-  const splits = path.split('.');
+Database.prototype.createDocumentTable = function (location) {
+  const splits = location.split('.');
   const tableName = splits.pop();
   const schemaName = splits.pop() || this.currentSchema;
   const indexName = tableName.replace('.', '_');
@@ -293,19 +310,18 @@ Massive.prototype.createDocumentTable = function (path) {
 /**
  * Find a database object, if attached.
  *
- * @function
- * @param {String} path - Name of the object to find. Unless the schema is
+ * @param {String} location - Name of the object to find. Unless the schema is
  * specified in a qualified path, current schema (usually 'public') is assumed.
  * @param {String} [collection=tables] - Collection to search: tables, views, or
  * functions.
  * @return {Object} The table, if found.
  */
-Massive.prototype.getObject = function (path, collection = 'tables') {
-  const splits = path.split(".");
+Database.prototype.getObject = function (location, collection = 'tables') {
+  const splits = location.split('.');
   const name = splits.pop();
   const schema = splits.pop() || this.currentSchema;
 
-  return this[collection].find(obj => (obj.schema == schema &amp;&amp; obj.name == name));
+  return this[collection].find(obj => obj.schema === schema &amp;&amp; obj.name === name);
 };
 
 /**
@@ -317,10 +333,10 @@ Massive.prototype.getObject = function (path, collection = 'tables') {
  * the table.
  * @return {Promise} A promise which resolves when the table has been removed.
  */
-Massive.prototype.dropTable = function (table, options) {
+Database.prototype.dropTable = function (table, options) {
   const cascade = options &amp;&amp; options.cascade;
 
-  return this.query(`DROP TABLE IF EXISTS ${table} ${cascade ? "CASCADE" : ""};`)
+  return this.query(`DROP TABLE IF EXISTS ${table} ${cascade ? 'CASCADE' : ''};`)
     .then(() => {
       this.detach(table);
     });
@@ -332,7 +348,7 @@ Massive.prototype.dropTable = function (table, options) {
  * @param {String} schemaName - A valid schema name.
  * @return {Promise} A promise which resolves when the schema has been added.
  */
-Massive.prototype.createSchema = function (schemaName) {
+Database.prototype.createSchema = function (schemaName) {
   return this.query(`CREATE SCHEMA IF NOT EXISTS ${schemaName};`)
     .then(() => {
       this[schemaName] = {};
@@ -349,8 +365,8 @@ Massive.prototype.createSchema = function (schemaName) {
  * @return {Promise} A promise which resolves when the schema and all owned
  * objects have been removed.
  */
-Massive.prototype.dropSchema = function(schemaName, options={}) {
-  return this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${options.cascade ? "CASCADE" : ""};`)
+Database.prototype.dropSchema = function (schemaName, options = {}) {
+  return this.query(`DROP SCHEMA IF EXISTS ${schemaName} ${options.cascade ? 'CASCADE' : ''};`)
     .then(() => {
       // Remove all the tables from the namespace
       if (this[schemaName]) {
@@ -373,7 +389,7 @@ Massive.prototype.dropSchema = function(schemaName, options={}) {
     });
 };
 
-exports = module.exports = Massive;
+exports = module.exports = Database;
 </code></pre>
         </article>
     </section>
@@ -384,13 +400,13 @@ exports = module.exports = Massive;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

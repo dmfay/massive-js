@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Update<span class="signature">(source, criteria, changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Update<span class="signature">(source, changes, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="Update"><span class="type-signature"></span>new Update<span class="signature">(source, criteria, changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Update"><span class="type-signature"></span>new Update<span class="signature">(source, changes, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -118,44 +118,6 @@
 
         <tr>
             
-                <td class="name"><code>criteria</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">String</span>
-|
-
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A criteria object, prebuilt
-predicate, or primitive pk value.</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>changes</code></td>
             
 
@@ -181,6 +143,37 @@ predicate, or primitive pk value.</td>
             
 
             <td class="description last">A map of field names to new values.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>criteria</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A criteria object.</td>
         </tr>
 
     
@@ -254,7 +247,7 @@ predicate, or primitive pk value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line16">line 16</a>
+        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line15">line 15</a>
     </li></ul></dd>
     
 
@@ -308,7 +301,7 @@ predicate, or primitive pk value.</td>
     
 
     
-    <h4 class="name" id="format"><span class="type-signature"></span>format<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="format"><span class="type-signature"></span>format<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
     
 
     
@@ -360,7 +353,7 @@ predicate, or primitive pk value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line55">line 55</a>
+        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -383,6 +376,28 @@ predicate, or primitive pk value.</td>
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A SQL UPDATE statement.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -404,13 +419,13 @@ predicate, or primitive pk value.</td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

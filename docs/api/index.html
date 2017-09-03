@@ -53,11 +53,12 @@
 <p>Here are some of the high points:</p>
 <ul>
 <li><strong>Dynamic query generation</strong>: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.</li>
-<li><strong>Do as much, or as little, as you need</strong>: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. As long as you don't run afoul of <code>NOT NULL</code> constraints, you can emit inserts and updates which affect only the columns you actually need to write and make up the data on the spot.</li>
+<li><strong>Do as much, or as little, as you need</strong>: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are <em>tables</em>, and you can insert or update directly into them.</li>
 <li><strong>Document storage</strong>: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.</li>
-<li><strong>Postgres everything</strong>: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.</li>
+<li><strong>Postgres everything</strong>: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.</li>
 </ul>
 <h2>Full Documentation</h2><p><a href="https://dmfay.github.io/massive-js/">Full documentation including API docs is available on GitHub Pages.</a></p>
+<h2>Contributing</h2><p><a href="https://github.com/dmfay/massive-js/blob/master/CONTRIBUTING.md">See CONTRIBUTING.md</a>.</p>
 <h2>Table of Contents</h2><!-- vim-markdown-toc GFM -->
 <ul>
 <li><a href="#installation">Installation</a></li>
@@ -80,7 +81,6 @@
 </li>
 <li><a href="#repl">REPL</a></li>
 <li><a href="#older-versions">Older Versions</a></li>
-<li><a href="#contributing">Contributing</a></li>
 </ul>
 <!-- vim-markdown-toc -->
 <h2>Installation</h2><pre class="prettyprint source"><code>npm i massive --save</code></pre><p><strong>Starting with version 3, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, install massive@2 or download version 2.x from <a href="https://github.com/dmfay/massive-js/releases">the Releases page</a>.</strong></p>
@@ -103,7 +103,7 @@ massive({
 </ul>
 <p>Massive understands database schemas and treats any schema other than <code>public</code> as a namespace. Objects in the <code>public</code> schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.</p>
 <p>Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex results to an object graph is a potential future consideration, but if you need to correlate data from multiple tables, using a view is recommended.</p>
-<p>The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with <code>app.set</code> in your entry point and retrieve it with <code>req.app.get</code> in your routes; with koa, using <code>app.context</code>. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.</p>
+<p>The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with <code>app.set</code> in your entry point and retrieve it with <code>req.app.get</code> in your routes; or with koa, using <code>app.context</code>. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.</p>
 <p>If you ever need to run the introspection again, use <code>db.reload()</code> to get a promise for an up-to-date instance.</p>
 <h2>Usage</h2><p>Consult the <a href="https://dmfay.github.io/massive-js/">documentation</a> for full usage instructions.</p>
 <h3>Criteria Objects</h3><p>Many functions use criteria objects to build a query WHERE clause. A criteria object is a JavaScript map matching database fields to values. Unless otherwise specified in the field name, the predicate operation is assumed to be equality. Massive's query builder is extremely flexible and accommodates both standard and Postgres-specific predicates, including JSON object traversal and array and regexp operations.</p>
@@ -119,7 +119,7 @@ massive({
   'field ~': 'val[ue]+',          // regexp match
   'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
   'field @>': ['value', 'Value'], // array contains
-  'field ->> attr': 'value'       // JSON traversal
+  'field.arr[1].item': 'value'    // JSON traversal
 }</code></pre><p>There are many more; see <a href="https://dmfay.github.io/massive-js/criteria.html">the full documentation</a> for the complete list.</p>
 <h3>Query Options</h3><p>Some functions, particularly the query functions (<code>find</code>, <code>findOne</code>, <code>findDoc</code>, <code>search</code>, and <code>searchDoc</code>) allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed. The options object may be omitted entirely if not needed.</p>
 <pre class="prettyprint source lang-javascript"><code>{
@@ -132,7 +132,8 @@ massive({
   single: true,                   // return the first result row as an object instead of all rows
   stream: true,                   // return results as a readable stream (see below)
   only: true                      // ignore tables inheriting from the target table
-}</code></pre><h3>A Brief Example</h3><p>Let's say we have a database for a software testing application. This database contains a <code>tests</code> table and an <code>issues</code> table, where one test may have many issues. In a separate <code>auth</code> schema, it contains a <code>users</code> table referenced by the others to represent a user running a test and discovering issues. There is a <code>test_stats</code> view which calculates statistics on aggregate issue information for individual tests; and there is a <code>copy_tests</code> function which clones a test for reuse.</p>
+}</code></pre><p>Complete documentation for query options is available <a href="https://dmfay.github.io/massive-js/options.html">here</a>.</p>
+<h3>A Brief Example</h3><p>Let's say we have a database for a software testing application. This database contains a <code>tests</code> table and an <code>issues</code> table, where one test may have many issues. In a separate <code>auth</code> schema, it contains a <code>users</code> table referenced by the others to represent a user running a test and discovering issues. There is a <code>test_stats</code> view which calculates statistics on aggregate issue information for individual tests; and there is a <code>copy_tests</code> function which clones a test for reuse.</p>
 <p>Our testing application can leverage the API Massive builds for almost everything it needs to do, but there is one feature that we haven't been able to integrate as a database function yet: the ability to, in one call, clear a test's issues and update its status to signify that it has been restarted. Eventually, we'll get there, but for now it's a SQL script in our application's <code>/db</code> directory, <code>resetTest.sql</code>.</p>
 <h4>Persistence</h4><p>After we initialize and connect Massive, all these entities are available on the instance. First, we need to create a user:</p>
 <pre class="prettyprint source lang-javascript"><code>db.auth.users.insert({
@@ -223,13 +224,9 @@ db > db.tables.map(table => table.name);
 db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In addition to the <code>tables</code> collection, the <code>views</code> and <code>functions</code> collections are also exposed on the database object.</p>
 <p>When invoking functions, you may omit the <code>then</code> if you just want to see output -- Massive provides a resolver which logs the results to make it easy to query with the REPL.</p>
 <p>Exit the REPL by pressing Ctrl-C twice.</p>
-<h2>Older Versions</h2><p>Release versions are tagged and available <a href="https://github.com/dmfay/massive-js/releases">here</a>.</p>
+<h2>Older Versions</h2><p>Install Massive.js v2: <code>npm install massive@2</code></p>
 <p>Documentation for Massive.js 2.x is at <a href="http://massive-js.readthedocs.org/en/v2/">readthedocs</a>.</p>
-<h2>Contributing</h2><p>Issues and especially pull requests are welcome! If you've found a bug, please include a minimal code sample I can use to hunt the problem down.</p>
-<p>When submitting pull requests with new features, fixes, or modifications to the code, please ensure first that no existing tests break and second that your change is itself validated by new tests, when applicable. Your pull request will be picked up by continuous integration, but it's more convenient to run the tests yourself locally before you submit.</p>
-<p>To run the tests, you'll need to have Postgres installed. First create an empty <code>massive</code> database. The <code>postgres</code> superuser should have <code>trust</code> authentication enabled for local socket connections.</p>
-<pre class="prettyprint source"><code>createdb massive</code></pre><p>Run the tests with npm:</p>
-<pre class="prettyprint source"><code>npm test</code></pre></article>
+<p>Release versions are tagged and available <a href="https://github.com/dmfay/massive-js/releases">here</a>.</p></article>
     </section>
 
 
@@ -240,13 +237,13 @@ db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In additio
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

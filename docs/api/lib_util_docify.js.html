@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/statement/order-by.js</title>
+    <title>JSDoc: Source: lib/util/docify.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/statement/order-by.js</h1>
+    <h1 class="page-title">Source: lib/util/docify.js</h1>
 
     
 
@@ -31,37 +31,38 @@
 const _ = require('lodash');
 
 /**
- * Generate an ORDER BY clause.
+ * Transforms a record or records which contain a "body" field into a document
+ * object or objects. Metadata is removed and the "id" field is moved into the
+ * body.
  *
- * @param {Array|String} order - An array of 'field direction' strings, or a
- * string containing all fields and directions.
- * @param {Boolean} [useBody] - If true and using the Array form of order,
- * will generate order based on a document body.
- * @return {String} An ORDER BY clause.
+ * @module docify
+ * @param {Array|Object} result - A record or list of records to transform.
+ * @return {Array|Object} The transformed record or records.
  */
-exports = module.exports = (order, useBody) => {
-  if (_.isArray(order)) {
-    return 'ORDER BY ' + _.reduce(order, function (acc, val) {
-      // TODO eliminate direct interpolation
-      val.direction = val.direction || 'asc';
+exports = module.exports = function (result) {
+  /**
+   * Transforms a single record containing a "body" field into a document object.
+   *
+   * @param {Object} row - A flat object representing a database record.
+   * @return {Object} A document object generated from the row.
+   */
+  function docify (row) {
+    if (row == null) {
+      return null;
+    }
 
-      if (useBody) {
-        val.field = `body->>'${val.field}'`;
-      }
+    const returnDoc = _.cloneDeep(row.body);
 
-      if (val.type) {
-        acc.push(`(${val.field})::${val.type} ${val.direction}`);
-      } else {
-        acc.push(`${val.field} ${val.direction}`);
-      }
+    returnDoc.id = row.id;
 
-      return acc;
-    }, []).join(',');
-  } else if (order) {
-    return `ORDER BY ${order}`;
+    return returnDoc;
   }
 
-  return '';
+  if (_.isArray(result)) {
+    return result.map(docify);
+  }
+
+  return docify(result);
 };
 </code></pre>
         </article>

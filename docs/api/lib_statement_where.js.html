@@ -45,101 +45,109 @@ const ops = require('./operations');
 const getCondition = function (key) {
   key = key.trim();
 
-  var i = 0,
-    char = key.charAt(i),
-    parsed = [[]],          // collect token arrays
-    buffer = parsed[0],     // start with the first token
-    inQuotedField = false,  // to turn off token break on whitespace
-    hasTraverser = false,   // final structure depends on presence of a JSON op
-    inTraverser = false,    // distinguish > in traversers from > as an operation
-    isJSONQuoted = false,   // was the JSON element quoted (for numeric keys)?
-    hasCast = false;        // make sure we pull the appropriate token for castType
+  const jsonShape = [];       // describe a JSON path: true is a field, false an array index
+  let parsed = [[]];          // we're going to collect token arrays
+  let buffer = parsed[0];     // start with the first token
+  let inQuotedField = false;  // ensure we pick up everything in quotes
+  let hasCast = false;        // make sure we pull the appropriate token for castType
+  let i = 0;
+  let char = key.charAt(i);
 
   do {
-    switch (char) {
-      case '"':
-        // quoted field
-        if (i === 0) {
-          inQuotedField = true;   // just starting out, use the initial token
-        } else {
-          inQuotedField = false;  // finishing the quoted field, new token
-          buffer = parsed[parsed.push([]) - 1];
-        }
-        break;
-      case "'":
-        //starting or ending a json element; new token
-        buffer = parsed[parsed.push([]) - 1];
-        isJSONQuoted = true;
-        break;
-      case ':':
-        // cast; new token, but we ignore the : characters since we only care about type
-        if (!hasCast) {
-          hasCast = true;
-
-          buffer = parsed[parsed.push([]) - 1];
-        }
-        break;
-      case '-': case '#':
-        // starting a json traverser; set up tracking and begin a new token
-        hasTraverser = true;
-        inTraverser = true;   // have to track for >
-        buffer = parsed[parsed.push([]) - 1];
-        buffer.push(char);
-        break;
-      case ' ': case '\t': case '\r': case '\n':
-        // whitespace; separates tokens everywhere except in quoted fields
-        if (!inQuotedField) {
-          buffer = parsed[parsed.push([]) - 1];
-          break;  // if this is a quoted field, fall through to default
-        }
-      case '>':   // eslint-disable-line no-fallthrough
-        // could be a json traverser, could be an operator. if the former *and*
-        // it's the third and last character of a traverser, we're done with
-        // this token; otherwise, just append it to the current buffer.
-        if (inTraverser) {
-          buffer.push(char);
-
-          if (buffer.length === 3) {
-            inTraverser = false;
+    if (inQuotedField &amp;&amp; char !== '"') {
+      buffer.push(char);
+    } else {
+      switch (char) {
+        case '"':
+          // quoted field
+          if (i === 0) {
+            inQuotedField = true;   // just starting out, use the initial token
+          } else {
+            inQuotedField = false;  // finishing the quoted field, new token
             buffer = parsed[parsed.push([]) - 1];
           }
 
           break;
-        }
-      default:    // eslint-disable-line no-fallthrough
-        buffer.push(char);
-        break;
+
+        case ':':
+          // cast; new token, but we ignore the : characters since we only care
+          // about type
+          if (!hasCast) {
+            hasCast = true;
+
+            buffer = parsed[parsed.push([]) - 1];
+          }
+
+          break;
+
+        case '.':
+          // json path traversal. new token, and note that it's a field to ensure
+          // proper element/index handling later.
+          jsonShape.push(true);
+          buffer = parsed[parsed.push([]) - 1];
+          break;
+
+        case '[':
+          // json array index. new token, and note that it's an index for later.
+          jsonShape.push(false);
+          buffer = parsed[parsed.push([]) - 1];
+          break;
+
+        case ']':
+          // terminate json array index. starts a new token, no jsonShape push
+          buffer = parsed[parsed.push([]) - 1];
+          break;
+
+        case ' ': case '\t': case '\r': case '\n':
+          // whitespace; separates tokens everywhere except in quoted fields
+          if (!inQuotedField) {
+            buffer = parsed[parsed.push([]) - 1];
+            break;  // if this is a quoted field, fall through to default
+          }
+
+        default:    // eslint-disable-line no-fallthrough
+          buffer.push(char);
+          break;
+      }
     }
 
     i++;
   } while (char = key.charAt(i)); // eslint-disable-line no-cond-assign
 
   parsed = parsed.reduce(function (acc, p) {
-    var str = p.join('').trim();
+    const str = p.join('').trim();
 
     if (str) { acc.push(str); }
 
     return acc;
   }, []);
 
-  var field = parsed.shift(), traverser, element, castType, operation;
-  var quotedField;
+  const field = parsed.shift();
+  let castType, operation;
+  let quotedField = `"${field}"`;
 
-  if (hasTraverser) {
-    traverser = parsed.shift();
-    element = parsed.shift();
+  if (jsonShape.length === 1) {
+    if (jsonShape[0]) {
+      // object key
+      quotedField = `${quotedField}->>'${parsed.shift()}'`;
+    } else {
+      // array index
+      quotedField = `${quotedField}->>${parsed.shift()}`;
+    }
+  } else if (jsonShape.length > 0) {
+    const tokens = parsed.splice(0, jsonShape.length);
 
-    // treat numeric json keys as array indices, otherwise quote it
-    if (isJSONQuoted || isNaN(element)) { element = `'${element}'`; }
+    quotedField = `${quotedField}#>>'{${tokens.join(',')}}'`;
   }
 
   if (hasCast) {
     castType = parsed.shift();
 
-    quotedField = `"${field}"::${castType}`;
-    field = `${field}::${castType}`;
-  } else {
-    quotedField = `"${field}"`;
+    if (jsonShape.length > 0) {
+      quotedField = `(${quotedField})::${castType}`;
+    } else {
+      quotedField = `${quotedField}::${castType}`;
+    }
   }
 
   if (parsed[0]) {
@@ -149,22 +157,21 @@ const getCondition = function (key) {
     operation = ops('=');
   }
 
-  if (hasTraverser) {
-    quotedField = `${quotedField}${traverser}${element}`;
-  }
-
   return {
     rawField: field,
     field: quotedField,
-    operation: operation,
-    isJSON: hasTraverser
+    operation,
+    isJSON: jsonShape.length > 0
   };
 };
 
 /**
- * Generate a predicate for a normal query.
+ * Generate a predicate for a query against an ordinary table.
+ *
+ * @param {Object} condition - A condition object (generated by getCondition).
+ * @return {Object} A predicate object.
  */
-const generator = function (condition) {
+const tableGenerator = function (condition) {
   if (condition.operation.mutator) {
     condition = condition.operation.mutator(condition);
   } else if (condition.value) {
@@ -180,49 +187,46 @@ const generator = function (condition) {
 
 /**
  * Generate a predicate for a document query.
+ *
+ * @param {Object} condition - A condition object (generated by getCondition).
+ * @param {Array} conditions - The full criteria object for this WHERE clause.
+ * @return {Object} A predicate object.
  */
 const docGenerator = function (condition, conditions) {
-  //case to check if key exist or not
+  // case to check if key exist or not
   if (condition.operation.operator === 'IS' || condition.operation.operator === 'IS NOT') {
     condition.rawField = `("body" ->> '${condition.rawField}')`;
-  }
-
-  //if we have an array of objects, this is a deep traversal
-  //we'll need to use a contains query to be sure we flex the index
-  else if (_.isArray(condition.value) &amp;&amp; _.isPlainObject(condition.value[0])) {
+  } else if (_.isArray(condition.value) &amp;&amp; _.isPlainObject(condition.value[0])) {
+    // if we have an array of objects, this is a deep traversal
+    // we'll need to use a contains query to be sure we flex the index
     condition.rawField = '"body"';
     condition.operation.operator = '@>';
     condition.params.push(JSON.stringify(conditions));
     condition.value = `$${condition.offset}`;
-  }
-
-  //if we have equality here, just use a JSON contains
-  else if (condition.operation.operator === '=' &amp;&amp; !_.isArray(condition.value)) {
+  } else if (condition.operation.operator === '=' &amp;&amp; !_.isArray(condition.value)) {
+    // if we have equality here, just use a JSON contains
     const param = {};
     param[condition.rawField] = condition.value;
     condition.params.push(JSON.stringify(param));
     condition.rawField = '"body"';
     condition.operation.operator = '@>';
     condition.value = `$${condition.offset}`;
-  }
-
-  else {
+  } else {
     // we're querying a key on the document body
     let cast = '';
 
-    //comparison stuff - same as method above but this time
-    //we'll be coercing the document key values using pg's ::
-    //not ideal, but it works nicely
-    if (_.isBoolean(condition.value)) { cast = '::boolean'; }
-    else if(_.isNumber(condition.value)) { cast = '::decimal'; }
-    else if(_.isDate(condition.value)) {
+    // comparison stuff - same as method above but this time
+    // we'll be coercing the document key values using pg's ::
+    // not ideal, but it works nicely
+    if (_.isBoolean(condition.value)) {
+      cast = '::boolean';
+    } else if (_.isNumber(condition.value)) {
+      cast = '::decimal';
+    } else if (_.isDate(condition.value)) {
       cast = '::timestamp';
       condition.params.push(condition.value);
       condition.value = `$${condition.offset}`;
-    }
-
-    //anything non-array handling
-    else if (condition.operation.mutator) {
+    } else if (condition.operation.mutator) {
       condition = condition.operation.mutator(condition);
     } else {
       condition.params.push(condition.value);
@@ -252,7 +256,9 @@ const generateDisjunction = (conditions, offset, generator) => {
   return _.reduce(conditions, (disjunction, subconditions) => {
     // each member of an 'or' array is itself a conjunction, so build it and
     // integrate it into the disjunction predicate structure
+    /* eslint-disable no-use-before-define */
     const conjunction = generateConjunction(subconditions, disjunction.offset + disjunction.params.length, generator);
+    /* eslint-enable no-use-before-define */
 
     disjunction.params = disjunction.params.concat(conjunction.params);
     disjunction.predicates.push(`(${conjunction.predicates.join(' AND ')})`);
@@ -261,7 +267,7 @@ const generateDisjunction = (conditions, offset, generator) => {
   }, {
     params: [],
     predicates: [],
-    offset: offset
+    offset
   });
 };
 
@@ -332,7 +338,7 @@ const generateConjunction = (conditions, offset, generator) => {
  * parameters for the prepared statement, and the `predicates` field the raw
  * predicate mapping.
  */
-exports = module.exports = function (criteria, offset = 0, generator = 'generator') {
+exports = module.exports = function (criteria, offset = 0, generator = 'tableGenerator') {
   if ((_.isPlainObject(criteria) &amp;&amp; _.isEmpty(criteria)) || criteria === '*') {
     return {
       conditions: 'TRUE',
@@ -348,7 +354,7 @@ exports = module.exports = function (criteria, offset = 0, generator = 'generato
   };
 };
 
-exports.generator = generator;
+exports.tableGenerator = tableGenerator;
 exports.docGenerator = docGenerator;
 exports.getCondition = getCondition;
 </code></pre>
@@ -361,13 +367,13 @@ exports.getCondition = getCondition;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

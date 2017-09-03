@@ -61,7 +61,7 @@ db.auth.users.find(...).then(...);
 
 If you don't want to load _every_ table, view, or function your user can access, Massive lets you restrict which objects are loaded through a set of white- and blacklist options on initialization. Any, all, or none of the loader configuration fields may be specified, or the object may be omitted entirely as long as driver configuration is also omitted.
 
-Blacklists and whitelists may use SQL `LIKE` (`_` and `%` placeholders) wildcarding. Consistent with PostgreSQL naming, they are case-sensitive.
+Blacklists and whitelists may be comma-separated strings or an array of strings (which will be separated by commas). Either type can use SQL `LIKE` (`_` and `%` placeholders) wildcarding. Consistent with PostgreSQL naming, they are case-sensitive.
 
 ```javascript
 massive(connectionInfo, {
@@ -75,7 +75,7 @@ massive(connectionInfo, {
   whitelist: ['test%', 'users'],
 
   // never load these tables or views...
-  blacklist: ['device%'],
+  blacklist: 'device%, issue',
 
   // ...unless they appear here
   exceptions: ['device_sessions'],
@@ -84,7 +84,7 @@ massive(connectionInfo, {
   functionWhitelist: ['%user%'],
 
   // never load functions on the blacklist
-  functionBlacklist: ['authorizeUser'],
+  functionBlacklist: 'authorizeUser,disableUser',
 
   // don't load database functions at all
   excludeFunctions: true,

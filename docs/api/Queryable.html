@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Queryable<span class="signature">(args)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Queryable<span class="signature">(spec)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="Queryable"><span class="type-signature"></span>new Queryable<span class="signature">(args)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Queryable"><span class="type-signature"></span>new Queryable<span class="signature">(spec)</span><span class="type-signature"></span></h4>
     
 
     
@@ -85,7 +85,7 @@
 
         <tr>
             
-                <td class="name"><code>args</code></td>
+                <td class="name"><code>spec</code></td>
             
 
             <td class="type">
@@ -101,7 +101,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">An <a href="Entity.html"><code>Entity</code></a> specification representing a queryable:
                 <h6>Properties</h6>
                 
 
@@ -143,7 +143,7 @@
 
             
 
-            <td class="description last">A <code>Database</code>.</td>
+            <td class="description last">A <a href="Database.html"><code>Database</code></a>.</td>
         </tr>
 
     
@@ -703,7 +703,7 @@ criteria objects.
 <span class="param-type">Object</span>
 |
 
-<span class="param-type">String</span>
+<span class="param-type">UUID</span>
 |
 
 <span class="param-type">Number</span>
@@ -724,8 +724,7 @@ criteria objects.
 
             
 
-            <td class="description last">A criteria object, prebuilt
-predicate, or raw primary key value.</td>
+            <td class="description last">A criteria object or primary key value.</td>
         </tr>
 
     
@@ -799,7 +798,7 @@ predicate, or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line88">line 88</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -910,7 +909,10 @@ predicate, or raw primary key value.</td>
 <span class="param-type">Object</span>
 |
 
-<span class="param-type">String</span>
+<span class="param-type">UUID</span>
+|
+
+<span class="param-type">Number</span>
 
 
             
@@ -930,8 +932,7 @@ predicate, or raw primary key value.</td>
 
             
 
-            <td class="description last">A criteria object, prebuilt predicate,
-or raw ID value.</td>
+            <td class="description last">A criteria object or primary key value.</td>
         </tr>
 
     
@@ -1005,7 +1006,7 @@ or raw ID value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line102">line 102</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -1116,7 +1117,7 @@ or raw ID value.</td>
 <span class="param-type">Object</span>
 |
 
-<span class="param-type">String</span>
+<span class="param-type">UUID</span>
 |
 
 <span class="param-type">Number</span>
@@ -1137,8 +1138,7 @@ or raw ID value.</td>
 
             
 
-            <td class="description last">A criteria object, prebuilt
-predicate, or raw primary key value.</td>
+            <td class="description last">A criteria object or primary key value.</td>
         </tr>
 
     
@@ -1212,7 +1212,7 @@ predicate, or raw primary key value.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line118">line 118</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1379,7 +1379,7 @@ test.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line136">line 136</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -1652,7 +1652,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line159">line 159</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line154">line 154</a>
     </li></ul></dd>
     
 
@@ -1924,7 +1924,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line212">line 212</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -1980,7 +1980,7 @@ looks in the document body fields instead of the table columns.
     
 
     
-    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(conditions, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="where"><span class="type-signature"></span>where<span class="signature">(conditions, params<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -2089,6 +2089,39 @@ db.mytable.where('id=$1', [123]).then(...);
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Select options</a>.</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -2126,7 +2159,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line227">line 227</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line222">line 222</a>
     </li></ul></dd>
     
 
@@ -2192,13 +2225,13 @@ db.mytable.where('id=$1', [123]).then(...);
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Massive.html">Massive</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.3</a> on Fri Aug 11 2017 17:55:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
