@@ -13,7 +13,7 @@ describe('Update', function () {
       const query = new Update(source);
 
       assert.equal(query.source, 'testsource');
-      assert.equal(query.generator, 'generator');
+      assert.equal(query.generator, 'tableGenerator');
       assert.isFalse(query.only);
       assert.isFalse(query.single);
     });
@@ -44,7 +44,7 @@ describe('Update', function () {
 
     it('should build a WHERE clause using the document generator', function () {
       const result = new Update(source, {field1: 'value1'}, {id: 1}, {document: true, generator: 'docGenerator'});
-      assert.equal(result.format(), `UPDATE testsource SET "field1" = $1 WHERE "body" @> $2 RETURNING *`);
+      assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1 WHERE "body" @> $2 RETURNING *');
     });
 
     it('should build a WHERE clause with a pk criterion and forestall the docGenerator', function () {

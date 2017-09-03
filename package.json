@@ -63,20 +63,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/dmfay/massive-js.git"
-  },
-  "jshintConfig": {
-    "esversion": 6
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "env": {
-      "node": true,
-      "mocha": true,
-      "es6": true
-    },
-    "rules": {
-      "semi": 2,
-      "eqeqeq": [2, "smart"]
-    }
   }
 }

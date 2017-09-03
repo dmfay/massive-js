@@ -24,13 +24,13 @@ describe('Entity', function () {
 
   it('should default to the current schema', function () {
     const e = new Entity({
-      db: { currentSchema: 'other' },
+      db: {currentSchema: 'other'},
       path: 'one.two',
       name: 'test_entity'
     });
 
     assert.deepEqual(e, {
-      db: { currentSchema: 'other' },
+      db: {currentSchema: 'other'},
       path: 'one.two',
       name: 'test_entity',
       schema: 'other',

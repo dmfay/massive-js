@@ -13,7 +13,7 @@ describe('Delete', function () {
       const query = new Delete(source);
 
       assert.equal(query.source, 'testsource');
-      assert.equal(query.generator, 'generator');
+      assert.equal(query.generator, 'tableGenerator');
       assert.isFalse(query.only);
       assert.isFalse(query.single);
     });

@@ -12,7 +12,7 @@ describe('saveDoc', function () {
   });
 
   describe('with an existing table', function () {
-    before(function() {
+    before(function () {
       return db.createDocumentTable('docs');
     });
 
@@ -99,7 +99,7 @@ describe('saveDoc', function () {
       assert.equal(retrieved.title, 'Together!');
     });
 
-    after(function() {
+    after(function () {
       return db.dropSchema('myschema', {cascade: true});
     });
   });
@@ -112,7 +112,7 @@ describe('saveDoc', function () {
       assert.equal(doc.name, 'Fido');
     });
 
-    after(function() {
+    after(function () {
       return db.query('DROP TABLE doggies;');
     });
   });
@@ -129,7 +129,7 @@ describe('saveDoc', function () {
       assert.equal(doc.name, 'Fido');
     });
 
-    after(function() {
+    after(function () {
       return db.dropSchema('myschema', {cascade: true});
     });
   });

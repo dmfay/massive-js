@@ -2,6 +2,8 @@
 
 /* eslint-disable no-console */
 
+'use strict';
+
 const path = require('path');
 const program = require('commander');
 const repl = require('repl');
@@ -17,7 +19,8 @@ program
 if (program.database) {
   program.connection = `postgres://localhost/${program.database}`;  // assume local user has rights
 } else if (!program.connection) {
-  return program.help();
+  program.help();
+  process.exit(1);
 }
 
 console.log(path.resolve(program.scripts));

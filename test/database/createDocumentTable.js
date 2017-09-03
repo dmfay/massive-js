@@ -15,12 +15,12 @@ describe('createDocumentTable', function () {
     return db.instance.$pool.end();
   });
 
-  describe('without schema', function() {
-    after(function() {
+  describe('without schema', function () {
+    after(function () {
       return db.dropTable(tableName, {cascade: true});
     });
 
-    it('creates a table on public schema', function() {
+    it('creates a table on public schema', function () {
       return db.createDocumentTable(tableName).then(() => {
         assert.isOk(db[tableName]);
         assert.instanceOf(db[tableName], Table);
@@ -29,18 +29,18 @@ describe('createDocumentTable', function () {
     });
   });
 
-  describe('with schema', function() {
+  describe('with schema', function () {
     const schemaTableName = `${schema}.${tableName}`;
 
-    before(function() {
+    before(function () {
       return db.createSchema(schema);
     });
 
-    after(function() {
+    after(function () {
       return db.dropSchema(schema, {cascade: true});
     });
 
-    it('creates a table on the specified schema', function() {
+    it('creates a table on the specified schema', function () {
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);
         assert.instanceOf(db[schema][tableName], Table);

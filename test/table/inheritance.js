@@ -3,7 +3,7 @@
 describe('Table Inheritance', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb('inheritance').then(instance => db = instance);
   });
 

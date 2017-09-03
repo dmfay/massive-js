@@ -3,7 +3,7 @@
 describe('invoke', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb('functions').then(instance => db = instance);
   });
 
@@ -31,7 +31,7 @@ describe('invoke', function () {
     });
 
     it('invokes a function with one argument in an array', function () {
-      return db.single_arg([ 1 ]).then(res => {
+      return db.single_arg([1]).then(res => {
         assert.equal(res, 1);
       });
     });
@@ -43,7 +43,7 @@ describe('invoke', function () {
     });
 
     it('invokes a function with multiple arguments in an array', function () {
-      return db.multi_arg([ 1, 2 ]).then(res => {
+      return db.multi_arg([1, 2]).then(res => {
         assert.equal(res, 3);
       });
     });
@@ -87,7 +87,7 @@ describe('invoke', function () {
     });
 
     it('invokes a function with one argument in an array plus options', function () {
-      return db.single_arg([ 1 ], {single: true}).then(res => {
+      return db.single_arg([1], {single: true}).then(res => {
         assert.equal(res, 1);
       });
     });
@@ -99,7 +99,7 @@ describe('invoke', function () {
     });
 
     it('invokes a function with multiple arguments in an array plus options', function () {
-      return db.multi_arg([ 1, 2 ], {single: true}).then(res => {
+      return db.multi_arg([1, 2], {single: true}).then(res => {
         assert.equal(res, 3);
       });
     });
@@ -150,7 +150,7 @@ describe('invoke', function () {
     it.skip('executes function coin_tosses and returns array of "heads" or "tails"', function () {
       return db.coin_tosses().then(res => {
         assert(Array.isArray(res), 'Expected array');
-        res.forEach(function(el) {
+        res.forEach(function (el) {
           assert(['heads', 'tails'].indexOf(el) >= 0, `${el} must be heads or tails`);
         });
       });
@@ -189,7 +189,7 @@ describe('invoke', function () {
       db.get_record({stream: true}).then(stream => {
         const result = [];
 
-        stream.on('readable', function() {
+        stream.on('readable', function () {
           const res = stream.read();
 
           if (res) {
@@ -213,7 +213,7 @@ describe('invoke', function () {
       db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}).then(stream => {
         const result = [];
 
-        stream.on('readable', function() {
+        stream.on('readable', function () {
           const res = stream.read();
 
           if (res) {
@@ -223,7 +223,7 @@ describe('invoke', function () {
 
         stream.on('end', function () {
           assert.equal(20, result.length);
-          result.forEach(function(r) {
+          result.forEach(function (r) {
             assert.equal(r, 'a');
           });
 

@@ -3,7 +3,7 @@
 describe('count', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb().then(instance => db = instance);
   });
 
@@ -13,7 +13,7 @@ describe('count', function () {
 
   describe('where syntax', function () {
     it('returns 2 for OR id 1 or 2', function () {
-      return db.products.count('id=$1 OR id=$2', [1,2]).then(res => assert.equal(res,2));
+      return db.products.count('id=$1 OR id=$2', [1, 2]).then(res => assert.equal(res, 2));
     });
 
     it('returns 1 for id 1', function () {

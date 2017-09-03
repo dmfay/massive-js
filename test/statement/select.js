@@ -14,7 +14,7 @@ describe('Select', function () {
 
       assert.equal(query.source, 'testsource');
       assert.equal(query.columns, '*');
-      assert.equal(query.generator, 'generator');
+      assert.equal(query.generator, 'tableGenerator');
       assert.isFalse(query.only);
       assert.isFalse(query.single);
       assert.equal(query.order, 'ORDER BY 1');

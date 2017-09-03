@@ -3,7 +3,7 @@
 describe('findDoc', function () {
   let db;
 
-  before(function(){
+  before(function () {
     return resetDb().then(instance => db = instance);
   });
 
@@ -50,19 +50,19 @@ describe('findDoc', function () {
     });
 
     it('finds a doc with > comparison on primary key', function () {
-      return db.docs.findDoc({'id >' : 1}).then(docs => {
+      return db.docs.findDoc({'id >': 1}).then(docs => {
         assert.lengthOf(docs, 3);
       });
     });
 
     it('finds a doc with >= comparison on primary key', function () {
-      return db.docs.findDoc({'id >=' : 2}).then(docs => {
+      return db.docs.findDoc({'id >=': 2}).then(docs => {
         assert.lengthOf(docs, 3);
       });
     });
 
     it('finds multiple docs with an IN on primary key', function () {
-      return db.docs.findDoc({'id' : [1, 2, 3]}).then(docs => {
+      return db.docs.findDoc({'id': [1, 2, 3]}).then(docs => {
         assert.lengthOf(docs, 3);
       });
     });
@@ -70,56 +70,56 @@ describe('findDoc', function () {
 
   describe('querying documents by fields', function () {
     it('finds a doc by title', function () {
-      return db.docs.findDoc({title : 'Document 1'}).then(docs => {
-        //find will return multiple if id not specified... confusing?
+      return db.docs.findDoc({title: 'Document 1'}).then(docs => {
+        // find will return multiple if id not specified... confusing?
         assert.equal(docs[0].title, 'Document 1');
       });
     });
 
     it('parses greater than with two string defs', function () {
-      return db.docs.findDoc({'price >' : '18'}).then(docs => {
+      return db.docs.findDoc({'price >': '18'}).then(docs => {
         assert.equal(docs[0].title, 'Document 1');
       });
     });
 
     it('parses greater than with a numeric', function () {
-      return db.docs.findDoc({'price >' : 18}).then(docs => {
+      return db.docs.findDoc({'price >': 18}).then(docs => {
         assert.equal(docs[0].title, 'Document 1');
       });
     });
 
     it('parses less than with a numeric', function () {
-      return db.docs.findDoc({'price <' : 18}).then(docs => {
+      return db.docs.findDoc({'price <': 18}).then(docs => {
         assert.equal(docs[0].title, 'Something Else');
       });
     });
 
     it('deals with arrays using IN', function () {
-      return db.docs.findDoc({'title' : ['Document 1', 'Document 2']}).then(docs => {
+      return db.docs.findDoc({'title': ['Document 1', 'Document 2']}).then(docs => {
         assert.lengthOf(docs, 2);
       });
     });
 
     it('deals with arrays using NOT IN', function () {
-      return db.docs.findDoc({'title <>' : ['Document 1', 'Document 2']}).then(docs => {
+      return db.docs.findDoc({'title <>': ['Document 1', 'Document 2']}).then(docs => {
         assert.lengthOf(docs, 2);
       });
     });
 
     it('check if field exists with IS NOT', function () {
-      return db.docs.findDoc({'price is not' : null}).then(docs => {
+      return db.docs.findDoc({'price is not': null}).then(docs => {
         assert.lengthOf(docs, 4);
       });
     });
 
     it('executes a contains if passed an array of objects', function () {
-      return db.docs.findDoc({studios : [{name : 'Warner'}]}).then(docs => {
+      return db.docs.findDoc({studios: [{name: 'Warner'}]}).then(docs => {
         assert.lengthOf(docs, 1);
       });
     });
 
     it('works properly with dates', function () {
-      return db.docs.findDoc({'created_at <' : new Date(1980, 1,1)}).then(docs => {
+      return db.docs.findDoc({'created_at <': new Date(1980, 1, 1)}).then(docs => {
         assert.lengthOf(docs, 1);
       });
     });
@@ -133,9 +133,9 @@ describe('findDoc', function () {
     });
 
     it('returns null when a single document is\'nt found', function () {
-        return db.docs.findDoc({title: 'Not Dound'}, {single: true}).then(doc => {
-            assert.equal(doc, null);
-        });
+      return db.docs.findDoc({title: 'Not Found'}, {single: true}).then(doc => {
+        assert.equal(doc, null);
+      });
     });
 
     it('applies criteria', function () {

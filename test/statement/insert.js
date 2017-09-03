@@ -43,7 +43,5 @@ describe('Insert', function () {
       const result = new Insert(source, {field1: 'value1'}, {onConflictIgnore: true});
       assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');
     });
-
-
   });
 });

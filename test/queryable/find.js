@@ -3,7 +3,7 @@
 describe('find', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb().then(instance => db = instance);
   });
 
@@ -71,45 +71,55 @@ describe('find', function () {
     it('returns product with id greater than 2', function () {
       return db.products.find({'id > ': 2}).then(res => assert.equal(res[0].id, 3));
     });
+
     it('returns product with id less than 2', function () {
       return db.products.find({'id < ': 2}).then(res => assert.equal(res[0].id, 1));
     });
+
     it('returns products IN 1 and 2', function () {
-      return db.products.find({id: [1,2]}).then(res => assert.equal(res[0].id, 1));
+      return db.products.find({id: [1, 2]}).then(res => assert.equal(res[0].id, 1));
     });
+
     it('returns product NOT IN 1 and 2', function () {
-      return db.products.find({'id <>': [1,2]}).then(res => assert.equal(res[0].id, 3));
+      return db.products.find({'id <>': [1, 2]}).then(res => assert.equal(res[0].id, 3));
     });
+
     it('returns products by finding a null field', function () {
       return db.products.find({'tags': null}).then(res => {
         assert.lengthOf(res, 1);
         assert.equal(res[0].id, 1);
       });
     });
+
     it('returns products by finding a non-null field', function () {
       return db.products.find({'id != ': null}).then(res => {
         assert.lengthOf(res, 4);
         assert.equal(res[0].id, 1);
       });
     });
+
     it('returns products using is null', function () {
       return db.products.find({'tags is': null}).then(res => {
         assert.lengthOf(res, 1);
         assert.equal(res[0].id, 1);
       });
     });
+
     it('returns products using is not null', function () {
       return db.products.find({'id is not': null}).then(res => {
         assert.lengthOf(res, 4);
         assert.equal(res[0].id, 1);
       });
-});
+    });
+
     it('returns products using distinct from', function () {
       return db.products.find({'tags is distinct from': '{tag1,tag2}'}).then(res => assert.lengthOf(res, 3));
     });
+
     it('returns products using not distinct from', function () {
       return db.products.find({'tags is not distinct from': '{tag1,tag2}'}).then(res => assert.lengthOf(res, 1));
     });
+
     it('returns products with a compound query including a null field', function () {
       return db.products.find({'id': 1, 'tags': null, price: 12.00}).then(res => {
         assert.lengthOf(res, 1);
@@ -341,18 +351,18 @@ describe('find', function () {
     });
 
     it('returns second result with limit of 1, offset of 1', function () {
-      return db.products.find({},{limit: 1, offset: 1}).then(res => assert.equal(res[0].id, 2));
+      return db.products.find({}, {limit: 1, offset: 1}).then(res => assert.equal(res[0].id, 2));
     });
 
     it('restricts the select list to specified columns', function () {
-      return db.products.find({},{columns :['id','name']}).then(res => {
+      return db.products.find({}, {columns: ['id', 'name']}).then(res => {
         const keys = _.keys(res[0]);
-        assert.equal(keys.length,2);
+        assert.equal(keys.length, 2);
       });
     });
 
     it('allows expressions in the select list', function () {
-      return db.products.find({},{columns :['id', 'upper(name) as name']}).then(res => {
+      return db.products.find({}, {columns: ['id', 'upper(name) as name']}).then(res => {
         assert.equal(res[0].id, 1);
         assert.equal(res[0].name, 'PRODUCT 1');
       });
@@ -367,7 +377,7 @@ describe('find', function () {
     });
 
     it('returns descending order of products', function () {
-      return db.products.find({},{order: 'id desc'}).then(res => {
+      return db.products.find({}, {order: 'id desc'}).then(res => {
         assert.lengthOf(res, 4);
         assert.equal(res[0].id, 4);
         assert.equal(res[2].id, 2);
@@ -390,36 +400,46 @@ describe('find', function () {
     it('returns users because we delimit OK', function () {
       return db.Users.find({}).then(res => assert.lengthOf(res, 1));
     });
+
     it('returns the first user because we delimit OK', function () {
       return db.Users.findOne().then(res => assert.equal(res.Id, 1));
     });
+
     it('returns a subset of columns, when we delimit in the calling code', function () {
-      return db.Users.find({},{columns: ['"Id"','"Email"']}).then(res => assert.lengthOf(res, 1));
+      return db.Users.find({}, {columns: ['"Id"', '"Email"']}).then(res => assert.lengthOf(res, 1));
     });
+
     it('returns a single column, when we delimit in the calling code', function () {
-      return db.Users.find({},{columns: '"Email"'}).then(res => assert.lengthOf(res, 1));
+      return db.Users.find({}, {columns: '"Email"'}).then(res => assert.lengthOf(res, 1));
     });
+
     it('returns users with a simple order by', function () {
       return db.Users.find({}, {order: '"Email"'}).then(res => assert.lengthOf(res, 1));
     });
+
     it('returns users with a compound order by', function () {
       return db.Users.find({}, {order: '"Email" asc, "Id" desc'}).then(res => assert.lengthOf(res, 1));
     });
-    it('returns users with a complex order by', function () {
-      return db.Users.find({}, {
+
+    it('returns users with a complex order by', function* () {
+      const res = yield db.Users.find({}, {
         order: [
           {field: '"Email"', direction: 'asc'},
           {field: '"Id"', direction: 'desc'}
-        ]}).then(res => {
-          assert.lengthOf(res, 1);
-        });
+        ]
+      });
+
+      assert.lengthOf(res, 1);
     });
+
     it('counts all funny cased users', function () {
       return db.Users.count({}).then(res => assert.equal(res, 1));
     });
+
     it('counts funny cased users when we use a where and delimit the condition', function () {
       return db.Users.count('"Email"=$1', ['test@test.com']).then(res => assert.equal(res, 1));
     });
+
     it('returns users when we use a simple where', function () {
       return db.Users.where('"Email"=$1', ['test@test.com']).then(res => assert.lengthOf(res, 1));
     });
@@ -454,28 +474,28 @@ describe('find', function () {
 
   describe('view queries with options', function () {
     it('applies offsets and limits', function () {
-      return db.popular_products.find({},{limit: 1, offset: 1}).then(res => {
+      return db.popular_products.find({}, {limit: 1, offset: 1}).then(res => {
         assert.lengthOf(res, 1);
         assert.equal(res[0].id, 2);
       });
     });
 
     it('restricts columns', function () {
-      return db.popular_products.find({}, {columns :['id','price']}).then(res => {
+      return db.popular_products.find({}, {columns: ['id', 'price']}).then(res => {
         const keys = _.keys(res[0]);
-        assert.equal(keys.length,2);
+        assert.equal(keys.length, 2);
       });
     });
 
     it('allows expressions in the select list', function () {
-      return db.popular_products.find({}, {columns :['id', 'upper(name) as name']}).then(res => {
+      return db.popular_products.find({}, {columns: ['id', 'upper(name) as name']}).then(res => {
         assert.equal(res[0].id, 1);
         assert.equal(res[0].name, 'PRODUCT 1');
       });
     });
 
     it('applies sorting', function () {
-      return db.popular_products.find({},{order: 'id desc'}).then(res => {
+      return db.popular_products.find({}, {order: 'id desc'}).then(res => {
         assert.lengthOf(res, 3);
         assert.equal(res[0].id, 4);
         assert.equal(res[1].id, 2);
@@ -497,7 +517,7 @@ describe('find', function () {
       db.products.find({}, {stream: true}).then(stream => {
         const result = [];
 
-        stream.on('readable', function() {
+        stream.on('readable', function () {
           const res = stream.read();
 
           if (res) {

@@ -12,16 +12,16 @@ describe('insert', function () {
   });
 
   it('inserts a record and returns an object', function () {
-    return db.products.insert({name: "A Product"}).then(res => {
-      assert.equal(res.name, "A Product");
+    return db.products.insert({name: 'A Product'}).then(res => {
+      assert.equal(res.name, 'A Product');
     });
   });
 
   it('inserts multiple products and returns an array', function () {
-    return db.products.insert([{name: "A Product"}, {name: "Another Product"}]).then(res => {
+    return db.products.insert([{name: 'A Product'}, {name: 'Another Product'}]).then(res => {
       assert.equal(res.length, 2);
-      assert.equal(res[0].name, "A Product");
-      assert.equal(res[1].name, "Another Product");
+      assert.equal(res[0].name, 'A Product');
+      assert.equal(res[1].name, 'Another Product');
     });
   });
 
@@ -32,8 +32,8 @@ describe('insert', function () {
   });
 
   it('inserts array fields', function () {
-    return db.products.insert({name: "A Product", tags: ['one', 'two']}).then(res => {
-      assert.equal(res.name, "A Product");
+    return db.products.insert({name: 'A Product', tags: ['one', 'two']}).then(res => {
+      assert.equal(res.name, 'A Product');
       assert.deepEqual(res.tags, ['one', 'two']);
     });
   });
@@ -48,16 +48,16 @@ describe('insert', function () {
   });
 
   it('inserts a record into a table with a Cased Name', function () {
-    return db.Users.insert({Email: "foo@bar.com", Name: "Another test user"}).then(res => {
+    return db.Users.insert({Email: 'foo@bar.com', Name: 'Another test user'}).then(res => {
       assert.equal(res.Id, 2);
-      assert.equal(res.Email, "foo@bar.com");
+      assert.equal(res.Email, 'foo@bar.com');
     });
   });
 
-  it('returns an error when a constraint is violated', function() {
+  it('returns an error when a constraint is violated', function () {
     return db.products.insert({name: null}).catch(err => {
       assert.equal(err.code, '23502');
-      assert.notEqual(err.detail, undefined);
+      assert.isOk(err.detail);
     });
   });
 

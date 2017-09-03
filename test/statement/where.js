@@ -85,14 +85,13 @@ describe('WHERE clause generation', function () {
       it('should encapsulate and OR together subgroups', function () {
         const result = where({
           or: [{
-              field1: 'value1'
-            }, {
-              field2: 'value2', field3: 'value3'
-            }, {
-              field4: 'value4'
-            }]
-          }
-        );
+            field1: 'value1'
+          }, {
+            field2: 'value2', field3: 'value3'
+          }, {
+            field4: 'value4'
+          }]
+        });
 
         assert.equal(result.conditions, '(("field1" = $1) OR ("field2" = $2 AND "field3" = $3) OR ("field4" = $4))');
         assert.equal(result.params.length, 4);
@@ -220,7 +219,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'myfield');
         assert.equal(result.field, '"myfield"');
         assert.equal(result.operation.operator, '=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should get the operation details for an unquoted identifier', function () {
@@ -228,7 +227,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'myfield');
         assert.equal(result.field, '"myfield"');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should get the operation details for a quoted identifier', function () {
@@ -236,7 +235,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'my field');
         assert.equal(result.field, '"my field"');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should allow any amount of whitespace', function () {
@@ -244,7 +243,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'myfield');
         assert.equal(result.field, '"myfield"');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should get the appropriate mutator', function () {
@@ -265,7 +264,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '"json"->>\'key\'');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should get operations for a deep JSON path', function () {
@@ -273,7 +272,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '"json"#>>\'{outer,inner}\'');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should get operations for a JSON array', function () {
@@ -281,23 +280,23 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '"json"->>1');
         assert.equal(result.operation.operator, '<=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should match > properly', function () {
-        var result = where.getCondition('field >');
+        const result = where.getCondition('field >');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"');
         assert.equal(result.operation.operator, '>');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should match >= properly', function () {
-        var result = where.getCondition('field >=');
+        const result = where.getCondition('field >=');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"');
         assert.equal(result.operation.operator, '>=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should match the longest possible operator', function () {
@@ -305,7 +304,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"');
         assert.equal(result.operation.operator, 'ILIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should ignore the case of LIKE and similar operators', function () {
@@ -313,33 +312,33 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should not clobber a field with an operator in the name', function () {
-        var result = where.getCondition('is_field is');
+        const result = where.getCondition('is_field is');
         assert.equal(result.rawField, 'is_field');
         assert.equal(result.field, '"is_field"');
         assert.equal(result.operation.operator, 'IS');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should not clobber a quoted field with an operator in the name', function () {
-        var result = where.getCondition('"this is a field" is');
+        const result = where.getCondition('"this is a field" is');
         assert.equal(result.rawField, 'this is a field');
         assert.equal(result.field, '"this is a field"');
         assert.equal(result.operation.operator, 'IS');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
     });
 
     describe('casting', function () {
       it('should cast fields without an operator', function () {
-        var result = where.getCondition('field::text');
+        const result = where.getCondition('field::text');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, '=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast fields', function () {
@@ -347,31 +346,31 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast fields with shallow JSON paths', function () {
-        var result = where.getCondition('field.element::boolean LIKE');
+        const result = where.getCondition('field.element::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>\'element\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast fields with deep JSON paths', function () {
-        var result = where.getCondition('field.one.two::boolean LIKE');
+        const result = where.getCondition('field.one.two::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"#>>\'{one,two}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast fields with JSON arrays', function () {
-        var result = where.getCondition('field[123]::boolean LIKE');
+        const result = where.getCondition('field[123]::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>123)::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should format mixed JSON paths', function () {
@@ -379,15 +378,15 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '("json"#>>\'{array,1,field,array,2}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast quoted fields without an operator', function () {
-        var result = where.getCondition('"field"::text');
+        const result = where.getCondition('"field"::text');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, '=');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast quoted fields', function () {
@@ -395,31 +394,31 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '"field"::text');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast quoted fields with JSON operations', function () {
-        var result = where.getCondition('"field".element::boolean LIKE');
+        const result = where.getCondition('"field".element::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>\'element\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast quoted fields with deep JSON paths', function () {
-        var result = where.getCondition('"field".one.two::boolean LIKE');
+        const result = where.getCondition('"field".one.two::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"#>>\'{one,two}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should cast quoted fields with JSON arrays', function () {
-        var result = where.getCondition('"field"[123]::boolean LIKE');
+        const result = where.getCondition('"field"[123]::boolean LIKE');
         assert.equal(result.rawField, 'field');
         assert.equal(result.field, '("field"->>123)::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
 
       it('should format quoted fields with mixed JSON paths', function () {
@@ -427,15 +426,15 @@ describe('WHERE clause generation', function () {
         assert.equal(result.rawField, 'json');
         assert.equal(result.field, '("json"#>>\'{array,1,field,array,2}\')::boolean');
         assert.equal(result.operation.operator, 'LIKE');
-        assert.equal(result.mutator, undefined);
+        assert.isUndefined(result.mutator);
       });
     });
   });
 
-  describe('generator', function () {
+  describe('tableGenerator', function () {
     it('should build an equality predicate', function () {
       const condition = {field: '"field"', operation: ops('='), value: 'value', offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" = $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], 'value');
@@ -443,7 +442,7 @@ describe('WHERE clause generation', function () {
 
     it('should build a BETWEEN predicate', function () {
       const condition = {field: '"field"', operation: ops('between'), value: [1, 100], offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" BETWEEN $1 AND $2');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 1);
@@ -452,21 +451,21 @@ describe('WHERE clause generation', function () {
 
     it('should interpolate nulls directly', function () {
       const condition = {field: '"field"', operation: ops('<>'), value: null, offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" IS NOT null');
       assert.equal(result.params.length, 0);
     });
 
     it('should interpolate booleans directly', function () {
       const condition = {field: '"field"', operation: ops('='), value: false, offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" IS false');
       assert.equal(result.params.length, 0);
     });
 
     it('should accept IS NOT explicitly', function () {
       const condition = {field: '"field"', operation: ops('is not'), value: null, offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" IS NOT null');
       assert.equal(result.params.length, 0);
     });
@@ -479,7 +478,7 @@ describe('WHERE clause generation', function () {
         offset: 1,
         params: []
       };
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" @> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], '{value}');
@@ -487,7 +486,7 @@ describe('WHERE clause generation', function () {
 
     it('should create IN clauses for array parameters', function () {
       const condition = {field: '"field"', operation: ops('='), value: ['value1', 'value2'], offset: 1, params: []};
-      const result = where.generator(condition);
+      const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" IN ($1,$2)');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');

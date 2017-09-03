@@ -13,8 +13,8 @@ describe('dropTable', function () {
     return db.instance.$pool.end();
   });
 
-  describe('without schema', function() {
-    before(function() {
+  describe('without schema', function () {
+    before(function () {
       return db.createDocumentTable(tableName);
     });
 
@@ -28,7 +28,7 @@ describe('dropTable', function () {
     });
   });
 
-  describe('with schema', function() {
+  describe('with schema', function () {
     const schemaTableName = `${schema}.${tableName}`;
 
     before(function* () {

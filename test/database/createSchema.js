@@ -1,22 +1,22 @@
 'use strict';
 
-describe("createSchema", function() {
+describe('createSchema', function () {
   let db;
-  const schemaName = "spec";
+  const schemaName = 'spec';
 
-  before(function() {
-    return resetDb("empty").then(instance => db = instance);
+  before(function () {
+    return resetDb('empty').then(instance => db = instance);
   });
 
-  after(function() {
+  after(function () {
     return db.dropSchema(schemaName, {cascade: true}).then(() => {
-      assert.equal(db[schemaName], undefined);
+      assert.isUndefined(db[schemaName]);
 
       return db.instance.$pool.end();
     });
   });
 
-  it("adds a new schema", function() {
+  it('adds a new schema', function () {
     return db.createSchema(schemaName).then(() => {
       assert(_.isEqual(db[schemaName], {}), 'should be an empty object');
     });

@@ -33,9 +33,9 @@ describe('update', function () {
     });
 
     it('updates a record in a table with a Cased Name', function () {
-      return db.Users.update({Id: 1, Email: "bar@foo.com"}).then(res => {
+      return db.Users.update({Id: 1, Email: 'bar@foo.com'}).then(res => {
         assert.equal(res.Id, 1);
-        assert.equal(res.Email, "bar@foo.com");
+        assert.equal(res.Email, 'bar@foo.com');
       });
     });
 

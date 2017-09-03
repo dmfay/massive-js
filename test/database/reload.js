@@ -3,15 +3,14 @@
 describe('reload', function () {
   let db;
 
-  before(() => {
-    return resetDb('multi-schema')
-      .then((db) => Promise.all([
-        // reconnect with a pool size of 1 to make it easier to change runtime settings on all connections
-        massive({database: 'massive', poolSize: 1}, db.loader),
-        // close original connection
-        db.instance.$pool.end(),
-      ]))
-      .then(([instance]) => db = instance);
+  before(function* () {
+    const initDb = yield resetDb('multi-schema');
+
+    // reconnect with a pool size of 1 to make it easier to change runtime settings on all connections
+    db = yield massive({database: 'massive', poolSize: 1}, massive.loader);
+
+    // close original connection
+    yield initDb.instance.$pool.end();
   });
 
   after(() => db.instance.$pool.end());

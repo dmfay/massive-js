@@ -3,7 +3,7 @@
 describe('initialization', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb('functions').then(instance => db = instance);
   });
 
@@ -23,7 +23,7 @@ describe('initialization', function () {
     assert.equal(res, 1);
 
     assert.isOk(db.GetNumber);
-    res = yield db.GetNumber();
+    res = yield db.GetNumber(); // eslint-disable-line new-cap
     assert.equal(res, 2);
 
     assert.isOk(db.one.get_number);
@@ -31,7 +31,7 @@ describe('initialization', function () {
     assert.equal(res, 3);
 
     assert.isOk(db.one.GetNumber);
-    res = yield db.one.GetNumber();
+    res = yield db.one.GetNumber(); // eslint-disable-line new-cap
     assert.equal(res, 4);
   });
 

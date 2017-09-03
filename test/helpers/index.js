@@ -15,18 +15,15 @@ global.loader = {
   enhancedFunctions: true
 };
 
-global.resetDb = function (schema) {
-  schema = schema || 'default';
-
+global.resetDb = function (schema = 'default') {
   global.loader.scripts = path.join(__dirname, 'scripts', schema);
 
   return massive(connectionString, global.loader).then(db => {
-    return db.run("select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'").then(schemata =>
-      Promise.all(schemata.map(schema => db.run(`drop schema ${schema.schema_name} cascade`)))
-    ).then(() =>
-      db.schema()
-    ).then(() =>
-      db.reload()
-    );
+    return db.run(`select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'`)
+      .then(schemata =>
+        Promise.all(schemata.map(s => db.run(`drop schema ${s.schema_name} cascade`)))
+      )
+      .then(() => db.schema())
+      .then(() => db.reload());
   });
 };

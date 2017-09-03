@@ -5,7 +5,7 @@ const Table = require('../../lib/table');
 describe('initialization', function () {
   let db;
 
-  before(function(){
+  before(function () {
     return resetDb().then(instance => db = instance);
   });
 

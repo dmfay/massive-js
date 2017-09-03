@@ -14,11 +14,11 @@ describe('getObject', function () {
     return db.instance.$pool.end();
   });
 
-  describe('without schema', function() {
-    before(function() {
+  describe('without schema', function () {
+    before(function () {
       return db.createDocumentTable(tableName);
     });
-    after(function() {
+    after(function () {
       return db.dropTable(tableName, {cascade: true});
     });
 
@@ -32,7 +32,7 @@ describe('getObject', function () {
     });
   });
 
-  describe('with schema', function() {
+  describe('with schema', function () {
     const schemaTableName = `${schema}.${tableName}`;
     const missingSchemaTableName = `${schema}.${missingTableName}`;
 
@@ -40,7 +40,7 @@ describe('getObject', function () {
       yield db.createSchema(schema);
       yield db.createDocumentTable(schemaTableName);
     });
-    after(function*() {
+    after(function* () {
       yield db.dropTable(schemaTableName, {cascade: true});
       yield db.dropSchema(schema, {cascade: true});
     });

@@ -16,7 +16,7 @@ describe('connecting', function () {
   });
 
   it('returns a database connection', function () {
-    return massive({ connectionString: connectionString }, loader).then(db => {
+    return massive({connectionString}, loader).then(db => {
       assert.isOk(db);
       assert.isOk(db.tables);
       assert.isOk(db.functions);
@@ -29,7 +29,7 @@ describe('connecting', function () {
 
   describe('variations', function () {
     it('connects with a connectionString property', function () {
-      return massive({ connectionString: connectionString }, loader).then(db => {
+      return massive({connectionString}, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -47,7 +47,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({ host: 'localhost', database: 'massive', user: 'postgres' }, loader).then(db => {
+      return massive({host: 'localhost', database: 'massive', user: 'postgres'}, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -56,7 +56,7 @@ describe('connecting', function () {
     });
 
     it('rejects with connection errors', function () {
-      return massive({ database: 'doesntexist', user: 'postgres' }, loader).then(
+      return massive({database: 'doesntexist', user: 'postgres'}, loader).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
@@ -114,7 +114,7 @@ describe('connecting', function () {
 
   describe('object loading', function () {
     it('loads non-public schemata as namespace properties', function () {
-      return massive({ connectionString: connectionString }, loader).then(db => {
+      return massive({connectionString}, loader).then(db => {
         assert.isOk(db.one);
         assert.isOk(db.two);
         assert.isOk(db.one.t1);
@@ -128,7 +128,7 @@ describe('connecting', function () {
     });
 
     it('loads all tables', function () {
-      return massive({ connectionString: connectionString }, loader).then(db => {
+      return massive({connectionString}, loader).then(db => {
         assert.equal(db.tables.length, 6);
 
         return db.instance.$pool.end();
@@ -136,7 +136,7 @@ describe('connecting', function () {
     });
 
     it('loads all views', function () {
-      return massive({ connectionString: connectionString }, loader).then(db => {
+      return massive({connectionString}, loader).then(db => {
         assert.equal(db.views.length, 6);
 
         return db.instance.$pool.end();
@@ -170,7 +170,7 @@ describe('connecting', function () {
         assert(!!db.mv1 && !!db.mv2);
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
-        assert(!!db.two && !! db.two.t1);
+        assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.tables, 6);
         assert.lengthOf(db.views, 6);
         assert.lengthOf(db.functions, 5);

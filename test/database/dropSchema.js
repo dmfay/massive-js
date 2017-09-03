@@ -1,6 +1,6 @@
 'use strict';
 
-describe('dropSchema', function() {
+describe('dropSchema', function () {
   let db;
   const schemaName = 'spec';
 
@@ -8,7 +8,7 @@ describe('dropSchema', function() {
     return resetDb('empty').then(instance => db = instance);
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     return db.createSchema(schemaName);
   });
 

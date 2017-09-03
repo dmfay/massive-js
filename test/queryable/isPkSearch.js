@@ -3,7 +3,7 @@
 describe('isPkSearch', function () {
   let db;
 
-  before(function() {
+  before(function () {
     return resetDb().then(instance => db = instance);
   });
 
