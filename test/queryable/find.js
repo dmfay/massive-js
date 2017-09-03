@@ -19,10 +19,6 @@ describe('find', function () {
     it('returns all records on find with empty conditions', function () {
       return db.products.find({}).then(res => assert.lengthOf(res, 4));
     });
-
-    it('returns all records on find with *', function () {
-      return db.products.find('*').then(res => assert.lengthOf(res, 4));
-    });
   });
 
   describe('primary keys', function () {
@@ -309,7 +305,7 @@ describe('find', function () {
     });
 
     it('orders by fields in the table', function () {
-      return db.docs.find('*', {order: 'id desc', document: true, generator: 'docGenerator'}).then(docs => {
+      return db.docs.find({}, {order: 'id desc', document: true, generator: 'docGenerator'}).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].id, 4);
         assert.equal(docs[1].id, 3);
@@ -320,7 +316,7 @@ describe('find', function () {
 
     it('orders by fields in the document body with raw traversal', function () {
       // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
-      return db.docs.find('*', {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
+      return db.docs.find({}, {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Something Else');
         assert.equal(docs[1].title, 'Document 3');
@@ -330,7 +326,7 @@ describe('find', function () {
     });
 
     it('orders by fields in the document body with a field spec', function () {
-      return db.docs.find('*', {
+      return db.docs.find({}, {
         order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true,
         document: true,
