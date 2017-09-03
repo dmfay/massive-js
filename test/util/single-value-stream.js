@@ -1,6 +1,7 @@
 'use strict';
 
 const stream = require('stream');
+const AssertionError = require('assert').AssertionError;
 const SingleValueStream = require('../../lib/util/single-value-stream');
 
 describe('SingleValueStream', function () {
@@ -57,5 +58,16 @@ describe('SingleValueStream', function () {
       r.push({field: 'value', otherfield: 'othervalue'});
       r.push(null);
     }).then(() => { assert.fail(); }).catch(() => {});
+  });
+
+  describe('singleValue', function () {
+    it('returns the value of a single-key map', function () {
+      assert.equal(SingleValueStream.singleValue({field: 'value'}), 'value');
+    });
+
+    it('raises an error if the map does not contain one and only one field', function () {
+      assert.throws(() => SingleValueStream.singleValue({}), AssertionError);
+      assert.throws(() => SingleValueStream.singleValue({field: 'value', otherfield: 'othervalue'}), AssertionError);
+    });
   });
 });
