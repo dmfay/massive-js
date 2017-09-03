@@ -299,7 +299,6 @@ describe('find', function () {
   describe('document generator', function () {
     it('finds a doc by title', function () {
       return db.docs.find({title: 'Document 1'}, {document: true, generator: 'docGenerator'}).then(docs => {
-        // TODO find will return multiple if id not specified... confusing?
         assert.equal(docs[0].title, 'Document 1');
       });
     });

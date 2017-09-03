@@ -12,7 +12,7 @@ I am not, however, going to make any promises regarding the speed with which I'l
 
 Want to contribute code to Massive? Awesome! I'm always happy to review pull requests. Here are some guidelines to make the process as smooth as possible:
 
-* First, if it's a big new feature or something else which involves a lot of effort, please open an issue to discuss before you put in too much time on it.
+* First, if it's a big new feature or something else which involves a lot of effort, please open an issue to discuss before you put too much time into it.
 * Stay focused. If you're tinkering with multiple things, use branches to ensure that your pull request only includes the relevant commits.
 * Lint your code (your editor may do this for you; alternatively, `npm run lint`) to ensure that your formatting is consistent with the existing code style.
 * Run the tests (`npm test`) before you commit or submit a pull request. Your changes will be picked up by continuous integration, but it's a lot faster to do it locally.

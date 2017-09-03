@@ -19,6 +19,8 @@
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha",
     "lint": "eslint '.'",
+    "docs": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r",
+    "docserver": "npm run docs && cd docs && bundle exec jekyll serve",
     "posttest": "npm run lint",
     "preversion": "sh build/apidocs.sh",
     "postversion": "sh build/update-gh-pages.sh",

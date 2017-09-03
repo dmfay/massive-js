@@ -2,9 +2,7 @@
 
 echo "regenerating API docs"
 
-rm -rf ./docs/api
-
-node_modules/.bin/jsdoc -d ./docs/api -c ./.jsdoc.json -r
+npm run docs
 
 echo "committing updated API docs"
 
