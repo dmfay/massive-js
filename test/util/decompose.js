@@ -246,7 +246,7 @@ describe('decompose', function () {
     assert.deepEqual(data, [{id: 1, val: 'p1', child: {id: 11, val: 'c1'}}]);
   });
 
-  it('should collapse tree structures on a different child pk with options.pk', function () {
+  it('consolidates duplicate children by pk', function () {
     // this dataset is 'bad' in that you're not usually going to see 100% duplicate rows unless you've really screwed up
     // but it's more legible than reproducing the 'multiple children' data and tests the deduplication just the same
     const data = decompose({
@@ -357,23 +357,6 @@ describe('decompose', function () {
         'labels_type': 1
       }
     ]);
-
-    const options = {
-      account: {
-        single: true
-      },
-      address: {
-        single: true
-      },
-      contact: {
-        single: true
-      },
-      coords: {
-        single: true
-      }
-    };
-
-    // const models = decompose('this', 'id', options, data);
 
     assert.deepEqual(data, [{
       'id': 1,
