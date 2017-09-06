@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Insert</title>
+    <title>JSDoc: Module: util/getFilterString</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Insert</h1>
+    <h1 class="page-title">Module: util/getFilterString</h1>
 
     
 
@@ -28,7 +28,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Insert<span class="signature">(source, record, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        
+            
         
     
 </header>
@@ -37,20 +38,13 @@
     <div class="container-overview">
     
         
+            <div class="description">Get a filter string or create one from an array of values.</div>
+        
 
-    
-
-    
-    <h4 class="name" id="Insert"><span class="type-signature"></span>new Insert<span class="signature">(source, record, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-    
-
-    
+        
+            
 
 
-
-<div class="description">
-    Represents an INSERT query.
-</div>
 
 
 
@@ -87,79 +81,16 @@
 
         <tr>
             
-                <td class="name"><code>source</code></td>
+                <td class="name"><code>allowed</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="Table.html">Table</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Database object to query.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>record</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 |
 
 <span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A map of field names to values to be inserted,
-or an array of same.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
 
 
             
@@ -179,7 +110,7 @@ or an array of same.</td>
 
             
 
-            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Insert options</a>.</td>
+            <td class="description last">Source filter data.</td>
         </tr>
 
     
@@ -220,7 +151,7 @@ or an array of same.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_insert.js.html">lib/statement/insert.js</a>, <a href="lib_statement_insert.js.html#line14">line 14</a>
+        <a href="lib_util_get-filter-string.js.html">lib/util/get-filter-string.js</a>, <a href="lib_util_get-filter-string.js.html#line5">line 5</a>
     </li></ul></dd>
     
 
@@ -241,119 +172,25 @@ or an array of same.</td>
 
 
 
+<h5>Throws:</h5>
 
+        
 
-
-
-
-
-
+    <div class="param-desc">
+    
+        Argument must be an array or string.
     
     </div>
 
-    
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="format"><span class="type-signature"></span>format<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Format this object into a SQL INSERT.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_insert.js.html">lib/statement/insert.js</a>, <a href="lib_statement_insert.js.html#line39">line 39</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    A SQL INSERT statement.
+    A comma-separated filter string.
 </div>
 
 
@@ -377,6 +214,23 @@ or an array of same.</td>
 
 
         
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     

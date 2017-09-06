@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/entity.js</title>
+    <title>JSDoc: Source: lib/util/docify.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/entity.js</h1>
+    <h1 class="page-title">Source: lib/util/docify.js</h1>
 
     
 
@@ -28,28 +28,42 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+const _ = require('lodash');
+
 /**
- * Base class for a database entity or script file.
+ * Transforms a record or records which contain a "body" field into a document
+ * object or objects. Metadata is removed and the "id" field is moved into the
+ * body.
  *
- * @class
- * @param {Object} spec - Entity arguments:
- * @param {Object} spec.db - A {@linkcode Database}.
- * @param {String} spec.name - The entity's name.
- * @param {String} spec.schema - Entity's owning schema.
+ * @module util/docify
+ * @param {Array|Object} result - A record or list of records to transform.
+ * @return {Array|Object} The transformed record or records.
  */
-const Entity = function (spec) {
-  this.schema = spec.schema || spec.db.currentSchema;
-  this.path = spec.path;
-  this.name = spec.name;
-  this.db = spec.db;
+exports = module.exports = function (result) {
+  /**
+   * Transforms a single record containing a "body" field into a document object.
+   *
+   * @param {Object} row - A flat object representing a database record.
+   * @return {Object} A document object generated from the row.
+   */
+  function docify (row) {
+    if (row == null) {
+      return null;
+    }
 
-  // create delimited names now instead of at query time
-  this.delimitedName = `"${this.name}"`;
-  this.delimitedSchema = `"${this.schema}"`;
-  this.delimitedFullName = `${this.delimitedSchema}.${this.delimitedName}`;
+    const returnDoc = _.cloneDeep(row.body);
+
+    returnDoc.id = row.id;
+
+    return returnDoc;
+  }
+
+  if (_.isArray(result)) {
+    return result.map(docify);
+  }
+
+  return docify(result);
 };
-
-module.exports = Entity;
 </code></pre>
         </article>
     </section>

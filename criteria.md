@@ -12,13 +12,13 @@ A criteria object is a "plain old JavaScript object" where keys represent the fi
 const criteria = {
   is_active: true,
   'name like': '%homepage%',
-  'stats ->> runs >': 5
+  'stats.runs >': 5
 };
 ```
 
 ## Operations
 
-Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. If no operator is provided, the predicate will test for equality.
+Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. **If no operator is provided, the predicate will test for equality.**
 
 Text operators are case-insensitive.
 
@@ -32,7 +32,7 @@ Text operators are case-insensitive.
 | `<=` | `<=` | Less than or equal |
 | `>` | `>` | Greater than |
 | `>=` | `>=` | Greater than or equal |
-| `BETWEEN` | `BETWEEN` | Test whether value is between the [lower, upper] bounds of a 2-element array |
+| `BETWEEN` | `BETWEEN` | Test whether value is between the `[lower, upper]` bounds of a 2-element array |
 | `IS` | `IS` | Explicit equality test for `NULL` and boolean values |
 | `IS NOT` | `IS NOT` | Explicit inequality test for `NULL` and boolean values |
 | `IS DISTINCT FROM` | `IS DISTINCT FROM` | Difference test with `NULL` considered a fixed value |
@@ -78,10 +78,4 @@ const criteria = {
 
 ## JSON Traversal
 
-Massive supports searching in JSON and JSONB fields using the common traversal operators. You can quote fields yourself or leave it up to the parser.
-
-JSON traversal operators and SQL operations may be combined.
-
-`field ->> key` generates a predicate in the `WHERE` clause testing the value at `field.key`. 
-
-`field #>> {one, two, three}` generates a predicate in the `WHERE` clause testing the deeply-nested value at `field.one.two.three`.
+Massive supports searching in JSON and JSONB fields using idiomatic JavaScript paths. Use dots to traverse fields, and [] brackets to denote array indices. JSON traversal may be combined with SQL operations and casts (the cast applies to the value in the JSON field at the specified path, not to the JSON field itself).

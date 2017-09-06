@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Update</title>
+    <title>JSDoc: Module: util/decompose</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Update</h1>
+    <h1 class="page-title">Module: util/decompose</h1>
 
     
 
@@ -28,7 +28,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Update<span class="signature">(source, changes, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        
+            
         
     
 </header>
@@ -37,20 +38,14 @@
     <div class="container-overview">
     
         
+            <div class="description">Collapses tabular result sets into a hierarchical object graph based on the
+provided schema.</div>
+        
 
-    
-
-    
-    <h4 class="name" id="Update"><span class="type-signature"></span>new Update<span class="signature">(source, changes, criteria, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-    
-
-    
+        
+            
 
 
-
-<div class="description">
-    Represents an UPDATE query.
-</div>
 
 
 
@@ -73,7 +68,50 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>schema</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An object describing the shape of the output data.
+Schema objects are nested to arbitrary depth, with a single top-level schema
+describing the "origin" record format and containing other schemas which
+describe descendant records.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
         
 
         
@@ -87,38 +125,31 @@
 
         <tr>
             
-                <td class="name"><code>source</code></td>
+                <td class="name"><code>pk</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="Table.html">Table</a></span>
+<span class="param-type">String</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">Database object to query.</td>
+            <td class="description last">The name of a field in the result set which
+uniquely identifies a single record.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>changes</code></td>
+                <td class="name"><code>colums</code></td>
             
 
             <td class="type">
@@ -131,25 +162,44 @@
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">A map of field names to new values.</td>
+            <td class="description last">A map of field names in the result set to
+keys of an output object.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>criteria</code></td>
+                <td class="name"><code>array</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">When true, entities built with this schema
+are coerced into arrays of entities. This is only valid for nested schemas.
+If an object described by this schema's parent schema does not contain any
+records for this schema, an empty array will be generated.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>anythingElse</code></td>
             
 
             <td class="type">
@@ -162,51 +212,41 @@
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">A criteria object.</td>
+            <td class="description last">Nests a descendant schema under this
+one.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Update options</a>.</td>
+            <td class="description last">Array of database records to decompose.</td>
         </tr>
 
     
@@ -247,113 +287,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line15">line 15</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="format"><span class="type-signature"></span>format<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Format this object into a SQL UPDATE.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_statement_update.js.html">lib/statement/update.js</a>, <a href="lib_statement_update.js.html#line56">line 56</a>
+        <a href="lib_util_decompose.js.html">lib/util/decompose.js</a>, <a href="lib_util_decompose.js.html#line5">line 5</a>
     </li></ul></dd>
     
 
@@ -380,7 +314,8 @@
 
         
 <div class="param-desc">
-    A SQL UPDATE statement.
+    An array of nested objects generated by applying the schema
+to each data element in turn.
 </div>
 
 
@@ -391,7 +326,7 @@
     </dt>
     <dd>
         
-<span class="param-type">String</span>
+<span class="param-type">Array</span>
 
 
     </dd>
@@ -404,6 +339,23 @@
 
 
         
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     

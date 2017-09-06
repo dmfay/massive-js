@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/entity.js</title>
+    <title>JSDoc: Source: lib/util/get-filter-string.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/entity.js</h1>
+    <h1 class="page-title">Source: lib/util/get-filter-string.js</h1>
 
     
 
@@ -28,28 +28,27 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+const _ = require('lodash');
+
 /**
- * Base class for a database entity or script file.
+ * Get a filter string or create one from an array of values.
  *
- * @class
- * @param {Object} spec - Entity arguments:
- * @param {Object} spec.db - A {@linkcode Database}.
- * @param {String} spec.name - The entity's name.
- * @param {String} spec.schema - Entity's owning schema.
+ * @module util/getFilterString
+ * @param {String|Array} [allowed] - Source filter data.
+ * @return {String} A comma-separated filter string.
+ * @throws Argument must be an array or string.
  */
-const Entity = function (spec) {
-  this.schema = spec.schema || spec.db.currentSchema;
-  this.path = spec.path;
-  this.name = spec.name;
-  this.db = spec.db;
+exports = module.exports = function (allowed) {
+  if (!allowed) {
+    return '';
+  } else if (_.isString(allowed)) {
+    return allowed;
+  } else if (_.isArray(allowed)) {
+    return allowed.join(', ');
+  }
 
-  // create delimited names now instead of at query time
-  this.delimitedName = `"${this.name}"`;
-  this.delimitedSchema = `"${this.schema}"`;
-  this.delimitedFullName = `${this.delimitedSchema}.${this.delimitedName}`;
+  throw new Error('Specify allowed values with a comma-delimited string or an array of strings');
 };
-
-module.exports = Entity;
 </code></pre>
         </article>
     </section>
