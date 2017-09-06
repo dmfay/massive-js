@@ -1,6 +1,6 @@
 # Queries
 
-Since Massive doesn't use models, data is retrieved as plain old JavaScript objects where keys correspond to column names. With the obvious exception of `findOne`, most query functions return arrays where each object represents a row in the resultset _even if_ there is only one result whether naturally or from a `LIMIT` clause applied by query options.
+Since Massive doesn't use models, data is retrieved as plain old JavaScript objects where keys correspond to column names. With the obvious exceptions of `findOne` and `count`, most query functions return arrays where each object represents a row in the resultset _even if_ there is only one result whether naturally or from a `LIMIT` clause applied by query options.
 
 The `find`, `findOne`, and `count` functions form a consistent API for data retrieval with criteria and options. `where` offers total flexibility if you need to hand-write a `WHERE` clause for cases where criteria objects aren't sufficient (for example, testing concatenation or math on a field). `search` handles full-text search across multiple columns.
 

@@ -18,7 +18,7 @@ const criteria = {
 
 ## Operations
 
-Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. If no operator is provided, the predicate will test for equality.
+Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. **If no operator is provided, the predicate will test for equality.**
 
 Text operators are case-insensitive.
 
@@ -32,7 +32,7 @@ Text operators are case-insensitive.
 | `<=` | `<=` | Less than or equal |
 | `>` | `>` | Greater than |
 | `>=` | `>=` | Greater than or equal |
-| `BETWEEN` | `BETWEEN` | Test whether value is between the [lower, upper] bounds of a 2-element array |
+| `BETWEEN` | `BETWEEN` | Test whether value is between the `[lower, upper]` bounds of a 2-element array |
 | `IS` | `IS` | Explicit equality test for `NULL` and boolean values |
 | `IS NOT` | `IS NOT` | Explicit inequality test for `NULL` and boolean values |
 | `IS DISTINCT FROM` | `IS DISTINCT FROM` | Difference test with `NULL` considered a fixed value |
