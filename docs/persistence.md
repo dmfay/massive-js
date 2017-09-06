@@ -1,6 +1,6 @@
 # Persistence
 
-Massive's lack of entity modeling means it retrieves your data in the form of plain JavaScript objects and arrays, and _storing_ your data is no different. The use of objects instead of models makes persistence an extremely flexible proposition: you can write what you want when you want and, unlike with object-relational models, ignore anything you don't know. The persistence methods operate only on the columns you specify, and leave all others with the existing or default value, as appropriate.
+Massive's lack of entity modeling means it retrieves your data in the form of plain JavaScript objects and arrays, and _storing_ your data is no different. The use of objects instead of models makes persistence an extremely flexible proposition: you can write what you want when you want and, unlike with object-relational models, ignore anything you don't know yet as long as it's not required by table constraints. The persistence methods operate only on the columns you specify, and leave all others with the existing or default value, as appropriate.
 
 ## save
 

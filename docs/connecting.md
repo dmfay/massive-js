@@ -2,7 +2,7 @@
 
 Require Massive and invoke the function with connection information. The resulting promise resolves into a connected database instance.
 
-The connection process is fast but does take time. The instance is intended to be maintained and reused rather than regenerated.
+The connection process is fast but does take time. The instance is intended to be maintained and reused rather than regenerated for each query.
 
 ```javascript
 const massive = require('massive');

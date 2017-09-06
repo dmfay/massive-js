@@ -137,7 +137,7 @@ Complete documentation for query options is available [here](https://dmfay.githu
 
 ### A Brief Example
 
-Let's say we have a database for a software testing application. This database contains a `tests` table and an `issues` table, where one test may have many issues. In a separate `auth` schema, it contains a `users` table referenced by the others to represent a user running a test and discovering issues. There is a `test_stats` view which calculates statistics on aggregate issue information for individual tests; and there is a `copy_tests` function which clones a test for reuse.
+Let's say we have a database for a software testing application. This database contains a `tests` table and an `issues` table, where one test may have many issues. In a separate `auth` schema, it contains a `users` table referenced by the others to represent a user running a test and discovering issues. There is a `test_stats` view which calculates statistics on aggregate issue information for individual tests, and a `user_tests` view which returns all users with their associated tests; and there is a `copy_tests` function which clones a test for reuse.
 
 Our testing application can leverage the API Massive builds for almost everything it needs to do, but there is one feature that we haven't been able to integrate as a database function yet: the ability to, in one call, clear a test's issues and update its status to signify that it has been restarted. Eventually, we'll get there, but for now it's a SQL script in our application's `/db` directory, `resetTest.sql`.
 
@@ -253,6 +253,61 @@ db.test_stats.find({
 ```
 
 `stats` is an array of records from the view which match the criteria object.
+
+Many views (or scripts!) combine related results from multiple tables. The `user_tests` view is one such. Rows might look like this:
+
+| user_id | username | test_id | name   |
+|---------|----------|---------|--------|
+|       1 | alice    |       1 | first  |
+|       1 | alice    |       2 | second |
+|       2 | bob      |       3 | third  |
+
+Databases are limited to working with this kind of information in terms of flat tables and relationships, and when you have a situation where Alice has multiple tests, that means Alice appears twice in the output. In JavaScript, however, we're more accustomed to working with object graphs where, instead of parent entities (users) being duplicated, the descendant entities (tests) are nested. Something like this:
+
+```javascript
+[{
+  id: 1,
+  username: 'alice',
+  tests: [{
+    id: 1,
+    name: 'first'
+  }, {
+    id: 2,
+    name: 'second'
+  }]
+}, {
+  id: 2,
+  username: 'bob',
+  tests: [{
+    id: 3,
+    name: 'third'
+  }]
+}]
+```
+
+Massive can transform any view or script result into an object graph with the `decompose` option. The value of `decompose` is a schema which represents the desired output format. To generate the structure above:
+
+```javascript
+db.user_tests.find({}, {
+  decompose: {
+    pk: 'user_id',
+    columns: {
+      user_id: 'id',
+      username: 'username'
+    },
+    tests: {
+      pk: 'test_id',
+      columns: {
+        test_id: 'id',
+        name: 'name'
+      },
+      array: true
+    }
+  }
+}).then(...)
+```
+
+See the [options docs](https://dmfay.github.io/massive-js/options.html) for a complete guide to the schema object.
 
 #### Arbitrary Queries
 

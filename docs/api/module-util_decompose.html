@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Entity</title>
+    <title>JSDoc: Module: util/decompose</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Entity</h1>
+    <h1 class="page-title">Module: util/decompose</h1>
 
     
 
@@ -28,7 +28,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Entity<span class="signature">(spec)</span><span class="type-signature"></span></h2>
+        
+            
         
     
 </header>
@@ -37,20 +38,14 @@
     <div class="container-overview">
     
         
+            <div class="description">Collapses tabular result sets into a hierarchical object graph based on the
+provided schema.</div>
+        
 
-    
-
-    
-    <h4 class="name" id="Entity"><span class="type-signature"></span>new Entity<span class="signature">(spec)</span><span class="type-signature"></span></h4>
-    
-
-    
+        
+            
 
 
-
-<div class="description">
-    Base class for a database entity or script file.
-</div>
 
 
 
@@ -85,7 +80,7 @@
 
         <tr>
             
-                <td class="name"><code>spec</code></td>
+                <td class="name"><code>schema</code></td>
             
 
             <td class="type">
@@ -101,7 +96,10 @@
 
             
 
-            <td class="description last">Entity arguments:
+            <td class="description last">An object describing the shape of the output data.
+Schema objects are nested to arbitrary depth, with a single top-level schema
+describing the "origin" record format and containing other schemas which
+describe descendant records.
                 <h6>Properties</h6>
                 
 
@@ -127,7 +125,31 @@
 
         <tr>
             
-                <td class="name"><code>db</code></td>
+                <td class="name"><code>pk</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The name of a field in the result set which
+uniquely identifies a single record.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>colums</code></td>
             
 
             <td class="type">
@@ -143,20 +165,21 @@
 
             
 
-            <td class="description last">A <a href="Database.html"><code>Database</code></a>.</td>
+            <td class="description last">A map of field names in the result set to
+keys of an output object.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>array</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Boolean</span>
 
 
             
@@ -166,20 +189,23 @@
 
             
 
-            <td class="description last">The entity's name.</td>
+            <td class="description last">When true, entities built with this schema
+are coerced into arrays of entities. This is only valid for nested schemas.
+If an object described by this schema's parent schema does not contain any
+records for this schema, an empty array will be generated.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>schema</code></td>
+                <td class="name"><code>anythingElse</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -189,7 +215,8 @@
 
             
 
-            <td class="description last">Entity's owning schema.</td>
+            <td class="description last">Nests a descendant schema under this
+one.</td>
         </tr>
 
     
@@ -197,6 +224,29 @@
 </table>
 
             </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of database records to decompose.</td>
         </tr>
 
     
@@ -237,7 +287,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_entity.js.html">lib/entity.js</a>, <a href="lib_entity.js.html#line12">line 12</a>
+        <a href="lib_util_decompose.js.html">lib/util/decompose.js</a>, <a href="lib_util_decompose.js.html#line5">line 5</a>
     </li></ul></dd>
     
 
@@ -260,11 +310,35 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An array of nested objects generated by applying the schema
+to each data element in turn.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
 
 
+        
     
     </div>
 

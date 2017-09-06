@@ -133,7 +133,7 @@ massive({
   stream: true,                   // return results as a readable stream (see below)
   only: true                      // ignore tables inheriting from the target table
 }</code></pre><p>Complete documentation for query options is available <a href="https://dmfay.github.io/massive-js/options.html">here</a>.</p>
-<h3>A Brief Example</h3><p>Let's say we have a database for a software testing application. This database contains a <code>tests</code> table and an <code>issues</code> table, where one test may have many issues. In a separate <code>auth</code> schema, it contains a <code>users</code> table referenced by the others to represent a user running a test and discovering issues. There is a <code>test_stats</code> view which calculates statistics on aggregate issue information for individual tests; and there is a <code>copy_tests</code> function which clones a test for reuse.</p>
+<h3>A Brief Example</h3><p>Let's say we have a database for a software testing application. This database contains a <code>tests</code> table and an <code>issues</code> table, where one test may have many issues. In a separate <code>auth</code> schema, it contains a <code>users</code> table referenced by the others to represent a user running a test and discovering issues. There is a <code>test_stats</code> view which calculates statistics on aggregate issue information for individual tests, and a <code>user_tests</code> view which returns all users with their associated tests; and there is a <code>copy_tests</code> function which clones a test for reuse.</p>
 <p>Our testing application can leverage the API Massive builds for almost everything it needs to do, but there is one feature that we haven't been able to integrate as a database function yet: the ability to, in one call, clear a test's issues and update its status to signify that it has been restarted. Eventually, we'll get there, but for now it's a SQL script in our application's <code>/db</code> directory, <code>resetTest.sql</code>.</p>
 <h4>Persistence</h4><p>After we initialize and connect Massive, all these entities are available on the instance. First, we need to create a user:</p>
 <pre class="prettyprint source lang-javascript"><code>db.auth.users.insert({
@@ -175,6 +175,73 @@ massive({
 <pre class="prettyprint source lang-javascript"><code>db.test_stats.find({
   url: 'http://www.example.com'
 }).then(stats => {...})</code></pre><p><code>stats</code> is an array of records from the view which match the criteria object.</p>
+<p>Many views (or scripts!) combine related results from multiple tables. The <code>user_tests</code> view is one such. Rows might look like this:</p>
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>username</th>
+<th>test_id</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>alice</td>
+<td>1</td>
+<td>first</td>
+</tr>
+<tr>
+<td>1</td>
+<td>alice</td>
+<td>2</td>
+<td>second</td>
+</tr>
+<tr>
+<td>2</td>
+<td>bob</td>
+<td>3</td>
+<td>third</td>
+</tr>
+</tbody>
+</table>
+<p>Databases are limited to working with this kind of information in terms of flat tables and relationships, and when you have a situation where Alice has multiple tests, that means Alice appears twice in the output. In JavaScript, however, we're more accustomed to working with object graphs where, instead of parent entities (users) being duplicated, the descendant entities (tests) are nested. Something like this:</p>
+<pre class="prettyprint source lang-javascript"><code>[{
+  id: 1,
+  username: 'alice',
+  tests: [{
+    id: 1,
+    name: 'first'
+  }, {
+    id: 2,
+    name: 'second'
+  }]
+}, {
+  id: 2,
+  username: 'bob',
+  tests: [{
+    id: 3,
+    name: 'third'
+  }]
+}]</code></pre><p>Massive can transform any view or script result into an object graph with the <code>decompose</code> option. The value of <code>decompose</code> is a schema which represents the desired output format. To generate the structure above:</p>
+<pre class="prettyprint source lang-javascript"><code>db.user_tests.find({}, {
+  decompose: {
+    pk: 'user_id',
+    columns: {
+      user_id: 'id',
+      username: 'username'
+    },
+    tests: {
+      pk: 'test_id',
+      columns: {
+        test_id: 'id',
+        name: 'name'
+      },
+      array: true
+    }
+  }
+}).then(...)</code></pre><p>See the <a href="https://dmfay.github.io/massive-js/options.html">options docs</a> for a complete guide to the schema object.</p>
 <h4>Arbitrary Queries</h4><p>Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a <code>hash</code> database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:</p>
 <pre class="prettyprint source lang-javascript"><code>db.run(
   'update users set password = hash(password) where id &lt; $1 returning *',
@@ -237,13 +304,13 @@ db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In additio
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-docify.html">docify</a></li><li><a href="module-getFilterString.html">getFilterString</a></li><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Sep 03 2017 18:39:34 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Sep 05 2017 22:32:22 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
