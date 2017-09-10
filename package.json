@@ -59,7 +59,7 @@
     "coveralls": "~2.13.1",
     "eslint": "~4.6.0",
     "jsdoc": "^3.5.4",
-    "mocha": "~3.2.0",
+    "mocha": "~3.5.1",
     "nyc": "~11.2.0"
   },
   "repository": {
