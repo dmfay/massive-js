@@ -365,7 +365,9 @@ db.test_attributes.searchDoc({
 }.then(matchingDocuments => {...});
 ```
 
-Persistence functions are also adapted for document tables. You can upsert a document with `saveDoc`; if the argument contains an `id` field, it will update the existing document in the database. Otherwise, it will create a new one. Either way, it returns the current state of the document.
+Persistence functions are also adapted for document tables. You can update/insert a document with `saveDoc`; if the argument contains an `id` field, it will update the existing document in the database. If the argument contains no `id` field then it will insert a new document into the database. Either way, it returns the current state of the document.
+
+Note that this isn't a true upsert. It basically checks the id field, if it exists it will do an `UPDATE` query otherwise it will do an `INSERT` query. If you specify an `id` that isn't in the database nothing will get updated and `null` will be returned.
 
 ```javascript
 attributes.requiresAuthentication = true;
