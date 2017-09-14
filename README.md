@@ -16,6 +16,7 @@ Here are some of the high points:
 * **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are _tables_, and you can insert or update directly into them.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
 * **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
+* **Result decomposition**: while Massive does not traverse relationships or build model graphs, the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
 
 ## Full Documentation
 
@@ -81,8 +82,6 @@ When you instantiate Massive, it introspects your database to discover the objec
 * Functions
 
 Massive understands database schemas and treats any schema other than `public` as a namespace. Objects in the `public` schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.
-
-Unlike object/relational mappers, Massive does not traverse relationships or build model trees. Limited support for mapping complex results to an object graph is a potential future consideration, but if you need to correlate data from multiple tables, using a view is recommended.
 
 The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; or with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
 
