@@ -94,3 +94,17 @@ massive(connectionInfo, {
   enhancedFunctions: true
 }).then(instance => {...});
 ```
+
+## Driver Configuration
+
+The third argument to the Massive constructor is a [driverConfig](https://vitaly-t.github.io/pg-promise/module-pg-promise.html) object passed directly through to pg-promise. Please consult the pg-promise documentation for more information.
+
+```javascript
+massive(connectionInfo, loaderConfig, {
+  // use native bindings (must be installed separately)
+  pgNative: true,
+
+  // don't log any warnings from the driver
+  noWarnings: true
+}).then(instance => {...});
+```
