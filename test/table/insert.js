@@ -62,6 +62,20 @@ describe('insert', function () {
     });
   });
 
+  it('inserts empty array fields with a literal {}', function () {
+    return db.products.insert({name: 'A Product', tags: '{}'}).then(res => {
+      assert.equal(res.name, 'A Product');
+      assert.deepEqual(res.tags, []);
+    });
+  });
+
+  it('inserts empty array fields', function () {
+    return db.products.insert({name: 'A Product', tags: []}).then(res => {
+      assert.equal(res.name, 'A Product');
+      assert.deepEqual(res.tags, []);
+    });
+  });
+
   it('inserts a record with a UUID key', function () {
     return db.orders.insert({product_id: 1, user_id: 1, notes: 'hi'}).then(res => {
       assert.isOk(res.id);
