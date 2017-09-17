@@ -7,10 +7,11 @@
 const path = require('path');
 const program = require('commander');
 const repl = require('repl');
+const pkg = require('../package.json');
 const massive = require('../index');
 
 program
-  .version('3.0.0')
+  .version(pkg.version)
   .option('-d, --database [name]', 'Quick connect with just a local database name')
   .option('-c, --connection [string]', 'Provide a full connection string (postgres://user:password@server/db)')
   .option('-s, --scripts [dir]', 'Change the scripts directory (default ./db)', 'db')
