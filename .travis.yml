@@ -1,13 +1,19 @@
 language: node_js
 node_js:
-  - '8'
-  - '7'
-  - '6'
+  - 8
+  - 7
+  - 6
 addons:
-  postgresql: "9.5"
+  postgresql: '9.5'
 services:
   - postgresql
+before_install:
+  - npm i -g npm@5
+  - npm i -g greenkeeper-lockfile@1
 before_script:
   - psql -c 'create database massive;' -U postgres
+  - greenkeeper-lockfile-update
+after_script:
+  - greenkeeper-lockfile-upload
 after_success:
   - npm run coverage
