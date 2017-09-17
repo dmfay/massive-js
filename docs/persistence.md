@@ -45,7 +45,8 @@ You can insert multiple rows at once -- just pass an array, and you'll receive a
 ```javascript
 db.tests.insert([{
   name: 'homepage',
-  version: 1
+  version: 1,
+  priority: 'low'
 }, {
   name: 'about us',
   version: 1
@@ -53,6 +54,8 @@ db.tests.insert([{
   // an array containing both newly-inserted tests
 });
 ```
+
+Records in the array may omit keys if the database default value is intended; however, fields having `NOT NULL` constraints must be included or the insert will fail.
 
 [Query options](/options) for `INSERT` statements and results processing may be used with `insert`:
 
