@@ -32,6 +32,13 @@ describe('update', function () {
       });
     });
 
+    it('updates an empty array field', function () {
+      return db.products.update({id: 1, tags: []}).then(res => {
+        assert.equal(res.id, 1);
+        assert.lengthOf(res.tags, 0);
+      });
+    });
+
     it('updates a record in a table with a Cased Name', function () {
       return db.Users.update({Id: 1, Email: 'bar@foo.com'}).then(res => {
         assert.equal(res.Id, 1);

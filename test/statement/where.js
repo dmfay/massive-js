@@ -492,6 +492,22 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
     });
+
+    it('should handle array operations', function () {
+      const condition = {field: '"field"', operation: ops('&&'), value: [1, 2], offset: 1, params: []};
+      const result = where.tableGenerator(condition);
+      assert.equal(result.predicate, '"field" && $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], '{1,2}');
+    });
+
+    it('should use legacy syntax for empty arrays', function () {
+      const condition = {field: '"field"', operation: ops('&&'), value: [], offset: 1, params: []};
+      const result = where.tableGenerator(condition);
+      assert.equal(result.predicate, '"field" && $1');
+      assert.equal(result.params.length, 1);
+      assert.equal(result.params[0], '{}');
+    });
   });
 
   describe('docGenerator', function () {

@@ -21,6 +21,23 @@ describe('Insert', function () {
       assert.equal(query.source, 'testsource');
       assert.isTrue(query.build);
     });
+
+    it('should process columns and parameters', function () {
+      const query = new Insert(source, {
+        string: 'hi',
+        boolean: true,
+        int: 123,
+        number: 456.78,
+        object: {field: 'value'},
+        array: [1, 2, 3],
+        emptyArray: []
+      });
+
+      assert.lengthOf(query.columns, 7);
+      assert.deepEqual(query.columns, ['"string"', '"boolean"', '"int"', '"number"', '"object"', '"array"', '"emptyArray"']);
+      assert.lengthOf(query.params, 7);
+      assert.deepEqual(query.params, ['hi', true, 123, 456.78, {field: 'value'}, [1, 2, 3], '{}']);
+    });
   });
 
   describe('format', function () {
