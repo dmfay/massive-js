@@ -25,6 +25,30 @@ describe('insert', function () {
     });
   });
 
+  it('combines keys of partial objects on insert', function () {
+    return db.products.insert([
+      {name: 'A Product', tags: ['this has a tag']},
+      {name: 'Another Product', description: 'this has a description', specs: {weight: 10}}
+    ]).then(res => {
+      assert.equal(res.length, 2);
+      assert.equal(res[0].id, 8);
+      assert.equal(res[0].name, 'A Product');
+      assert.deepEqual(res[0].tags, ['this has a tag']);
+      assert.equal(res[1].id, 9);
+      assert.equal(res[1].name, 'Another Product');
+      assert.deepEqual(res[1].specs, {weight: 10});
+    });
+  });
+
+  it('throws when a partial record excludes a constrained field', function () {
+    return db.products.insert([
+      {name: 'A Product', tags: ['this has a tag']},
+      {name: 'Another Product', description: 'this has a description', price: 1.23}
+    ]).then(() => {
+      assert.fail();
+    }).catch(() => {});
+  });
+
   it('inserts nothing', function () {
     return db.products.insert([]).then(res => {
       assert.equal(res.length, 0);

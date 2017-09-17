@@ -48,6 +48,12 @@ describe('Insert', function () {
       assert.deepEqual(result.params, ['value1', 2, 'value2', 3]);
     });
 
+    it('should combine keys of partial records', function () {
+      const result = new Insert(source, [{field1: 'value1'}, {field2: 'value2'}]);
+      assert.equal(result.format(), 'INSERT INTO testsource ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
+      assert.deepEqual(result.params, ['value1', undefined, undefined, 'value2']);
+    });
+
     it('should handle onConflictIgnore option', function () {
       const result = new Insert(source, {field1: 'value1'}, {onConflictIgnore: true});
       assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');

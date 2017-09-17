@@ -15,8 +15,8 @@ Here are some of the high points:
 * **Dynamic query generation**: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.
 * **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are _tables_, and you can insert or update directly into them.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
-* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
 * **Result decomposition**: while Massive does not traverse relationships or build model graphs, the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
+* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation
 
@@ -366,7 +366,7 @@ db.test_attributes.searchDoc({
 
 Persistence functions are also adapted for document tables. You can update/insert a document with `saveDoc`; if the argument contains an `id` field, it will update the existing document in the database. If the argument contains no `id` field then it will insert a new document into the database. Either way, it returns the current state of the document.
 
-Note that this isn't a true upsert. It basically checks the id field, if it exists it will do an `UPDATE` query otherwise it will do an `INSERT` query. If you specify an `id` that isn't in the database nothing will get updated and `null` will be returned.
+This is not a true upsert! `saveDoc`, like `save`, determines whether to emit an `INSERT` or an `UPDATE` based on whether the data _you_ pass it contains a primary key. If you are generating primary keys manually, use `insert` instead -- if you specify a value for the primary key, it will execute an `UPDATE` whether or not the row actually exists in the database, and if it does not the result will be `null`.
 
 ```javascript
 attributes.requiresAuthentication = true;
