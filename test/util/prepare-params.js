@@ -8,10 +8,4 @@ describe('prepareParams', function () {
 
     assert.deepEqual(params, [1, 2, undefined, undefined, 3, 4]);
   });
-
-  it('substitutes empty arrays with the legacy syntax', function () {
-    const params = prepareParams(['arrayfield'], [{arrayfield: []}]);
-
-    assert.deepEqual(params, ['{}']);
-  });
 });
