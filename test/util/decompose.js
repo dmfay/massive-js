@@ -32,6 +32,23 @@ describe('decompose', function () {
     assert.deepEqual(data, [{id: 1, val: 'p1', children: [{id: 11, val: 'c1'}, {id: 12, val: 'c2'}]}]);
   });
 
+  it('can use arrays of column names if no mapping is needed', function () {
+    const data = decompose({
+      pk: 'parent_id',
+      columns: ['parent_id', 'parent_val'],
+      children: {
+        pk: 'children_id',
+        columns: ['children_id', 'children_val'],
+        array: true
+      }
+    }, [
+      {parent_id: 1, parent_val: 'p1', children_id: 11, children_val: 'c1'},
+      {parent_id: 1, parent_val: 'p1', children_id: 12, children_val: 'c2'}
+    ]);
+
+    assert.deepEqual(data, [{parent_id: 1, parent_val: 'p1', children: [{children_id: 11, children_val: 'c1'}, {children_id: 12, children_val: 'c2'}]}]);
+  });
+
   it.skip('sorts children based on the order in which rows appear', function () {
     let data = decompose({
       pk: 'parent_id',
