@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/statement/order-by.js</title>
+    <title>JSDoc: Source: lib/util/prepare-params.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/statement/order-by.js</h1>
+    <h1 class="page-title">Source: lib/util/prepare-params.js</h1>
 
     
 
@@ -31,38 +31,23 @@
 const _ = require('lodash');
 
 /**
- * Generate an ORDER BY clause.
+ * Assembles a parameter list for a prepared statement from a list of records
+ * being inserted or updated. Parameter list generation for WHERE clauses in
+ * all statements is handled in {@linkcode module:where}.
  *
- * @param {Array|String} order - An array of 'field direction' strings, or a
- * string containing all fields and directions.
- * @param {Boolean} [useBody] - If true and using the Array form of order,
- * will generate order based on a document body.
- * @return {String} An ORDER BY clause.
+ * @module util/prepareParams
+ * @param {Array} fields - A list of fields to pick from each record.
+ * @param {Array} records - A list of records.
+ * @return {Array} An array containing the values of each key from each record,
+ * or undefined if the record does not contain the key.
  */
-exports = module.exports = (order, useBody) => {
-  if (_.isArray(order)) {
-    return 'ORDER BY ' + _.reduce(order, function (acc, val) {
-      // TODO eliminate direct interpolation
-      val.direction = val.direction || 'asc';
+exports = module.exports = (fields, records) => _.reduce(records, (params, r) => {
+  return params.concat(fields.map(key => {
+    const val = r[key];
 
-      if (useBody) {
-        val.field = `body->>'${val.field}'`;
-      }
-
-      if (val.type) {
-        acc.push(`(${val.field})::${val.type} ${val.direction}`);
-      } else {
-        acc.push(`${val.field} ${val.direction}`);
-      }
-
-      return acc;
-    }, []).join(',');
-  } else if (order) {
-    return `ORDER BY ${order}`;
-  }
-
-  return '';
-};
+    return val;
+  }));
+}, []);
 </code></pre>
         </article>
     </section>
