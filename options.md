@@ -51,7 +51,7 @@ Results processing options are generally applicable to all query types, although
 The `decompose` option takes a schema which represents the desired output structure. A schema is a JavaScript object with a few specific properties, and which may contain further schemas.
 
 * `pk` (for "primary key") specifies the field in the resultset which uniquely identifies the entity represented by this schema.
-* `columns` is a map of fields in the resultset (keys) to fields in the output entity (values).
+* `columns` is either a map of fields in the resultset (keys) to fields in the output entity (values), or an array of field names if they do not need to be transformed.
 * `array` is only usable on schemas nested at least one level deep. If `true`, the entities this schema represents are considered a collection instead of a nested object.
 
 Any other key on a schema is taken to represent a nested schema, and nested schemas **may not be named** with one of the reserved keys. The following schema:
@@ -60,10 +60,7 @@ Any other key on a schema is taken to represent a nested schema, and nested sche
 db.user_tests.find({}, {
   decompose: {
     pk: 'user_id',
-    columns: {
-      user_id: 'id',
-      username: 'username'
-    },
+    columns: ['user_id', 'username'],
     tests: {
       pk: 'test_id',
       columns: {
@@ -76,11 +73,21 @@ db.user_tests.find({}, {
 }).then(...)
 ```
 
-will generate results in this format:
+will transform this recordset:
+
+```javascript
+[
+  {user_id: 1, username: 'alice', test_id: 1, name: 'first'},
+  {user_id: 1, username: 'alice', test_id: 2, name: 'second'},
+  {user_id: 2, username: 'bob', test_id: 3, name: 'third'},
+]
+```
+
+into this:
 
 ```javascript
 [{
-  id: 1,
+  user_id: 1,
   username: 'alice',
   tests: [{
     id: 1,
@@ -90,7 +97,7 @@ will generate results in this format:
     name: 'second'
   }]
 }, {
-  id: 2,
+  user_id: 2,
   username: 'bob',
   tests: [{
     id: 3,
