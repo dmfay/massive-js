@@ -1,5 +1,7 @@
 'use strict';
 
+const types = require('pg').types;
+
 describe('run', function () {
   let db;
 
@@ -27,5 +29,17 @@ describe('run', function () {
     return db.run('select * from products where id=${id}', {id: 1}).then(res => {
       assert.equal(1, res[0].id);
     });
+  });
+
+  it('changes types', function* () {
+    const stringCount = yield db.run('select count(*) from products');
+
+    assert.typeOf(stringCount[0].count, 'string');
+
+    types.setTypeParser(20, parseInt);
+
+    const intCount = yield db.run('select count(*) from products');
+
+    assert.typeOf(intCount[0].count, 'number');
   });
 });
