@@ -4,6 +4,8 @@
 
 If something goes wrong or does not behave as expected, please raise an issue to report it. At minimum it should include steps to reproduce, and the more detailed the description, the better; if at all possible, please include a minimal code sample that reproduces the problem.
 
+Please do _not_ close bugs on your own unless the problem turned out to be on your end. A `fixes` directive in a pull request, however, is completely fine.
+
 New feature requests and ideas are also welcome! Massive is intentionally somewhat minimalist, but I'm more invested in it being _useful_ than I am in simplicity for its own sake. If something will make life easier without straying too far from the library's core purpose of facilitating data access, I'm all ears.
 
 I am not, however, going to make any promises regarding the speed with which I'll get around to implementing anyone else's suggestions on my own. So if there's something you'd really like to see, please do raise an issue to discuss it, but also consider submitting a pull request! And speaking of...
