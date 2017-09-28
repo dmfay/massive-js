@@ -55,7 +55,7 @@
     "chai": "~4.1.0",
     "chai-as-promised": "~7.1.1",
     "co-mocha": "~1.2.0",
-    "coveralls": "~2.13.1",
+    "coveralls": "~3.0.0",
     "eslint": "~4.7.1",
     "jsdoc": "^3.5.4",
     "mocha": "~3.5.1",
