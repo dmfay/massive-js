@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: util/getFilterString</title>
+    <title>JSDoc: Module: util/parseKey</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: util/getFilterString</h1>
+    <h1 class="page-title">Module: util/parseKey</h1>
 
     
 
@@ -38,7 +38,10 @@
     <div class="container-overview">
     
         
-            <div class="description">Get a filter string or create one from an array of values.</div>
+            <div class="description">Parse out a criterion key into something more intelligible. Massive is more
+flexible than Postgres' query parser, with more alternate aliases for
+operations and looser rules about quoting, especially with JSON fields. This
+necessitates some pretty gnarly parsing.</div>
         
 
         
@@ -67,8 +70,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -81,36 +82,46 @@
 
         <tr>
             
-                <td class="name"><code>allowed</code></td>
+                <td class="name"><code>key</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">String</span>
-|
-
-<span class="param-type">Array</span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
 
-                
+            
 
+            <td class="description last">A reference to a database column. The field name may be quoted using double quotes to allow names which otherwise would not conform with database naming conventions. Optional components include, in order, [] and . notation to describe elements of a JSON field; ::type to describe a cast; and finally, an argument to the appendix function.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>appendix</code></td>
+            
+
+            <td class="type">
+            
                 
-                </td>
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
             
 
             
 
-            <td class="description last">Source filter data.</td>
+            <td class="description last">A function which when invoked with an optional component of the key returns a value to be used later. So far used for operations (from <code>where</code>) and ordering (from <code>order</code>.</td>
         </tr>
 
     
@@ -151,7 +162,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_util_get-filter-string.js.html">lib/util/get-filter-string.js</a>, <a href="lib_util_get-filter-string.js.html#line5">line 5</a>
+        <a href="lib_util_parse-key.js.html">lib/util/parse-key.js</a>, <a href="lib_util_parse-key.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -172,25 +183,13 @@
 
 
 
-<h5>Throws:</h5>
-
-        
-
-    <div class="param-desc">
-    
-        Argument must be an array or string.
-    
-    </div>
-
-
-    
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    A comma-separated filter string.
+    An object describing the parsed key.
 </div>
 
 
@@ -201,7 +200,7 @@
     </dt>
     <dd>
         
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
     </dd>
