@@ -33,6 +33,13 @@ describe('orderBy', function () {
     ]), `ORDER BY "col1" desc,"col2" asc`);
   });
 
+  it('should be case-insensitive about directions', function () {
+    assert.equal(orderBy([
+      {field: 'col1', direction: 'DESC'},
+      {field: 'col2', direction: 'ASC'}
+    ]), `ORDER BY "col1" desc,"col2" asc`);
+  });
+
   it('should not quote fields if specified', function () {
     assert.equal(orderBy([
       {field: 'col1'},
