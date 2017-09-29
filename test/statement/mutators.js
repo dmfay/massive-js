@@ -23,13 +23,13 @@ describe('mutators', function () {
   describe('buildIn', function () {
     it('builds an IN list', function () {
       const condition = mutators.buildIn({
-        operation: ops('='),
+        appended: ops('='),
         offset: 1,
         value: [1, 2, 3],
         params: []
       });
 
-      assert.equal(condition.operation.operator, 'IN');
+      assert.equal(condition.appended.operator, 'IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
       assert.equal(condition.value, '($1,$2,$3)');
@@ -37,13 +37,13 @@ describe('mutators', function () {
 
     it('builds a NOT IN list', function () {
       const condition = mutators.buildIn({
-        operation: ops('<>'),
+        appended: ops('<>'),
         offset: 1,
         value: [1, 2, 3],
         params: []
       });
 
-      assert.equal(condition.operation.operator, 'NOT IN');
+      assert.equal(condition.appended.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
       assert.equal(condition.value, '($1,$2,$3)');
@@ -53,13 +53,13 @@ describe('mutators', function () {
   describe('buildIs', function () {
     it('interpolates values with IS', function () {
       const condition = mutators.buildIs({
-        operation: ops('='),
+        appended: ops('='),
         offset: 1,
         value: null,
         params: []
       });
 
-      assert.equal(condition.operation.operator, 'IS');
+      assert.equal(condition.appended.operator, 'IS');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
       assert.isNull(condition.value);
@@ -67,13 +67,13 @@ describe('mutators', function () {
 
     it('interpolates values with IS NOT', function () {
       const condition = mutators.buildIs({
-        operation: ops('is not'),
+        appended: ops('is not'),
         offset: 1,
         value: true,
         params: []
       });
 
-      assert.equal(condition.operation.operator, 'IS NOT');
+      assert.equal(condition.appended.operator, 'IS NOT');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, []);
       assert.isTrue(condition.value);
@@ -83,13 +83,13 @@ describe('mutators', function () {
   describe('equality', function () {
     it('passes off arrays to buildIn', function () {
       const condition = mutators.equality({
-        operation: ops('<>'),
+        appended: ops('<>'),
         offset: 1,
         value: [1, 2, 3],
         params: []
       });
 
-      assert.equal(condition.operation.operator, 'NOT IN');
+      assert.equal(condition.appended.operator, 'NOT IN');
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
       assert.equal(condition.value, '($1,$2,$3)');
@@ -97,36 +97,36 @@ describe('mutators', function () {
 
     it('passes nulls and booleans to buildIs', function () {
       assert.equal(mutators.equality({
-        operation: ops('is'),
+        appended: ops('is'),
         offset: 1,
         value: null,
         params: []
-      }).operation.operator, 'IS');
+      }).appended.operator, 'IS');
 
       assert.equal(mutators.equality({
-        operation: ops('='),
+        appended: ops('='),
         offset: 1,
         value: true,
         params: []
-      }).operation.operator, 'IS');
+      }).appended.operator, 'IS');
 
       assert.equal(mutators.equality({
-        operation: ops('='),
+        appended: ops('='),
         offset: 1,
         value: false,
         params: []
-      }).operation.operator, 'IS');
+      }).appended.operator, 'IS');
     });
 
     it('prepares parameters', function () {
       const condition = mutators.equality({
-        operation: ops('='),
+        appended: ops('='),
         offset: 1,
         value: 123,
         params: []
       });
 
-      assert.equal(condition.operation.operator, '=');
+      assert.equal(condition.appended.operator, '=');
       assert.equal(condition.offset, 1);
       assert.deepEqual(condition.params, [123]);
       assert.equal(condition.value, '$1');
