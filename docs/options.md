@@ -38,10 +38,10 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 
 The `order` option may be passed an array of order objects. These are used to build a SQL `ORDER BY` clause. An order object must contain a `field`; all other properties are optional.
 
-* **field**: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body. The column name will be quoted unless `raw` is also specified.
-* **direction**: The sort direction, `ASC` or `DESC`.
-* **type**: Define a cast type for values. Useful with JSON fields.
-* **raw**: True to leave the `field` unquoted. Useful if you're ordering by something other than a single column value, for example `col1 + col2`.
+* `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body. The column name will be quoted unless `raw` is also specified.
+* `direction`: The sort direction, `ASC` or `DESC`.
+* `type`: Define a cast type for values. Useful with JSON fields.
+* `raw`: True to leave the `field` unquoted. Useful if you're ordering by something other than a single column value, for example `col1 + col2`.
 
 ## Results Processing
 
