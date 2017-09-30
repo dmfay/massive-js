@@ -5,7 +5,7 @@ describe('modify', function () {
   let newDoc = {};
 
   before(function () {
-    return resetDb()
+    return resetDb('data-docs-products')
       .then(instance => db = instance)
       .then(() => {
         return db.saveDoc('docs', {name: 'foo'});
