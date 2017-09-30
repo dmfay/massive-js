@@ -122,7 +122,13 @@ Some functions, particularly the query functions (`find`, `findOne`, `findDoc`, 
 {
   build: true,                    // return query text and parameters without executing anything
   document: true,                 // treat table as a document store (see 'Documents')
-  order: 'id desc',               // creates an ORDER BY clause to enforce sorting
+  order: [{                       // creates an ORDER BY clause to enforce sorting
+    field: 'settings.role',       // JSON fields use . and [] notation
+    direction: 'desc',            // set the sort direction with 'desc' or 'asc' (optional)
+    type: 'int'                   // enforce a cast type (optional)
+  }, {
+    field: 'name'                 // order elements are applied in order
+  }],
   orderBody: true,                // order applies to document body fields instead of table columns
   offset: 20,                     // adds an OFFSET to skip the first n rows
   limit: 10,                      // adds a LIMIT to restrict the number of rows returned
