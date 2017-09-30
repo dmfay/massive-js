@@ -4,7 +4,7 @@ describe('find', function () {
   let db;
 
   before(function () {
-    return resetDb().then(instance => db = instance);
+    return resetDb('data-all').then(instance => db = instance);
   });
 
   after(function () {
