@@ -3,8 +3,8 @@
 describe('search', function () {
   let db;
 
-  before(function () {
-    return resetDb().then(instance => db = instance);
+  before(function* () {
+    db = yield resetDb('data-products-users');
   });
 
   after(function () {
