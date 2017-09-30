@@ -4,7 +4,7 @@ describe('search', function () {
   let db;
 
   before(function* () {
-    db = yield resetDb('data-products-users')
+    db = yield resetDb('data-products-users');
   });
 
   after(function () {
