@@ -6,7 +6,7 @@ describe('views', function () {
   let db;
 
   before(function* () {
-    db = yield resetDb();
+    db = yield resetDb('singleview');
   });
 
   after(function () {
@@ -18,8 +18,9 @@ describe('views', function () {
     const views = yield loader(db, config);
 
     assert.isArray(views);
-    assert.lengthOf(views, 3);
+    assert.lengthOf(views, 1);
     assert.isTrue(views[0].hasOwnProperty('schema'));
     assert.isTrue(views[0].hasOwnProperty('name'));
+    assert.equal(views[0].name,'products_named_t');
   });
 });
