@@ -6,7 +6,7 @@ describe('functions', function () {
   let db;
 
   before(function* () {
-    db = yield resetDb();
+    db = yield resetDb('functions');
   });
 
   after(function () {
@@ -17,7 +17,7 @@ describe('functions', function () {
     const functions = yield loader(db, db.loader);
 
     assert.isArray(functions);
-    assert.lengthOf(functions, 39);
+    assert.lengthOf(functions, 44);
     assert.isTrue(functions[0].hasOwnProperty('name'));
     assert.isTrue(functions[0].hasOwnProperty('schema'));
     assert.isTrue(functions[0].hasOwnProperty('sql'));
