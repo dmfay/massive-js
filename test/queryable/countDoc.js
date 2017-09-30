@@ -4,7 +4,7 @@ describe('countDoc', function () {
   let db;
 
   before(function () {
-    return resetDb().then(instance => db = instance);
+    return resetDb('data-docs').then(instance => db = instance);
   });
 
   after(function () {
