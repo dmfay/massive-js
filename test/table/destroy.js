@@ -4,7 +4,7 @@ describe('destroy', function () {
   let db;
 
   before(function () {
-    return resetDb().then(instance => db = instance);
+    return resetDb('singletable').then(instance => db = instance);
   });
 
   after(function () {
@@ -37,39 +37,42 @@ describe('destroy', function () {
   });
 
   it('deletes by matching json', function* () {
-    const deleted = yield db.docs.destroy({'body.title': 'Document 1'});
+    yield db.products.insert({string: 'five', specs: {title: 'Document 1'}});
+    const deleted = yield db.products.destroy({'specs.title': 'Document 1'});
     assert.lengthOf(deleted, 1);
 
-    const found = yield db.docs.find({id: deleted[0].id});
+    const found = yield db.products.find({id: deleted[0].id});
     assert.equal(found.length, 0);
   });
 
   it('deletes by matching json with quotes', function* () {
-    const deleted = yield db.docs.destroy({'"body".title': 'Document 3'});
+    yield db.products.insert({string: 'five', specs: {title: 'Document 1'}});
+    const deleted = yield db.products.destroy({'"specs".title': 'Document 1'});
     assert.lengthOf(deleted, 1);
 
-    const found = yield db.docs.find({id: deleted[0].id});
+    const found = yield db.products.find({id: deleted[0].id});
     assert.equal(found.length, 0);
   });
 
   it('deletes a record from a table with a Cased Name', function* () {
-    const deleted = yield db.Users.destroy({Id: 1});
+    const index = yield db.products.insert({CaseName: 'FourTeen', string: 'fourteen'});
+    const deleted = yield db.products.destroy({CaseName: 'FourTeen'});
     assert.lengthOf(deleted, 1);
-    assert.equal(deleted[0].Id, 1);
+    assert.equal(deleted[0].CaseName, 'FourTeen');
 
-    const found = yield db.Users.find(1);
-    assert.isNull(found);
+    const found = yield db.products.find(index);
+    assert.lengthOf(found, 0);
   });
 
   it('deletes a record with a UUID key', function* () {
-    const foundBefore = yield db.orders.findOne({});
+    const foundBefore = yield db.products.insert({string: 'five', specs: {title: 'Document 1'}});
     assert.isOk(foundBefore);
 
-    const deleted = yield db.orders.destroy({id: foundBefore.id});
+    const deleted = yield db.products.destroy({uuid: foundBefore.uuid});
     assert.lengthOf(deleted, 1);
-    assert.equal(deleted[0].id, foundBefore.id);
+    assert.equal(deleted[0].uuid, foundBefore.uuid);
 
-    const foundAfter = yield db.orders.findOne({id: foundBefore.id});
+    const foundAfter = yield db.products.findOne({uuid: foundBefore.uuid});
     assert.notOk(foundAfter);
   });
 
