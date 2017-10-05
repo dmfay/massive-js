@@ -180,6 +180,30 @@ describe('connecting', function () {
       });
     });
 
+    it('excludes materialized views', function () {
+      const testLoader = _.defaults({
+        scripts: `${__dirname}/helpers/scripts/loader`,
+        noWarnings: true,
+        excludeMatViews: true
+      }, loader);
+
+      return massive(connectionString, testLoader).then(db => {
+        assert.isOk(db);
+        assert(!!db.t1 && !!db.t2 && !!db.tA);
+        assert(!!db.v1 && !!db.v2);
+        assert(!db.mv1 && !db.mv2);
+        assert(!!db.f1 && !!db.f2);
+        assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!!db.two && !!db.two.t1);
+        assert.lengthOf(db.tables, 6);
+        assert.lengthOf(db.views, 4);
+        assert.lengthOf(db.functions, 5);
+        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+
+        return db.instance.$pool.end();
+      });
+    });
+
     it('does not load tables without primary keys', function () {
       return massive(connectionString, loader).then(db => {
         assert(!db.t3); // tables without primary keys aren't loaded

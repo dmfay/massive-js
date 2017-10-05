@@ -1,4 +1,4 @@
--- Load views and materialized views.
+-- Load views (excluding materialized views).
 --
 -- Parameters:
 -- whitelist: array or comma-delimited string of LIKE conditions applied to
@@ -14,9 +14,6 @@ SELECT * FROM (
   SELECT schemaname AS schema, viewname AS name
   FROM pg_views
   WHERE schemaname <> 'pg_catalog' AND schemaname <> 'information_schema'
-  UNION
-  SELECT schemaname AS schema, matviewname AS name
-  FROM pg_matviews
 ) views
 WHERE CASE
   WHEN $(whitelist) <> '' THEN
