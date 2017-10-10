@@ -356,6 +356,29 @@ table, view, and function visible to the connection's user.
 
         <tr>
             
+                <td class="name"><code>enhancedFunctions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Streamline function return values.</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>excludeFunctions</code></td>
             
 
@@ -379,7 +402,7 @@ table, view, and function visible to the connection's user.
 
         <tr>
             
-                <td class="name"><code>enhancedFunctions</code></td>
+                <td class="name"><code>excludeMatViews</code></td>
             
 
             <td class="type">
@@ -395,7 +418,7 @@ table, view, and function visible to the connection's user.
 
             
 
-            <td class="description last">Streamline function return values.</td>
+            <td class="description last">Ignore materialized views.</td>
         </tr>
 
     
@@ -664,7 +687,7 @@ specifications.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line76">line 76</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -822,7 +845,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line266">line 266</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line267">line 267</a>
     </li></ul></dd>
     
 
@@ -979,7 +1002,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line326">line 326</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line327">line 327</a>
     </li></ul></dd>
     
 
@@ -1180,7 +1203,7 @@ belongs.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line112">line 112</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1388,7 +1411,7 @@ the schema.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line343">line 343</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line344">line 344</a>
     </li></ul></dd>
     
 
@@ -1619,7 +1642,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line311">line 311</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line312">line 312</a>
     </li></ul></dd>
     
 
@@ -1833,7 +1856,7 @@ functions.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line294">line 294</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line295">line 295</a>
     </li></ul></dd>
     
 
@@ -2179,7 +2202,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line199">line 199</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line200">line 200</a>
     </li></ul></dd>
     
 
@@ -2289,7 +2312,7 @@ cleared and new objects and files added.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line139">line 139</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line140">line 140</a>
     </li></ul></dd>
     
 
@@ -2470,7 +2493,7 @@ already exist, it will be created.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line249">line 249</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line250">line 250</a>
     </li></ul></dd>
     
 
@@ -2542,7 +2565,7 @@ already exist, it will be created.</td>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Sep 29 2017 00:13:16 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 10 2017 09:37:02 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

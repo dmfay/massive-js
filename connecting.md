@@ -86,12 +86,15 @@ massive(connectionInfo, {
   // never load functions on the blacklist
   functionBlacklist: 'authorizeUser,disableUser',
 
+  // streamline function return values: a function with a scalar
+  // value will return just the scalar instead of an array, etc.
+  enhancedFunctions: true,
+
   // don't load database functions at all
   excludeFunctions: true,
 
-  // streamline function return values: a function with a scalar
-  // value will return just the scalar instead of an array, etc.
-  enhancedFunctions: true
+  // don't load materialized views (required for Postgres < 9.3)
+  excludeMatViews: true
 }).then(instance => {...});
 ```
 
