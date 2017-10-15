@@ -52,6 +52,14 @@ CREATE OR REPLACE FUNCTION multi_arg(arg1 int, arg2 int) RETURNS int AS $$
 SELECT arg1 + arg2;
 $$ LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION single_variadic(variadic args int[]) RETURNS int AS $$
+SELECT array_length(args, 1);
+$$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION multi_variadic(arg1 int, variadic args int[]) RETURNS int AS $$
+SELECT arg1 + array_length(args, 1);
+$$ LANGUAGE SQL;
+
 CREATE SCHEMA one;
 
 CREATE OR REPLACE FUNCTION one.get_number() RETURNS int AS $$

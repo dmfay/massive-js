@@ -65,6 +65,18 @@ describe('invoke', function () {
         assert.equal(res[0][Object.keys(res[0])[0]], 3);
       });
     });
+
+    it('invokes a simple variadic function', function () {
+      return db.single_variadic(1, 2, 1, 2).then(res => {
+        assert.equal(res, 4);
+      });
+    });
+
+    it('invokes a variadic function with earlier arguments', function () {
+      return db.multi_variadic(10, 2, 1, 2).then(res => {
+        assert.equal(res, 13);
+      });
+    });
   });
 
   describe('options', function () {
