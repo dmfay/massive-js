@@ -4,11 +4,21 @@ describe('connecting', function () {
   let loader;
 
   before(function () {
+    // override the default PG env vars for testing since empty user information
+    // will default to the current username otherwise
+    process.env.PGUSER = 'postgres';
+    process.env.PGDATABASE = 'massive';
+
     return resetDb('loader').then(db => {
       loader = db.loader;
 
       return db.instance.$pool.end();
     });
+  });
+
+  after(function () {
+    delete process.env.PGUSER;
+    delete process.env.PGDATABASE;
   });
 
   it('exposes the Database class from the module', function () {
