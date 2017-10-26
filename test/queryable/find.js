@@ -349,15 +349,15 @@ describe('find', function () {
       return db.products.find({}, {limit: 1, offset: 1}).then(res => assert.equal(res[0].id, 2));
     });
 
-    it('restricts the select list to specified columns', function () {
-      return db.products.find({}, {columns: ['id', 'name']}).then(res => {
+    it('restricts the select list to specified fields', function () {
+      return db.products.find({}, {fields: ['id', 'name']}).then(res => {
         const keys = _.keys(res[0]);
         assert.equal(keys.length, 2);
       });
     });
 
-    it('allows expressions in the select list', function () {
-      return db.products.find({}, {columns: ['id', 'upper(name) as name']}).then(res => {
+    it('applies fields and exprs', function () {
+      return db.products.find({}, {fields: ['id'], exprs: {name: 'upper(name)'}}).then(res => {
         assert.equal(res[0].id, 1);
         assert.equal(res[0].name, 'PRODUCT 1');
       });
@@ -384,7 +384,7 @@ describe('find', function () {
     });
 
     it('supports options in findOne', function () {
-      return db.products.findOne({}, {order: 'id desc', columns: 'id'}).then(res => {
+      return db.products.findOne({}, {order: 'id desc', fields: 'id'}).then(res => {
         assert.equal(res.id, 4);
         assert.equal(Object.keys(res).length, 1);
       });
@@ -400,12 +400,12 @@ describe('find', function () {
       return db.Users.findOne().then(res => assert.equal(res.Id, 1));
     });
 
-    it('returns a subset of columns, when we delimit in the calling code', function () {
-      return db.Users.find({}, {columns: ['"Id"', '"Email"']}).then(res => assert.lengthOf(res, 1));
+    it('returns a subset of fields, when we delimit in the calling code', function () {
+      return db.Users.find({}, {fields: ['"Id"', '"Email"']}).then(res => assert.lengthOf(res, 1));
     });
 
     it('returns a single column, when we delimit in the calling code', function () {
-      return db.Users.find({}, {columns: '"Email"'}).then(res => assert.lengthOf(res, 1));
+      return db.Users.find({}, {fields: '"Email"'}).then(res => assert.lengthOf(res, 1));
     });
 
     it('returns users with a simple order by', function () {
@@ -475,15 +475,15 @@ describe('find', function () {
       });
     });
 
-    it('restricts columns', function () {
-      return db.popular_products.find({}, {columns: ['id', 'price']}).then(res => {
+    it('restricts fields', function () {
+      return db.popular_products.find({}, {fields: ['id', 'price']}).then(res => {
         const keys = _.keys(res[0]);
         assert.equal(keys.length, 2);
       });
     });
 
     it('allows expressions in the select list', function () {
-      return db.popular_products.find({}, {columns: ['id', 'upper(name) as name']}).then(res => {
+      return db.popular_products.find({}, {fields: ['id'], exprs: {name: 'upper(name)'}}).then(res => {
         assert.equal(res[0].id, 1);
         assert.equal(res[0].name, 'PRODUCT 1');
       });

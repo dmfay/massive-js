@@ -28,7 +28,7 @@ describe('query', function () {
     const query = new Select(
       {delimitedFullName: `(values ('hi'), ('ih')) temp`, isPkSearch: () => false},
       {column1: 'hi'},
-      {columns: ['column1']}
+      {fields: ['column1']}
     );
 
     return db.query(query).then(result => {
@@ -41,13 +41,13 @@ describe('query', function () {
     const query = new Select(
       {delimitedFullName: `(values ('hi'), ('ih')) temp`, isPkSearch: () => false},
       {column1: 'hi'},
-      {columns: ['column1'], build: true}
+      {fields: ['column1'], build: true}
     );
 
     return db.query(query).then(result => {
       assert.isObject(result);
       assert.deepEqual(result, {
-        sql: `SELECT column1 FROM (values ('hi'), ('ih')) temp WHERE "column1" = $1 ORDER BY 1`,
+        sql: `SELECT "column1" FROM (values ('hi'), ('ih')) temp WHERE "column1" = $1 ORDER BY 1`,
         params: ['hi']
       });
     });

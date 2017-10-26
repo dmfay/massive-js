@@ -122,6 +122,10 @@ Some functions, particularly the query functions (`find`, `findOne`, `findDoc`, 
 {
   build: true,                    // return query text and parameters without executing anything
   document: true,                 // treat table as a document store (see 'Documents')
+  fields: ['name', 'created_at']  // retrieve only the specified fields (can be used with exprs)
+  exprs: {                        // retrieve the specified expressions (can be used with fields)
+    lowername: 'lower(name)'
+  }
   order: [{                       // creates an ORDER BY clause to enforce sorting
     field: 'settings.role',       // JSON fields use . and [] notation
     direction: 'desc',            // set the sort direction with 'desc' or 'asc' (optional)
