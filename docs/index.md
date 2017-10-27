@@ -13,6 +13,40 @@ npm install massive --save
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
+## Koa Example
+
+```
+const Koa = require('koa');
+const Router = require('koa-router');
+const massive = require('massive');
+
+const app = new Koa();
+const router = new Router();
+
+massive({
+  host: '127.0.0.1',
+  port: 5432,
+  database: 'appdb',
+  user: 'appuser',
+  password: 'apppwd'
+}).then(instance => {
+  app.context.db = instance;
+
+  router.get('/', async (ctx) => {
+    ctx.body = await ctx.db.feed_items.find({
+      'rating >': 0
+    }, {
+      order: 'created_at desc'
+    });
+  });
+
+  app
+    .use(router.routes())
+    .use(router.allowedMethods())
+    .listen(3000);
+});
+```
+
 ## Express Example
 
 ```
