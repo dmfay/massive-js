@@ -59,7 +59,7 @@
     "eslint": "~4.10.0",
     "jsdoc": "^3.5.4",
     "mocha": "~4.0.0",
-    "nyc": "~11.2.0"
+    "nyc": "~11.3.0"
   },
   "repository": {
     "type": "git",
