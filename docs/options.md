@@ -123,7 +123,7 @@ into this:
 }]
 ```
 
-This can also be used with raw sql queries, using the .query interface. Note that options need to be passed as the third argument to .query, as the second argument is used for params.
+This can also be used with raw sql through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
 
 ```javascript
 db.query(
@@ -135,47 +135,12 @@ db.query(
       columns: {u_id: 'id', u_name: 'name', u_address: 'address'},
       tests: {
         pk: 't_id',
-        columns: {t_id: 'id', t_score: 'score},
+        columns: {t_id: 'id', t_score: 'score'},
         array: true
       }
     }
   }
 ).then(...)
-```
-
-This will transform this recordset:
-
-```javascript
-[
-  {u_id: 1, u_name: 'alice', u_address: '111 Road', t_id: 1, t_score: 90},
-  {u_id: 1, u_name: 'alice', u_address: '111 Road', t_id: 2, t_score: 80},
-  {u_id: 1, u_name: 'bob', u_address: '22 Street', t_id: 1, t_score: 75},
-]
-```
-
-into this:
-
-```javascript
-[{
-  id: 1,
-  name: 'alice',
-  address: '111 Road',
-  tests: [{
-    id: 1,
-    score: 90
-  }, {
-    id: 2,
-    score: 80
-  }]
-}, {
-  id: 2,
-  name: 'bob',
-  address: '22 Street',
-  tests: [{
-    id: 1,
-    score: 75
-  }]
-}]
 ```
 
 The `decompose` option can be applied to any result set, although it will generally be most useful with views and scripts.
