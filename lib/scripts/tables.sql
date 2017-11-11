@@ -11,28 +11,59 @@
 --   override blacklisted tables.
 
 SELECT * FROM (
-  SELECT tc.table_schema AS schema, tc.table_name AS name, NULL AS parent, kc.column_name AS pk, TRUE AS is_insertable_into
+  SELECT tc.table_schema AS schema,
+    tc.table_name AS name,
+    NULL AS parent,
+    kc.column_name AS pk,
+    TRUE AS is_insertable_into,
+    array_agg(c.column_name::text) AS columns
   FROM information_schema.table_constraints tc
   JOIN information_schema.key_column_usage kc
-    ON kc.table_name = tc.table_name
-    AND kc.constraint_schema = tc.table_schema
+    ON kc.constraint_schema = tc.table_schema
+    AND kc.table_name = tc.table_name
     AND kc.constraint_name = tc.constraint_name
+  JOIN information_schema.columns c
+    ON c.table_schema = tc.table_schema
+    AND c.table_name = tc.table_name
   WHERE tc.constraint_type = 'PRIMARY KEY'
+  GROUP BY tc.table_schema, tc.table_name, kc.column_name
+
   UNION
-  SELECT tc.table_schema AS schema, c.relname AS name, p.relname AS parent, kc.column_name AS pk, TRUE AS is_insertable_into
+
+  SELECT tc.table_schema AS schema,
+    child.relname AS name,
+    parent.relname AS parent,
+    kc.column_name AS pk,
+    TRUE AS is_insertable_into,
+    array_agg(c.column_name::text) AS columns
   FROM pg_catalog.pg_inherits
-  JOIN pg_catalog.pg_class AS c ON (inhrelid = c.oid)
-  JOIN pg_catalog.pg_class AS p ON (inhparent = p.oid)
-  JOIN information_schema.table_constraints tc ON tc.table_name = p.relname
+  JOIN pg_catalog.pg_class AS child ON (inhrelid = child.oid)
+  JOIN pg_catalog.pg_class AS parent ON (inhparent = parent.oid)
+  JOIN information_schema.table_constraints tc ON tc.table_name = parent.relname
   JOIN information_schema.key_column_usage kc
-    ON kc.table_name = tc.table_name
-    AND kc.constraint_schema = tc.table_schema
+    ON kc.constraint_schema = tc.table_schema
+    AND kc.table_name = tc.table_name
     AND kc.constraint_name = tc.constraint_name
+  JOIN information_schema.columns c
+    ON c.table_schema = tc.table_schema
+    AND c.table_name = tc.table_name
   WHERE tc.constraint_type = 'PRIMARY KEY'
+  GROUP BY tc.table_schema, child.relname, parent.relname, kc.column_name
+
   UNION
-  SELECT t.table_schema AS schema, t.table_name AS name, NULL AS parent, NULL AS pk, CASE t.is_insertable_into WHEN 'YES' THEN TRUE ELSE FALSE END AS is_insertable_into
+
+  SELECT t.table_schema AS schema,
+    t.table_name AS name,
+    NULL AS parent,
+    NULL AS pk,
+    CASE t.is_insertable_into WHEN 'YES' THEN TRUE ELSE FALSE END AS is_insertable_into,
+    array_agg(c.column_name::text) AS columns
   FROM information_schema.tables t
+  JOIN information_schema.columns c
+    ON c.table_schema = t.table_schema
+    AND c.table_name = t.table_name
   WHERE table_type = 'FOREIGN TABLE'
+  GROUP BY t.table_schema, t.table_name, t.is_insertable_into
 ) tables
 WHERE CASE
   WHEN $(whitelist) <> '' THEN
