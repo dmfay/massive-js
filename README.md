@@ -15,7 +15,7 @@ Here are some of the high points:
 * **Dynamic query generation**: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.
 * **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are _tables_, and you can insert or update directly into them.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
-* **Result decomposition**: while Massive does not traverse relationships or build model graphs, the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
+* **Relational awareness**: while Massive does not traverse relationships or build model graphs, [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
 * **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation

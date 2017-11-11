@@ -5,20 +5,22 @@ const Insert = require('../../lib/statement/insert');
 describe('Insert', function () {
   const source = {
     delimitedFullName: 'testsource',
-    isPkSearch: () => false
+    pk: 'id',
+    isPkSearch: () => false,
+    columns: ['field1', 'field2', 'string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']
   };
 
   describe('ctor', function () {
     it('should have defaults', function () {
       const query = new Insert(source);
 
-      assert.equal(query.source, 'testsource');
+      assert.equal(query.source.delimitedFullName, 'testsource');
     });
 
     it('should apply options', function () {
       const query = new Insert(source, {}, {build: true});
 
-      assert.equal(query.source, 'testsource');
+      assert.equal(query.source.delimitedFullName, 'testsource');
       assert.isTrue(query.build);
     });
 
@@ -34,7 +36,7 @@ describe('Insert', function () {
       });
 
       assert.lengthOf(query.columns, 7);
-      assert.deepEqual(query.columns, ['"string"', '"boolean"', '"int"', '"number"', '"object"', '"array"', '"emptyArray"']);
+      assert.deepEqual(query.columns, ['string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']);
       assert.lengthOf(query.params, 7);
       assert.deepEqual(query.params, ['hi', true, 123, 456.78, {field: 'value'}, [1, 2, 3], []]);
     });
@@ -75,6 +77,72 @@ describe('Insert', function () {
       const result = new Insert(source, {field1: 'value1'}, {onConflictIgnore: true});
       assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');
       assert.deepEqual(result.params, ['value1']);
+    });
+
+    it('should create junction queries', function () {
+      const result = new Insert(
+        source,
+        {
+          field1: 'value1',
+          junction_one: [{
+            j1fk: 10,
+            source_id: undefined,
+            j1field: 'something'
+          }],
+          junction_many: [{
+            source_id_another_name: undefined,
+            j2fk: 101,
+            j2field: 'j2f1'
+          }, {
+            source_id_another_name: undefined,
+            j2fk: 102,
+            j2field: null
+          }]
+        }
+      );
+
+      assert.equal(result.format(), 'WITH inserted AS (INSERT INTO testsource ("field1") VALUES ($1) RETURNING *), q_0_0 AS (INSERT INTO junction_one ("source_id", "j1fk", "j1field") SELECT "id", $2, $3 FROM inserted), q_1_0 AS (INSERT INTO junction_many ("source_id_another_name", "j2fk", "j2field") SELECT "id", $4, $5 FROM inserted), q_1_1 AS (INSERT INTO junction_many ("source_id_another_name", "j2fk", "j2field") SELECT "id", $6, $7 FROM inserted) SELECT * FROM inserted');
+      assert.deepEqual(result.params, ['value1', 10, 'something', 101, 'j2f1', 102, null]);
+    });
+
+    it('should throw when trying to create junction queries for multiple records', function () {
+      try {
+        const x = new Insert(
+          source,
+          [{
+            field1: 'value1',
+            junction_one: [{
+              j1fk: 10,
+              j1field: 'something'
+            }],
+            junction_many: [{
+              j2fk: 101,
+              j2field: 'j2f1'
+            }, {
+              j2fk: 102,
+              j2field: 'j2f2'
+            }]
+          }, {
+            field1: 'value2',
+            junction_one: [{
+              j1fk: 20,
+              j1field: 'something else'
+            }],
+            junction_many: [{
+              j2fk: 201,
+              j2field: 'j2f3'
+            }, {
+              j2fk: 202,
+              j2field: 'j2f4'
+            }]
+          }]
+        );
+
+        assert.fail();
+        assert.isNull(x);
+      } catch (err) {
+        assert.isOk(err);
+      }
     });
   });
 });
