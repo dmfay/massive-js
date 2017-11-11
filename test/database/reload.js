@@ -20,7 +20,7 @@ describe('reload', function () {
   });
 
   it('picks up change in current schema', () => {
-    return db.run('SET search_path=test')
+    return db.query('SET search_path=test')
       .then(() => db.reload())
       .then(() => assert.equal(db.currentSchema, 'test'));
   });

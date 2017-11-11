@@ -323,13 +323,13 @@ See the [options docs](https://dmfay.github.io/massive-js/options.html) for a co
 Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a `hash` database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:
 
 ```javascript
-db.run(
+db.query(
   'update users set password = hash(password) where id < $1 returning *',
   [3]
 ).then(users => {...});
 ```
 
-The value returned is an array of rows, assuming the query returns anything. `run` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
+The value returned is an array of rows, assuming the query returns anything. `query` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
 
 #### Documents
 
@@ -407,7 +407,7 @@ When changing multiple documents, `modify` returns an array containing all updat
 
 ### Accessing the Driver
 
-Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.run` for arbitrary queries. In the same vein, Massive exposes the [pg-promise] driver (as `db.pgp`) and connected [Database] instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
+Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.query` for arbitrary SQL. In the same vein, Massive exposes the [pg-promise] driver (as `db.pgp`) and connected [Database] instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
 
 ## REPL
 

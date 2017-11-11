@@ -19,9 +19,9 @@ global.resetDb = function (schema = 'default') {
   global.loader.scripts = path.join(__dirname, 'scripts', schema);
 
   return massive(connectionString, global.loader).then(db => {
-    return db.run(`select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'`)
+    return db.query(`select schema_name from information_schema.schemata where catalog_name = 'massive' and schema_name not like 'pg_%' and schema_name not like 'information_schema'`)
       .then(schemata =>
-        Promise.all(schemata.map(s => db.run(`drop schema ${s.schema_name} cascade`)))
+        Promise.all(schemata.map(s => db.query(`drop schema ${s.schema_name} cascade`)))
       )
       .then(() => db.schema())
       .then(() => db.reload());

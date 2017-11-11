@@ -41,5 +41,7 @@ describe('run', function () {
     const intCount = yield db.run('select count(*) from products');
 
     assert.typeOf(intCount[0].count, 'number');
+
+    types.setTypeParser(20, v => v);  // reset
   });
 });
