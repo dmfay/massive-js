@@ -55,7 +55,7 @@
 <li><strong>Dynamic query generation</strong>: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.</li>
 <li><strong>Do as much, or as little, as you need</strong>: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are <em>tables</em>, and you can insert or update directly into them.</li>
 <li><strong>Document storage</strong>: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.</li>
-<li><strong>Result decomposition</strong>: while Massive does not traverse relationships or build model graphs, the <a href="https://dmfay.github.io/massive-js/options.html#decomposition-schemas"><code>decompose</code> option</a> allows you to map the results of complex views and scripts to nested object trees.</li>
+<li><strong>Relational awareness</strong>: while Massive does not traverse relationships or build model graphs, <a href="https://dmfay.github.io/massive-js/persistence.html#deep-insert">deep inserts</a> can create related entities and junctions transactionally, and the <a href="https://dmfay.github.io/massive-js/options.html#decomposition-schemas"><code>decompose</code> option</a> allows you to map the results of complex views and scripts to nested object trees.</li>
 <li><strong>Postgres everything</strong>: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.</li>
 </ul>
 <h2>Full Documentation</h2><p><a href="https://dmfay.github.io/massive-js/">Full documentation including API docs is available on GitHub Pages.</a></p>
@@ -125,6 +125,10 @@ massive({
 <pre class="prettyprint source lang-javascript"><code>{
   build: true,                    // return query text and parameters without executing anything
   document: true,                 // treat table as a document store (see 'Documents')
+  fields: ['name', 'created_at']  // retrieve only the specified fields (can be used with exprs)
+  exprs: {                        // retrieve the specified expressions (can be used with fields)
+    lowername: 'lower(name)'
+  }
   order: [{                       // creates an ORDER BY clause to enforce sorting
     field: 'settings.role',       // JSON fields use . and [] notation
     direction: 'desc',            // set the sort direction with 'desc' or 'asc' (optional)
@@ -249,10 +253,10 @@ massive({
   }
 }).then(...)</code></pre><p>See the <a href="https://dmfay.github.io/massive-js/options.html">options docs</a> for a complete guide to the schema object.</p>
 <h4>Arbitrary Queries</h4><p>Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a <code>hash</code> database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:</p>
-<pre class="prettyprint source lang-javascript"><code>db.run(
+<pre class="prettyprint source lang-javascript"><code>db.query(
   'update users set password = hash(password) where id &lt; $1 returning *',
   [3]
-).then(users => {...});</code></pre><p>The value returned is an array of rows, assuming the query returns anything. <code>run</code> is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.</p>
+).then(users => {...});</code></pre><p>The value returned is an array of rows, assuming the query returns anything. <code>query</code> is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.</p>
 <h4>Documents</h4><p>The <code>tests</code> table represents a fairly limited picture of what exactly Alice and Bob are doing. An individual test may have a lot more data associated with it, and this data could be wildly different depending on what precisely is being evaluated, so simply adding more columns to <code>tests</code> isn't really an ideal solution. Postgres' JSONB functionality allows for a more free-form approach than relational databases otherwise support. Working with JSONB fields is certainly possible with the suite of standard table functions, but Massive also allows the dynamic creation and usage of dedicated document tables with a separate set of functions based on the relational data persistence and retrieval functionality.</p>
 <p>We can create a document table dynamically by calling <code>saveDoc</code>:</p>
 <pre class="prettyprint source lang-javascript"><code>db.saveDoc('test_attributes', {
@@ -286,7 +290,7 @@ db.test_attributes.saveDoc(attributes)
 }, {
   browser: 'Chrome'
 }).then(changedAttributesDocs => {...});</code></pre><p>When changing multiple documents, <code>modify</code> returns an array containing all updated documents.</p>
-<h3>Accessing the Driver</h3><p>Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's <code>db.run</code> for arbitrary queries. In the same vein, Massive exposes the <a href="https://github.com/vitaly-t/pg-promise">pg-promise</a> driver (as <code>db.pgp</code>) and connected <a href="http://vitaly-t.github.io/pg-promise/Database.html">Database</a> instance (as <code>db.instance</code>) so client code can easily use its lower-level functions when necessary.</p>
+<h3>Accessing the Driver</h3><p>Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's <code>db.query</code> for arbitrary SQL. In the same vein, Massive exposes the <a href="https://github.com/vitaly-t/pg-promise">pg-promise</a> driver (as <code>db.pgp</code>) and connected <a href="http://vitaly-t.github.io/pg-promise/Database.html">Database</a> instance (as <code>db.instance</code>) so client code can easily use its lower-level functions when necessary.</p>
 <h2>REPL</h2><p>Massive.js ships with a REPL (read-evaluate-print loop), an interactive console that lets you connect to a database and execute JavaScript code. The easiest way to run it is to install globally:</p>
 <pre class="prettyprint source"><code>npm i -g massive</code></pre><p>You can then fire up a connection and start writing JavaScript:</p>
 <pre class="prettyprint source"><code>massive -d appdb
@@ -317,7 +321,7 @@ db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In additio
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 10 2017 09:37:02 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Nov 12 2017 01:38:40 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>
