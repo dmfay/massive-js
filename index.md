@@ -13,6 +13,75 @@ npm install massive --save
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
+## Raw SQL
+
+**Important note: `db.run` is deprecated and will be removed in a future release. Update your code to use `db.query` instead.**
+
+Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.query`.
+
+```javascript
+db.query('select * from tests where id > $1', [1]).then(tests => {
+  // all tests matching the criteria
+});
+```
+
+`query` takes named parameters as well:
+
+```javascript
+db.query(
+  'select * from tests where id > ${something}',
+  {something: 1}
+).then(tests => {
+  // all tests matching the criteria
+});
+```
+
+And options:
+
+```javascript
+db.query(
+  'select * from tests where id > ${something}',
+  {something: 1},
+  {build: true}
+).then(query => {
+  // an object with sql and params
+});
+```
+
+## Koa Example
+
+```
+const Koa = require('koa');
+const Router = require('koa-router');
+const massive = require('massive');
+
+const app = new Koa();
+const router = new Router();
+
+massive({
+  host: '127.0.0.1',
+  port: 5432,
+  database: 'appdb',
+  user: 'appuser',
+  password: 'apppwd'
+}).then(instance => {
+  app.context.db = instance;
+
+  router.get('/', async (ctx) => {
+    ctx.body = await ctx.db.feed_items.find({
+      'rating >': 0
+    }, {
+      order: 'created_at desc'
+    });
+  });
+
+  app
+    .use(router.routes())
+    .use(router.allowedMethods())
+    .listen(3000);
+});
+```
+
 ## Express Example
 
 ```
@@ -84,7 +153,7 @@ const monitor = require('pg-monitor');
 massive('postgres://localhost:5432/massive').then(db => {
   monitor.attach(db.driverConfig);
 
-  db.run('select 1').then(data => {
+  db.query('select 1').then(data => {
     // monitor output appears in the console
   });
 });

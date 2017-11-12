@@ -2,7 +2,7 @@
 
 Since Massive doesn't use models, data is retrieved as plain old JavaScript objects where keys correspond to column names. With the obvious exceptions of `findOne` and `count`, most query functions return arrays where each object represents a row in the resultset _even if_ there is only one result whether naturally or from a `LIMIT` clause applied by query options.
 
-The `find`, `findOne`, and `count` functions form a consistent API for data retrieval with criteria and options. `where` offers total flexibility if you need to hand-write a `WHERE` clause for cases where criteria objects aren't sufficient (for example, testing concatenation or math on a field). `search` handles full-text search across multiple columns.
+The `find`, `findOne`, and `count` functions form a consistent API for data retrieval with criteria and options. `where` offers total flexibility if you need to hand-write a `WHERE` clause for cases where criteria objects aren't sufficient (for example, testing concatenation or math on a field). `search` handles full-text search across multiple fields.
 
 All query functions except `count` may take [options objects](/options). Valid options are those for `SELECT` statements and general results processing. One especially useful option with query functions is `stream`, which, when true, will return results as a stream instead of an array. This allows you to start reading and handling data immediately, but the connection will remain open until the stream is terminated.
 
@@ -29,7 +29,7 @@ db.tests.find({
 db.tests.findOne({
   id: 1
 }, {
-  columns: ['name', 'is_active']
+  fields: ['name', 'is_active']
 }).then(result => {
   // an object with the name and active status for test #1
 });
@@ -39,7 +39,7 @@ You can use a primary key value instead of a criteria object with `findOne` if d
 
 ```javascript
 db.tests.findOne(1, {
-  columns: ['name', 'is_active']
+  fields: ['name', 'is_active']
 }).then(result => {
   // an object with the name and active status for test #1
 });
@@ -87,7 +87,7 @@ db.tests.where(
 
 ## search
 
-`search` enables full-text searching across multiple columns. The first argument is a search plan with an array of `columns` and a `term` to search for. The function also takes a query options object as an optional second argument. `search` returns a results array.
+`search` enables full-text searching across multiple fields. The first argument is a search plan with an array of `fields` and a `term` to search for. The function also takes a query options object as an optional second argument. `search` returns a results array.
 
 ```javascript
 db.users.search(

@@ -24,6 +24,8 @@ Massive treats functions and scripts identically. Each is attached as a function
 
 If `enhancedFunctions` is set to `true` in the loader configuration, functions returning scalars or flat arrays will be intercepted and the results massaged into scalars or flat arrays, as appropriate. Since this represents a departure from the consistent form, it must be explicitly enabled on initialization.
 
+The last argument to Postgres functions may be declared a `VARIADIC` array, similar to JavaScript rest parameters: all extra values are rolled up into an array of the same type. Massive builds prepared statements at runtime for variadic functions, so you can just pass all your arguments inline.
+
 ```javascript
 db.uuid_generate_v1mc().then(arr => {
   // an array containing the generated UUID (requires the

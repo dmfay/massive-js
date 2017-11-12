@@ -8,13 +8,20 @@ Options can be passed to most query and persistence functions as the final argum
 db.tests.find({
   is_active: true
 }, {
+  fields: ['name', 'started_at'],
+  exprs: {
+    lowername: 'lower(name)',
+    total: 'passes + failures'
+  },
   offset: 20,
   limit: 10,
   only: true,
   stream: true
 }).then(stream => {
-  // a stream returning the active tests 21-30,
-  // omitting rows from any descendant tables
+  // a stream returning the name, start date, lower-
+  // cased name, and pass + failure total for active
+  // tests 21-30, omitting rows from any descendant
+  // tables
 });
 ```
 
@@ -24,7 +31,8 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 
 | Option key       | Use in | Description |
 |------------------|--------|-------------|
-| columns          | `SELECT` | Change the `SELECT` list by specifying an array of columns to include in the resultset. |
+| fields           | `SELECT` | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |
+| exprs            | `SELECT` | Specify a map of aliases to expressions to include in the resultset. |
 | limit            | `SELECT` | Set the number of rows to take. |
 | offset           | `SELECT` | Set the number of rows to skip. |
 | only             | `SELECT`, `UPDATE`, `DELETE` | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
@@ -32,7 +40,7 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 | orderBody        | `SELECT` | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
 | onConflictIgnore | `INSERT` | If the inserted data would violate a unique constraint, do nothing. |
 
-*nb. The `columns` and `order` properties allow comma-delimited string as well as array values. Take care when using raw strings since the values are interpolated directly into the emitted SQL. If user input is included in the values, you open yourself up to SQL injection attacks.*
+*nb. The `fields`, `exprs`, and `order` options interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.*
 
 ### Ordering Results
 
@@ -113,6 +121,26 @@ into this:
     name: 'third'
   }]
 }]
+```
+
+This can also be used with raw sql through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
+
+```javascript
+db.query(
+  'select u.id as u_id, u.name as u_name, u.address as u_address,  t.id as t_id, t.score as t_score ' +
+  'from users u inner join tests t ' +
+  'on t.user_id = u.id', [], {
+    decompose: {
+      pk: 'id',
+      columns: {u_id: 'id', u_name: 'name', u_address: 'address'},
+      tests: {
+        pk: 't_id',
+        columns: {t_id: 'id', t_score: 'score'},
+        array: true
+      }
+    }
+  }
+).then(...)
 ```
 
 The `decompose` option can be applied to any result set, although it will generally be most useful with views and scripts.

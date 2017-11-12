@@ -40,7 +40,9 @@ db.tests.insert({
 });
 ```
 
-You can insert multiple rows at once -- just pass an array, and you'll receive an array containing all your new records:
+#### Multiple Records
+
+You can insert multiple records at once -- just pass an array, and you'll receive an array containing all your new data:
 
 ```javascript
 db.tests.insert([{
@@ -55,7 +57,38 @@ db.tests.insert([{
 });
 ```
 
-Records in the array may omit keys if the database default value is intended; however, fields having `NOT NULL` constraints must be included or the insert will fail.
+Records must be consistently formed, having the same fields in the same iteration order. Fields may be omitted if the database default value is intended; however, fields having `NOT NULL` constraints must be included or the insert will fail.
+
+#### Deep Insert
+
+Inserting into multiple related tables at once happens fairly frequently, especially when you're dealing with many-to-many relationships through a junction table. For these cases, you can pass arrays of related records into `insert` as a property named for the related table.
+
+Entries in each related table array have the same conditions as those for normal inserts: they must be consistently formed, and nullable fields may be omitted if no value is intended. The one difference is that the foreign key to the original record must be explicitly `undefined`.
+
+```javascript
+db.tests.insert({
+  name: 'homepage',
+  version: 1,
+  priority: 'low',
+  user_tests: [{
+    test_id: undefined,
+    user_id: 1,
+    role: 'primary'
+  }, {
+    test_id: undefined,
+    user_id: 2,
+    role: 'auxiliary'
+  }]
+}).then(tests => {
+  // as with regular inserts, you only get the test back;
+  // if user_tests has a primary key constraint, you can
+  // query db.user_tests to retrieve its rows.
+});
+```
+
+Deep insert is _only_ supported when inserting single records. Attempting to deep insert an array of records will raise an exception.
+
+#### Options
 
 [Query options](/options) for `INSERT` statements and results processing may be used with `insert`:
 
