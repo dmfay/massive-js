@@ -1,3 +1,13 @@
+.travis.yml
+.jsdoc.json
+.eslintrc
+.eslintignore
+build
+docs/Gemfile
+docs/_config.yml
+docs/_layouts
+docs/assets
+docs/api
+docs/Gemfile.lock
 test
-examples
-db
+*.tgz
