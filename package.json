@@ -13,6 +13,13 @@
     "lib": "lib",
     "test": "test"
   },
+  "files": [
+    "bin",
+    "*.md",
+    "docs/*.md",
+    "*.js",
+    "lib"
+  ],
   "engines": {
     "node": ">= 6.0.0"
   },
