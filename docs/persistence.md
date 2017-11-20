@@ -94,12 +94,14 @@ Deep insert is _only_ supported when inserting single records. Attempting to dee
 
 ```javascript
 db.tests.insert({
+  id: 1,
   name: 'homepage',
-  version: 1,
+  version: 1
 }, {
-  onConflictIgnore: true, // add ON CONFLICT DO NOTHING to the query
+  onConflictIgnore: true, // do nothing if this row already exists
 }).then(test => {
-  // the inserted row, or `null` if there was a conflict and nothing was inserted
+  // the inserted row, or `null` if there was a conflict and
+  // nothing was inserted
 });
 ```
 

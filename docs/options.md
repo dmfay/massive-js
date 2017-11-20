@@ -123,13 +123,16 @@ into this:
 }]
 ```
 
-This can also be used with raw sql through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
+This can also be used with raw SQL through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
 
 ```javascript
 db.query(
-  'select u.id as u_id, u.name as u_name, u.address as u_address,  t.id as t_id, t.score as t_score ' +
-  'from users u inner join tests t ' +
-  'on t.user_id = u.id', [], {
+  `select u.id as u_id, u.name as u_name, u.address as u_address,
+    t.id as t_id, t.score as t_score
+    from users u
+    inner join tests t on t.user_id = u.id`,
+  [],
+  {
     decompose: {
       pk: 'id',
       columns: {u_id: 'id', u_name: 'name', u_address: 'address'},
