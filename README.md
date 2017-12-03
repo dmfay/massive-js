@@ -8,15 +8,15 @@
 
 Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.
 
-Massive is _not_ an object-relational mapper (ORM)! It doesn't use models, it doesn't track state, and it doesn't limit you to a single entity-based metaphor for accessing and persisting data. You've already got a data model: your schema. Massive introspects your database at runtime and returns a connected instance with your tables, views, functions, and scripts attached and ready to query, write, or execute.
+Massive is _not_ an object-relational mapper (ORM)! It doesn't use models, it doesn't track state, and it doesn't limit you to a single entity-based metaphor for accessing and persisting data. Massive connects to your database and introspects its schemas to build an API for the data model you already have: your tables, views, functions, and easily-modified SQL scripts.
 
 Here are some of the high points:
 
-* **Dynamic query generation**: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.
-* **Do as much, or as little, as you need**: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are _tables_, and you can insert or update directly into them.
+* **Dynamic query generation**: Massive's versatile query builder supports a wide variety of operators, all generated from a simple criteria object.
+* **Low overhead**: An API built from your schema means no model classes to maintain, super-simple bulk operations, and writing directly to tables without any need to create or load entity instances beforehand.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
-* **Relational awareness**: while Massive does not traverse relationships or build model graphs, [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
-* **Postgres everything**: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.
+* **Relational awareness**: Massive does not traverse relationships or build model graphs, but [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
+* **Postgres everything**: Commitment to a single RDBMS lets us use it to its full potential. Massive supports array fields and operations, regular expression matching, foreign tables, materialized views, and more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation
 
