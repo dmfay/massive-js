@@ -1,6 +1,6 @@
 'use strict';
 
-describe('getObject', function () {
+describe('list functions', function () {
   let db;
 
   before(function () {
