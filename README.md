@@ -422,7 +422,7 @@ You can then fire up a connection and start writing JavaScript:
 ```
 massive -d appdb
 
-db > db.tables.map(table => table.name);
+db > db.listTables();
 [ 'tests',
   'users' ]
 

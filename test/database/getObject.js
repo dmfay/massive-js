@@ -14,25 +14,26 @@ describe('getObject', function () {
     return db.instance.$pool.end();
   });
 
-  describe('without schema', function () {
+  describe('public schema', function () {
     before(function () {
       return db.createDocumentTable(tableName);
     });
+
     after(function () {
       return db.dropTable(tableName, {cascade: true});
     });
 
     it('verifies the presence of a table in public schema', function () {
-      assert.isOk(db.getObject(tableName, 'tables'));
-      assert.isNotOk(db.getObject(missingTableName, 'tables'));
+      assert.isOk(db.getObject(tableName));
+      assert.isNotOk(db.getObject(missingTableName));
     });
 
-    it('defaults to searching tables', function () {
-      assert.isOk(db.getObject(tableName));
+    it('handles explicit public schema name in path', function () {
+      assert.isOk(db.getObject(`public.${tableName}`));
     });
   });
 
-  describe('with schema', function () {
+  describe('other schema', function () {
     const schemaTableName = `${schema}.${tableName}`;
     const missingSchemaTableName = `${schema}.${missingTableName}`;
 
@@ -40,14 +41,15 @@ describe('getObject', function () {
       yield db.createSchema(schema);
       yield db.createDocumentTable(schemaTableName);
     });
+
     after(function* () {
       yield db.dropTable(schemaTableName, {cascade: true});
       yield db.dropSchema(schema, {cascade: true});
     });
 
     it('verifies the presence of the table in the specified schema', function () {
-      assert.isOk(db.getObject(schemaTableName, 'tables'));
-      assert.isNotOk(db.getObject(missingSchemaTableName, 'tables'));
+      assert.isOk(db.getObject(schemaTableName));
+      assert.isNotOk(db.getObject(missingSchemaTableName));
     });
   });
 });

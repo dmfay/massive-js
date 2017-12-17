@@ -19,12 +19,11 @@ describe('dropTable', function () {
     });
 
     it('removes the table from public schema', function* () {
-      assert.lengthOf(db.tables, 1);
+      assert.isOk(db[tableName]);
 
       yield db.dropTable(tableName, {cascade: true});
 
       assert.isUndefined(db[tableName]);
-      assert.lengthOf(db.tables, 0);
     });
   });
 
@@ -37,12 +36,11 @@ describe('dropTable', function () {
     });
 
     it('removes the table from the specified schema', function* () {
-      assert.lengthOf(db.tables, 1);
+      assert.isOk(db[schema][tableName]);
 
       yield db.dropTable(schemaTableName, {cascade: true});
 
       assert.isUndefined(db[schema][tableName]);
-      assert.lengthOf(db.tables, 0);
     });
   });
 });

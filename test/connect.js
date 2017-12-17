@@ -1,5 +1,9 @@
 'use strict';
 
+const Executable = require('../lib/executable');
+const Queryable = require('../lib/queryable');
+const Table = require('../lib/table');
+
 describe('connecting', function () {
   let loader;
 
@@ -28,10 +32,10 @@ describe('connecting', function () {
   it('returns a database connection', function () {
     return massive({connectionString}, loader).then(db => {
       assert.isOk(db);
-      assert.isOk(db.tables);
-      assert.isOk(db.functions);
       assert.isOk(db.loader);
       assert.isOk(db.driverConfig);
+      assert.isTrue(db.objects.length > 0);
+      assert.isOk(db.t1);
 
       return db.instance.$pool.end();
     });
@@ -106,8 +110,8 @@ describe('connecting', function () {
       delete testLoader.scripts;
 
       return massive(connectionString, testLoader).then(db => {
-        assert.lengthOf(db.functions, 4);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 0);
+        assert.lengthOf(db.objects.filter(f => f instanceof Executable), 4);
+        assert.lengthOf(db.objects.filter(f => f.sql instanceof pgp.QueryFile), 0);
 
         return db.instance.$pool.end();
       });
@@ -139,7 +143,7 @@ describe('connecting', function () {
 
     it('loads all tables', function () {
       return massive({connectionString}, loader).then(db => {
-        assert.equal(db.tables.length, 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 6);
 
         return db.instance.$pool.end();
       });
@@ -147,7 +151,7 @@ describe('connecting', function () {
 
     it('loads all views', function () {
       return massive({connectionString}, loader).then(db => {
-        assert.equal(db.views.length, 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable && !(o instanceof Table)), 6);
 
         return db.instance.$pool.end();
       });
@@ -160,8 +164,8 @@ describe('connecting', function () {
       }, loader);
 
       return massive(connectionString, testLoader).then(db => {
-        assert.ok(db.functions.length > 1);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
+        assert.isTrue(db.objects.filter(o => o instanceof Executable).length > 1);
+        assert.lengthOf(db.objects.filter(f => f.sql instanceof pgp.QueryFile), 1); // just the schema script
 
         return db.instance.$pool.end();
       });
@@ -181,10 +185,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.lengthOf(db.tables, 6);
-        assert.lengthOf(db.views, 6);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 17);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 12);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -205,10 +210,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.lengthOf(db.tables, 6);
-        assert.lengthOf(db.views, 4);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 15);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 10);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -239,10 +245,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.equal(db.tables.length, 3);
-        assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 10);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 3);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -264,10 +271,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.equal(db.tables.length, 2);
-        assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 9);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 4);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -290,10 +298,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 2);
-        assert.equal(db.views.length, 2);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 9);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 4);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -314,10 +323,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.equal(db.tables.length, 5);
-        assert.equal(db.views.length, 5);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 15);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 10);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -339,10 +349,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 4);
-        assert.equal(db.views.length, 4);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 13);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 8);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 4);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -365,10 +376,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !!db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 2);
-        assert.equal(db.views.length, 0);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 7);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -391,10 +403,11 @@ describe('connecting', function () {
         assert(!!db.f1 && !!db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.equal(db.tables.length, 1);
-        assert.equal(db.views.length, 0);
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects, 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Table), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -410,8 +423,8 @@ describe('connecting', function () {
       }, loader);
 
       return massive(connectionString, testLoader).then(db => {
-        assert.lengthOf(db.functions, 1);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
@@ -425,8 +438,8 @@ describe('connecting', function () {
       }, loader);
 
       return massive(connectionString, testLoader).then(db => {
-        assert.lengthOf(db.functions, 5);
-        assert.lengthOf(db.functions.filter(f => f.sql instanceof pgp.QueryFile), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
       });
