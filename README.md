@@ -222,6 +222,28 @@ db.issues.find({
 
 The second object we passed defines query options; here, we're sorting the issues most recent first. There are many other options which affect query shape and results processing, and the options object can be used with many of the retrieval and persistence functions. The output of our `find` call is the `issues` array, which contains all records in that table matching the criteria we passed to `find`.
 
+You can also select the internal value of the JSONB field and can rename the selected field
+
+```javascript
+db.issues.find({
+  test_id: 1
+}, {
+  columns: ['field1','jsonbField2.attr1','jsonbField3.attr2.attr3 theAttr3']
+}).then(issues => {
+  /*
+  The issues is: 
+  [
+    {
+      field1: 'xxx',
+      jsonbField2_attr1: 'xxx',
+      theAttr3: 'xxx'
+    },
+    ...
+  ]
+  */
+});
+```
+
 There are other retrieval functions: `where` allows us to write more complex `WHERE` clauses than those `find` can generate based on the criteria object, and `search` performs a full-text search against multiple fields in a table. [The documentation](https://dmfay.github.io/massive-js/queries.html) has more information on these.
 
 #### Deleting
