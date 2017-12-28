@@ -1,10 +1,9 @@
 'use strict';
 
-const Entity = require('../../lib/entity');
 const Executable = require('../../lib/executable');
 const Table = require('../../lib/table');
 
-describe('connecting', function () {
+describe('attaching entities', function () {
   let db;
 
   before(function () {
@@ -15,17 +14,23 @@ describe('connecting', function () {
     db = yield db.reload();
   });
 
+  after(function () {
+    return db.instance.$pool.end();
+  });
+
   describe('object merges', function () {
     it('merges schemas and folders', function () {
-      db.attach(new Entity({
+      db.attach(new Table({
         schema: 'newschema',
         name: 't1',
         db
       }));
 
-      db.attach(new Entity({
-        path: 'newschema.script1',
+      db.attach(new Executable({
         name: 'script1',
+        path: 'newschema.script1',
+        sql: 'select 2 as val',
+        paramCount: 0,
         db
       }));
 
@@ -65,8 +70,6 @@ describe('connecting', function () {
         path: 'schema_or_function',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -86,8 +89,6 @@ describe('connecting', function () {
         path: 'folder_or_table.script1',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -102,8 +103,6 @@ describe('connecting', function () {
         path: 'folder_or_table.subfolder.script2',
         sql: 'select 2 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -132,8 +131,6 @@ describe('connecting', function () {
           path: 'folder_or_table.findOne',
           sql: 'select 1 as val',
           isVariadic: false,
-          singleRow: false,
-          singleValue: false,
           db
         }));
       });
@@ -145,8 +142,6 @@ describe('connecting', function () {
         path: 'folder_or_table.findOne',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -165,8 +160,6 @@ describe('connecting', function () {
         path: 'folder_or_function',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -175,8 +168,6 @@ describe('connecting', function () {
         path: 'folder_or_function.script',
         sql: 'select 2 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -196,8 +187,6 @@ describe('connecting', function () {
         path: 'function_or_table',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -226,8 +215,6 @@ describe('connecting', function () {
         path: 'function_or_script',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -237,8 +224,6 @@ describe('connecting', function () {
           path: 'function_or_script',
           sql: 'select 2 as val',
           paramCount: 0,
-          singleRow: false,
-          singleValue: false,
           db
         }));
       });
@@ -249,8 +234,6 @@ describe('connecting', function () {
         name: 'function_or_script',
         path: 'function_or_script',
         sql: 'select 1 as val',
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -261,8 +244,6 @@ describe('connecting', function () {
           sql: 'select 2 as val',
           paramCount: 0,
           isVariadic: false,
-          singleRow: false,
-          singleValue: false,
           db
         }));
       });
@@ -274,8 +255,6 @@ describe('connecting', function () {
         path: 'myfunc',
         sql: 'select 1 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
 
@@ -284,8 +263,6 @@ describe('connecting', function () {
         path: 'myfunc',
         sql: 'select 2 as val',
         isVariadic: false,
-        singleRow: false,
-        singleValue: false,
         db
       }));
     });
