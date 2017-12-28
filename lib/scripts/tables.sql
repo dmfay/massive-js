@@ -14,7 +14,7 @@ SELECT * FROM (
   SELECT tc.table_schema AS schema,
     tc.table_name AS name,
     NULL AS parent,
-    kc.column_name AS pk,
+    array_agg(DISTINCT kc.column_name::text) AS pk,
     TRUE AS is_insertable_into,
     array_agg(c.column_name::text) AS columns
   FROM information_schema.table_constraints tc
@@ -26,14 +26,14 @@ SELECT * FROM (
     ON c.table_schema = tc.table_schema
     AND c.table_name = tc.table_name
   WHERE tc.constraint_type = 'PRIMARY KEY'
-  GROUP BY tc.table_schema, tc.table_name, kc.column_name
+  GROUP BY tc.table_schema, tc.table_name
 
   UNION
 
   SELECT tc.table_schema AS schema,
     child.relname AS name,
     parent.relname AS parent,
-    kc.column_name AS pk,
+    array_agg(DISTINCT kc.column_name::text) AS pk,
     TRUE AS is_insertable_into,
     array_agg(c.column_name::text) AS columns
   FROM pg_catalog.pg_inherits
@@ -48,7 +48,7 @@ SELECT * FROM (
     ON c.table_schema = tc.table_schema
     AND c.table_name = tc.table_name
   WHERE tc.constraint_type = 'PRIMARY KEY'
-  GROUP BY tc.table_schema, child.relname, parent.relname, kc.column_name
+  GROUP BY tc.table_schema, child.relname, parent.relname
 
   UNION
 
