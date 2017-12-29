@@ -41,7 +41,7 @@ describe('Delete', function () {
       const result = new Delete({
         delimitedFullName: 'testsource',
         isPkSearch: () => true,
-        pk: 'id'
+        pk: ['id']
       }, 1);
       assert.equal(result.format(), 'DELETE FROM testsource WHERE "id" = $1 RETURNING *');
     });

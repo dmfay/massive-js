@@ -18,6 +18,12 @@ describe('update', function () {
       });
     });
 
+    it('returns null when updating a record with operations in the pk field', function () {
+      return db.products.update({'id <': 123, name: 'use other form for bulk updates'}).then(res => {
+        assert.isNull(res);
+      });
+    });
+
     it('updates a product by the primary key of a single record', function () {
       return db.products.update({id: 4, name: 'new and improved product 4'}).then(res => {
         assert.equal(res.id, 4);
