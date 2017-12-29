@@ -52,4 +52,26 @@ describe('getObject', function () {
       assert.isNotOk(db.getObject(missingSchemaTableName));
     });
   });
+
+  describe('non-public default schema', function () {
+    const schemaTableName = `${schema}.${tableName}`;
+
+    before(function* () {
+      yield db.createSchema(schema);
+      yield db.createDocumentTable(schemaTableName);
+
+      yield db.query(`set schema '${schema}'`);
+
+      db = yield db.reload();
+    });
+
+    after(function* () {
+      yield db.dropSchema(schema, {cascade: true});
+    });
+
+    it('verifies the presence of the table by name only with currentSchema set', function () {
+      assert.isOk(db.getObject(tableName));
+      assert.isNotOk(db.getObject(missingTableName));
+    });
+  });
 });
