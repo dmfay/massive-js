@@ -33,6 +33,30 @@ describe('compound primary keys', function () {
     });
   });
 
+  it('deep inserts', function* () {
+    const res = yield db.compoundpk.insert({
+      key_one: 234,
+      key_two: 567,
+      value: 'deep insert test',
+      junction: [{
+        c_key_one: undefined,
+        c_key_two: undefined,
+        value: 'other side'
+      }]
+    });
+
+    assert.isOk(res);
+    assert.equal(res.key_one, 234);
+    assert.equal(res.key_two, 567);
+    assert.equal(res.value, 'deep insert test');
+
+    const junction = yield db.junction.findOne({value: 'other side'});
+
+    assert.isOk(junction);
+    assert.equal(junction.c_key_one, 234);
+    assert.equal(junction.c_key_two, 567);
+  });
+
   it('detects pk collisions', function () {
     return db.compoundpk.insert({
       key_one: 123,
