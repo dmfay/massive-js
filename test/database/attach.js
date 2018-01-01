@@ -83,6 +83,40 @@ describe('attaching entities', function () {
       assert.equal(result[0].val, 1);
     });
 
+    it('merges schemas, executables, and tables', function* () {
+      db.attach(new Table({
+        schema: 'three_things',
+        name: 't1',
+        db
+      }));
+
+      db.attach(new Executable({
+        name: 'three_things',
+        path: 'three_things',
+        sql: 'select 1 as val',
+        isVariadic: false,
+        db
+      }));
+
+      db.attach(new Table({
+        schema: 'public',
+        name: 'three_things',
+        db
+      }));
+
+      assert.isOk(db.three_things);
+      assert.isOk(db.three_things.t1);
+      assert.isFunction(db.three_things);
+      assert.isFunction(db.three_things.find);
+      assert.isFunction(db.three_things.t1.find);
+      assert.isTrue(db.three_things instanceof Table);
+      assert.isTrue(db.three_things.t1 instanceof Table);
+
+      const result = yield db.three_things();
+
+      assert.equal(result[0].val, 1);
+    });
+
     it('merges folders and tables', function* () {
       db.attach(new Executable({
         name: 'script',

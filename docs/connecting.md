@@ -46,6 +46,18 @@ There are a few specific cases in which collisions will result in an error:
 * When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script at `mytable/find.sql` cannot be loaded.
 * When a script file has the same path as a database function.
 
+### Looking Into the Instance
+
+To see everything Massive has discovered and loaded, use the three list functions:
+
+```javascript
+db.listTables();
+db.listViews();
+db.listFunctions();
+```
+
+Each returns an unsorted array of dot-separated paths (including the schema for non-public database entities, and nested directory names for script files). `listTables` includes normal and foreign tables. `listFunctions` includes both database functions and script files.
+
 ### Refreshing the API
 
 If you're changing your database's schema on the go by issuing `CREATE`, `ALTER`, and `DROP` statements at runtime, the connected Massive instance will eventually be out of date since it is generated at the time of connection. The `reload` function cleans out your database's API and performs the introspection again, ensuring you can access dynamically instantiated objects.
