@@ -49,14 +49,14 @@
 <a href="https://greenkeeper.io/"><img src="https://badges.greenkeeper.io/dmfay/massive-js.svg" alt="Greenkeeper badge"></a>
 <a href="https://npmjs.org/package/massive"><img src="https://img.shields.io/npm/dw/massive.svg" alt="npm"></a></p>
 <p>Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.</p>
-<p>Massive is <em>not</em> an object-relational mapper (ORM)! It doesn't use models, it doesn't track state, and it doesn't limit you to a single entity-based metaphor for accessing and persisting data. You've already got a data model: your schema. Massive introspects your database at runtime and returns a connected instance with your tables, views, functions, and scripts attached and ready to query, write, or execute.</p>
+<p>Massive is <em>not</em> an object-relational mapper (ORM)! It doesn't use models, it doesn't track state, and it doesn't limit you to a single entity-based metaphor for accessing and persisting data. Massive connects to your database and introspects its schemas to build an API for the data model you already have: your tables, views, functions, and easily-modified SQL scripts.</p>
 <p>Here are some of the high points:</p>
 <ul>
-<li><strong>Dynamic query generation</strong>: Massive features a versatile query builder with support for a wide variety of operators, all generated from a simple criteria object.</li>
-<li><strong>Do as much, or as little, as you need</strong>: if you're coming from an ORM background, you might be expecting to have to create or load an entity instance before you can write it to the database. You don't. Your tables are <em>tables</em>, and you can insert or update directly into them.</li>
+<li><strong>Dynamic query generation</strong>: Massive's versatile query builder supports a wide variety of operators, all generated from a simple criteria object.</li>
+<li><strong>Low overhead</strong>: An API built from your schema means no model classes to maintain, super-simple bulk operations, and writing directly to tables without any need to create or load entity instances beforehand.</li>
 <li><strong>Document storage</strong>: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.</li>
-<li><strong>Relational awareness</strong>: while Massive does not traverse relationships or build model graphs, <a href="https://dmfay.github.io/massive-js/persistence.html#deep-insert">deep inserts</a> can create related entities and junctions transactionally, and the <a href="https://dmfay.github.io/massive-js/options.html#decomposition-schemas"><code>decompose</code> option</a> allows you to map the results of complex views and scripts to nested object trees.</li>
-<li><strong>Postgres everything</strong>: committing to a single RDBMS allows us to leverage it to the fullest extent possible. Massive supports array fields and operations, JSON storage, foreign tables, and many, many more features found in PostgreSQL but not in other databases.</li>
+<li><strong>Relational awareness</strong>: Massive does not traverse relationships or build model graphs, but <a href="https://dmfay.github.io/massive-js/persistence.html#deep-insert">deep inserts</a> can create related entities and junctions transactionally, and the <a href="https://dmfay.github.io/massive-js/options.html#decomposition-schemas"><code>decompose</code> option</a> allows you to map the results of complex views and scripts to nested object trees.</li>
+<li><strong>Postgres everything</strong>: Commitment to a single RDBMS lets us use it to its full potential. Massive supports array fields and operations, regular expression matching, foreign tables, materialized views, and more features found in PostgreSQL but not in other databases.</li>
 </ul>
 <h2>Full Documentation</h2><p><a href="https://dmfay.github.io/massive-js/">Full documentation including API docs is available on GitHub Pages.</a></p>
 <h2>Contributing</h2><p><a href="https://github.com/dmfay/massive-js/blob/master/CONTRIBUTING.md">See CONTRIBUTING.md</a>.</p>
@@ -102,7 +102,13 @@ massive({
 <li>Views, including materialized views</li>
 <li>Functions</li>
 </ul>
-<p>Massive understands database schemas and treats any schema other than <code>public</code> as a namespace. Objects in the <code>public</code> schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.</p>
+<p>Massive understands database schemas and treats any schema other than <code>public</code> (or your default configured in Postgres) as a namespace. Objects in the <code>public</code> schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.</p>
+<p>Most objects can coexist if they wind up in the same namespace. For example, you might have a table named <code>companies</code> and a schema named <code>companies</code> which contains more tables. In this scenario, <code>db.companies</code> will be a table and <em>also</em> a schema, so you might query <code>db.companies.find(...)</code> and <code>db.companies.audit.find(...)</code> as you need to.</p>
+<p>There are a few specific cases in which collisions will result in an error:</p>
+<ul>
+<li>When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, <code>db.mytable</code> already has a <code>find()</code> function, so a script file named <code>mytable/find.sql</code> cannot be loaded.</li>
+<li>When a script file has the same path as a database function.</li>
+</ul>
 <p>The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with <code>app.set</code> in your entry point and retrieve it with <code>req.app.get</code> in your routes; or with koa, using <code>app.context</code>. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.</p>
 <p>If you ever need to run the introspection again, use <code>db.reload()</code> to get a promise for an up-to-date instance.</p>
 <h2>Usage</h2><p>Consult the <a href="https://dmfay.github.io/massive-js/">documentation</a> for full usage instructions.</p>
@@ -295,7 +301,7 @@ db.test_attributes.saveDoc(attributes)
 <pre class="prettyprint source"><code>npm i -g massive</code></pre><p>You can then fire up a connection and start writing JavaScript:</p>
 <pre class="prettyprint source"><code>massive -d appdb
 
-db > db.tables.map(table => table.name);
+db > db.listTables();
 [ 'tests',
   'users' ]
 
@@ -321,7 +327,7 @@ db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In additio
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Nov 12 2017 01:38:40 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 01 2018 13:10:56 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

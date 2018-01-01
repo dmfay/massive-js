@@ -37,6 +37,27 @@ Tables and views, including foreign tables and materialized views, are attached 
 
 Database functions and scripts are attached as invocable functions. See [Functions](/functions) for more.
 
+Schemas other than `public` (or your configured default) act as namespaces, as do paths in your scripts directory.
+
+Most objects can coexist if they wind up in the same namespace. For example, you might have a table named `companies` and a schema named `companies` which contains more tables. In this scenario, `db.companies` will be a table and _also_ a schema, so you might query `db.companies.find(...)` and `db.companies.audit.find(...)` as you need to.
+
+There are a few specific cases in which collisions will result in an error:
+
+* When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script at `mytable/find.sql` cannot be loaded.
+* When a script file has the same path as a database function.
+
+### Looking Into the Instance
+
+To see everything Massive has discovered and loaded, use the three list functions:
+
+```javascript
+db.listTables();
+db.listViews();
+db.listFunctions();
+```
+
+Each returns an unsorted array of dot-separated paths (including the schema for non-public database entities, and nested directory names for script files). `listTables` includes normal and foreign tables. `listFunctions` includes both database functions and script files.
+
 ### Refreshing the API
 
 If you're changing your database's schema on the go by issuing `CREATE`, `ALTER`, and `DROP` statements at runtime, the connected Massive instance will eventually be out of date since it is generated at the time of connection. The `reload` function cleans out your database's API and performs the introspection again, ensuring you can access dynamically instantiated objects.

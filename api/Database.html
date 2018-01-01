@@ -499,7 +499,7 @@ table, view, and function visible to the connection's user.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line15">line 15</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -553,7 +553,7 @@ table, view, and function visible to the connection's user.
     
 
     
-    <h4 class="name" id="attach"><span class="type-signature"></span>attach<span class="signature">(ctor, sources)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="attach"><span class="type-signature"></span>attach<span class="signature">(entities)</span><span class="type-signature"> &rarr; {Array}</span></h4>
     
 
     
@@ -561,13 +561,7 @@ table, view, and function visible to the connection's user.
 
 
 <div class="description">
-    Discover objects in the database and attach them for usage.
-
-Tables and Views are attached to the Database directly, while an invocation
-function is attached for Executables.
-
-References to attached objects are also stored in the tables, views, and
-functions arrays.
+    Attach an entity to the connected instance.
 </div>
 
 
@@ -603,39 +597,16 @@ functions arrays.
 
         <tr>
             
-                <td class="name"><code>ctor</code></td>
+                <td class="name"><code>entities</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Constructor for the object instances.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sources</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Promise</span>
+<span class="param-type">Object</span>
 |
 
-<span class="param-type">function</span>
+<span class="param-type">Array</span>
 
 
             
@@ -645,8 +616,8 @@ functions arrays.
 
             
 
-            <td class="description last">Something which resolves to a list of entity
-specifications.</td>
+            <td class="description last">New Entity or list of Entities to add to the
+instance.</td>
         </tr>
 
     
@@ -687,7 +658,7 @@ specifications.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line77">line 77</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -714,7 +685,7 @@ specifications.</td>
 
         
 <div class="param-desc">
-    The collection of objects just attached.
+    All added entities.
 </div>
 
 
@@ -725,13 +696,100 @@ specifications.</td>
     </dt>
     <dd>
         
-<span class="param-type">Promise</span>
+<span class="param-type">Array</span>
 
 
     </dd>
 </dl>
 
     
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="clean"><span class="type-signature"></span>clean<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove all attached entities from the instance, returning it to the pre-
+introspection state.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line176">line 176</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -845,7 +903,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line267">line 267</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line401">line 401</a>
     </li></ul></dd>
     
 
@@ -1002,7 +1060,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line332">line 332</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line449">line 449</a>
     </li></ul></dd>
     
 
@@ -1058,7 +1116,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
 
     
-    <h4 class="name" id="detach"><span class="type-signature"></span>detach<span class="signature">(entity, collection<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="detach"><span class="type-signature"></span>detach<span class="signature">(entityPath)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1090,8 +1148,6 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -1104,7 +1160,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
 
         <tr>
             
-                <td class="name"><code>entity</code></td>
+                <td class="name"><code>entityPath</code></td>
             
 
             <td class="type">
@@ -1117,52 +1173,10 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
-            <td class="description last">Fully-qualified name of the entity.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>collection</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Name of the collection to which the entity
-belongs.</td>
+            <td class="description last">Path to the entity.</td>
         </tr>
 
     
@@ -1203,7 +1217,7 @@ belongs.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line113">line 113</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line166">line 166</a>
     </li></ul></dd>
     
 
@@ -1411,7 +1425,7 @@ the schema.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line349">line 349</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line466">line 466</a>
     </li></ul></dd>
     
 
@@ -1468,7 +1482,7 @@ objects have been removed.
     
 
     
-    <h4 class="name" id="dropTable"><span class="type-signature"></span>dropTable<span class="signature">(table, options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="dropTable"><span class="type-signature"></span>dropTable<span class="signature">(tablePath, options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -1512,7 +1526,7 @@ objects have been removed.
 
         <tr>
             
-                <td class="name"><code>table</code></td>
+                <td class="name"><code>tablePath</code></td>
             
 
             <td class="type">
@@ -1528,7 +1542,8 @@ objects have been removed.
 
             
 
-            <td class="description last">Name of the table to drop.</td>
+            <td class="description last">Path to the table (including schema, if not
+public).</td>
         </tr>
 
     
@@ -1642,7 +1657,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line317">line 317</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line434">line 434</a>
     </li></ul></dd>
     
 
@@ -1698,7 +1713,7 @@ the table.</td>
     
 
     
-    <h4 class="name" id="getObject"><span class="type-signature"></span>getObject<span class="signature">(location, collection<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="listFunctions"><span class="type-signature"></span>listFunctions<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
     
 
     
@@ -1706,7 +1721,7 @@ the table.</td>
 
 
 <div class="description">
-    Find a database object, if attached.
+    List all the functions and scripts attached to the connected instance.
 </div>
 
 
@@ -1715,112 +1730,6 @@ the table.</td>
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>location</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">Name of the object to find. Unless the schema is
-specified in a qualified path, current schema (usually 'public') is assumed.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>collection</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    tables
-                
-                </td>
-            
-
-            <td class="description last">Collection to search: tables, views, or
-functions.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -1856,7 +1765,7 @@ functions.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line300">line 300</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line303">line 303</a>
     </li></ul></dd>
     
 
@@ -1883,7 +1792,7 @@ functions.</td>
 
         
 <div class="param-desc">
-    The table, if found.
+    A list of function paths.
 </div>
 
 
@@ -1894,7 +1803,223 @@ functions.</td>
     </dt>
     <dd>
         
-<span class="param-type">Object</span>
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="listTables"><span class="type-signature"></span>listTables<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    List all the tables attached to the connected instance.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line273">line 273</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A list of table paths.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="listViews"><span class="type-signature"></span>listViews<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    List all the views attached to the connected instance.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line288">line 288</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A list of view paths.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
 
 
     </dd>
@@ -2202,7 +2327,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line200">line 200</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line330">line 330</a>
     </li></ul></dd>
     
 
@@ -2312,7 +2437,7 @@ cleared and new objects and files added.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line140">line 140</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line195">line 195</a>
     </li></ul></dd>
     
 
@@ -2493,7 +2618,7 @@ already exist, it will be created.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line250">line 250</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line380">line 380</a>
     </li></ul></dd>
     
 
@@ -2565,7 +2690,7 @@ already exist, it will be created.</td>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Nov 12 2017 01:38:40 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 01 2018 13:10:56 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

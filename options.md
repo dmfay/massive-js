@@ -67,7 +67,7 @@ Results processing options are generally applicable to all query types, although
 
 The `decompose` option takes a schema which represents the desired output structure. A schema is a JavaScript object with a few specific properties, and which may contain further schemas.
 
-* `pk` (for "primary key") specifies the field in the resultset which uniquely identifies the entity represented by this schema.
+* `pk` (for "primary key") specifies the field in the resultset which uniquely identifies the entity represented by this schema. Decomposition currently only supports unary primary keys and does not work with compound keys.
 * `columns` is either a map of fields in the resultset (keys) to fields in the output entity (values), or an array of field names if they do not need to be transformed.
 * `array` is only usable on schemas nested at least one level deep. If `true`, the entities this schema represents are considered a collection instead of a nested object.
 
@@ -123,13 +123,16 @@ into this:
 }]
 ```
 
-This can also be used with raw sql through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
+This can also be used with raw SQL through `db.query`. Note that options need to be passed as the third argument, as the second argument is used for params.
 
 ```javascript
 db.query(
-  'select u.id as u_id, u.name as u_name, u.address as u_address,  t.id as t_id, t.score as t_score ' +
-  'from users u inner join tests t ' +
-  'on t.user_id = u.id', [], {
+  `select u.id as u_id, u.name as u_name, u.address as u_address,
+    t.id as t_id, t.score as t_score
+    from users u
+    inner join tests t on t.user_id = u.id`,
+  [],
+  {
     decompose: {
       pk: 'id',
       columns: {u_id: 'id', u_name: 'name', u_address: 'address'},

@@ -1,8 +1,3 @@
----
-title: Index - MassiveJS
-permalink: /
----
-
 # Get Started
 
 ```
@@ -20,7 +15,9 @@ Examples are presented using the standard `then()` construction for compatibilit
 Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.query`.
 
 ```javascript
-db.query('select * from tests where id > $1', [1]).then(tests => {
+db.query(
+  'select * from tests where id > $1', [1]
+).then(tests => {
   // all tests matching the criteria
 });
 ```

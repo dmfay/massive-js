@@ -35,7 +35,7 @@ db.tests.findOne({
 });
 ```
 
-You can use a primary key value instead of a criteria object with `findOne` if desired.
+You can use a primary key value instead of a criteria object with `findOne` if desired. If your table has a compound primary key you must use the criteria object.
 
 ```javascript
 db.tests.findOne(1, {
