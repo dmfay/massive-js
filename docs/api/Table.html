@@ -826,7 +826,7 @@ criteria objects.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line135">line 135</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -1519,6 +1519,166 @@ null if no records match.
     
 
     
+    <h4 class="name" id="getPkCriteria"><span class="type-signature"></span>getPkCriteria<span class="signature">(record)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Attempts to assemble primary key criteria for a record object representing a
+row in this table. The criteria must include the full primary key, and must
+not invoke any operations.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>record</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The record to evaluate.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line43">line 43</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The successfully assembled criteria, or null if primary key
+information is incomplete or invalid.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="insert"><span class="type-signature"></span>insert<span class="signature">(data, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
@@ -1666,7 +1826,7 @@ null if no records match.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line44">line 44</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line68">line 68</a>
     </li></ul></dd>
     
 
@@ -2101,7 +2261,7 @@ criteria object.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line176">line 176</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -2305,7 +2465,7 @@ returned.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line113">line 113</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -2463,7 +2623,7 @@ body.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line146">line 146</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -2741,7 +2901,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line154">line 154</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -3018,7 +3178,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line206">line 206</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line213">line 213</a>
     </li></ul></dd>
     
 
@@ -3254,7 +3414,7 @@ a hash of column names to their new values.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line72">line 72</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -3495,7 +3655,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line222">line 222</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line229">line 229</a>
     </li></ul></dd>
     
 
@@ -3567,7 +3727,7 @@ db.mytable.where('id=$1', [123]).then(...);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Nov 12 2017 01:38:40 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 01 2018 13:10:57 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>
