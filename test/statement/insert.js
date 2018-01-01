@@ -5,7 +5,7 @@ const Insert = require('../../lib/statement/insert');
 describe('Insert', function () {
   const source = {
     delimitedFullName: 'testsource',
-    pk: 'id',
+    pk: ['id'],
     isPkSearch: () => false,
     columns: ['field1', 'field2', 'string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']
   };

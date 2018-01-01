@@ -81,7 +81,14 @@ When you instantiate Massive, it introspects your database to discover the objec
 * Views, including materialized views
 * Functions
 
-Massive understands database schemas and treats any schema other than `public` as a namespace. Objects in the `public` schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.
+Massive understands database schemas and treats any schema other than `public` (or your default configured in Postgres) as a namespace. Objects in the `public` schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.
+
+Most objects can coexist if they wind up in the same namespace. For example, you might have a table named `companies` and a schema named `companies` which contains more tables. In this scenario, `db.companies` will be a table and _also_ a schema, so you might query `db.companies.find(...)` and `db.companies.audit.find(...)` as you need to.
+
+There are a few specific cases in which collisions will result in an error:
+
+* When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script file named `mytable/find.sql` cannot be loaded.
+* When a script file has the same path as a database function.
 
 The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; or with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
 
@@ -422,7 +429,7 @@ You can then fire up a connection and start writing JavaScript:
 ```
 massive -d appdb
 
-db > db.tables.map(table => table.name);
+db > db.listTables();
 [ 'tests',
   'users' ]
 

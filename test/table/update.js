@@ -12,9 +12,15 @@ describe('update', function () {
   });
 
   describe('single-object updates', function () {
-    it('returns null when updating a record with an invalid primary key', function () {
+    it('returns null when updating a nonexistent record', function () {
       return db.products.update({id: 99999, name: 'new and improved product 4'}).then(res => {
         assert.isNull(res);
+      });
+    });
+
+    it('throws when updating a record with operations in the pk field', function () {
+      assert.throws(() => {
+        db.products.update({'id <': 123, name: 'use other form for bulk updates'});
       });
     });
 

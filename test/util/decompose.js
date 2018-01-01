@@ -415,4 +415,93 @@ describe('decompose', function () {
       ]
     }]);
   });
+
+  it.skip('should accept and use pk arrays', function () {
+    const data = decompose({
+      pk: ['parent_id_one', 'parent_id_two'],
+      columns: {parent_id_one: 'id_one', parent_id_two: 'id_two', parent_val: 'val'},
+      children1: {
+        pk: ['children1_id_one', 'children1_id_two'],
+        columns: {children1_id_one: 'cid_one', children1_id_two: 'cid_two', children1_val: 'val'},
+        array: true,
+        children2: {
+          pk: ['children1_children2_id_one', 'children1_children2_id_two'],
+          columns: {children1_children2_id_one: 'ccid_one', children1_children2_id_two: 'ccid_two', children1_children2_val: 'val'},
+          array: true
+        }
+      }
+    }, [
+      {
+        parent_id_one: 1,
+        parent_id_two: 2,
+        parent_val: 'p1',
+        children1_id_one: 11,
+        children1_id_two: 12,
+        children1_val: 'c1',
+        children1_children2_id_one: 21,
+        children1_children2_id_two: 22,
+        children1_children2_val: 'd1'
+      }, {
+        parent_id_one: 1,
+        parent_id_two: 2,
+        parent_val: 'p1',
+        children1_id_one: 13,
+        children1_id_two: 14,
+        children1_val: 'c2',
+        children1_children2_id_one: 23,
+        children1_children2_id_two: 24,
+        children1_children2_val: 'd2'
+      }, {
+        parent_id_one: 1,
+        parent_id_two: 2,
+        parent_val: 'p1',
+        children1_id_one: 13,
+        children1_id_two: 14,
+        children1_val: 'c2',
+        children1_children2_id_one: 25,
+        children1_children2_id_two: 26,
+        children1_children2_val: 'd3'
+      }, {
+        parent_id_one: 3,
+        parent_id_two: 4,
+        parent_val: 'p2',
+        children1_id_one: 15,
+        children1_id_two: 16,
+        children1_val: 'c3',
+        children1_children2_id_one: 27,
+        children1_children2_id_two: 28,
+        children1_children2_val: 'd4'
+      }
+    ]);
+
+    assert.deepEqual(data, [{
+      id_one: 1,
+      id_two: 2,
+      val: 'p1',
+      children1: [{
+        id_one: 11,
+        id_two: 12,
+        val: 'c1',
+        children2: [{id_one: 21, id_two: 22, val: 'd1'}]
+      }, {
+        id_one: 13,
+        id_two: 14,
+        val: 'c2',
+        children2: [
+          {id_one: 23, id_two: 24, val: 'd2'},
+          {id_one: 25, id_two: 26, val: 'd3'}
+        ]
+      }]
+    }, {
+      id_one: 3,
+      id_two: 4,
+      val: 'p2',
+      children1: [{
+        id_one: 15,
+        id_two: 16,
+        val: 'c3',
+        children2: [{id_one: 26, id_two: 28, val: 'd4'}]
+      }]
+    }]);
+  });
 });

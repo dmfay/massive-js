@@ -24,7 +24,6 @@ describe('createDocumentTable', function () {
       return db.createDocumentTable(tableName).then(() => {
         assert.isOk(db[tableName]);
         assert.instanceOf(db[tableName], Table);
-        assert.lengthOf(db.tables, 1);
       });
     });
   });
@@ -44,7 +43,6 @@ describe('createDocumentTable', function () {
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);
         assert.instanceOf(db[schema][tableName], Table);
-        assert.lengthOf(db.tables, 1);
       });
     });
   });

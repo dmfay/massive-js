@@ -16,7 +16,7 @@ describe('initialization', function () {
   });
 
   it('recognizes variadic functions', function () {
-    const fn = db.functions.find(f => f.name === 'single_variadic');
+    const fn = db.objects.find(f => f.name === 'single_variadic');
     assert.isTrue(fn.isVariadic);
   });
 
