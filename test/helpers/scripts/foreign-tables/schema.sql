@@ -1,6 +1,7 @@
 CREATE SCHEMA public;
 
 CREATE TABLE t1 (id serial PRIMARY KEY);
+CREATE TABLE t2 (id serial PRIMARY KEY);
 
 CREATE EXTENSION IF NOT EXISTS postgres_fdw;
 
@@ -11,3 +12,5 @@ CREATE USER MAPPING FOR postgres
   OPTIONS (user 'postgres');
 
 CREATE FOREIGN TABLE foreigntable (id serial) SERVER loopback OPTIONS (schema_name 'public', table_name 't1');
+
+CREATE FOREIGN TABLE inheriting (id serial) INHERITS (t2) SERVER loopback OPTIONS (schema_name 'public', table_name 't1');

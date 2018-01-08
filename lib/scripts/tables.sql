@@ -30,25 +30,49 @@ SELECT * FROM (
 
   UNION
 
-  SELECT tc.table_schema AS schema,
+  SELECT ctc.table_schema AS schema,
     child.relname AS name,
     parent.relname AS parent,
     array_agg(DISTINCT kc.column_name::text) AS pk,
     TRUE AS is_insertable_into,
     array_agg(c.column_name::text) AS columns
   FROM pg_catalog.pg_inherits
-  JOIN pg_catalog.pg_class AS child ON (inhrelid = child.oid)
-  JOIN pg_catalog.pg_class AS parent ON (inhparent = parent.oid)
-  JOIN information_schema.table_constraints tc ON tc.table_name = parent.relname
+
+  -- child table schema+name
+  JOIN pg_catalog.pg_class AS child ON inhrelid = child.oid
+  JOIN pg_catalog.pg_namespace AS childschema
+    ON childschema.oid = child.relnamespace
+
+  -- parent table schema+name
+  JOIN pg_catalog.pg_class AS parent ON inhparent = parent.oid
+  JOIN pg_catalog.pg_namespace AS parentschema
+    ON parentschema.oid = parent.relnamespace
+
+  -- pk info from parent
+  JOIN information_schema.table_constraints ptc
+    ON ptc.table_schema = parentschema.nspname
+    AND ptc.table_name = parent.relname
   JOIN information_schema.key_column_usage kc
-    ON kc.constraint_schema = tc.table_schema
-    AND kc.table_name = tc.table_name
-    AND kc.constraint_name = tc.constraint_name
+    ON kc.constraint_schema = ptc.table_schema
+    AND kc.table_name = ptc.table_name
+    AND kc.constraint_name = ptc.constraint_name
+
+  -- column info from child
+  JOIN information_schema.table_constraints ctc
+    ON ctc.table_schema = childschema.nspname
+    AND ctc.table_name = child.relname
   JOIN information_schema.columns c
-    ON c.table_schema = tc.table_schema
-    AND c.table_name = tc.table_name
-  WHERE tc.constraint_type = 'PRIMARY KEY'
-  GROUP BY tc.table_schema, child.relname, parent.relname
+    ON c.table_schema = ctc.table_schema
+    AND c.table_name = ctc.table_name
+
+  -- filter foreign tables
+  JOIN information_schema.tables t
+    ON t.table_schema = childschema.nspname
+    AND t.table_name = child.relname
+
+  WHERE ptc.constraint_type = 'PRIMARY KEY'
+    AND t.table_type <> 'FOREIGN TABLE'
+  GROUP BY ctc.table_schema, child.relname, parent.relname
 
   UNION
 
@@ -62,7 +86,7 @@ SELECT * FROM (
   JOIN information_schema.columns c
     ON c.table_schema = t.table_schema
     AND c.table_name = t.table_name
-  WHERE table_type = 'FOREIGN TABLE'
+  WHERE t.table_type = 'FOREIGN TABLE'
   GROUP BY t.table_schema, t.table_name, t.is_insertable_into
 ) tables
 WHERE CASE
