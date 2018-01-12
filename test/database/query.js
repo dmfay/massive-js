@@ -37,6 +37,23 @@ describe('query', function () {
     });
   });
 
+  it('decomposes and returns single objects when called for', function () {
+    return db.query(
+      'select * from products where id=${id}',
+      {id: 1},
+      {
+        single: true,
+        decompose: {
+          pk: 'id',
+          columns: {id: 'id', string: 'aStringColumn'}
+        }
+      }
+    ).then(res => {
+      assert.equal(1, res.id);
+      assert.equal('one', res.aStringColumn);
+    });
+  });
+
   it('changes types', function* () {
     const stringCount = yield db.query('select count(*) from products');
 

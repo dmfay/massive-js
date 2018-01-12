@@ -18,10 +18,22 @@ describe('Insert', function () {
     });
 
     it('should apply options', function () {
-      const query = new Insert(source, {}, {build: true});
+      const query = new Insert(source, {}, {
+        build: true,
+        decompose: true,
+        document: true,
+        only: true,
+        stream: true,
+        onConflictIgnore: true
+      });
 
       assert.equal(query.source.delimitedFullName, 'testsource');
       assert.isTrue(query.build);
+      assert.isTrue(query.decompose);
+      assert.isTrue(query.document);
+      assert.isTrue(query.only);
+      assert.isTrue(query.stream);
+      assert.isTrue(query.onConflictIgnore);
     });
 
     it('should process columns and parameters', function () {
