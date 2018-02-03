@@ -63,7 +63,7 @@
     "chai-as-promised": "~7.1.1",
     "co-mocha": "~1.2.0",
     "coveralls": "~3.0.0",
-    "eslint": "~4.16.0",
+    "eslint": "~4.17.0",
     "jsdoc": "^3.5.4",
     "mocha": "~5.0.0",
     "nyc": "~11.4.1"
