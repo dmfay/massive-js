@@ -61,10 +61,6 @@ describe('decomposing results', function () {
       id: 3,
       username: 'carol',
       tests: [{
-        id: 2,
-        name: 'carol\'s first test',
-        issues: []
-      }, {
         id: 3,
         name: 'carol\'s second test',
         issues: [{
@@ -73,6 +69,10 @@ describe('decomposing results', function () {
           test_id: 3,
           description: 'carol\'s issue'
         }]
+      }, {
+        id: 2,
+        name: 'carol\'s first test',
+        issues: []
       }]
     }]);
   });
