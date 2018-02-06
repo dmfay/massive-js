@@ -7,7 +7,12 @@ describe('attaching entities', function () {
   let db;
 
   before(function () {
-    return resetDb('loader').then(instance => db = instance);
+    return resetDb('loader').then(instance => db = instance)
+      .catch(err => {
+        console.log(err); // eslint-disable-line no-console
+
+        throw err;
+      });
   });
 
   beforeEach(function* () {
