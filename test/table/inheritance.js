@@ -11,6 +11,12 @@ describe('Table Inheritance', function () {
     return db.instance.$pool.end();
   });
 
+  it('only loads descendant tables with primary keys', function () {
+    assert.isOk(db.cities);
+    assert.isOk(db.capitals);
+    assert.notOk(db.ancient);
+  });
+
   describe('Querying', function () {
     it('includes descendant rows with the parent schema by default', function () {
       return db.cities.find().then(res => {
