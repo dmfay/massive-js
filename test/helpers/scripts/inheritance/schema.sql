@@ -9,8 +9,14 @@ CREATE TABLE cities (
 );
 
 CREATE TABLE capitals (
+  id serial PRIMARY KEY,
   of_state char(2)
 ) INHERITS (cities);
+
+CREATE TABLE ancient (
+  name text,
+  country text
+);
 
 INSERT INTO cities (name, population)
 VALUES ('Anchorage', 298615),
@@ -25,3 +31,8 @@ VALUES ('Oklahoma City', 631346, 'OK'),
   ('Phoenix', 1563025, 'AZ'),
   ('Nashville', 654610, 'TN'),
   ('Indianapolis', 853173, 'IN');
+
+INSERT INTO ancient (name, country)
+VALUES ('Petra', 'Jordan'),
+  ('Cahokia', 'US'),
+  ('Macchu Picchu', 'Peru');
