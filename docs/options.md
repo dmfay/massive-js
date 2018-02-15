@@ -58,7 +58,7 @@ Results processing options are generally applicable to all query types, although
 | Option key | Description |
 |------------|-------------|
 | build      | Set to `true` to return the query text and parameters *without* executing anything. |
-| document   | Set to `true` to invoke [document table handling](/documents). |
+| document   | Set to `true` to invoke [document table handling](/massive-js/documents). |
 | single     | Set to `true` to return the first result as an object instead of a results array. |
 | stream     | Set to `true` to return results as a stream instead of an array. Streamed results cannot be `decompose`d. |
 | decompose  | Provide a schema to transform the results into an object graph (see below). Not compatible with `stream`. |
