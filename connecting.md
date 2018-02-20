@@ -18,7 +18,7 @@ const connectionInfo = {
   port: 5432,
   database: 'appdb',
   user: 'appuser',
-  passsword: 'apppwd',
+  password: 'apppwd',
   ssl: false,
   poolSize: 10
 };
@@ -89,7 +89,8 @@ massive(connectionInfo, {
   // change the scripts directory
   scripts: './myscripts',
 
-  // ignore objects in any other schema
+  // ignore tables and views in any other schema (does not
+  // apply to functions)
   allowedSchemas: ['public', 'auth'],   
 
   // only load tables and views matching the whitelist
