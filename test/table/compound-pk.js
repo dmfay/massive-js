@@ -122,4 +122,9 @@ describe('compound primary keys', function () {
       assert.equal(res.value, 'try this');
     });
   });
+
+  it('creates one entry per column in the columns array', function () {
+    const columnsAreUnique = (new Set(db.compoundpk.columns)).size === db.compoundpk.columns.length;
+    assert.isTrue(columnsAreUnique);
+  });
 });

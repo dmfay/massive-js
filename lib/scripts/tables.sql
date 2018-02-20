@@ -16,7 +16,7 @@ SELECT * FROM (
     parent.relname AS parent,
     array_agg(DISTINCT kc.column_name::text) AS pk,
     TRUE AS is_insertable_into,
-    array_agg(c.column_name::text) AS columns
+    array_agg(DISTINCT c.column_name::text) AS columns
   FROM information_schema.tables t
   JOIN information_schema.table_constraints tc
     ON tc.table_schema = t.table_schema
