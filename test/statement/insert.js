@@ -117,6 +117,33 @@ describe('Insert', function () {
       assert.deepEqual(result.params, ['value1', 10, 'something', 101, 'j2f1', 102, null]);
     });
 
+    it('should not create junction queries when options specified', function () {
+      const result = new Insert(
+        source,
+        {
+          field1: 'value1',
+          junction_one: [{
+            j1fk: 10,
+            source_id: undefined,
+            j1field: 'something'
+          }],
+          junction_many: [{
+            source_id_another_name: undefined,
+            j2fk: 101,
+            j2field: 'j2f1'
+          }, {
+            source_id_another_name: undefined,
+            j2fk: 102,
+            j2field: null
+          }]
+        },
+        {deepInsert: false}
+      );
+
+      assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) RETURNING *');
+      assert.deepEqual(result.params, ['value1']);
+    });
+
     it('should throw when trying to create junction queries for multiple records', function () {
       try {
         const x = new Insert(
