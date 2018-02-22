@@ -88,6 +88,8 @@ db.tests.insert({
 
 Deep insert is _only_ supported when inserting single records. Attempting to deep insert an array of records will raise an exception.
 
+If your object is going to store a property as json in postgres, you will want to ignore deep insert functions, otherwise it will look for junction tables that match the nested object. To do this use the option ` { deepInsert: false }` with the insert. 
+
 #### Options
 
 [Query options](/options) for `INSERT` statements and results processing may be used with `insert`:
