@@ -39,6 +39,7 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 | order            | `SELECT` | An array of order objects (see below) or a literal string in the form `column1 ASC, column2 DESC`. **Avoid sending user input as a literal string. If you have to, be aware of the possibility of SQL injection.** |
 | orderBody        | `SELECT` | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
 | onConflictIgnore | `INSERT` | If the inserted data would violate a unique constraint, do nothing. |
+| deepInsert       | `INSERT` | Specify `false` when passing a record object which contains keys that do not represent columns or junctions to prevent Massive from trying to handle the extra data. |
 
 **nb. The `exprs`, `order`, and the deprecated `columns` options interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
 
