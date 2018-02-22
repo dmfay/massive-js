@@ -137,7 +137,7 @@ describe('Insert', function () {
             j2field: null
           }]
         },
-        {ignoreJunctions: true}
+        {deepInsert: false}
       );
 
       assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) RETURNING *');
