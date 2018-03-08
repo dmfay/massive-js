@@ -68,7 +68,7 @@ massive({
     ctx.body = await ctx.db.feed_items.find({
       'rating >': 0
     }, {
-      order: 'created_at desc'
+      order: [{field: 'created_at', direction: 'desc'}]
     });
   });
 
@@ -101,7 +101,7 @@ massive({
     req.app.get('db').feed_items.find({
       'rating >': 0
     }, {
-      order: 'created_at desc'
+      order: [{field: 'created_at', direction: 'desc'}]
     }).then(items => {
       res.json(items);
     });
