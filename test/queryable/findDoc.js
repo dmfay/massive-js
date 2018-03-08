@@ -12,12 +12,6 @@ describe('findDoc', function () {
   });
 
   describe('querying all documents', function () {
-    it('returns all documents when passed \'*\'', function () {
-      return db.docs.findDoc('*').then(docs => {
-        assert.lengthOf(docs, 4);
-      });
-    });
-
     it('returns all documents when passed an empty conditions block', function () {
       return db.docs.findDoc({}).then(docs => {
         assert.lengthOf(docs, 4);
@@ -153,7 +147,7 @@ describe('findDoc', function () {
 
   describe('querying with options', function () {
     it('returns the first matching document', function () {
-      return db.docs.findDoc('*', {single: true}).then(doc => {
+      return db.docs.findDoc({}, {single: true}).then(doc => {
         assert.equal(doc.id, 1);
       });
     });
@@ -195,14 +189,14 @@ describe('findDoc', function () {
     });
 
     it('applies offset and limit with a fixed sort by pk', function () {
-      return db.docs.findDoc('*', {offset: 1, limit: 1}).then(docs => {
+      return db.docs.findDoc({}, {offset: 1, limit: 1}).then(docs => {
         assert.lengthOf(docs, 1);
         assert.equal(docs[0].id, 2);
       });
     });
 
     it('orders by fields in the table', function () {
-      return db.docs.findDoc('*', {order: 'id desc'}).then(docs => {
+      return db.docs.findDoc({}, {order: 'id desc'}).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].id, 4);
         assert.equal(docs[1].id, 3);
@@ -213,7 +207,7 @@ describe('findDoc', function () {
 
     it('orders by fields in the document body', function () {
       // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
-      return db.docs.findDoc('*', {order: 'body->>\'title\' desc'}).then(docs => {
+      return db.docs.findDoc({}, {order: 'body->>\'title\' desc'}).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Something Else');
         assert.equal(docs[1].title, 'Document 3');
@@ -223,7 +217,7 @@ describe('findDoc', function () {
     });
 
     it('orders by fields in the document body with criteria', function () {
-      return db.docs.findDoc('*', {
+      return db.docs.findDoc({}, {
         order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true
       }).then(docs => {
