@@ -52,7 +52,7 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
-    "commander": "~2.14.0",
+    "commander": "~2.15.0",
     "glob": "~7.1.1",
     "lodash": "~4.17.4",
     "pg-promise": "~8.1.1",
