@@ -11,6 +11,23 @@ describe('deep insert', function () {
     return db.instance.$pool.end();
   });
 
+  it('is off by default', function* () {
+    const res = yield db.products.insert({
+      name: 'something',
+      orders: [{
+        product_id: undefined,
+        user_id: 5,
+        notes: 'deep insert test'
+      }]
+    });
+
+    assert.equal(res.name, 'something');
+
+    const orders = yield db.orders.find({product_id: res.id});
+
+    assert.lengthOf(orders, 0);
+  });
+
   it('inserts a product and an order in one go', function* () {
     const res = yield db.products.insert({
       name: 'something',
@@ -19,6 +36,8 @@ describe('deep insert', function () {
         user_id: 5,
         notes: 'deep insert test'
       }]
+    }, {
+      deepInsert: true
     });
 
     assert.equal(res.name, 'something');
@@ -42,6 +61,8 @@ describe('deep insert', function () {
         user_id: 6,
         notes: 'deep insert test 2'
       }]
+    }, {
+      deepInsert: true
     });
 
     assert.equal(res.name, 'something');

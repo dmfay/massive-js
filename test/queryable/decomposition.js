@@ -12,7 +12,7 @@ describe('decomposing results', function () {
   });
 
   it('throws when decomposing a null pk', function* () {
-    return yield db.run('SELECT * FROM users LEFT JOIN users ON TRUE', {
+    return yield db.query('SELECT * FROM users LEFT JOIN users ON TRUE', {
       decompose: {
         pk: 'id',
         columns: {

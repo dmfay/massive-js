@@ -110,6 +110,8 @@ describe('Insert', function () {
             j2fk: 102,
             j2field: null
           }]
+        }, {
+          deepInsert: true
         }
       );
 
