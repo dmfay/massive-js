@@ -115,6 +115,8 @@ describe('Insert', function () {
             jsfk: 111,
             jsfield: 'abc'
           }]
+        }, {
+          deepInsert: true
         }
       );
 
