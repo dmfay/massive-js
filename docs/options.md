@@ -36,21 +36,20 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 | limit            | `SELECT` | Set the number of rows to take. |
 | offset           | `SELECT` | Set the number of rows to skip. |
 | only             | `SELECT`, `UPDATE`, `DELETE` | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
-| order            | `SELECT` | An array of order objects (see below) or a literal string in the form `column1 ASC, column2 DESC`. **Avoid sending user input as a literal string. If you have to, be aware of the possibility of SQL injection.** |
-| orderBody        | `SELECT` | If querying a document table, set to `true` to apply `options.order` to fields in the document body rather than the table. |
+| order            | `SELECT` | An array of order objects (see below). |
 | onConflictIgnore | `INSERT` | If the inserted data would violate a unique constraint, do nothing. |
 | deepInsert       | `INSERT` | Specify `false` when passing a record object which contains keys that do not represent columns or junctions to prevent Massive from trying to handle the extra data. |
 
-**nb. The `exprs`, `order`, and the deprecated `columns` options interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
+**nb. The `exprs` option and the corresponding `expr` key in order objects interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
 
 ### Ordering Results
 
-The `order` option may be passed an array of order objects. These are used to build a SQL `ORDER BY` clause. An order object must contain a `field`; all other properties are optional.
+The `order` option sets an array of order objects which are used to build a SQL `ORDER BY` clause. An order object must contain a `field` or an `expr`; all other properties are optional.
 
-* `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body. The column name will be quoted unless `raw` is also specified.
+* `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body.
+* `expr`: A raw SQL expression. Will not be escaped or quoted and **is potentially vulnerable to SQL injection**.
 * `direction`: The sort direction, `ASC` or `DESC`.
 * `type`: Define a cast type for values. Useful with JSON fields.
-* `raw`: True to leave the `field` unquoted. Useful if you're ordering by something other than a single column value, for example `col1 + col2`.
 
 ## Results Processing
 
