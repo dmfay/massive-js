@@ -43,6 +43,8 @@ describe('compound primary keys', function () {
         c_key_two: undefined,
         value: 'other side'
       }]
+    }, {
+      deepInsert: true
     });
 
     assert.isOk(res);
