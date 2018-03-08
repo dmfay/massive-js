@@ -149,7 +149,7 @@ describe('findDoc', function () {
     });
 
     it('orders by fields in the table', function () {
-      return db.docs.findDoc({}, {order: 'id desc'}).then(docs => {
+      return db.docs.findDoc({}, {order: [{field: 'id', direction: 'desc'}]}).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].id, 4);
         assert.equal(docs[1].id, 3);
@@ -158,9 +158,13 @@ describe('findDoc', function () {
       });
     });
 
-    it('orders by fields in the document body', function () {
-      // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
-      return db.docs.findDoc({}, {order: 'body->>\'title\' desc'}).then(docs => {
+    it('orders by literal exprs', function () {
+      return db.docs.findDoc(
+        {},
+        {
+          order: [{expr: 'body->>\'title\'', direction: 'desc'}]
+        }
+      ).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Something Else');
         assert.equal(docs[1].title, 'Document 3');
@@ -169,7 +173,7 @@ describe('findDoc', function () {
       });
     });
 
-    it('orders by fields in the document body with criteria', function () {
+    it('orders by fields in the document body', function () {
       return db.docs.findDoc({}, {
         order: [{field: 'title', direction: 'desc', type: 'varchar'}],
         orderBody: true
