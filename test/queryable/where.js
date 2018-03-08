@@ -16,7 +16,7 @@ describe('where', function () {
   });
 
   it('executes a handwritten WHERE clause with options', function () {
-    return db.products.where('id=$1 OR id=$2', [1, 2], {order: 'id desc'}).then(res => {
+    return db.products.where('id=$1 OR id=$2', [1, 2], {order: [{field: 'id', direction: 'desc'}]}).then(res => {
       assert.lengthOf(res, 2);
 
       assert.equal(res[0].id, 2);

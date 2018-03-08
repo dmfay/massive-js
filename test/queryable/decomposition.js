@@ -162,7 +162,7 @@ describe('decomposing results', function () {
           }
         }
       },
-      order: 'username DESC'
+      order: [{field: 'username', direction: 'desc'}]
     });
 
     assert.deepEqual(issues, [{
