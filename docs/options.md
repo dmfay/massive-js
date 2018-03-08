@@ -38,7 +38,7 @@ Certain SQL clauses are used with different types of query. For example, a `LIMI
 | only             | `SELECT`, `UPDATE`, `DELETE` | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
 | order            | `SELECT` | An array of order objects (see below). |
 | onConflictIgnore | `INSERT` | If the inserted data would violate a unique constraint, do nothing. |
-| deepInsert       | `INSERT` | Specify `false` when passing a record object which contains keys that do not represent columns or junctions to prevent Massive from trying to handle the extra data. |
+| deepInsert       | `INSERT` | Specify `true` to turn on [deep insert](persistence#deep-insert). |
 
 **nb. The `exprs` option and the corresponding `expr` key in order objects interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
 

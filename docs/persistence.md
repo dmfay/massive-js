@@ -79,6 +79,8 @@ db.tests.insert({
     user_id: 2,
     role: 'auxiliary'
   }]
+}, {
+  deepInsert: true
 }).then(tests => {
   // as with regular inserts, you only get the test back;
   // if user_tests has a primary key constraint, you can
@@ -87,8 +89,6 @@ db.tests.insert({
 ```
 
 Deep insert is _only_ supported when inserting single records. Attempting to deep insert an array of records will raise an exception.
-
-If your object is going to store a property as json in postgres, you will want to ignore deep insert functions, otherwise it will look for junction tables that match the nested object. To do this use the option ` { deepInsert: false }` with the insert. 
 
 #### Options
 
