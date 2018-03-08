@@ -304,7 +304,14 @@ describe('find', function () {
     });
 
     it('orders by fields in the table', function () {
-      return db.docs.find({}, {order: 'id desc', document: true, generator: 'docGenerator'}).then(docs => {
+      return db.docs.find(
+        {},
+        {
+          order: [{field: 'id', direction: 'desc'}],
+          document: true,
+          generator: 'docGenerator'
+        }
+      ).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].id, 4);
         assert.equal(docs[1].id, 3);
@@ -313,9 +320,15 @@ describe('find', function () {
       });
     });
 
-    it('orders by fields in the document body with raw traversal', function () {
-      // nb: no parsing the key here -- it has to be exactly as you'd paste it into psql
-      return db.docs.find({}, {order: 'body->>\'title\' desc', document: true, generator: 'docGenerator'}).then(docs => {
+    it('orders by literal exprs', function () {
+      return db.docs.find(
+        {},
+        {
+          order: [{expr: 'body->>\'title\'', direction: 'desc'}],
+          document: true,
+          generator: 'docGenerator'
+        }
+      ).then(docs => {
         assert.lengthOf(docs, 4);
         assert.equal(docs[0].title, 'Something Else');
         assert.equal(docs[1].title, 'Document 3');
@@ -364,7 +377,7 @@ describe('find', function () {
     });
 
     it('returns ascending order of products by price', function () {
-      return db.products.find({}, {order: 'price'}).then(res => {
+      return db.products.find({}, {order: [{field: 'price'}]}).then(res => {
         assert.lengthOf(res, 4);
         assert.equal(res[0].id, 1);
         assert.equal(res[2].id, 3);
@@ -372,7 +385,7 @@ describe('find', function () {
     });
 
     it('returns descending order of products', function () {
-      return db.products.find({}, {order: 'id desc'}).then(res => {
+      return db.products.find({}, {order: [{field: 'id', direction: 'desc'}]}).then(res => {
         assert.lengthOf(res, 4);
         assert.equal(res[0].id, 4);
         assert.equal(res[2].id, 2);
@@ -380,11 +393,11 @@ describe('find', function () {
     });
 
     it('returns a single result', function () {
-      return db.products.find({}, {order: 'id desc', single: true}).then(res => assert.equal(res.id, 4));
+      return db.products.find({}, {order: [{field: 'id', direction: 'desc'}], single: true}).then(res => assert.equal(res.id, 4));
     });
 
     it('supports options in findOne', function () {
-      return db.products.findOne({}, {order: 'id desc', fields: 'id'}).then(res => {
+      return db.products.findOne({}, {order: [{field: 'id', direction: 'desc'}], fields: 'id'}).then(res => {
         assert.equal(res.id, 4);
         assert.equal(Object.keys(res).length, 1);
       });
@@ -409,11 +422,19 @@ describe('find', function () {
     });
 
     it('returns users with a simple order by', function () {
-      return db.Users.find({}, {order: '"Email"'}).then(res => assert.lengthOf(res, 1));
+      return db.Users.find({}, {order: [{field: '"Email"'}]}).then(res => assert.lengthOf(res, 1));
     });
 
     it('returns users with a compound order by', function () {
-      return db.Users.find({}, {order: '"Email" asc, "Id" desc'}).then(res => assert.lengthOf(res, 1));
+      return db.Users.find(
+        {},
+        {
+          order: [
+            {field: '"Email"'},
+            {field: '"Id"', direction: 'desc'}
+          ]
+        }
+      ).then(res => assert.lengthOf(res, 1));
     });
 
     it('returns users with a complex order by', function* () {
@@ -490,7 +511,7 @@ describe('find', function () {
     });
 
     it('applies sorting', function () {
-      return db.popular_products.find({}, {order: 'id desc'}).then(res => {
+      return db.popular_products.find({}, {order: [{field: 'id', direction: 'desc'}]}).then(res => {
         assert.lengthOf(res, 3);
         assert.equal(res[0].id, 4);
         assert.equal(res[1].id, 2);
@@ -499,7 +520,7 @@ describe('find', function () {
     });
 
     it('returns a single result', function () {
-      return db.popular_products.find({}, {order: 'id desc', single: true}).then(res => assert.equal(res.id, 4));
+      return db.popular_products.find({}, {order: [{field: 'id', direction: 'desc'}], single: true}).then(res => assert.equal(res.id, 4));
     });
 
     it('works with materialized views', function () {
