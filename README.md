@@ -37,7 +37,7 @@ massive.connect({db : "myDb"}, function(err,db){
 
 One of the key features of Massive is that it loads all of your tables, Postgres functions, and local query files up as functions (this is really cool, you want this. See below for more info). Massive is fast, and does this quickly. However, there is a one-time execution penalty at intialization while all this happens. In most situations it makes sense to do this once, at application load. From there, maintain a reference to the Massive instance (Massive was conceived with this usage in mind). For example, if you are using Express as your application framework, you might do something like this:
 
-####Express Example
+#### Express Example
 
 ```javascript
 var express = require("express");

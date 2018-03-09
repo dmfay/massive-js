@@ -1,5 +1,9 @@
 ![MassiveJS](http://rob.conery.io/img/2015/03/massive-logo.png)
 
+## Version 2 Documentation
+
+This documentation is specific to Massive.js version 2.x. If you're looking for the documentation on version 3 and up, that's on [GitHub Pages](https://dmfay.github.io/massive-js/) now.
+
 ## What Is Massive?
 
 Massive is a PostgreSQL-specific data access tool. The **goal** of Massive is to make it easier for you to use PostgreSQL's amazing features, *not to hide them under a load of abstraction*.
