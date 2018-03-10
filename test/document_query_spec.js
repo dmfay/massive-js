@@ -154,9 +154,17 @@ describe('Document queries', function () {
     });
 
     it('works properly with dates', function (done) {
-      db.docs.findDoc({"created_at <" : new Date(1980, 1,1)}, function(err,docs){
+      db.docs.findDoc({"created_at <" : new Date(1980, 1, 1)}, function(err,docs){
         assert.ifError(err);
         assert.equal(docs.length, 1);
+        done();
+      });
+    });
+
+    it('works properly with timestamp including time zone ', function (done) {
+      db.docs.findDoc({"created_at >" : new Date("2015-03-04T09:00:00.000Z")}, function(err,docs){
+        assert.ifError(err);
+        assert.equal(docs.length, 2);
         done();
       });
     });
