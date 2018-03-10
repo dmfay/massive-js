@@ -92,7 +92,7 @@ const docGenerator = function (condition, conditions) {
     } else if (_.isNumber(condition.value)) {
       cast = '::decimal';
     } else if (_.isDate(condition.value)) {
-      cast = '::timestamp';
+      cast = '::timestamptz';
       condition.params.push(condition.value);
       condition.value = `$${condition.offset}`;
     } else if (condition.appended.mutator) {

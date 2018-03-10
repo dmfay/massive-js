@@ -123,6 +123,12 @@ describe('findDoc', function () {
         assert.lengthOf(docs, 1);
       });
     });
+
+    it('works properly with timestamp including time zone', function () {
+      return db.docs.findDoc({'created_at >': new Date('2015-03-04T09:00:00.000Z')}).then(docs => {
+        assert.lengthOf(docs, 3);
+      });
+    });
   });
 
   describe('querying with options', function () {
