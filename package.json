@@ -55,7 +55,7 @@
     "commander": "~2.14.0",
     "glob": "~7.1.1",
     "lodash": "~4.17.4",
-    "pg-promise": "~8.1.1",
+    "pg-promise": "~8.2.0",
     "pg-query-stream": "~1.1.1"
   },
   "devDependencies": {
