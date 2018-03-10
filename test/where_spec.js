@@ -475,7 +475,7 @@ describe('WHERE clause generation', function () {
       var condition = {field: 'field', operator: '<>'};
       var result = where.docPredicate({params: [], predicates: [], offset: 0}, condition, date, {'field <>': date});
       assert.equal(result.predicates.length, 1);
-      assert.equal(result.predicates[0], '(body ->> \'field\')::timestamp <> $1');
+      assert.equal(result.predicates[0], '(body ->> \'field\')::timestamptz <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], date);
     });
