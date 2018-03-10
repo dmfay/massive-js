@@ -237,7 +237,7 @@ describe('WHERE clause generation', function () {
       const date = new Date();
       const condition = {rawField: 'field', appended: ops('<>'), value: date, offset: 1, params: []};
       const result = where.docGenerator(condition, {'field <>': date});
-      assert.equal(result.predicate, '("body" ->> \'field\')::timestamp <> $1');
+      assert.equal(result.predicate, '("body" ->> \'field\')::timestamptz <> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], date);
     });
