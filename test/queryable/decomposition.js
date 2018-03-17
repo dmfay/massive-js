@@ -11,6 +11,18 @@ describe('decomposing results', function () {
     return db.instance.$pool.end();
   });
 
+  it('throws when decomposing a null pk', function* () {
+    return yield db.run('SELECT * FROM users LEFT JOIN users ON TRUE', {
+      decompose: {
+        pk: 'id',
+        columns: {
+          id: 'id',
+          username: 'username'
+        }
+      }
+    }).then(() => { assert.fail(); }).catch(() => Promise.resolve());
+  });
+
   it('applies a schema to decompose results', function* () {
     const issues = yield db.everything.find({}, {
       decompose: {

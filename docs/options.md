@@ -72,7 +72,11 @@ The `decompose` option takes a schema which represents the desired output struct
 * `columns` is either a map of fields in the resultset (keys) to fields in the output entity (values), or an array of field names if they do not need to be transformed.
 * `array` is only usable on schemas nested at least one level deep. If `true`, the entities this schema represents are considered a collection instead of a nested object.
 
-Any other key on a schema is taken to represent a nested schema, and nested schemas **may not be named** with one of the reserved keys. The following schema:
+Any other key on a schema is taken to represent a nested schema, and nested schemas **may not be named** with one of the reserved keys.
+
+Note also that pks and columns must be unique in your query's results, which is important if your query includes tables with shared column names. Ensure that any duplicate column names are aliased in your `SELECT` list.
+
+The following schema:
 
 ```javascript
 db.user_tests.find({}, {

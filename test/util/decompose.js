@@ -15,6 +15,21 @@ describe('decompose', function () {
     }, []));
   });
 
+  it('should throw if it finds a null root pk', function () {
+    assert.throws(() => decompose({
+      pk: 'parent_id',
+      columns: {parent_id: 'id', parent_val: 'val'},
+      children: {
+        pk: 'children_id',
+        columns: {children_id: 'id', children_val: 'val'},
+        array: true
+      }
+    }, [
+      {parent_id: 1, parent_val: 'p1', children_id: 11, children_val: 'c1'},
+      {parent_id: null, parent_val: null, children_id: null, children_val: null}
+    ]));
+  });
+
   it('should collapse simple tree structures', function () {
     const data = decompose({
       pk: 'parent_id',
