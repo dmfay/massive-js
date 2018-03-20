@@ -20,7 +20,7 @@ SELECT * FROM (
 ) views
 WHERE CASE
   WHEN $(whitelist) <> '' THEN
-    -- whitelist specific tables, with fully-qualified name (no schema assumes public).
+    -- whitelist specific views, with fully-qualified name (no schema assumes public).
     replace((views.schema || '.'|| views.name), 'public.', '') LIKE ANY(string_to_array(replace($(whitelist), ' ', ''), ','))
   WHEN $(allowedSchemas) <> '' OR $(blacklist) <> '' THEN ((
     $(allowedSchemas) = ''
@@ -30,10 +30,10 @@ WHERE CASE
   ) AND (
     $(blacklist) = ''
     OR
-    -- blacklist tables using LIKE by fully-qualified name (no schema assumes public):
+    -- blacklist views using LIKE by fully-qualified name (no schema assumes public):
     replace((schema || '.'|| name), 'public.', '') NOT LIKE ALL(string_to_array(replace($(blacklist), ' ', ''), ','))
   )) OR
-    -- make exceptions for specific tables, with fully-qualified name or wildcard pattern (no schema assumes public).
+    -- make exceptions for specific views, with fully-qualified name or wildcard pattern (no schema assumes public).
     replace((schema || '.'|| name), 'public.', '') LIKE ANY(string_to_array(replace($(exceptions), ' ', ''), ','))
   ELSE TRUE
 END;
