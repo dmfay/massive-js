@@ -242,13 +242,13 @@ describe('connecting', function () {
         assert(!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
         assert(!db.mv1 && !db.mv2);
-        assert(!!db.f1 && !!db.f2);
+        assert(!db.f1 && !db.f2);
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.lengthOf(db.objects, 10);
+        assert.lengthOf(db.objects, 8);
         assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Table), 3);
-        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
@@ -268,13 +268,13 @@ describe('connecting', function () {
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!!db.v1 && !db.v2);
         assert(!db.mv1 && !db.mv2);
-        assert(!!db.f1 && !!db.f2);
-        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
+        assert(!db.f1 && !db.f2);
+        assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !!db.one.v2 && !db.one.f1 && !db.one.f2);
         assert(!!db.two && !!db.two.t1);
-        assert.lengthOf(db.objects, 9);
+        assert.lengthOf(db.objects, 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 4);
         assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
-        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 1);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
@@ -400,13 +400,13 @@ describe('connecting', function () {
         assert(!!db.t1 && !db.t2 && !db.tA);
         assert(!db.v1 && !db.v2);
         assert(!db.mv1 && !db.mv2);
-        assert(!!db.f1 && !!db.f2);
+        assert(!db.f1 && !db.f2);
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
-        assert.lengthOf(db.objects, 6);
+        assert.lengthOf(db.objects, 4);
         assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 1);
         assert.lengthOf(db.objects.filter(o => o instanceof Table), 1);
-        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
@@ -477,11 +477,12 @@ describe('connecting', function () {
       });
     });
 
-    it('overlaps whitelists and blacklists', function () {
+    it('applies exceptions', function () {
       const testLoader = _.defaults({
         scripts: `${__dirname}/helpers/scripts/loader`,
+        allowedSchemas: 'one',
         functionBlacklist: 'one.%1',
-        functionWhitelist: 'one.%',
+        exceptions: 'one.f2',
         noWarnings: true
       }, loader);
 
