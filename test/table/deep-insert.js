@@ -56,4 +56,37 @@ describe('deep insert', function () {
     const order2 = orders.find(o => o.user_id === 6);
     assert.equal(order2.notes, 'deep insert test 2');
   });
+
+  it('errors on attempting to deep insert multiple records', function () {
+    return db.products.insert([{
+      name: 'something',
+      orders: [{
+        product_id: undefined,
+        user_id: 5,
+        notes: 'deep insert test 1'
+      }, {
+        product_id: undefined,
+        user_id: 6,
+        notes: 'deep insert test 2'
+      }]
+    }, {
+      name: 'something else',
+      orders: [{
+        product_id: undefined,
+        user_id: 6,
+        notes: 'deep insert test 3'
+      }]
+    }])
+      .then(() => { assert.fail(); })
+      .catch(() => {});
+  });
+
+  it('errors if a junction is erroneously detected', function () {
+    return db.products.insert([{
+      name: 'something',
+      not_a_column: 'junction false positive'
+    }])
+      .then(() => { assert.fail(); })
+      .catch(() => {});
+  });
 });
