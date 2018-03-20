@@ -183,5 +183,17 @@ describe('Insert', function () {
         assert.isOk(err);
       }
     });
+
+    it('should throw when formatting a deep insert with bad definitions', function () {
+      const x = new Insert(
+        source,
+        {
+          field1: 'value1',
+          not_a_junction: 'q'
+        }
+      );
+
+      assert.throws(x.format);
+    });
   });
 });
