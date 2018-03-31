@@ -29,11 +29,19 @@ describe('foreign tables', function () {
   });
 
   it('cannot save to foreign tables', function () {
-    assert.throws(() => db.foreigntable.save({id: 1}), 'foreigntable has no primary key, use insert or update to write to this table');
+    db.foreigntable.save({id: 1})
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'foreigntable has no primary key, use insert or update to write to this table');
+      });
   });
 
   it('cannot use the single-object update with foreign tables', function () {
-    assert.throws(() => db.foreigntable.update({id: 1}), 'foreigntable has no primary key, use update(criteria, changes)');
+    db.foreigntable.update({id: 1})
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'foreigntable has no primary key, use update(criteria, changes)');
+      });
   });
 });
 

@@ -2,7 +2,8 @@ CREATE SCHEMA public;
 
 CREATE TABLE normal_pk (
   id SERIAL NOT NULL PRIMARY KEY,
-  field1 TEXT
+  field1 TEXT,
+  array_field TEXT[]
 );
 
 CREATE TABLE compound_pk (
@@ -18,6 +19,12 @@ CREATE TABLE no_pk (
   field2 TEXT
 );
 
+CREATE TABLE "CasedName" (
+  "Id" SERIAL NOT NULL PRIMARY KEY,
+  "Field1" TEXT
+);
+
 INSERT INTO normal_pk (field1) VALUES ('alpha'), ('beta'), ('gamma');
 INSERT INTO compound_pk (field1) VALUES ('alpha'), ('beta'), ('gamma');
 INSERT INTO no_pk (field1, field2) VALUES ('alpha', 'beta'), ('gamma', 'delta'), ('epsilon', 'zeta');
+INSERT INTO "CasedName" ("Field1") VALUES ('Alpha'), ('Beta'), ('Gamma');
