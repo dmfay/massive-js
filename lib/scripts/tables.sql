@@ -18,21 +18,22 @@ SELECT * FROM (
     TRUE AS is_insertable_into,
     array_agg(DISTINCT c.column_name::text) AS columns
   FROM information_schema.tables t
-  JOIN information_schema.table_constraints tc
+  LEFT OUTER JOIN information_schema.table_constraints tc
     ON tc.table_schema = t.table_schema
     AND tc.table_name = t.table_name
-  JOIN information_schema.key_column_usage kc
+    AND tc.constraint_type = 'PRIMARY KEY'
+  LEFT OUTER JOIN information_schema.key_column_usage kc
     ON kc.constraint_schema = tc.table_schema
     AND kc.table_name = tc.table_name
     AND kc.constraint_name = tc.constraint_name
   JOIN information_schema.columns c
-    ON c.table_schema = tc.table_schema
-    AND c.table_name = tc.table_name
+    ON c.table_schema = t.table_schema
+    AND c.table_name = t.table_name
   JOIN pg_catalog.pg_namespace nsp
     ON nsp.nspname = t.table_schema
   JOIN pg_catalog.pg_class cls
     ON cls.relnamespace = nsp.oid
-    AND cls.relname = tc.table_name
+    AND cls.relname = t.table_name
 
   -- get parent table if there is one
   LEFT OUTER JOIN pg_catalog.pg_inherits inh ON inh.inhrelid = cls.oid
@@ -40,8 +41,8 @@ SELECT * FROM (
   LEFT OUTER JOIN pg_catalog.pg_namespace AS parentschema
     ON parentschema.oid = parent.relnamespace
 
-  WHERE tc.constraint_type = 'PRIMARY KEY'
-    AND t.table_type <> 'FOREIGN TABLE'
+  WHERE t.table_schema NOT IN ('information_schema', 'pg_catalog')
+    AND t.table_type NOT IN ('VIEW', 'FOREIGN TABLE')
   GROUP BY t.table_schema, t.table_name, parent.relname
 
   UNION
