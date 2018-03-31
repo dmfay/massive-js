@@ -11,10 +11,10 @@ describe('Table Inheritance', function () {
     return db.instance.$pool.end();
   });
 
-  it('only loads descendant tables with primary keys', function () {
+  it('loads descendent tables', function () {
     assert.isOk(db.cities);
     assert.isOk(db.capitals);
-    assert.notOk(db.ancient);
+    assert.isOk(db.ancient);
   });
 
   describe('Querying', function () {
