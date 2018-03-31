@@ -14,7 +14,7 @@ SELECT * FROM (
   SELECT t.table_schema AS schema,
     t.table_name AS name,
     parent.relname AS parent,
-    array_agg(DISTINCT kc.column_name::text) AS pk,
+    array_agg(DISTINCT kc.column_name::text) FILTER (WHERE kc.column_name IS NOT NULL) AS pk,
     TRUE AS is_insertable_into,
     array_agg(DISTINCT c.column_name::text) AS columns
   FROM information_schema.tables t
