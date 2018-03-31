@@ -13,7 +13,7 @@ describe('list functions', function () {
 
   describe('listTables', function () {
     it('lists tables', function () {
-      assert.sameMembers(db.listTables(), ['t1', 't2', 'tA', 'one.t1', 'one.t2', 'two.t1']);
+      assert.sameMembers(db.listTables(), ['t1', 't2', 't3', 'tA', 'one.t1', 'one.t2', 'two.t1']);
     });
   });
 
