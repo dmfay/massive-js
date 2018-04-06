@@ -29,15 +29,25 @@ describe('foreign tables', function () {
   });
 
   it('cannot save to foreign tables', function () {
-    db.foreigntable.save({id: 1})
+    return db.foreigntable.save({id: 1})
       .then(() => { assert.fail(); })
       .catch(err => {
-        assert.equal(err.message, 'foreigntable has no primary key, use insert or update to write to this table');
+        assert.equal(err.message, 'foreigntable is not writable');
+      });
+  });
+
+  it('cannot directly update foreign tables', function () {
+    return db.foreigntable.update({id: 1})
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'foreigntable is not writable');
       });
   });
 
   it('cannot use the single-object update with foreign tables', function () {
-    db.foreigntable.update({id: 1})
+    db.foreigntable.is_insertable_into = true; // spoof a writable table to get around the check
+
+    return db.foreigntable.update({id: 1})
       .then(() => { assert.fail(); })
       .catch(err => {
         assert.equal(err.message, 'foreigntable has no primary key, use update(criteria, changes)');
