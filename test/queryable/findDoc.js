@@ -153,6 +153,17 @@ describe('findDoc', function () {
       });
     });
 
+    it('passing object without hasOwnProperty method', function () {
+      const criteria = Object.create(null);
+      criteria.title = 'Document 1';
+      return db.docs.findDoc(criteria).then(docs => {
+        assert.lengthOf(docs, 1);
+        assert.equal(docs[0].id, 1);
+        assert.equal(docs[0].title, 'Document 1');
+        assert.equal(docs[0].description, 'lorem ipsum etc');
+      });
+    });
+
     it('applies offset and limit with a fixed sort by pk', function () {
       return db.docs.findDoc('*', {offset: 1, limit: 1}).then(docs => {
         assert.lengthOf(docs, 1);
