@@ -97,6 +97,17 @@ describe('Document queries', function () {
       });
     });
 
+    it('passing object without hasOwnProperty method', function (done) {
+      var criteria = Object.create(null);
+      criteria.title = "A Document";
+      db.docs.findDoc(criteria, function(err,docs){
+        //find will return multiple if id not specified... confusing?
+        assert.ifError(err);
+        assert.equal(docs[0].title, "A Document");
+        done();
+      });
+    });
+
     it('parses greater than with two string defs', function (done) {
       db.docs.findDoc({"price >" : "18"}, function(err,docs){
         assert.ifError(err);
