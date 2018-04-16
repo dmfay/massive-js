@@ -27,3 +27,5 @@ global.resetDb = function (schema = 'default') {
       .then(() => db.reload());
   });
 };
+
+module.exports = {resetDb};

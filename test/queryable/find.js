@@ -1,5 +1,7 @@
 'use strict';
 
+const {resetDb} =  require('./../helpers/');
+
 describe('find', function () {
   let db;
 
