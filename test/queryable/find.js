@@ -415,6 +415,12 @@ describe('find', function () {
       return db.Users.findOne().then(res => assert.equal(res.Id, 1));
     });
 
+    it('rejects when field array is empty', function () {
+      db.Users.find({}, {fields: []})
+        .then(() => assert.fail('Should not show up'))
+        .catch(err => { assert.equal(err.message, 'The fields array cannot be empty'); });
+    });
+
     it('returns a subset of fields, when we delimit in the calling code', function () {
       return db.Users.find({}, {fields: ['"Id"', '"Email"']}).then(res => assert.lengthOf(res, 1));
     });
