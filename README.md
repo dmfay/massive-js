@@ -16,6 +16,7 @@ Here are some of the high points:
 * **Low overhead**: An API built from your schema means no model classes to maintain, super-simple bulk operations, and writing directly to tables without any need to create or load entity instances beforehand.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
 * **Relational awareness**: Massive does not traverse relationships or build model graphs, but [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
+* **Transactions**: New in v5, use `db.withTransaction` to execute a callback with full Massive API support in a transaction scope, getting a promise which fulfills if it commits or rejects if it rolls back.
 * **Postgres everything**: Commitment to a single RDBMS lets us use it to its full potential. Massive supports array fields and operations, regular expression matching, foreign tables, materialized views, and more features found in PostgreSQL but not in other databases.
 
 ## Full Documentation
