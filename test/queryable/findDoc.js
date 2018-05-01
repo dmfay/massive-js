@@ -156,6 +156,7 @@ describe('findDoc', function () {
     it('passing object without hasOwnProperty method', function () {
       const criteria = Object.create(null);
       criteria.title = 'Document 1';
+
       return db.docs.findDoc(criteria).then(docs => {
         assert.lengthOf(docs, 1);
         assert.equal(docs[0].id, 1);
