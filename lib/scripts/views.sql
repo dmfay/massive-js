@@ -11,11 +11,11 @@
 --   override blacklisted tables.
 
 SELECT * FROM (
-  SELECT schemaname AS schema, viewname AS name
+  SELECT schemaname AS schema, viewname AS name, FALSE AS is_matview
   FROM pg_views
   WHERE schemaname <> 'pg_catalog' AND schemaname <> 'information_schema'
   UNION
-  SELECT schemaname AS schema, matviewname AS name
+  SELECT schemaname AS schema, matviewname AS name, TRUE AS is_matview
   FROM pg_matviews
 ) views
 WHERE CASE

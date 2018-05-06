@@ -98,3 +98,16 @@ db.users.search(
   // search condition
 });
 ```
+
+## refresh
+
+`refresh` can be used with [materialized views](https://www.postgresql.org/docs/current/static/rules-materializedviews.html), which cache the view query results to sacrifice realtime updates for performance. Materialized views must be refreshed whenever you need to ensure the information in them is up to date.
+
+Materialized views ordinarily block reads while refreshing. To avoid this, invoke the function passing `true` to specify a concurrent refresh.
+
+`refresh` returns an empty query result.
+
+```javascript
+db.cached_statistics.refresh(true) // concurrently
+  .then(() => {...});
+```
