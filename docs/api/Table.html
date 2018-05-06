@@ -463,7 +463,7 @@ predicates.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line40">line 40</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -626,7 +626,7 @@ criteria objects.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line61">line 61</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -1038,7 +1038,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line74">line 74</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -1251,7 +1251,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line85">line 85</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line90">line 90</a>
     </li></ul></dd>
     
 
@@ -1462,7 +1462,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line100">line 100</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line105">line 105</a>
     </li></ul></dd>
     
 
@@ -1999,7 +1999,7 @@ test.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line118">line 118</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -2290,6 +2290,180 @@ criteria object.</td>
 <div class="param-desc">
     If modifying a document table, the document; otherwise, the
 modified row.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="refresh"><span class="type-signature"></span>refresh<span class="signature">(concurrently<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Refresh a materialized view.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>concurrently</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Do it without locking reads.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Queryable.html#refresh">Queryable#refresh</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line120">line 120</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A query with no results.
 </div>
 
 
@@ -2901,7 +3075,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line148">line 148</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -3178,7 +3352,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line200">line 200</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line221">line 221</a>
     </li></ul></dd>
     
 
@@ -3655,7 +3829,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line216">line 216</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -3727,7 +3901,7 @@ db.mytable.where('id=$1', [123]).then(...);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Apr 17 2018 08:51:54 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun May 06 2018 00:18:39 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
