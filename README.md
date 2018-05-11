@@ -29,6 +29,7 @@ Here are some of the high points:
 ## Table of Contents
 
 <!-- vim-markdown-toc GFM -->
+
 * [Installation](#installation)
 * [Connecting to a Database](#connecting-to-a-database)
 * [Usage](#usage)
@@ -162,7 +163,7 @@ Our testing application can leverage the API Massive builds for almost everythin
 After we initialize and connect Massive, all these entities are available on the instance. First, we need to create a user:
 
 ```javascript
-db.auth.users.insert({
+db.auth.users.save({
   username: 'alice',
   password: 'supersecure'
 }).then(alice => {...});
@@ -170,38 +171,36 @@ db.auth.users.insert({
 
 `alice` is a JavaScript object containing the username and password we specified. But our `users` table has more columns than that: first and foremost, there's a primary key, an `id` column, which uniquely identifies this user record. A user also has a `role`, a `created_at` timestamp defaulting to the current date on insert, and an `updated_at` timestamp to track when the record was last modified. So in addition to the fields we provided, `alice` has an `id`, a `role`, a `created_at`, and an `updated_at`. Since we didn't specify values for `role` or `updated_at`, these are `null`.
 
-When Alice resets her password, we issue an `update`:
+When Alice resets her password, we issue a `save` again, including `alice`'s primary key value:
 
 ```javascript
-db.auth.users.update({
+db.auth.users.save({
   id: 1,
   password: 'evenmoresecure'
 }).then(alice => {...});
 ```
 
-The `update` will search by the primary key in the object and modify only those fields we include. Since Alice's username isn't changing, we don't need to include that in the object we're passing. However, it won't hurt anything if we do, so we could have simply modified the original `alice` object and passed that in instead.
+The `save` will search by the primary key in the object and modify only those fields we include. Since Alice's username isn't changing, we don't need to include that in the object we're passing. However, it won't hurt anything if we do, so we could have simply modified the original `alice` object and passed that in instead.
 
-`alice` still doesn't have a role, however, and we may have added more users without roles as well. Let's perform a bulk update to ensure that users have a minimal level of access:
-
-```javascript
-db.auth.users.update({
-  'role is': null
-}, {
-  role: 'tester'
-}).then(users => {...});
-```
-
-Now that `alice` exists in the system and has the correct role, she can start a test. When working with tests, however, we'd rather be a little more efficient and not have separate `insert` and `update` paths. We can create or retrieve a `test` object and perform an upsert -- creating it if it doesn't exist, or modifying it if it does -- using the `save` function:
+Now that `alice` exists in the system, she can start a test. However, we don't want to bother with updating those from the same code path. `insert` will take care of that:
 
 ```javascript
-db.tests.save({
+db.tests.insert({
   name: 'application homepage',
   url: 'http://www.example.com',
   user_id: alice.id
 }).then(test => {...});
 ```
 
-Had we already had a test and specified its id, we'd have updated that record. Since we didn't, we have a new test instead.
+Last bit of housekeeping: `alice` still doesn't have a role, however, and we may have added more users without roles as well. Let's perform a bulk update to ensure that we're giving people the right access levels:
+
+```javascript
+db.auth.users.update({
+  'role is': null
+}, {
+  role: 'default'
+}).then(users => {...});
+```
 
 #### Retrieval
 

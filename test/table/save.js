@@ -13,9 +13,33 @@ describe('save', function () {
     return db.instance.$pool.end();
   });
 
+  it('returns null when updating a nonexistent record', function () {
+    return db.normal_pk.save({id: 99999, field1: 'something'}).then(res => {
+      assert.isNull(res);
+    });
+  });
+
+  it('throws when updating a record with operations in the pk field', function () {
+    return db.normal_pk.save({
+      'id <': 123,
+      field1: 'something'
+    })
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.isOk(err);
+      });
+  });
+
+  it('returns a product when there are no fields to be updated', function () {
+    return db.normal_pk.save({id: 1}).then(res => {
+      assert.equal(res.id, 1);
+      assert.equal(res.field1, 'alpha');
+    });
+  });
+
   it('inserts into a table with a single key', function () {
     return db.normal_pk.save({field1: 'delta'}).then(res => {
-      assert.equal(res.id, 4);
+      assert.equal(res.id, 5);
     });
   });
 
@@ -46,6 +70,28 @@ describe('save', function () {
       assert.equal(res.id1, 1);
       assert.equal(res.id2, 1);
       assert.equal(res.field1, 'omega');
+    });
+  });
+
+  it('updates an array field', function () {
+    return db.normal_pk.save({id: 1, array_field: ['one', 'two']}).then(res => {
+      assert.equal(res.id, 1);
+      assert.lengthOf(res.array_field, 2);
+      assert.deepEqual(res.array_field, ['one', 'two']);
+    });
+  });
+
+  it('updates an empty array field', function () {
+    return db.normal_pk.save({id: 1, array_field: []}).then(res => {
+      assert.equal(res.id, 1);
+      assert.lengthOf(res.array_field, 0);
+    });
+  });
+
+  it('updates a record in a table with a Cased Name', function () {
+    return db.CasedName.save({Id: 1, Field1: 'Omega'}).then(res => {
+      assert.equal(res.Id, 1);
+      assert.equal(res.Field1, 'Omega');
     });
   });
 

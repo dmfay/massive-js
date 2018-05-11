@@ -78,8 +78,8 @@ describe('compound primary keys', function () {
     });
   });
 
-  it('updates with the single-record format', function () {
-    return db.compoundpk.update({
+  it('saves a single record', function () {
+    return db.compoundpk.save({
       key_one: 123,
       key_two: 456,
       value: 'again'
