@@ -16,6 +16,10 @@ describe('docify', function () {
     assert.deepEqual(docs, [{id: 1, val: 'val1'}, {id: 2, val: 'val2'}]);
   });
 
+  it('docifies a row without a body', function () {
+    assert.deepEqual(docify({id: 1, field: 'value'}), {id: 1, field: 'value'});
+  });
+
   it('returns null if there is no row', function () {
     assert.equal(docify(), null);
   });

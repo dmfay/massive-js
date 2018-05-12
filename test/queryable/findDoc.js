@@ -173,6 +173,15 @@ describe('findDoc', function () {
       });
     });
 
+    it('restricts fields', function () {
+      return db.docs.findDoc({title: 'Document 1'}, {fields: ['title']}).then(docs => {
+        assert.lengthOf(docs, 1);
+        assert.equal(docs[0].id, 1);
+        assert.equal(docs[0].title, 'Document 1');
+        assert.isUndefined(docs[0].description);
+      });
+    });
+
     it('passing object without hasOwnProperty method', function () {
       const criteria = Object.create(null);
       criteria.title = 'Document 1';

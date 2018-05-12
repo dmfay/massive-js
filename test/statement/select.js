@@ -67,6 +67,15 @@ describe('Select', function () {
       assert.equal(result.format(), `SELECT "field"->>'element',"field"#>>'{array,0}',"field"#>>'{array,1,nested,2,element}' FROM testsource WHERE TRUE ORDER BY 1`);
     });
 
+    it('should alias fields in document mode', function () {
+      const result = new Select(source, {}, {
+        fields: ['one', 'two'],
+        document: true
+      });
+
+      assert.equal(result.format(), `SELECT "body"->>'one' AS "one","body"->>'two' AS "two",id FROM testsource WHERE TRUE ORDER BY 1`);
+    });
+
     it('should add expressions', function () {
       const result = new Select(source, {}, {
         exprs: {
@@ -75,7 +84,7 @@ describe('Select', function () {
         }
       });
 
-      assert.equal(result.format(), 'SELECT col1 + col2 AS colsum,col1 - col2 AS coldiff FROM testsource WHERE TRUE ORDER BY 1');
+      assert.equal(result.format(), 'SELECT col1 + col2 AS "colsum",col1 - col2 AS "coldiff" FROM testsource WHERE TRUE ORDER BY 1');
     });
 
     it('should add fields and expressions', function () {
@@ -87,7 +96,7 @@ describe('Select', function () {
         }
       });
 
-      assert.equal(result.format(), 'SELECT "col1","col2",col1 + col2 AS colsum,col1 - col2 AS coldiff FROM testsource WHERE TRUE ORDER BY 1');
+      assert.equal(result.format(), 'SELECT "col1","col2",col1 + col2 AS "colsum",col1 - col2 AS "coldiff" FROM testsource WHERE TRUE ORDER BY 1');
     });
 
     it('should add an offset', function () {
