@@ -2,8 +2,27 @@
 
 const where = require('../../lib/statement/where');
 const ops = require('../../lib/statement/operations');
+const parseKey = require('../../lib/util/parse-key');
 
 describe('WHERE clause generation', function () {
+  /**
+   * Helper for generating conditions in WHERE clause testing.
+   *
+   * @param {String} key - The key and optional operation.
+   * @param {Any} value - The value being tested in the predicate.
+   * @param {Integer} offset - The condition offset.
+   * @param {Array} params - This may not be needed TODO
+   * @returns {Object} A condition object.
+   */
+  function getCondition (key, value, offset, params) {
+    const condition = parseKey(key, ops);
+    condition.value = value;
+    condition.offset = offset;
+    condition.params = params;
+
+    return condition;
+  }
+
   describe('module', function () {
     it('should return a safe value for empty criteria', function () {
       const result = where({});
@@ -150,15 +169,7 @@ describe('WHERE clause generation', function () {
 
   describe('tableGenerator', function () {
     it('should add values to params', function () {
-      const condition = {
-        field: '"field"',
-        appended: {
-          operator: '='
-        },
-        value: 'value',
-        offset: 1,
-        params: []
-      };
+      const condition = getCondition('field', 'value', 1, []);
       const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" = $1');
       assert.equal(result.params.length, 1);
@@ -166,20 +177,13 @@ describe('WHERE clause generation', function () {
     });
 
     it('should apply mutators', function () {
-      const condition = {
-        field: '"field"',
-        appended: {
-          operator: '=',
-          mutator: cond => {
-            cond.value = 'hi!';
+      const condition = getCondition('field', 'value', 1, []);
+      condition.appended.mutator = cond => {
+        cond.value = 'hi!';
 
-            return cond;
-          }
-        },
-        value: 'value',
-        offset: 1,
-        params: []
+        return cond;
       };
+
       const result = where.tableGenerator(condition);
       assert.equal(result.predicate, '"field" = hi!');
       assert.equal(result.params.length, 0);
@@ -189,22 +193,22 @@ describe('WHERE clause generation', function () {
   describe('docGenerator', function () {
     it('should build deep traversals', function () {
       const obj = {field: [{one: 'two'}]};
-      const condition = {rawField: 'field', appended: ops('='), value: [{one: 'two'}], offset: 1, params: []};
+      const condition = getCondition('field', [{one: 'two'}], 1, []);
       const result = where.docGenerator(condition, obj);
       assert.equal(result.predicate, '"body" @> $1');
       assert.equal(result.params.length, 1);
       assert.equal(result.params[0], JSON.stringify(obj));
     });
 
-    it('should create IS comparison predicate', function () {
-      const condition = {rawField: 'field', appended: ops('is'), value: true, offset: 1, params: []};
+    it('should create an IS comparison predicate', function () {
+      const condition = getCondition('field is', true, 1, []);
       const result = where.docGenerator(condition, {'field is': true});
       assert.equal(result.predicate, '("body" ->> \'field\') IS true');
       assert.equal(result.params.length, 0);
     });
 
     it('should build an equality predicate using the JSON contains op', function () {
-      const condition = {rawField: 'field', appended: ops('='), value: 'value', offset: 1, params: []};
+      const condition = getCondition('field', 'value', 1, []);
       const result = where.docGenerator(condition, {field: 'value'});
       assert.equal(result.predicate, '"body" @> $1');
       assert.equal(result.params.length, 1);
@@ -212,7 +216,7 @@ describe('WHERE clause generation', function () {
     });
 
     it('should build a non-equality predicate', function () {
-      const condition = {rawField: 'field', appended: ops('<>'), value: 'value', offset: 1, params: []};
+      const condition = getCondition('field <>', 'value', 1, []);
       const result = where.docGenerator(condition, {'field <>': 'value'});
       assert.equal(result.predicate, '("body" ->> \'field\') <> $1');
       assert.equal(result.params.length, 1);
@@ -220,14 +224,14 @@ describe('WHERE clause generation', function () {
     });
 
     it('should cast booleans in non-equality predicates', function () {
-      const condition = {rawField: 'field', appended: ops('<>'), value: true, offset: 1, params: []};
+      const condition = getCondition('field <>', true, 1, []);
       const result = where.docGenerator(condition, {'field <>': true});
       assert.equal(result.predicate, '("body" ->> \'field\')::boolean <> true');
       assert.equal(result.params.length, 0);
     });
 
     it('should cast numbers in non-equality predicates', function () {
-      const condition = {rawField: 'field', appended: ops('<>'), value: 123.45, offset: 1, params: []};
+      const condition = getCondition('field <>', 123.45, 1, []);
       const result = where.docGenerator(condition, {'field <>': 123.45});
       assert.equal(result.predicate, '("body" ->> \'field\')::decimal <> 123.45');
       assert.equal(result.params.length, 0);
@@ -235,7 +239,7 @@ describe('WHERE clause generation', function () {
 
     it('should cast dates in non-equality predicates', function () {
       const date = new Date();
-      const condition = {rawField: 'field', appended: ops('<>'), value: date, offset: 1, params: []};
+      const condition = getCondition('field <>', date, 1, []);
       const result = where.docGenerator(condition, {'field <>': date});
       assert.equal(result.predicate, '("body" ->> \'field\')::timestamptz <> $1');
       assert.equal(result.params.length, 1);
@@ -243,9 +247,27 @@ describe('WHERE clause generation', function () {
     });
 
     it('should create IN clauses for array parameters', function () {
-      const condition = {rawField: 'field', appended: ops('='), value: ['value1', 'value2'], offset: 1, params: []};
+      const condition = getCondition('field', ['value1', 'value2'], 1, []);
       const result = where.docGenerator(condition, {field: ['value1', 'value2']});
       assert.equal(result.predicate, '("body" ->> \'field\') IN ($1,$2)');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value1');
+      assert.equal(result.params[1], 'value2');
+    });
+
+    it('should traverse JSON with ->>', function () {
+      const condition = getCondition('field', ['value1', 'value2'], 1, []);
+      const result = where.docGenerator(condition, {field: ['value1', 'value2']});
+      assert.equal(result.predicate, '("body" ->> \'field\') IN ($1,$2)');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value1');
+      assert.equal(result.params[1], 'value2');
+    });
+
+    it('should use pathing operator #>> for nested values', function () {
+      const condition = getCondition('field.one.two', ['value1', 'value2'], 1, []);
+      const result = where.docGenerator(condition, {field: ['value1', 'value2']});
+      assert.equal(result.predicate, '("body" #>> \'{field,one,two}\') IN ($1,$2)');
       assert.equal(result.params.length, 2);
       assert.equal(result.params[0], 'value1');
       assert.equal(result.params[1], 'value2');
