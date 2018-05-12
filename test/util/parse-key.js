@@ -23,48 +23,56 @@ describe('parseKey', function () {
       const result = parseKey('json.property');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"->>\'property\'');
+      assert.deepEqual(result.elements, ['property']);
     });
 
     it('should format a shallow JSON path with a numeric key', function () {
       const result = parseKey('json.123');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"->>\'123\'');
+      assert.deepEqual(result.elements, ['123']);
     });
 
     it('should format a JSON array path', function () {
       const result = parseKey('json[123]');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"->>123');
+      assert.deepEqual(result.elements, ['123']);
     });
 
     it('should format a deep JSON path', function () {
       const result = parseKey('json.outer.inner');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"#>>\'{outer,inner}\'');
+      assert.deepEqual(result.elements, ['outer', 'inner']);
     });
 
     it('should format a JSON path with a quoted field', function () {
       const result = parseKey('"json field".outer.inner');
       assert.equal(result.rawField, 'json field');
       assert.equal(result.field, '"json field"#>>\'{outer,inner}\'');
+      assert.deepEqual(result.elements, ['outer', 'inner']);
     });
 
     it('should format a JSON path with a quoted field containing special characters', function () {
       const result = parseKey('"json.fiel[d]".outer.inner');
       assert.equal(result.rawField, 'json.fiel[d]');
       assert.equal(result.field, '"json.fiel[d]"#>>\'{outer,inner}\'');
+      assert.deepEqual(result.elements, ['outer', 'inner']);
     });
 
     it('should format a deep JSON path with numeric keys', function () {
       const result = parseKey('json.123.456');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"#>>\'{123,456}\'');
+      assert.deepEqual(result.elements, ['123', '456']);
     });
 
     it('should format mixed JSON paths', function () {
       const result = parseKey('json.array[1].field.array[2]');
       assert.equal(result.rawField, 'json');
       assert.equal(result.field, '"json"#>>\'{array,1,field,array,2}\'');
+      assert.deepEqual(result.elements, ['array', '1', 'field', 'array', '2']);
     });
   });
 

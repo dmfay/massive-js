@@ -16,6 +16,43 @@ Standard table functions still work on document tables, and can be quite useful 
 
 `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
 
+### A Note About Criteria
+
+Document criteria can be a little more complex to work with. When possible, Massive tries to use a "contains" (`@>`) operator in order to leverage the index on the document body. Example criteria objects are below.
+
+```javascript
+// A criteria object testing top-level keys uses the index
+db.docs.findDoc({
+  field1: 'value',
+  'field2 !=': value
+});
+
+// Matching nested values exactly also uses the index, although
+// combining multiple top-level conditions like this is less
+// efficient. Note that operations cannot be used with the
+// inner values -- only equality!
+db.docs.findDoc({
+  objectfield: {
+    innervalue: 123
+  },
+  arrayfield: [
+    {'return': 'all docs where arrayfield contains this pair'}
+  ]
+});
+
+// Testing values with IN does _not_ use the index
+db.docs.findDoc({
+  'field1 IN': [1, 2, 3]
+});
+
+// Traversal for operations does _not_ use the index
+db.docs.findDoc({
+  'outer.inner <>': 'nested value'
+});
+```
+
+Be careful with criteria which cannot use the index since they may result in poorly-performing queries with sufficiently large tables.
+
 ### db.saveDoc
 
 The connected database instance has a `saveDoc` function. Passed a collection name (which can include a non-public schema) and a JavaScript object, this will create the table if it doesn't already exist and write the object to it.

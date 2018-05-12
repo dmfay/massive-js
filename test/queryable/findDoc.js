@@ -118,6 +118,12 @@ describe('findDoc', function () {
       });
     });
 
+    it('gets results from dual contains criteria', function () {
+      return db.docs.findDoc({nested: {id: 1}, studios: [{name: 'Warner'}]}).then(docs => {
+        assert.lengthOf(docs, 1);
+      });
+    });
+
     it('works properly with dates', function () {
       return db.docs.findDoc({'created_at <': new Date(1980, 1, 1)}).then(docs => {
         assert.lengthOf(docs, 1);
@@ -127,6 +133,20 @@ describe('findDoc', function () {
     it('works properly with timestamp including time zone', function () {
       return db.docs.findDoc({'created_at >': new Date('2015-03-04T09:00:00.000Z')}).then(docs => {
         assert.lengthOf(docs, 3);
+      });
+    });
+
+    it('finds by nested fields', function () {
+      return db.docs.findDoc({'nested.id': 1}).then(docs => {
+        assert.lengthOf(docs, 1);
+        assert.equal(docs[0].title, 'Something Else');
+      });
+    });
+
+    it('finds by nested fields with operations', function () {
+      return db.docs.findDoc({'nested.id >': 0}).then(docs => {
+        assert.lengthOf(docs, 1);
+        assert.equal(docs[0].title, 'Something Else');
       });
     });
   });
