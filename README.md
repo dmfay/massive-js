@@ -391,25 +391,25 @@ db.test_attributes.saveDoc(attributes)
   .then(attributes => {...});
 ```
 
-Note that `saveDoc` replaces the _entire_ document. To change fields without having to retrieve the document, use `modify`:
+Note that `saveDoc` replaces the _entire_ document. To change fields without having to retrieve the document, use `updateDoc`:
 
 ```javascript
-db.test_attributes.modify(1, {
+db.test_attributes.updateDoc(1, {
   requiresAuthentication: false
 }).then(attributes => {...});
 ```
 
-`modify`, like `saveDoc`, returns the current version of the entire document. `modify` can also perform bulk operations with a criteria object and a changes object, just like the relational `update`:
+`updateDoc`, like `saveDoc`, returns the current version of the entire document. `updateDoc` can also perform bulk operations with a criteria object and a changes object, just like the relational `update`:
 
 ```javascript
-db.test_attributes.modify({
+db.test_attributes.updateDoc({
   web: true
 }, {
   browser: 'Chrome'
 }).then(changedAttributesDocs => {...});
 ```
 
-When changing multiple documents, `modify` returns an array containing all updated documents.
+When changing multiple documents, `updateDoc` returns an array containing all updated documents.
 
 ### Accessing the Driver
 
