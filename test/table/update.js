@@ -11,11 +11,33 @@ describe('update', function () {
     return db.instance.$pool.end();
   });
 
-  it('updates multiple normal_pk', function () {
-    return db.normal_pk.update({'id >': 2}, {field1: 'zeta'}).then(res => {
+  it('does nothing without changes and returns an array', function () {
+    return db.normal_pk.update({id: 1}, {}).then(res => {
+      assert.equal(res.length, 1);
+      assert.equal(res[0].id, 1);
+      assert.equal(res[0].field1, 'alpha');
+    });
+  });
+
+  it('does nothing without changes and returns an object for unary updates', function () {
+    return db.normal_pk.update(1, {}).then(res => {
+      assert.equal(res.id, 1);
+      assert.equal(res.field1, 'alpha');
+    });
+  });
+
+  it('updates a single record by primary key', function () {
+    return db.normal_pk.update(1, {field1: 'zeta'}).then(res => {
+      assert.equal(res.id, 1);
+      assert.equal(res.field1, 'zeta');
+    });
+  });
+
+  it('updates records by criteria', function () {
+    return db.normal_pk.update({'id >': 2}, {field1: 'eta'}).then(res => {
       assert.equal(res.length, 1);
       assert.equal(res[0].id, 3);
-      assert.equal(res[0].field1, 'zeta');
+      assert.equal(res[0].field1, 'eta');
     });
   });
 

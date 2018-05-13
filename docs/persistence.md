@@ -109,7 +109,7 @@ db.tests.insert({
 
 ## update
 
-`update` alters existing records in a table, given a criteria object and a map of column names to the new values. It returns a promise for an array containing the updated records.
+`update` alters existing records in a table, given a criteria object (or unary primary key) and a map of column names to the new values. It returns a promise for an array containing the updated record(s) if passed a criteria object, or a promise for an object if passed a primary key.
 
 ```javascript
 db.tests.update({

@@ -192,7 +192,7 @@ db.tests.insert({
 }).then(test => {...});
 ```
 
-Last bit of housekeeping: `alice` still doesn't have a role, however, and we may have added more users without roles as well. Let's perform a bulk update to ensure that we're giving people the right access levels:
+Last bit of housekeeping: `alice` still doesn't have a role, and we may have added more users without roles as well. Let's perform a bulk update to ensure that we're giving people the right access levels:
 
 ```javascript
 db.auth.users.update({
