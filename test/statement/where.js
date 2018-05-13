@@ -11,14 +11,13 @@ describe('WHERE clause generation', function () {
    * @param {String} key - The key and optional operation.
    * @param {Any} value - The value being tested in the predicate.
    * @param {Integer} offset - The condition offset.
-   * @param {Array} params - This may not be needed TODO
    * @returns {Object} A condition object.
    */
-  function getCondition (key, value, offset, params) {
+  function getCondition (key, value, offset) {
     const condition = parseKey(key, ops);
     condition.value = value;
     condition.offset = offset;
-    condition.params = params;
+    condition.params = [];
 
     return condition;
   }
