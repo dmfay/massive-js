@@ -2,7 +2,7 @@
 
 Database transactions batch multiple statements in an all-or-nothing group: if any individual statement fails to complete, the whole set is rolled back -- as if none of them had ever executed in the first place. Only when the final statement has completed can the transaction be _committed_ into the database. This allows complex workflows to be broken apart and processed safely.
 
-Script files and functions execute in a single transaction naturally, but working with Massive's queryable and table API requires invoking `db.withTransaction` with a callback function containing the statements to be executed inside the transaction scope.
+Script files and functions execute in a single transaction naturally, but working with Massive's queryable and table API requires invoking `db.withTransaction` with a callback function containing the statements to be executed inside the transaction scope. The callback takes an argument `tx` which is a copy of the `db` object, with all your tables, views, functions, and scripts attached, but which directs all statements through the transaction.
 
 ```javascript
 db.withTransaction(tx => {
