@@ -60,16 +60,23 @@ describe('updateDoc', function () {
   });
 
   it('works with non-document json fields by id', function () {
-    return db.products.updateDoc(2, {appliedCriteria: true}, 'specs').then(product => {
+    return db.products.updateDoc(2, {appliedCriteria: true}, {body: 'specs'}).then(product => {
       assert.isOk(product);
       assert.isTrue(product.specs.appliedCriteria);
     });
   });
 
   it('works with non-document json fields by *row* criteria', function () {
-    return db.products.updateDoc({id: 3}, {appliedCriteria: true}, 'specs').then(products => {
+    return db.products.updateDoc({id: 3}, {appliedCriteria: true}, {body: 'specs'}).then(products => {
       assert.lengthOf(products, 1);
       assert.isTrue(products[0].specs.appliedCriteria);
+    });
+  });
+
+  it('accepts options', function () {
+    return db.products.updateDoc({id: 2}, {something: 'else'}, {build: true}).then(res => {
+      assert.equal(res.sql, 'UPDATE "products" SET "body" = COALESCE("body", \'{}\'::jsonb) || $1 WHERE "body" @> $2 RETURNING *;');
+      assert.deepEqual(res.params, [JSON.stringify({something: 'else'}), JSON.stringify({id: 2})]);
     });
   });
 });
