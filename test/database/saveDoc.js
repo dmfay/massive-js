@@ -26,6 +26,8 @@ describe('saveDoc', function () {
       }).then(doc => {
         assert.equal(doc.title, 'Alone');
         assert.equal(doc.id, 1);
+        assert.isOk(doc.created_at);
+        assert.notOk(doc.updated_at);
       });
     });
 
@@ -40,6 +42,8 @@ describe('saveDoc', function () {
 
       assert.equal(doc.title, 'Alone');
       assert.isOk(doc.id);
+      assert.isOk(doc.created_at);
+      assert.notOk(doc.updated_at);
 
       doc.title = 'Together!';
 
@@ -47,10 +51,38 @@ describe('saveDoc', function () {
 
       assert.equal(updated.id, doc.id);
       assert.equal(updated.title, 'Together!');
+      assert.isOk(updated.created_at);
+      assert.isOk(updated.updated_at);
 
       const retrieved = yield db.docs.findDoc(doc.id);
 
       assert.equal(retrieved.title, 'Together!');
+    });
+
+    it('pulls metadata off the actual jsonb field', function* () {
+      let doc = yield db.saveDoc('docs', {
+        one: 1
+      });
+
+      assert.isOk(doc.id);
+      assert.isOk(doc.created_at);
+      assert.notOk(doc.updated_at);
+      assert.equal(doc.one, 1);
+
+      doc.two = 2;
+
+      doc = yield db.saveDoc('docs', doc);
+
+      assert.isOk(doc.id);
+      assert.isOk(doc.created_at);
+      assert.isOk(doc.updated_at);
+      assert.equal(doc.one, 1);
+      assert.equal(doc.two, 2);
+
+      const row = yield db.docs.findOne(doc.id);
+
+      assert.isOk(row);
+      assert.deepEqual(row.body, {one: 1, two: 2});
     });
   });
 
