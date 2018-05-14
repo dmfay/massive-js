@@ -5,7 +5,7 @@ describe('updateDoc', function () {
   let newDoc = {};
 
   before(function () {
-    return resetDb('data-docs-products')
+    return resetDb('singletable')
       .then(instance => db = instance)
       .then(() => {
         return db.saveDoc('docs', {name: 'foo'});
@@ -23,13 +23,8 @@ describe('updateDoc', function () {
     return db.docs.updateDoc(newDoc.id, {score: 99}).then(doc => {
       assert.equal(doc.name, 'foo');
       assert.equal(doc.score, 99);
-    });
-  });
-
-  it('updates the document', function () {
-    return db.docs.updateDoc(newDoc.id, {score: 100}).then(doc => {
-      assert.equal(doc.name, 'foo');
-      assert.equal(doc.score, 100);
+      assert.isOk(doc.updated_at);
+      assert.isOk(doc.updated_at);
     });
   });
 
@@ -72,7 +67,7 @@ describe('updateDoc', function () {
   });
 
   it('works with non-document json fields by *row* criteria', function () {
-    return db.products.updateDoc({name: 'Product 3'}, {appliedCriteria: true}, 'specs').then(products => {
+    return db.products.updateDoc({id: 3}, {appliedCriteria: true}, 'specs').then(products => {
       assert.lengthOf(products, 1);
       assert.isTrue(products[0].specs.appliedCriteria);
     });
