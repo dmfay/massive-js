@@ -1,6 +1,8 @@
 # Resultset Decomposition
 
-The `decompose` option takes a schema which represents the desired output structure. A schema is a JavaScript object with a few specific properties, and which may contain further schemas.
+Views, scripts, and functions can return results from multiple tables. These complex resultsets often contain duplicate information if a `JOIN` is involved. For example, a query which joins `users` with the `tests` each has begun will return as many rows _per user_ as each user has tests. These redundancies can be difficult to work with in code.
+
+The `decompose` option can be used to transform complex resultsets into a more friendly form. In the users-tests example, this would take the shape of an array of users, where each user has an array of tests. In order to accomplish the transformation, you have to provide a _schema_ as the option value. This schema is a JavaScript object with a few specific properties:
 
 * `pk` (for "primary key") specifies the field in the resultset which uniquely identifies the entity represented by this schema. Decomposition currently only supports unary primary keys and does not work with compound keys.
 * `columns` is either a map of fields in the resultset (keys) to fields in the output entity (values), or an array of field names if they do not need to be transformed.
