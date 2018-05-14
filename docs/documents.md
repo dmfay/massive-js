@@ -146,9 +146,9 @@ db.reports.saveDoc({
 
 ### updateDoc
 
-`updateDoc` adds and updates fields in an existing document or documents _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `updateDoc` takes an ID or criteria object, a changes object, and an optional name for the JSON or JSONB column.
+`updateDoc` adds and updates fields in an existing document or documents _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `updateDoc` requires an ID or criteria object and a changes object, with optional options.
 
-This function may be used with any JSON or JSONB column, not just with document tables, but the behavior is slightly different. With document tables, criteria objects will be tested against the document body; with other tables, they will be tested against the row. Likewise, the promise returned will be for the updated document with a document table, or for the entire row with another table.
+`updateDoc` may be used to alter values in any JSON or JSONB column, not just with document tables. However, if the JSON column name is overridden by passing `options.body`, there is an important change in behavior. Criteria are normally applied against the document body as with other document methods; however, when a new `body` is specified, criteria will be tested against the row as with other _table_ methods. Likewise, the promise returned will be for the updated document with a document table, or for the entire row when `updateDoc` is invoked against another table.
 
 ```javascript
 db.reports.updateDoc(1, {
@@ -161,11 +161,13 @@ db.products.updateDoc({
   type: 'widget'
 }, {
   colors: ['gray', 'purple', 'red']
-}, 'info').then(widgets => {
-  // an array of widgets, now in at least three colors.
-  // since products is not a document table (note the
-  // 'info' field was specified to update), the 'type'
-  // is tested against a column named type rather than
-  // a key in the info JSON or JSONB column.
+}, {
+  body: 'info'
+}).then(widgets => {
+  // an array of widgets, now in at least three colors; since
+  // products is not a document table (note the 'info' field
+  // was specified to update), the 'type' is tested against a
+  // column named type rather than a key in the info JSON or
+  // JSONB column.
 });
 ```
