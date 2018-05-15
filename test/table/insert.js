@@ -40,7 +40,7 @@ describe('insert', function () {
     });
   });
 
-  it('throws when a partial record excludes a constrained field', function () {
+  it('rejects when a partial record excludes a constrained field', function () {
     return db.products.insert([
       {tags: ['this has a tag']},
       {description: 'this has a description', price: 1.23}
@@ -103,5 +103,33 @@ describe('insert', function () {
         params: ['fifteen']
       });
     });
+  });
+
+  it('rejects if not insertable', function* () {
+    let caught = false;
+
+    try {
+      db.products.insertable = false;
+
+      yield db.products.insert({string: 'sixteen'});
+    } catch (err) {
+      caught = true;
+
+      assert.equal(err.message, 'products is not writable');
+    } finally {
+      db.products.insertable = true;
+
+      if (!caught) {
+        assert.fail();
+      }
+    }
+  });
+
+  it('rejects if no data', function () {
+    return db.products.insert()
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'Must provide data to insert');
+      });
   });
 });

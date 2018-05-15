@@ -11,8 +11,8 @@ describe('decomposing results', function () {
     return db.instance.$pool.end();
   });
 
-  it('throws when decomposing a null pk', function* () {
-    return yield db.query('SELECT * FROM users LEFT JOIN users ON TRUE', {
+  it('rejects when decomposing a null pk', function () {
+    return db.query('SELECT * FROM users LEFT JOIN users ON TRUE', {
       decompose: {
         pk: 'id',
         columns: {
