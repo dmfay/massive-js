@@ -56,6 +56,7 @@
 <li><strong>Low overhead</strong>: An API built from your schema means no model classes to maintain, super-simple bulk operations, and writing directly to tables without any need to create or load entity instances beforehand.</li>
 <li><strong>Document storage</strong>: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.</li>
 <li><strong>Relational awareness</strong>: Massive does not traverse relationships or build model graphs, but <a href="https://dmfay.github.io/massive-js/persistence.html#deep-insert">deep inserts</a> can create related entities and junctions transactionally, and the <a href="https://dmfay.github.io/massive-js/options.html#decomposition-schemas"><code>decompose</code> option</a> allows you to map the results of complex views and scripts to nested object trees.</li>
+<li><strong>Transactions</strong>: New in v5, use <code>db.withTransaction</code> to execute a callback with full Massive API support in a transaction scope, getting a promise which fulfills if it commits or rejects if it rolls back.</li>
 <li><strong>Postgres everything</strong>: Commitment to a single RDBMS lets us use it to its full potential. Massive supports array fields and operations, regular expression matching, foreign tables, materialized views, and more features found in PostgreSQL but not in other databases.</li>
 </ul>
 <h2>Full Documentation</h2><p><a href="https://dmfay.github.io/massive-js/">Full documentation including API docs is available on GitHub Pages.</a></p>
@@ -152,27 +153,26 @@ massive({
 <h3>A Brief Example</h3><p>Let's say we have a database for a software testing application. This database contains a <code>tests</code> table and an <code>issues</code> table, where one test may have many issues. In a separate <code>auth</code> schema, it contains a <code>users</code> table referenced by the others to represent a user running a test and discovering issues. There is a <code>test_stats</code> view which calculates statistics on aggregate issue information for individual tests, and a <code>user_tests</code> view which returns all users with their associated tests; and there is a <code>copy_tests</code> function which clones a test for reuse.</p>
 <p>Our testing application can leverage the API Massive builds for almost everything it needs to do, but there is one feature that we haven't been able to integrate as a database function yet: the ability to, in one call, clear a test's issues and update its status to signify that it has been restarted. Eventually, we'll get there, but for now it's a SQL script in our application's <code>/db</code> directory, <code>resetTest.sql</code>.</p>
 <h4>Persistence</h4><p>After we initialize and connect Massive, all these entities are available on the instance. First, we need to create a user:</p>
-<pre class="prettyprint source lang-javascript"><code>db.auth.users.insert({
+<pre class="prettyprint source lang-javascript"><code>db.auth.users.save({
   username: 'alice',
   password: 'supersecure'
 }).then(alice => {...});</code></pre><p><code>alice</code> is a JavaScript object containing the username and password we specified. But our <code>users</code> table has more columns than that: first and foremost, there's a primary key, an <code>id</code> column, which uniquely identifies this user record. A user also has a <code>role</code>, a <code>created_at</code> timestamp defaulting to the current date on insert, and an <code>updated_at</code> timestamp to track when the record was last modified. So in addition to the fields we provided, <code>alice</code> has an <code>id</code>, a <code>role</code>, a <code>created_at</code>, and an <code>updated_at</code>. Since we didn't specify values for <code>role</code> or <code>updated_at</code>, these are <code>null</code>.</p>
-<p>When Alice resets her password, we issue an <code>update</code>:</p>
-<pre class="prettyprint source lang-javascript"><code>db.auth.users.update({
+<p>When Alice resets her password, we issue a <code>save</code> again, including <code>alice</code>'s primary key value:</p>
+<pre class="prettyprint source lang-javascript"><code>db.auth.users.save({
   id: 1,
   password: 'evenmoresecure'
-}).then(alice => {...});</code></pre><p>The <code>update</code> will search by the primary key in the object and modify only those fields we include. Since Alice's username isn't changing, we don't need to include that in the object we're passing. However, it won't hurt anything if we do, so we could have simply modified the original <code>alice</code> object and passed that in instead.</p>
-<p><code>alice</code> still doesn't have a role, however, and we may have added more users without roles as well. Let's perform a bulk update to ensure that users have a minimal level of access:</p>
-<pre class="prettyprint source lang-javascript"><code>db.auth.users.update({
-  'role is': null
-}, {
-  role: 'tester'
-}).then(users => {...});</code></pre><p>Now that <code>alice</code> exists in the system and has the correct role, she can start a test. When working with tests, however, we'd rather be a little more efficient and not have separate <code>insert</code> and <code>update</code> paths. We can create or retrieve a <code>test</code> object and perform an upsert -- creating it if it doesn't exist, or modifying it if it does -- using the <code>save</code> function:</p>
-<pre class="prettyprint source lang-javascript"><code>db.tests.save({
+}).then(alice => {...});</code></pre><p>The <code>save</code> will search by the primary key in the object and modify only those fields we include. Since Alice's username isn't changing, we don't need to include that in the object we're passing. However, it won't hurt anything if we do, so we could have simply modified the original <code>alice</code> object and passed that in instead.</p>
+<p>Now that <code>alice</code> exists in the system, she can start a test. However, we don't want to bother with updating those from the same code path. <code>insert</code> will take care of that:</p>
+<pre class="prettyprint source lang-javascript"><code>db.tests.insert({
   name: 'application homepage',
   url: 'http://www.example.com',
   user_id: alice.id
-}).then(test => {...});</code></pre><p>Had we already had a test and specified its id, we'd have updated that record. Since we didn't, we have a new test instead.</p>
-<h4>Retrieval</h4><p>Some time later, we want to retrieve that test. But we don't have the object returned from <code>save</code>, so we need to go back to the database with the primary key:</p>
+}).then(test => {...});</code></pre><p>Last bit of housekeeping: <code>alice</code> still doesn't have a role, and we may have added more users without roles as well. Let's perform a bulk update to ensure that we're giving people the right access levels:</p>
+<pre class="prettyprint source lang-javascript"><code>db.auth.users.update({
+  'role is': null
+}, {
+  role: 'default'
+}).then(users => {...});</code></pre><h4>Retrieval</h4><p>Some time later, we want to retrieve that test. But we don't have the object returned from <code>save</code>, so we need to go back to the database with the primary key:</p>
 <pre class="prettyprint source lang-javascript"><code>db.tests.findOne(1).then(test => {...});</code></pre><p>In the mean time, Alice has been busy and discovered several problems which are now stored in the <code>issues</code> table. We can see how many she's found with <code>count</code>:</p>
 <pre class="prettyprint source lang-javascript"><code>db.issues.count({test_id: 1}).then(total => {...});</code></pre><p>Since Postgres' <code>count</code> returns a 64-bit integer and JavaScript only handles up to 53 bits, <code>total</code> will actually be a string. But thanks to JavaScript's weak typing this generally doesn't matter. Next, let's actually pull out the issue data:</p>
 <pre class="prettyprint source lang-javascript"><code>db.issues.find({
@@ -287,15 +287,15 @@ db.test_attributes.findDoc({web: true})
 <pre class="prettyprint source lang-javascript"><code>attributes.requiresAuthentication = true;
 
 db.test_attributes.saveDoc(attributes)
-  .then(attributes => {...});</code></pre><p>Note that <code>saveDoc</code> replaces the <em>entire</em> document. To change fields without having to retrieve the document, use <code>modify</code>:</p>
-<pre class="prettyprint source lang-javascript"><code>db.test_attributes.modify(1, {
+  .then(attributes => {...});</code></pre><p>Note that <code>saveDoc</code> replaces the <em>entire</em> document. To change fields without having to retrieve the document, use <code>updateDoc</code>:</p>
+<pre class="prettyprint source lang-javascript"><code>db.test_attributes.updateDoc(1, {
   requiresAuthentication: false
-}).then(attributes => {...});</code></pre><p><code>modify</code>, like <code>saveDoc</code>, returns the current version of the entire document. <code>modify</code> can also perform bulk operations with a criteria object and a changes object, just like the relational <code>update</code>:</p>
-<pre class="prettyprint source lang-javascript"><code>db.test_attributes.modify({
+}).then(attributes => {...});</code></pre><p><code>updateDoc</code>, like <code>saveDoc</code>, returns the current version of the entire document. <code>updateDoc</code> can also perform bulk operations with a criteria object and a changes object, just like the relational <code>update</code>:</p>
+<pre class="prettyprint source lang-javascript"><code>db.test_attributes.updateDoc({
   web: true
 }, {
   browser: 'Chrome'
-}).then(changedAttributesDocs => {...});</code></pre><p>When changing multiple documents, <code>modify</code> returns an array containing all updated documents.</p>
+}).then(changedAttributesDocs => {...});</code></pre><p>When changing multiple documents, <code>updateDoc</code> returns an array containing all updated documents.</p>
 <h3>Accessing the Driver</h3><p>Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's <code>db.query</code> for arbitrary SQL. In the same vein, Massive exposes the <a href="https://github.com/vitaly-t/pg-promise">pg-promise</a> driver (as <code>db.pgp</code>) and connected <a href="http://vitaly-t.github.io/pg-promise/Database.html">Database</a> instance (as <code>db.instance</code>) so client code can easily use its lower-level functions when necessary.</p>
 <h2>REPL</h2><p>Massive.js ships with a REPL (read-evaluate-print loop), an interactive console that lets you connect to a database and execute JavaScript code. The easiest way to run it is to install globally:</p>
 <pre class="prettyprint source"><code>npm i -g massive</code></pre><p>You can then fire up a connection and start writing JavaScript:</p>
@@ -327,7 +327,7 @@ db > db.tests.find({user_id: 1}).then(tests => {...});</code></pre><p>In additio
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 21 2018 20:58:09 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
