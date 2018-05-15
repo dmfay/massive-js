@@ -19,7 +19,7 @@ describe('save', function () {
     });
   });
 
-  it('throws when updating a record with operations in the pk field', function () {
+  it('rejects when updating a record with operations in the pk field', function () {
     return db.normal_pk.save({
       'id <': 123,
       field1: 'something'
@@ -50,7 +50,7 @@ describe('save', function () {
     });
   });
 
-  it('throws if inserting into a table with no key', function () {
+  it('rejects if inserting into a table with no key', function () {
     return db.no_pk.save({field1: 'eta', field2: 'theta'}).then(() => {
       assert.fail();
     }).catch(err => {
@@ -111,5 +111,21 @@ describe('save', function () {
         params: ['omega', 1]
       });
     });
+  });
+
+  it('rejects if changes are not an object', function () {
+    return db.normal_pk.save('eta')
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'Must provide an object with all fields being modified and the primary key if updating');
+      });
+  });
+
+  it('rejects if changes are an array', function () {
+    return db.normal_pk.save([{id: 1, field1: 'zeta'}])
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'Must provide an object with all fields being modified and the primary key if updating');
+      });
   });
 });

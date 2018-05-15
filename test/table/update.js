@@ -79,4 +79,40 @@ describe('update', function () {
       });
     });
   });
+
+  it('rejects if not insertable', function* () {
+    let caught = false;
+
+    try {
+      db.normal_pk.insertable = false;
+
+      yield db.normal_pk.update({id: 1}, {field1: 'theta'});
+    } catch (err) {
+      caught = true;
+
+      assert.equal(err.message, 'normal_pk is not writable');
+    } finally {
+      db.normal_pk.insertable = true;
+
+      if (!caught) {
+        assert.fail();
+      }
+    }
+  });
+
+  it('rejects if changes are not an object', function () {
+    return db.normal_pk.update({id: 1}, 'eta')
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'Update requires a hash of fields=>values to update to');
+      });
+  });
+
+  it('rejects if changes are an array', function () {
+    return db.normal_pk.update({id: 1}, ['eta'])
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'Update requires a hash of fields=>values to update to');
+      });
+  });
 });
