@@ -23,9 +23,17 @@ describe('updateDoc', function () {
     return db.docs.updateDoc(newDoc.id, {score: 99}).then(doc => {
       assert.equal(doc.name, 'foo');
       assert.equal(doc.score, 99);
-      assert.isOk(doc.updated_at);
+      assert.isOk(doc.created_at);
       assert.isOk(doc.updated_at);
     });
+  });
+
+  it('updates the search vector', function* () {
+    yield db.docs.updateDoc(newDoc.id, {field: 'value', nested: {something: 'else'}});
+
+    const record = yield db.docs.findOne(newDoc.id);
+
+    assert.isOk(record.search);
   });
 
   it('sets null', function () {

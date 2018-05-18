@@ -29,6 +29,14 @@ describe('searchDoc', function () {
     });
   });
 
+  it('works on all fields', function () {
+    return db.docs.searchDoc({
+      term: 'Else'
+    }).then(docs => {
+      assert.lengthOf(docs, 1);
+    });
+  });
+
   it('returns multiple results', function () {
     return db.docs.searchDoc({
       fields: ['title'],

@@ -8,6 +8,17 @@ CREATE TABLE docs(
   updated_at timestamptz
 );
 
+CREATE OR REPLACE FUNCTION massive_document_inserted()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY definer
+AS $$
+BEGIN
+  NEW.search = to_tsvector(NEW.body);
+  RETURN NEW;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION massive_document_updated()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -15,9 +26,14 @@ SECURITY definer
 AS $$
 BEGIN
   NEW.updated_at = now();
+  NEW.search = to_tsvector(NEW.body);
   RETURN NEW;
 END;
 $$;
+
+CREATE TRIGGER public_docs_inserted
+BEFORE INSERT ON public.docs
+FOR EACH ROW EXECUTE PROCEDURE massive_document_inserted();
 
 CREATE TRIGGER public_docs_updated
 BEFORE UPDATE ON public.docs
@@ -32,6 +48,10 @@ CREATE TABLE uuid_docs(
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz
 );
+
+CREATE TRIGGER public_uuid_docs_inserted
+BEFORE INSERT ON public.uuid_docs
+FOR EACH ROW EXECUTE PROCEDURE massive_document_inserted();
 
 CREATE TRIGGER public_uuid_docs_updated
 BEFORE UPDATE ON public.uuid_docs
