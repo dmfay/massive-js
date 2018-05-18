@@ -9,6 +9,17 @@ CREATE TABLE ${schema~}.${table~}(
 CREATE INDEX idx_${index^} ON ${schema~}.${table~} USING GIN(body jsonb_path_ops);
 CREATE INDEX idx_search_${index^} ON ${schema~}.${table~} USING GIN(search);
 
+CREATE OR REPLACE FUNCTION massive_document_inserted()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY definer
+AS $$
+BEGIN
+  NEW.search = to_tsvector(NEW.body);
+  RETURN NEW;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION massive_document_updated()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -16,9 +27,14 @@ SECURITY definer
 AS $$
 BEGIN
   NEW.updated_at = now();
+  NEW.search = to_tsvector(NEW.body);
   RETURN NEW;
 END;
 $$;
+
+CREATE TRIGGER ${schema^}_${table^}_inserted
+BEFORE INSERT ON ${schema~}.${table~}
+FOR EACH ROW EXECUTE PROCEDURE massive_document_inserted();
 
 CREATE TRIGGER ${schema^}_${table^}_updated
 BEFORE UPDATE ON ${schema~}.${table~}

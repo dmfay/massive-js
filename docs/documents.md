@@ -107,7 +107,7 @@ db.reports.findDoc({
 
 ### searchDoc
 
-`searchDoc` performs a full-text search on the document body fields.
+`searchDoc` performs a full-text search on the document body. You can specify fields, or omit in order to use the stored search vector to search the entire document.
 
 ```javascript
 db.reports.searchDoc({
