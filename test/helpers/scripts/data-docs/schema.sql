@@ -14,7 +14,7 @@ LANGUAGE plpgsql
 SECURITY definer
 AS $$
 BEGIN
-  NEW.search = to_tsvector(NEW.body);
+  NEW.search = to_tsvector(NEW.body::text);
   RETURN NEW;
 END;
 $$;
@@ -26,7 +26,7 @@ SECURITY definer
 AS $$
 BEGIN
   NEW.updated_at = now();
-  NEW.search = to_tsvector(NEW.body);
+  NEW.search = to_tsvector(NEW.body::text);
   RETURN NEW;
 END;
 $$;
