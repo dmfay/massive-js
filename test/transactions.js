@@ -71,7 +71,7 @@ describe('transactions', function () {
     return db.products.count().then(count => {
       total = count;
 
-      return Promise.resolve();
+      return db.instance.$config.promise.resolve();
     }).then(() => {
       return db.withTransaction(tx => {
         let promise = tx.products.insert({string: 'beta'});
