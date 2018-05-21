@@ -4,7 +4,7 @@ const Insert = require('../../lib/statement/insert');
 
 describe('Insert', function () {
   const source = {
-    delimitedFullName: 'testsource',
+    delimitedFullName: '"testsource"',
     pk: ['id'],
     isPkSearch: () => false,
     columns: ['field1', 'field2', 'string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']
@@ -14,7 +14,7 @@ describe('Insert', function () {
     it('should have defaults', function () {
       const query = new Insert(source);
 
-      assert.equal(query.source.delimitedFullName, 'testsource');
+      assert.equal(query.source.delimitedFullName, '"testsource"');
     });
 
     it('should apply options', function () {
@@ -27,7 +27,7 @@ describe('Insert', function () {
         onConflictIgnore: true
       });
 
-      assert.equal(query.source.delimitedFullName, 'testsource');
+      assert.equal(query.source.delimitedFullName, '"testsource"');
       assert.isTrue(query.build);
       assert.isTrue(query.decompose);
       assert.isTrue(query.document);
@@ -57,37 +57,37 @@ describe('Insert', function () {
   describe('format', function () {
     it('should return a basic update statement for the specified changes', function () {
       const result = new Insert(source, {field1: 'value1'});
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1") VALUES ($1) RETURNING *');
       assert.deepEqual(result.params, ['value1']);
     });
 
     it('should join fields and values with commas', function () {
       const result = new Insert(source, {field1: 'value1', field2: 2});
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1", "field2") VALUES ($1, $2) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1", "field2") VALUES ($1, $2) RETURNING *');
       assert.deepEqual(result.params, ['value1', 2]);
     });
 
     it('should handle multiple records', function () {
       const result = new Insert(source, [{field1: 'value1', field2: 2}, {field1: 'value2', field2: 3}]);
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
       assert.deepEqual(result.params, ['value1', 2, 'value2', 3]);
     });
 
     it('should handle multiple records with fields out of order', function () {
       const result = new Insert(source, [{field1: 'value1', field2: 2}, {field2: 3, field1: 'value2'}]);
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
       assert.deepEqual(result.params, ['value1', 2, 'value2', 3]);
     });
 
     it('should combine keys of partial records', function () {
       const result = new Insert(source, [{field1: 'value1'}, {field2: 'value2'}]);
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1", "field2") VALUES ($1, $2), ($3, $4) RETURNING *');
       assert.deepEqual(result.params, ['value1', undefined, undefined, 'value2']);
     });
 
     it('should handle onConflictIgnore option', function () {
       const result = new Insert(source, {field1: 'value1'}, {onConflictIgnore: true});
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');
       assert.deepEqual(result.params, ['value1']);
     });
 
@@ -109,12 +109,17 @@ describe('Insert', function () {
             source_id_another_name: undefined,
             j2fk: 102,
             j2field: null
+          }],
+          'junction.in_schema': [{
+            source_id: undefined,
+            jsfk: 111,
+            jsfield: 'abc'
           }]
         }
       );
 
-      assert.equal(result.format(), 'WITH inserted AS (INSERT INTO testsource ("field1") VALUES ($1) RETURNING *), q_0_0 AS (INSERT INTO junction_one ("source_id", "j1fk", "j1field") SELECT "id", $2, $3 FROM inserted), q_1_0 AS (INSERT INTO junction_many ("source_id_another_name", "j2fk", "j2field") SELECT "id", $4, $5 FROM inserted), q_1_1 AS (INSERT INTO junction_many ("source_id_another_name", "j2fk", "j2field") SELECT "id", $6, $7 FROM inserted) SELECT * FROM inserted');
-      assert.deepEqual(result.params, ['value1', 10, 'something', 101, 'j2f1', 102, null]);
+      assert.equal(result.format(), 'WITH inserted AS (INSERT INTO "testsource" ("field1") VALUES ($1) RETURNING *), q_0_0 AS (INSERT INTO "junction_one" ("source_id", "j1fk", "j1field") SELECT "id", $2, $3 FROM inserted), q_1_0 AS (INSERT INTO "junction_many" ("source_id_another_name", "j2fk", "j2field") SELECT "id", $4, $5 FROM inserted), q_1_1 AS (INSERT INTO "junction_many" ("source_id_another_name", "j2fk", "j2field") SELECT "id", $6, $7 FROM inserted), q_2_0 AS (INSERT INTO "junction"."in_schema" ("source_id", "jsfk", "jsfield") SELECT "id", $8, $9 FROM inserted) SELECT * FROM inserted');
+      assert.deepEqual(result.params, ['value1', 10, 'something', 101, 'j2f1', 102, null, 111, 'abc']);
     });
 
     it('should not create junction queries when options specified', function () {
@@ -140,7 +145,7 @@ describe('Insert', function () {
         {deepInsert: false}
       );
 
-      assert.equal(result.format(), 'INSERT INTO testsource ("field1") VALUES ($1) RETURNING *');
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1") VALUES ($1) RETURNING *');
       assert.deepEqual(result.params, ['value1']);
     });
 
