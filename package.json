@@ -1,6 +1,6 @@
 {
   "name": "massive",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
   "homepage": "https://dmfay.github.io/massive-js/",
   "bugs": "https://github.com/dmfay/massive-js/issues",
@@ -29,6 +29,7 @@
     "docs": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r",
     "docserver": "npm run docs && cd docs && bundle exec jekyll serve",
     "posttest": "npm run lint",
+    "release": "standard-version",
     "preversion": "sh build/apidocs.sh",
     "postversion": "sh build/update-gh-pages.sh",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
@@ -51,6 +52,12 @@
     "Rob Conery <robconery@gmail.com>"
   ],
   "license": "BSD-3-Clause",
+  "standard-version": {
+    "scripts": {
+      "prerelease": "sh build/apidocs.sh",
+      "posttag": "sh build/update-gh-pages.sh"
+    }
+  },
   "dependencies": {
     "commander": "~2.15.0",
     "glob": "~7.1.1",
@@ -66,7 +73,8 @@
     "eslint": "~4.19.0",
     "jsdoc": "^3.5.4",
     "mocha": "~5.1.0",
-    "nyc": "~11.8.0"
+    "nyc": "~11.8.0",
+    "standard-version": "^4.4.0"
   },
   "repository": {
     "type": "git",
