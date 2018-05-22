@@ -86,7 +86,10 @@ describe('deep insert', function () {
         user_id: 5,
         notes: 'deep insert test'
       }]
-    }, {build: true}).then(res => {
+    }, {
+      build: true,
+      deepInsert: true
+    }).then(res => {
       assert.equal(res.sql, 'WITH inserted AS (INSERT INTO "products" ("name") VALUES ($1) RETURNING *), q_0_0 AS (INSERT INTO "orders" ("product_id", "user_id", "notes") SELECT "id", $2, $3 FROM inserted) SELECT * FROM inserted');
       assert.deepEqual(res.params, ['something', 5, 'deep insert test']);
     });
