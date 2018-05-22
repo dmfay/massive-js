@@ -57,6 +57,20 @@ describe('deep insert', function () {
     assert.equal(order2.notes, 'deep insert test 2');
   });
 
+  it('builds the expected sql', function () {
+    return db.products.insert({
+      name: 'something',
+      orders: [{
+        product_id: undefined,
+        user_id: 5,
+        notes: 'deep insert test'
+      }]
+    }, {build: true}).then(res => {
+      assert.equal(res.sql, 'WITH inserted AS (INSERT INTO "products" ("name") VALUES ($1) RETURNING *), q_0_0 AS (INSERT INTO "orders" ("product_id", "user_id", "notes") SELECT "id", $2, $3 FROM inserted) SELECT * FROM inserted');
+      assert.deepEqual(res.params, ['something', 5, 'deep insert test']);
+    });
+  });
+
   it('errors on attempting to deep insert multiple records', function () {
     return db.products.insert([{
       name: 'something',
