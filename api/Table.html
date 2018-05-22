@@ -626,7 +626,7 @@ criteria objects.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line65">line 65</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -1038,7 +1038,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line78">line 78</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -1251,7 +1251,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line89">line 89</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line90">line 90</a>
     </li></ul></dd>
     
 
@@ -1462,7 +1462,7 @@ object, an array containing all deleted records.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line104">line 104</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line105">line 105</a>
     </li></ul></dd>
     
 
@@ -1999,7 +1999,7 @@ test.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line137">line 137</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -2038,6 +2038,269 @@ test.</td>
     <dd>
         
 <span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="modify"><span class="type-signature"></span>modify<span class="signature">(criteria, changes, field<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update a document, adding new information and changing existing information.
+This function can be used with any JSON field, not just document tables;
+however, only document tables can use criteria objects which directly
+reference document fields.
+
+If calling modify with a criteria object for a non-document table, the
+criteria will be tested against the entire row (as opposed to the document
+body as it is for document tables). To test elements of the JSON field in a
+non-document table with a criteria object, use a JSON path string.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>criteria</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Primary key of the document, or a
+criteria object.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>changes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Changes to apply.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>field</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    body
+                
+                </td>
+            
+
+            <td class="description last">Document field name.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line206">line 206</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    If modifying a document table, the document; otherwise, the
+modified row.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
 
 
     </dd>
@@ -2173,7 +2436,7 @@ test.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line118">line 118</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line120">line 120</a>
     </li></ul></dd>
     
 
@@ -2237,14 +2500,10 @@ test.</td>
 
 
 <div class="description">
-    Saves an object. If the object does not include a value for the table's
-primary key, this will emit an INSERT to create a new record; if it does
-contain the primary key it will emit an UPDATE for the existing record.
-
-Either way, the newest available version of the record will be returned.
-
-This is not a true Postgres upsert! If you need the behavior of ON CONFLICT
-DO UPDATE, you'll need to use db.query or create an SQL script file.
+    Performs an upsert. If the record does not include a value for the primary
+key column, it will be inserted and the persisted record (including primary
+key) returned; if it does, the row will be updated and the modified record
+returned.
 </div>
 
 
@@ -2380,7 +2639,7 @@ DO UPDATE, you'll need to use db.query or create an SQL script file.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line128">line 128</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line139">line 139</a>
     </li></ul></dd>
     
 
@@ -2444,8 +2703,8 @@ DO UPDATE, you'll need to use db.query or create an SQL script file.
 
 
 <div class="description">
-    Save a document to the database. This function will create or replace the
-entire document body.
+    Save a document to the database. This function replaces the entire document
+body.
 </div>
 
 
@@ -2497,7 +2756,7 @@ entire document body.
 
             
 
-            <td class="description last">The document to persist.</td>
+            <td class="description last">The document to write.</td>
         </tr>
 
     
@@ -2816,7 +3075,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line167">line 167</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -3093,7 +3352,7 @@ looks in the document body fields instead of the table columns.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line219">line 219</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line221">line 221</a>
     </li></ul></dd>
     
 
@@ -3149,7 +3408,7 @@ looks in the document body fields instead of the table columns.
     
 
     
-    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(criteria, changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(criteria, fields, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -3205,12 +3464,6 @@ only possible through the latter usage.
             <td class="type">
             
                 
-<span class="param-type">String</span>
-|
-
-<span class="param-type">Number</span>
-|
-
 <span class="param-type">Object</span>
 
 
@@ -3229,15 +3482,14 @@ only possible through the latter usage.
 
             
 
-            <td class="description last">Primary key of the record, or a
-criteria object.</td>
+            <td class="description last">An updated record, or a criteria object.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>changes</code></td>
+                <td class="name"><code>fields</code></td>
             
 
             <td class="type">
@@ -3261,7 +3513,8 @@ criteria object.</td>
 
             
 
-            <td class="description last">A map of columns to their new values.</td>
+            <td class="description last">If using a criteria object without a primary key,
+a hash of column names to their new values.</td>
         </tr>
 
     
@@ -3335,7 +3588,7 @@ criteria object.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line99">line 99</a>
+        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -3364,314 +3617,6 @@ criteria object.</td>
 <div class="param-desc">
     If updating a single record by its primary key, the
 modified record; otherwise, an array containing any modified records.
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Promise</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="updateDoc"><span class="type-signature"></span>updateDoc<span class="signature">(criteria, changes, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Update a document, adding new information and changing existing information.
-This function can be used with any JSON field, not just document tables;
-however, only document tables can use criteria objects which directly
-reference document fields.
-
-If calling updateDoc with a criteria object for a non-document table, the
-criteria will be tested against the entire row (as opposed to the document
-body as it is for document tables). To test elements of the JSON field in a
-non-document table with a criteria object, use a JSON path string.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>criteria</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-|
-
-<span class="param-type">Number</span>
-|
-
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Primary key of the document, or a
-criteria object.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>changes</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Changes to apply.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Update options</a>.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>body</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Override the "body" JSON field to affect.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_table.js.html">lib/table.js</a>, <a href="lib_table.js.html#line214">line 214</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    If modifying a document table, the document; otherwise, the
-modified row.
 </div>
 
 
@@ -3884,7 +3829,7 @@ db.mytable.where('id=$1', [123]).then(...);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line235">line 235</a>
+        <a href="lib_queryable.js.html">lib/queryable.js</a>, <a href="lib_queryable.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -3956,7 +3901,7 @@ db.mytable.where('id=$1', [123]).then(...);
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 21 2018 20:58:09 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

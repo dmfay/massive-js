@@ -89,7 +89,8 @@ massive(connectionInfo, {
   // change the scripts directory
   scripts: './myscripts',
 
-  // only load tables, views, and functions in these schemas
+  // ignore tables and views in any other schema (does not
+  // apply to functions)
   allowedSchemas: ['public', 'auth'],   
 
   // only load tables and views matching the whitelist

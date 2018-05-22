@@ -94,11 +94,8 @@ Table.prototype.getPkCriteria = function (record) {
  * containing the inserted records.
  */
 Table.prototype.insert = function (data, options) {
-  if (!this.insertable) {
-    return Promise.reject(new Error(`${this.name} is not writable`));
-  } else if (!data) {
-    return Promise.reject(new Error('Must provide data to insert'));
-  }
+  assert(!!this.insertable, `${this.name} is not insertable`);
+  assert(!!data, 'Must provide data to insert');
 
   const insert = new Insert(this, data, options);
 
@@ -117,62 +114,65 @@ Table.prototype.insert = function (data, options) {
  * criteria object and a map of fields to new values. Multi-row updates are
  * only possible through the latter usage.
  *
- * @param {String|Number|Object} criteria - Primary key of the record, or a
- * criteria object.
- * @param {Object} changes - A map of columns to their new values.
+ * @param {Object} criteria - An updated record, or a criteria object.
+ * @param {Object} fields - If using a criteria object without a primary key,
+ * a hash of column names to their new values.
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Update options}.
  * @return {Promise} If updating a single record by its primary key, the
  * modified record; otherwise, an array containing any modified records.
  */
-Table.prototype.update = function (criteria, changes, options = {}) {
-  if (!this.insertable) {
-    return Promise.reject(new Error(`${this.name} is not writable`));
-  } else if (!_.isObjectLike(changes) || _.isArray(changes)) {
-    return Promise.reject(new Error('Update requires a hash of fields=>values to update to'));
-  } else if (_.isEmpty(changes)) {
-    // there's nothing to update, so just return the matching records
-    return this.find(criteria, options);
+Table.prototype.update = function (criteria, fields, options = {}) {
+  if (_.isNil(fields)) {
+    assert(!!this.pk, `${this.name} has no primary key, use update(criteria, changes)`);
+
+    fields = criteria;
+
+    criteria = this.getPkCriteria(fields);
+
+    assert(!!criteria, `Incomplete or invalid primary key criteria for ${this.name}.update`);
+
+    fields = _.omitBy(fields, (value, key) => {
+      return _.isFunction(fields[key]) || this.pk.indexOf(key) > -1;
+    });
+
+    options.single = true;
   }
 
-  const update = new Update(this, changes, criteria, options);
+  assert(_.isObjectLike(fields) &amp;&amp; !_.isArray(fields), 'Update requires a hash of fields=>values to update to');
+
+  if (_.isEmpty(fields)) {
+    // there's nothing to update, so just return the matching records
+    if (options.single) {
+      return this.findOne(criteria);
+    }
+
+    return this.find(criteria);
+  }
+
+  const update = new Update(this, fields, criteria, options);
 
   return this.db.query(update);
 };
 
 /**
- * Saves an object. If the object does not include a value for the table's
- * primary key, this will emit an INSERT to create a new record; if it does
- * contain the primary key it will emit an UPDATE for the existing record.
- *
- * Either way, the newest available version of the record will be returned.
- *
- * This is not a true Postgres upsert! If you need the behavior of ON CONFLICT
- * DO UPDATE, you'll need to use db.query or create an SQL script file.
+ * Performs an upsert. If the record does not include a value for the primary
+ * key column, it will be inserted and the persisted record (including primary
+ * key) returned; if it does, the row will be updated and the modified record
+ * returned.
  *
  * @param {Object} record - The record to upsert.
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Insert/update options}.
  * @return {Promise} The inserted or updated record object.
  */
 Table.prototype.save = function (record, options = {}) {
-  if (!this.pk) {
-    return Promise.reject(new Error(`${this.name} has no primary key, use insert or update to write to this table`));
-  } else if (!_.isObjectLike(record) || _.isArray(record)) {
-    return Promise.reject(new Error('Must provide an object with all fields being modified and the primary key if updating'));
-  }
+  assert(!!this.pk, `${this.name} has no primary key, use insert or update to write to this table`);
+  assert(_.isObjectLike(record) &amp;&amp; !_.isArray(record), 'Must provide an object with all fields being modified and the primary key if updating');
 
   const keys = _.keys(record);
 
   if (_.intersection(keys, this.pk).length === this.pk.length) {
-    const criteria = this.getPkCriteria(record);
-
-    record = _.omitBy(record, (value, key) => {
-      return _.isFunction(record[key]) || this.pk.indexOf(key) > -1;
-    });
-
-    options.single = true;
-
     // prevent options from being read as changes in the bulk update format
-    return this.update(criteria, record, options);
+    return this.update(record, null, options);
   }
 
   return this.insert.apply(this, arguments);
@@ -191,10 +191,10 @@ Table.prototype.destroy = function (criteria, options) {
 };
 
 /**
- * Save a document to the database. This function will create or replace the
- * entire document body.
+ * Save a document to the database. This function replaces the entire document
+ * body.
  *
- * @param {Object} doc - The document to persist.
+ * @param {Object} doc - The document to write.
  * @return {Promise} The updated document.
  */
 Table.prototype.saveDoc = function (doc) {
@@ -205,14 +205,7 @@ Table.prototype.saveDoc = function (doc) {
   const criteria = this.getPkCriteria(doc);
 
   if (criteria) {
-    const update = new Update(
-      this,
-      {
-        body: _.omit(doc, this.pk, 'created_at', 'updated_at')
-      },
-      criteria,
-      options
-    );
+    const update = new Update(this, {body: _.omit(doc, this.pk)}, criteria, options);
 
     return this.db.query(update);
   }
@@ -226,7 +219,7 @@ Table.prototype.saveDoc = function (doc) {
  * however, only document tables can use criteria objects which directly
  * reference document fields.
  *
- * If calling updateDoc with a criteria object for a non-document table, the
+ * If calling modify with a criteria object for a non-document table, the
  * criteria will be tested against the entire row (as opposed to the document
  * body as it is for document tables). To test elements of the JSON field in a
  * non-document table with a criteria object, use a JSON path string.
@@ -234,16 +227,14 @@ Table.prototype.saveDoc = function (doc) {
  * @param {String|Number|Object} criteria - Primary key of the document, or a
  * criteria object.
  * @param {Object} changes - Changes to apply.
- * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Update options}.
- * @param {String} [options.body] - Override the "body" JSON field to affect.
+ * @param {String} [field=body] - Document field name.
  * @return {Promise} If modifying a document table, the document; otherwise, the
  * modified row.
  */
-Table.prototype.updateDoc = function (criteria, changes, options = {}) {
-  if (!Object.prototype.hasOwnProperty.call(options, 'body')) {
-    options.body = 'body';
-    options.document = true;
-  }
+Table.prototype.modify = function (criteria, changes, field = 'body') {
+  const options = {
+    document: field === 'body'
+  };
 
   if (!_.isPlainObject(criteria)) {
     // primitive criteria will always reference a unary primary key
@@ -255,7 +246,7 @@ Table.prototype.updateDoc = function (criteria, changes, options = {}) {
 
   const queryCriteria = where(criteria, 1, options.generator || (options.document ? 'docGenerator' : 'tableGenerator'));
 
-  const sql = `UPDATE ${this.delimitedFullName} SET "${options.body}" = COALESCE("${options.body}", '{}'::jsonb) || $1 WHERE ${queryCriteria.conditions} RETURNING *;`;
+  const sql = `UPDATE ${this.delimitedFullName} SET "${field}"="${field}" || $1 WHERE ${queryCriteria.conditions} RETURNING *;`;
 
   return this.db.query(sql, [JSON.stringify(changes)].concat(queryCriteria.params), options);
 };
@@ -277,7 +268,7 @@ module.exports = Table;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 21 2018 20:58:09 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

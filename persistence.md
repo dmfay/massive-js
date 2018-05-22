@@ -4,9 +4,9 @@ Massive's lack of entity modeling means it retrieves your data in the form of pl
 
 ## save
 
-`save` persists a single object to the database. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. The promise `save` returns will resolve to the created or modified record represented as an object.
+`save` performs an upsert. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. The promise `save` returns will resolve to the created or modified record represented as an object.
 
-`save` may not be used with foreign tables, since they cannot have primary keys. If you need to persist data to a foreign table, use `insert` and `update`.
+`save` may not be used with foreign tables, since they do not have primary keys to test.
 
 [Query options](options) for `INSERT` and `UPDATE` statements, and for results processing, may be used with `save` as a second argument. However, most of these are of limited utility.
 
@@ -79,8 +79,6 @@ db.tests.insert({
     user_id: 2,
     role: 'auxiliary'
   }]
-}, {
-  deepInsert: true
 }).then(tests => {
   // as with regular inserts, you only get the test back;
   // if user_tests has a primary key constraint, you can
@@ -89,6 +87,8 @@ db.tests.insert({
 ```
 
 Deep insert is _only_ supported when inserting single records. Attempting to deep insert an array of records will raise an exception.
+
+If your object is going to store a property as json in postgres, you will want to ignore deep insert functions, otherwise it will look for junction tables that match the nested object. To do this use the option ` { deepInsert: false }` with the insert. 
 
 #### Options
 
@@ -109,9 +109,19 @@ db.tests.insert({
 
 ## update
 
-`update` alters existing records in a table, given a criteria object (or unary primary key) and a map of column names to the new values. It returns a promise for an array containing the updated record(s) if passed a criteria object, or a promise for an object if passed a primary key.
+`update` has two variants. Passed an object with a value for the table's primary key field or fields, it updates all included fields of the object based on the primary key; or, passed a criteria object and a changes map, it applies all changes to all rows matching the criteria. Only the criteria-changes variant can be used with foreign tables.
+
+Both `update` functions return promises for the updated data. If given a single object, the promise will resolve to the updated object or `null` if the primary key was not found. If passed both criteria and changes objects to perform a bulk update, it will resolve to an array of records, even if no or only one record was actually modified.
 
 ```javascript
+db.tests.update({
+  id: 1,
+  version: 2,
+  priority: 'high'
+}).then(test => {
+  // the updated test
+});
+
 db.tests.update({
   priority: 'high'
 }, {
@@ -124,13 +134,13 @@ db.tests.update({
 });
 ```
 
-`update` can take [query options](options) for `UPDATE` statements and for results processing:
+Both versions of `update` can take [query options](options) for `UPDATE` statements and for results processing:
 
 ```javascript
 db.tests.update({
+  id: 1,
+  version: 2,
   priority: 'high'
-}, {
-  priority: 'moderate'
 }, {build: true}).then(test => {
   // builds the query without executing it
 });

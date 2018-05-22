@@ -10,7 +10,7 @@ Examples are presented using the standard `then()` construction for compatibilit
 
 ## Raw SQL
 
-**Important note: `db.run` is deprecated as of version 5.0.0. Update your code to use `db.query` instead.**
+**Important note: `db.run` is deprecated and will be removed in a future release. Update your code to use `db.query` instead.**
 
 Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.query`.
 
@@ -68,7 +68,7 @@ massive({
     ctx.body = await ctx.db.feed_items.find({
       'rating >': 0
     }, {
-      order: [{field: 'created_at', direction: 'desc'}]
+      order: 'created_at desc'
     });
   });
 
@@ -101,7 +101,7 @@ massive({
     req.app.get('db').feed_items.find({
       'rating >': 0
     }, {
-      order: [{field: 'created_at', direction: 'desc'}]
+      order: 'created_at desc'
     }).then(items => {
       res.json(items);
     });
