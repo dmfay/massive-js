@@ -52,6 +52,24 @@ The `order` option sets an array of order objects which are used to build a SQL 
 * `direction`: The sort direction, `ASC` or `DESC`.
 * `type`: Define a cast type for values. Useful with JSON fields.
 
+```javascript
+db.tests.find({
+  is_active: true
+}, {
+  order: [{
+    field: 'started_at',
+    direction: 'desc'
+  }, {
+    expr: 'passes + failures',
+    direction: 'asc'
+  }]
+}).then(stream => {
+  // all tests, ordered first by most recent start
+  // date, then by pass + failure total beginning
+  // with the lowest
+});
+```
+
 ## Results Processing
 
 Results processing options are generally applicable to all query types, although `stream` is principally useful with query functions.
