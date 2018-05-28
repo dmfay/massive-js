@@ -1,8 +1,8 @@
 'use strict';
 
 const Executable = require('../lib/executable');
-const Queryable = require('../lib/queryable');
-const Table = require('../lib/table');
+const Readable = require('../lib/readable');
+const Writable = require('../lib/writable');
 
 describe('connecting', function () {
   let loader;
@@ -143,7 +143,7 @@ describe('connecting', function () {
 
     it('loads all tables', function () {
       return massive({connectionString}, loader).then(db => {
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 7);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 7);
 
         return db.instance.$pool.end();
       });
@@ -151,7 +151,7 @@ describe('connecting', function () {
 
     it('loads all views', function () {
       return massive({connectionString}, loader).then(db => {
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable && !(o instanceof Table)), 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable && !(o instanceof Writable)), 6);
 
         return db.instance.$pool.end();
       });
@@ -186,8 +186,8 @@ describe('connecting', function () {
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.objects, 18);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 13);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 7);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 13);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 7);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -211,8 +211,8 @@ describe('connecting', function () {
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.objects, 16);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 11);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 7);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 11);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 7);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -238,8 +238,8 @@ describe('connecting', function () {
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.objects, 8);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 5);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 3);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -264,8 +264,8 @@ describe('connecting', function () {
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !!db.one.v2 && !db.one.f1 && !db.one.f2);
         assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.objects, 5);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 4);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 4);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 2);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 1);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -291,8 +291,8 @@ describe('connecting', function () {
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
         assert.lengthOf(db.objects, 10);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 5);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 3);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -316,8 +316,8 @@ describe('connecting', function () {
         assert(!!db.one && !db.one.t1 && !!db.one.t2 && !db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!!db.two && !!db.two.t1);
         assert.lengthOf(db.objects, 16);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 11);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 6);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 11);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 6);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -342,8 +342,8 @@ describe('connecting', function () {
         assert(!!db.one && !!db.one.t1 && !!db.one.t2 && !!db.one.v1 && !!db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
         assert.lengthOf(db.objects, 14);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 9);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 5);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 9);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -369,8 +369,8 @@ describe('connecting', function () {
         assert(!!db.one && !!db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
         assert.lengthOf(db.objects, 7);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 2);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 2);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 2);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
@@ -396,8 +396,8 @@ describe('connecting', function () {
         assert(!!db.one && !db.one.t1 && !db.one.t2 && !db.one.v1 && !db.one.v2 && !!db.one.f1 && !!db.one.f2);
         assert(!db.two);
         assert.lengthOf(db.objects, 4);
-        assert.lengthOf(db.objects.filter(o => o instanceof Queryable), 1);
-        assert.lengthOf(db.objects.filter(o => o instanceof Table), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Readable), 1);
+        assert.lengthOf(db.objects.filter(o => o instanceof Writable), 1);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable), 3);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
