@@ -1,6 +1,6 @@
 'use strict';
 
-const Table = require('../../lib/table');
+const Writable = require('../../lib/writable');
 
 describe('createDocumentTable', function () {
   const schema = 'spec';
@@ -23,7 +23,7 @@ describe('createDocumentTable', function () {
     it('creates a table on public schema', function () {
       return db.createDocumentTable(tableName).then(() => {
         assert.isOk(db[tableName]);
-        assert.instanceOf(db[tableName], Table);
+        assert.instanceOf(db[tableName], Writable);
       });
     });
   });
@@ -42,7 +42,7 @@ describe('createDocumentTable', function () {
     it('creates a table on the specified schema', function () {
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);
-        assert.instanceOf(db[schema][tableName], Table);
+        assert.instanceOf(db[schema][tableName], Writable);
       });
     });
   });

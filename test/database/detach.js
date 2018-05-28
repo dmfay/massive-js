@@ -1,7 +1,7 @@
 'use strict';
 
 const Executable = require('../../lib/executable');
-const Table = require('../../lib/table');
+const Writable = require('../../lib/writable');
 
 describe('detaching entities', function () {
   let db;
@@ -21,7 +21,7 @@ describe('detaching entities', function () {
   it('removes entities from the tree and object list', function () {
     const originalLength = db.objects.length;
 
-    db.attach(new Table({
+    db.attach(new Writable({
       schema: 'public',
       name: 'mytable',
       db
@@ -29,7 +29,7 @@ describe('detaching entities', function () {
 
     assert.lengthOf(db.objects, originalLength + 1);
     assert.isOk(db.mytable);
-    assert.isTrue(db.mytable instanceof Table);
+    assert.isTrue(db.mytable instanceof Writable);
 
     db.detach('mytable');
 
@@ -40,7 +40,7 @@ describe('detaching entities', function () {
   it('removes merged entities', function () {
     const originalLength = db.objects.length;
 
-    db.attach(new Table({
+    db.attach(new Writable({
       schema: 'public',
       name: 'table_or_script',
       db
@@ -56,7 +56,7 @@ describe('detaching entities', function () {
 
     assert.lengthOf(db.objects, originalLength + 2);
     assert.isOk(db.table_or_script);
-    assert.isTrue(db.table_or_script instanceof Table);
+    assert.isTrue(db.table_or_script instanceof Writable);
     assert.isFunction(db.table_or_script);
 
     db.detach('table_or_script');

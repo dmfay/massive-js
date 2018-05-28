@@ -1,7 +1,7 @@
 'use strict';
 
 const Executable = require('../../lib/executable');
-const Table = require('../../lib/table');
+const Writable = require('../../lib/writable');
 
 describe('attaching entities', function () {
   let db;
@@ -20,7 +20,7 @@ describe('attaching entities', function () {
 
   describe('object merges', function () {
     it('merges schemas and folders', function () {
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'newschema',
         name: 't1',
         db
@@ -39,13 +39,13 @@ describe('attaching entities', function () {
     });
 
     it('merges schemas and tables', function () {
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'schema_or_table',
         name: 't1',
         db
       }));
 
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'public',
         name: 'schema_or_table',
         db
@@ -54,12 +54,12 @@ describe('attaching entities', function () {
       assert.isOk(db.schema_or_table);
       assert.isOk(db.schema_or_table.t1);
       assert.isOk(db.schema_or_table.find);
-      assert.isTrue(db.schema_or_table instanceof Table);
-      assert.isTrue(db.schema_or_table.t1 instanceof Table);
+      assert.isTrue(db.schema_or_table instanceof Writable);
+      assert.isTrue(db.schema_or_table.t1 instanceof Writable);
     });
 
     it('merges schemas and executables', function* () {
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'schema_or_function',
         name: 't1',
         db
@@ -76,7 +76,7 @@ describe('attaching entities', function () {
       assert.isOk(db.schema_or_function);
       assert.isOk(db.schema_or_function.t1);
       assert.isFunction(db.schema_or_function);
-      assert.isTrue(db.schema_or_function.t1 instanceof Table);
+      assert.isTrue(db.schema_or_function.t1 instanceof Writable);
 
       const result = yield db.schema_or_function();
 
@@ -84,7 +84,7 @@ describe('attaching entities', function () {
     });
 
     it('merges schemas, executables, and tables', function* () {
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'three_things',
         name: 't1',
         db
@@ -98,7 +98,7 @@ describe('attaching entities', function () {
         db
       }));
 
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'public',
         name: 'three_things',
         db
@@ -109,8 +109,8 @@ describe('attaching entities', function () {
       assert.isFunction(db.three_things);
       assert.isFunction(db.three_things.find);
       assert.isFunction(db.three_things.t1.find);
-      assert.isTrue(db.three_things instanceof Table);
-      assert.isTrue(db.three_things.t1 instanceof Table);
+      assert.isTrue(db.three_things instanceof Writable);
+      assert.isTrue(db.three_things.t1 instanceof Writable);
 
       const result = yield db.three_things();
 
@@ -126,7 +126,7 @@ describe('attaching entities', function () {
         db
       }));
 
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'public',
         name: 'folder_or_table',
         db
@@ -142,7 +142,7 @@ describe('attaching entities', function () {
 
       assert.isFunction(db.folder_or_table.script1);
       assert.isFunction(db.folder_or_table.subfolder.script2);
-      assert.isTrue(db.folder_or_table instanceof Table);
+      assert.isTrue(db.folder_or_table instanceof Writable);
       assert.isFunction(db.folder_or_table.find);
 
       const result1 = yield db.folder_or_table.script1();
@@ -153,7 +153,7 @@ describe('attaching entities', function () {
     });
 
     it('errors if an existing entity method is shadowed', function () {
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'public',
         name: 'folder_or_table',
         db
@@ -180,7 +180,7 @@ describe('attaching entities', function () {
       }));
 
       assert.throws(() => {
-        db.attach(new Table({
+        db.attach(new Writable({
           schema: 'public',
           name: 'folder_or_table',
           db
@@ -224,14 +224,14 @@ describe('attaching entities', function () {
         db
       }));
 
-      db.attach(new Table({
+      db.attach(new Writable({
         schema: 'public',
         name: 'function_or_table',
         db
       }));
 
       assert.isFunction(db.function_or_table);
-      assert.isTrue(db.function_or_table instanceof Table);
+      assert.isTrue(db.function_or_table instanceof Writable);
 
       const result1 = yield db.function_or_table();
       const result2 = yield db.function_or_table.find({}, {build: true});
