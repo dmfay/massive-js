@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0-rc.2"></a>
+# [5.0.0-rc.2](https://github.com/dmfay/massive-js/compare/v4.8.3...v5.0.0-rc.2) (2018-05-28)
+
+
+### Bug Fixes
+
+* apply allowedSchemas to function loader ([51d5839](https://github.com/dmfay/massive-js/commit/51d5839))
+* better error messaging around writing to foreign tables ([9f087a1](https://github.com/dmfay/massive-js/commit/9f087a1))
+* correct behavior for save with tables lacking pks ([ff235fe](https://github.com/dmfay/massive-js/commit/ff235fe))
+* process document search vectors from text for backwards-compatibility ([e6e1c50](https://github.com/dmfay/massive-js/commit/e6e1c50))
+* reject if select options.fields is explicitly empty (fixes [#583](https://github.com/dmfay/massive-js/issues/583)) ([7a5463c](https://github.com/dmfay/massive-js/commit/7a5463c))
+* updateDoc takes query options ([6523402](https://github.com/dmfay/massive-js/commit/6523402))
+
+
+### Code Refactoring
+
+* change modify to updateDoc for table/document api consistency ([1744f8a](https://github.com/dmfay/massive-js/commit/1744f8a))
+* remove deprecated '*' criteria ([d3c63d2](https://github.com/dmfay/massive-js/commit/d3c63d2))
+* remove deprecated columns select option ([63eda28](https://github.com/dmfay/massive-js/commit/63eda28))
+* remove deprecated db.run ([0df49df](https://github.com/dmfay/massive-js/commit/0df49df))
+* remove unary update in favor of save ([c570f13](https://github.com/dmfay/massive-js/commit/c570f13))
+
+
+### Features
+
+* add withConnection for tasks ([0510766](https://github.com/dmfay/massive-js/commit/0510766))
+* allow primary key in update() ([a2cb9ae](https://github.com/dmfay/massive-js/commit/a2cb9ae))
+* brute force copy api for transactions ([5b7e7f7](https://github.com/dmfay/massive-js/commit/5b7e7f7))
+* disable deep insert by default ([7ad25e1](https://github.com/dmfay/massive-js/commit/7ad25e1))
+* full document search with stored vector ([8564da3](https://github.com/dmfay/massive-js/commit/8564da3))
+* introduce order exprs ([d4b76fc](https://github.com/dmfay/massive-js/commit/d4b76fc))
+* load tables even if they don't have primary keys ([8f58ecb](https://github.com/dmfay/massive-js/commit/8f58ecb))
+* metadata in documents ([c782ce1](https://github.com/dmfay/massive-js/commit/c782ce1))
+* support updatable views (fixes [#528](https://github.com/dmfay/massive-js/issues/528)) ([8000888](https://github.com/dmfay/massive-js/commit/8000888))
+
+
+### BREAKING CHANGES
+
+* empty options.fields is now recognized as an error
+instead of falling back to '*'
+* db.run is gone; please use db.query instead
+* 'created_at' and 'updated_at' are now reserved keys in documents
+* db.doctable.modify is now db.doctable.updateDoc
+* update() now requires separate criteria and changes, use save() to update record objects
+* field should now be specified with options.body
+* deepInsert option must be truthy to enable this behavior
+* unsafe literal {order: 'string asc'} syntax has been removed
+* find, countDoc, etc no longer accept '*' in place of an empty criteria object
+* using 'columns' option in find etc has been removed; use 'fields' for columns themselves and 'exprs' for potentially unsafe operations
+* functions in disallowed schemas will no longer be loaded
+
+
+
 <a name="4.8.3"></a>
 ## [4.8.3](https://github.com/dmfay/massive-js/compare/v4.8.2...v4.8.3) (2018-05-22)
 
@@ -246,6 +299,3 @@ All notable changes to this project will be documented in this file. See [standa
 
 <a name="2.0.5"></a>
 ## 2.0.5 (2015-07-08)
-
-
-
