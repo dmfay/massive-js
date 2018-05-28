@@ -35,8 +35,8 @@ const pgp = require('pg-promise');
 const stream = require('stream');
 const QueryStream = require('pg-query-stream');
 const Executable = require('./executable');
-const Queryable = require('./queryable');
-const Table = require('./table');
+const Readable = require('./readable');
+const Writable = require('./writable');
 const Entity = require('./entity');
 const decompose = require('./util/decompose');
 const docify = require('./util/docify');
@@ -130,25 +130,25 @@ Database.prototype.attach = function (entities) {
       }
 
       // determine which entity is more "advanced": executor functions win out,
-      // followed by Tables, which in turn define a superset of Queryable
+      // followed by Tables, which in turn define a superset of Readable
       // functionality. If neither the new nor the existing entity are anything
       // interesting, just use the new entity.
 
       const both = [executor || entity, existing];
 
       const winner = both.find(e => typeof e === 'function') ||
-        both.find(e => e instanceof Table) ||
-        both.find(e => e instanceof Queryable) ||
+        both.find(e => e instanceof Writable) ||
+        both.find(e => e instanceof Readable) ||
         entity;
 
       const loser = both.find(e => e !== winner);
 
       // determine the appropriate prototype for the new object based on the
-      // types of _both_ entities: Table > Queryable > Executable > Entity.
+      // types of _both_ entities: Writable > Readable > Executable > Entity.
 
       const newProto = _.cond([
-        [() => both.some(e => e instanceof Table), _.constant(Table)],
-        [() => both.some(e => e instanceof Queryable), _.constant(Queryable)],
+        [() => both.some(e => e instanceof Writable), _.constant(Writable)],
+        [() => both.some(e => e instanceof Readable), _.constant(Readable)],
         [() => both.some(e => typeof e === 'function'), _.constant(Executable)],
         [_.stubTrue, _.constant(Entity)]
       ])();
@@ -250,39 +250,34 @@ Database.prototype.reload = function () {
     }));
   }
 
+  // attach the introspection scripts
+  this.loader.queryFiles = introspectors;
+
   return this.$p.all(initPromises).then(() => {
     // run introspections and flatten the results into a single list of Entities
-    return this.$p.all([{
-      ctor: Table,
-      loaders: ['tables']
-    }, {
-      ctor: Queryable,
-      loaders: ['views']
-    }, {
-      ctor: Executable,
-      loaders: ['functions', 'scripts']
-    }].reduce((promises, defn) => {
-      // attach the introspection scripts
-      this.loader.queryFiles = introspectors;
+    return this.$p.all(['tables', 'views', 'functions', 'scripts'].map(loader => {
+      // first find and execute the loader function
+      const loaderFunc = require(`./loader/${loader}`); // eslint-disable-line global-require
 
-      // for each ctor + associated loaders:
-      return promises.concat(defn.loaders.map(loader => {
-        // run the loader
-        const loaderFunc = require(`./loader/${loader}`); // eslint-disable-line global-require
+      return loaderFunc(this.instance, this.loader).then(loaded => {
+        // then afterwards map whatever it got into objects defined by ctor
+        return loaded.map(obj => {
+          obj = _.extend(obj, this.loader);
+          obj.db = this;
+          obj.path = !obj.schema || obj.schema === this.currentSchema ? obj.name : [obj.schema, obj.name].join('.');
+          obj.loader = loader;
 
-        return loaderFunc(this.instance, this.loader).then(loaded => {
-          // then afterwards map whatever it got into objects defined by ctor
-          return loaded.map(obj => {
-            obj = _.extend(obj, this.loader);
-            obj.db = this;
-            obj.path = !obj.schema || obj.schema === this.currentSchema ? obj.name : [obj.schema, obj.name].join('.');
+          if (Object.hasOwnProperty.call(obj, 'is_insertable_into')) {
+            if (obj.is_insertable_into) {
+              return new (Function.prototype.bind.apply(Writable, [null, obj]))();
+            }
 
-            return new (Function.prototype.bind.apply(defn.ctor, [null, obj]))();
-          });
+            return new (Function.prototype.bind.apply(Readable, [null, obj]))();
+          }
+
+          return new (Function.prototype.bind.apply(Executable, [null, obj]))();
         });
-      }));
-
-      // return promises.concat(entityLoaders);
+      });
     }, [])).then(groupedObjects => {
       return _.flatten(groupedObjects);
     }).then(objs => {
@@ -300,7 +295,7 @@ Database.prototype.reload = function () {
  */
 Database.prototype.listTables = function () {
   return this.objects.reduce((names, obj) => {
-    if (obj instanceof Table) {
+    if (obj.loader === 'tables') {
       names.push(obj.path);
     }
 
@@ -315,7 +310,7 @@ Database.prototype.listTables = function () {
  */
 Database.prototype.listViews = function () {
   return this.objects.reduce((names, obj) => {
-    if (obj instanceof Queryable &amp;&amp; !(obj instanceof Table)) {
+    if (obj.loader === 'views') {
       names.push(obj.path);
     }
 
@@ -424,6 +419,27 @@ Database.prototype.query = function (query, params = [], options = {}) {
 };
 
 /**
+ * Begin a task, returning a copy of the connected instance which will route all
+ * queries made in the callback through the task scope.
+ *
+ * @param {Function} callback - A callback containing Massive API calls and SQL
+ * queries to be made within the task scope.
+ * @param {Object} [options] - Task options.
+ * @param {String} [options.tag] - A tag for tracking the task's queries.
+ * @return {Promise} A promise for the completed task, which will be fulfilled
+ * if it succeeds and commits or rejected if it rolls back.
+ */
+Database.prototype.withConnection = function (callback, options = {}) {
+  return this.instance.task(options, task => {
+    const withTask = _.cloneDeep(this);
+
+    withTask.instance = task;
+
+    return callback(withTask);
+  });
+};
+
+/**
  * Begin a transaction, returning a copy of the connected instance which will
  * route all queries made in the callback through the transaction scope.
  *
@@ -484,7 +500,7 @@ Database.prototype.createDocumentTable = function (location) {
     table: tableName,
     index: indexName
   }).then(() =>
-    this.attach(new Table({
+    this.attach(new Writable({
       db: this,
       schema: schemaName,
       name: tableName,
@@ -564,13 +580,13 @@ exports = module.exports = Database;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 28 2018 14:07:21 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -903,7 +903,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line448">line 448</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line464">line 464</a>
     </li></ul></dd>
     
 
@@ -1060,7 +1060,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line496">line 496</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line512">line 512</a>
     </li></ul></dd>
     
 
@@ -1425,7 +1425,7 @@ the schema.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line513">line 513</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line529">line 529</a>
     </li></ul></dd>
     
 
@@ -1657,7 +1657,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line481">line 481</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line497">line 497</a>
     </li></ul></dd>
     
 
@@ -1765,7 +1765,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line303">line 303</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line298">line 298</a>
     </li></ul></dd>
     
 
@@ -1873,7 +1873,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line273">line 273</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line268">line 268</a>
     </li></ul></dd>
     
 
@@ -1981,7 +1981,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line288">line 288</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line283">line 283</a>
     </li></ul></dd>
     
 
@@ -2327,7 +2327,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line330">line 330</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line325">line 325</a>
     </li></ul></dd>
     
 
@@ -2618,7 +2618,7 @@ already exist, it will be created.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line427">line 427</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line443">line 443</a>
     </li></ul></dd>
     
 
@@ -2646,6 +2646,270 @@ already exist, it will be created.</td>
         
 <div class="param-desc">
     The saved document.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="withConnection"><span class="type-signature"></span>withConnection<span class="signature">(callback, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Begin a task, returning a copy of the connected instance which will route all
+queries made in the callback through the task scope.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A callback containing Massive API calls and SQL
+queries to be made within the task scope.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Task options.
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tag</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">A tag for tracking the task's queries.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line404">line 404</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for the completed task, which will be fulfilled
+if it succeeds and commits or rejected if it rolls back.
 </div>
 
 
@@ -2881,7 +3145,7 @@ queries to be made within the transaction scope.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line409">line 409</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line425">line 425</a>
     </li></ul></dd>
     
 
@@ -2948,13 +3212,13 @@ fulfilled if it succeeds and commits or rejected if it rolls back.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 28 2018 14:07:21 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

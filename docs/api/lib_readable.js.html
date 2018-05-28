@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/queryable.js</title>
+    <title>JSDoc: Source: lib/readable.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: lib/queryable.js</h1>
+    <h1 class="page-title">Source: lib/readable.js</h1>
 
     
 
@@ -29,7 +29,6 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 
 const _ = require('lodash');
-const assert = require('assert');
 const util = require('util');
 const Entity = require('./entity');
 const Select = require('./statement/select');
@@ -38,12 +37,12 @@ const where = require('./statement/where');
 const isUuid = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
 /**
- * A queryable database entity (table or view).
+ * A readable database entity (table or view).
  *
  * @class
  * @extends Entity
  * @param {Object} spec - An {@linkcode Entity} specification representing a
- * queryable:
+ * readable object:
  * @param {Object} spec.db - A {@linkcode Database}.
  * @param {String} spec.name - The table or view's name.
  * @param {String} spec.schema - The name of the schema owning the table or
@@ -51,13 +50,13 @@ const isUuid = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a
  * @param {Boolean} [spec.is_matview] - Whether the object is a materialized view
  * (default false).
  */
-const Queryable = function (spec) {
+const Readable = function (spec) {
   Entity.apply(this, arguments);
 
   this.isMatview = spec.is_matview || false;
 };
 
-util.inherits(Queryable, Entity);
+util.inherits(Readable, Entity);
 
 /**
  * Count rows matching criteria. There are two ways to use this method:
@@ -70,7 +69,7 @@ util.inherits(Queryable, Entity);
  * predicates.
  * @return {Promise} Row count.
  */
-Queryable.prototype.count = function (conditions = {}, params = []) {
+Readable.prototype.count = function (conditions = {}, params = []) {
   if (_.isString(conditions)) {
     conditions = {
       conditions,
@@ -90,7 +89,7 @@ Queryable.prototype.count = function (conditions = {}, params = []) {
  * @param {Object} criteria - A criteria object.
  * @return {Promise} Number of matching documents.
  */
-Queryable.prototype.countDoc = function (criteria = {}) {
+Readable.prototype.countDoc = function (criteria = {}) {
   const query = new Select(this, criteria, {exprs: {count: 'COUNT(1)'}, order: null, single: true, generator: 'docGenerator'});
 
   return this.db.query(query).then(res => res.count);
@@ -103,7 +102,7 @@ Queryable.prototype.countDoc = function (criteria = {}) {
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.find = function (criteria = {}, options = {}) {
+Readable.prototype.find = function (criteria = {}, options = {}) {
   return this.db.query(new Select(this, criteria, options));
 };
 
@@ -114,7 +113,7 @@ Queryable.prototype.find = function (criteria = {}, options = {}) {
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.findDoc = function (criteria = {}, options = {}) {
+Readable.prototype.findDoc = function (criteria = {}, options = {}) {
   options.document = true;
   options.generator = 'docGenerator';
 
@@ -129,7 +128,7 @@ Queryable.prototype.findDoc = function (criteria = {}, options = {}) {
  * @return {Promise} An object representing the (first) record found, or
  * null if no records match.
  */
-Queryable.prototype.findOne = function () {
+Readable.prototype.findOne = function () {
   const opts = arguments[1] || {};
 
   opts.single = true;
@@ -143,7 +142,7 @@ Queryable.prototype.findOne = function () {
  * @param {Boolean} [concurrently] - Do it without locking reads.
  * @return {Promise} A query with no results.
  */
-Queryable.prototype.refresh = function (concurrently) {
+Readable.prototype.refresh = function (concurrently) {
   if (!this.isMatview) {
     return this.db.$p.reject(new Error(`${this.delimitedName} is not a materialized view`));
   }
@@ -162,7 +161,7 @@ Queryable.prototype.refresh = function (concurrently) {
  * test.
  * @return {Boolean} True if the criteria represent a primary key search.
  */
-Queryable.prototype.isPkSearch = function (criteria) {
+Readable.prototype.isPkSearch = function (criteria) {
   // disqualify non-tables and foreign tables
   if (!this.pk) { return false; }
 
@@ -192,24 +191,15 @@ Queryable.prototype.isPkSearch = function (criteria) {
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.search = function (plan, options = {}) {
-  assert(plan.fields &amp;&amp; plan.term, 'Need fields as an array and a term string');
+Readable.prototype.search = function (plan, options = {}) {
+  if (!plan.fields || !plan.term) {
+    return this.db.instance.$config.promise.reject('Need fields as an array and a term string');
+  }
 
   const params = [plan.term];
   let tsv;
 
-  // TODO 'where' functionality might be better at processing search params for JSON etc
-  if (options.document) {
-    if (plan.fields.length === 1) {
-      tsv = `(body ->> '${plan.fields[0]}')`;
-    } else {
-      const formattedKeys = [];
-      _.each(plan.fields, function (key) {
-        formattedKeys.push(`(body ->> '${key}')`);
-      });
-      tsv = `concat(${formattedKeys.join(", ' ',")})`;  // eslint-disable-line quotes
-    }
-  } else if (plan.fields.length === 1) {
+  if (plan.fields.length === 1) {
     tsv = plan.fields[0];
     if (tsv.indexOf('>>') === -1) {
       tsv = `"${tsv}"`; // just a column, quote it to preserve casing
@@ -221,6 +211,54 @@ Queryable.prototype.search = function (plan, options = {}) {
   const criteria = {
     conditions: `to_tsvector(${tsv}) @@ to_tsquery($1)`,
     params
+  };
+
+  if (plan.where) {
+    const searchWhere = where(plan.where);
+
+    criteria.conditions += ` AND ${searchWhere.conditions}`;
+    criteria.params = criteria.params.concat(searchWhere.params);
+  }
+
+  const query = new Select(this, criteria, options);
+
+  return this.db.query(query);
+};
+
+/**
+ * Shortcut to perform a full text search on a document table.
+ *
+ * @param {Object} plan - Search definition.
+ * @param {Array} [plan.fields] - List of the document keys to search.
+ * @param {String} plan.term - Search term.
+ * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
+ * @return {Promise} An array containing any query results.
+ */
+Readable.prototype.searchDoc = function (plan, options = {}) {
+  if (!plan.term) {
+    return this.db.instance.$config.promise.reject('Need fields as an array and a term string');
+  }
+
+  options.document = true;
+
+  let tsv;
+
+  // TODO 'where' functionality might be better at processing search params for JSON etc
+  if (!plan.fields) {
+    tsv = 'search';
+  } else if (plan.fields.length === 1) {
+    tsv = `to_tsvector(body ->> '${plan.fields[0]}')`;
+  } else {
+    const formattedKeys = plan.fields.map(key => {
+      return `(body ->> '${key}')`;
+    });
+
+    tsv = `to_tsvector(concat(${formattedKeys.join(", ' ',")}))`;  // eslint-disable-line quotes
+  }
+
+  const criteria = {
+    conditions: `${tsv} @@ to_tsquery($1)`,
+    params: [plan.term]
   };
 
   if (plan.where) {
@@ -236,21 +274,6 @@ Queryable.prototype.search = function (plan, options = {}) {
 };
 
 /**
- * Shortcut to perform a full text search on a document table.
- *
- * @param {Object} plan - Search definition.
- * @param {Array} plan.fields - List of the document keys to search.
- * @param {String} plan.term - Search term.
- * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
- * @return {Promise} An array containing any query results.
- */
-Queryable.prototype.searchDoc = function (plan, options = {}) {
-  options.document = true;
-
-  return this.search(plan, options);
-};
-
-/**
  * Run a query with a raw SQL predicate, eg:
  *
  * db.mytable.where('id=$1', [123]).then(...);
@@ -260,7 +283,7 @@ Queryable.prototype.searchDoc = function (plan, options = {}) {
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  * @return {Promise} An array containing any query results.
  */
-Queryable.prototype.where = function (conditions, params = [], options) {
+Readable.prototype.where = function (conditions, params = [], options) {
   if (!_.isArray(params) &amp;&amp; !_.isPlainObject(params)) { params = [params]; }
 
   const query = new Select(this, {conditions, params}, options);
@@ -268,7 +291,7 @@ Queryable.prototype.where = function (conditions, params = [], options) {
   return this.db.query(query);
 };
 
-module.exports = Queryable;
+module.exports = Readable;
 </code></pre>
         </article>
     </section>
@@ -279,13 +302,13 @@ module.exports = Queryable;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 21:18:13 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 28 2018 14:07:21 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>
