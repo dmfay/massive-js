@@ -18,7 +18,7 @@ describe('tables', function () {
     const tables = yield loader(db, config);
 
     assert.isArray(tables);
-    assert.lengthOf(tables, 4);
+    assert.lengthOf(tables, 5);
     assert.isTrue(tables[0].hasOwnProperty('schema'));
     assert.isTrue(tables[0].hasOwnProperty('name'));
     assert.isTrue(tables[0].hasOwnProperty('parent'));

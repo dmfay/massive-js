@@ -58,7 +58,7 @@ describe('update', function () {
 
   it('updates multiple normal_pk with a NOT IN list', function () {
     return db.normal_pk.update({'id !=': [1, 2]}, {field1: 'tau'}).then(res => {
-      assert.equal(res.length, 1);
+      assert.lengthOf(res, 1);
       assert.equal(res[0].id, 3);
       assert.equal(res[0].field1, 'tau');
     });
@@ -78,6 +78,15 @@ describe('update', function () {
         params: ['iota', 1, 2]
       });
     });
+  });
+
+  it('updates a writable view', function* () {
+    yield db.normal_pk.insert({field1: 'alfalfa'});
+
+    const res = yield db.normal_as.update({field1: 'alfalfa'}, {field1: 'upsilon'});
+
+    assert.lengthOf(res, 1);
+    assert.equal(res[0].field1, 'upsilon');
   });
 
   it('rejects if not insertable', function* () {

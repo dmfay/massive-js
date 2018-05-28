@@ -50,6 +50,14 @@ describe('save', function () {
     });
   });
 
+  it('cannot insert into a writable view', function () {
+    return db.normal_as.save({field1: 'upsilon'})
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'normal_as has no primary key, use insert or update to write to this table');
+      });
+  });
+
   it('rejects if inserting into a table with no key', function () {
     return db.no_pk.save({field1: 'eta', field2: 'theta'}).then(() => {
       assert.fail();
@@ -93,6 +101,14 @@ describe('save', function () {
       assert.equal(res.Id, 1);
       assert.equal(res.Field1, 'Omega');
     });
+  });
+
+  it('cannot update a writable view', function () {
+    return db.normal_as.save({id: 1, field1: 'upsilon'})
+      .then(() => { assert.fail(); })
+      .catch(err => {
+        assert.equal(err.message, 'normal_as has no primary key, use insert or update to write to this table');
+      });
   });
 
   it('applies options to inserts', function () {

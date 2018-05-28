@@ -1,9 +1,17 @@
 CREATE SCHEMA public;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE normal_pk (
   id SERIAL NOT NULL PRIMARY KEY,
-  field1 TEXT,
+  field1 TEXT NOT NULL,
+  field2 TEXT,
   array_field TEXT[]
+);
+
+CREATE TABLE uuid_pk (
+  id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+  field1 TEXT
 );
 
 CREATE TABLE compound_pk (
@@ -23,6 +31,11 @@ CREATE TABLE "CasedName" (
   "Id" SERIAL NOT NULL PRIMARY KEY,
   "Field1" TEXT
 );
+
+CREATE VIEW normal_as AS
+SELECT *
+FROM normal_pk
+WHERE field1 LIKE 'a%';
 
 INSERT INTO normal_pk (field1) VALUES ('alpha'), ('beta'), ('gamma');
 INSERT INTO compound_pk (field1) VALUES ('alpha'), ('beta'), ('gamma');
