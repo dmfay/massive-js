@@ -15,8 +15,8 @@ SELECT * FROM (
     t.table_name AS name,
     parent.relname AS parent,
     array_agg(DISTINCT kc.column_name::text) FILTER (WHERE kc.column_name IS NOT NULL) AS pk,
-    TRUE AS is_insertable_into,
-    array_agg(DISTINCT c.column_name::text) AS columns
+    array_agg(DISTINCT c.column_name::text) AS columns,
+    TRUE AS is_insertable_into
   FROM information_schema.tables t
   LEFT OUTER JOIN information_schema.table_constraints tc
     ON tc.table_schema = t.table_schema
@@ -51,8 +51,8 @@ SELECT * FROM (
     t.table_name AS name,
     NULL AS parent,
     NULL AS pk,
-    CASE t.is_insertable_into WHEN 'YES' THEN TRUE ELSE FALSE END AS is_insertable_into,
-    array_agg(c.column_name::text) AS columns
+    array_agg(c.column_name::text) AS columns,
+    CASE t.is_insertable_into WHEN 'YES' THEN TRUE ELSE FALSE END AS is_insertable_into
   FROM information_schema.tables t
   JOIN information_schema.columns c
     ON c.table_schema = t.table_schema
