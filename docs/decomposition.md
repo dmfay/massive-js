@@ -76,7 +76,11 @@ db.query(
   {
     decompose: {
       pk: 'id',
-      columns: {u_id: 'id', u_name: 'name', u_address: 'address'},
+      columns: {
+        u_id: 'id',
+        u_name: 'name',
+        u_address: 'address'
+      },
       tests: {
         pk: 't_id',
         columns: {t_id: 'id', t_score: 'score'},

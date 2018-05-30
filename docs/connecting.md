@@ -1,19 +1,15 @@
 # Connecting
 
-Require Massive and invoke the function with connection information. The resulting promise resolves into a connected database instance.
+Connect by requiring or importing Massive and invoking the function with connection information. The resulting promise resolves into a connected database instance.
 
 The connection process is fast but does take time. The instance is intended to be maintained and reused rather than regenerated for each query.
-
-```javascript
-const massive = require('massive');
-
-massive(connectionInfo).then(instance => {...});
-```
 
 You can connect Massive to your database with a [pg-promise configuration object](https://github.com/vitaly-t/pg-promise/wiki/Connection-Syntax#configuration-object) or a connection string. Using the former is recommended for application code since connection strings provide no mechanism for configuring the pool size and other options.
 
 ```javascript
-const connectionInfo = {
+const massive = require('massive');
+
+massive({
   host: 'localhost',
   port: 5432,
   database: 'appdb',
@@ -21,13 +17,20 @@ const connectionInfo = {
   password: 'apppwd',
   ssl: false,
   poolSize: 10
-};
+}).then(instance => {...});
 ```
 
-```javascript
-const connectionInfo =
-  'postgres://appuser:apppwd@localhost:5432/appdb?ssl=false';
-```
+<!-- vim-markdown-toc GFM -->
+
+* [Introspection](#introspection)
+  * [Looking Into the Instance](#looking-into-the-instance)
+  * [Schemas](#schemas)
+  * [Refreshing the API](#refreshing-the-api)
+  * [Refreshing Materialized Views](#refreshing-materialized-views)
+* [Loader Configuration and Filtering](#loader-configuration-and-filtering)
+* [Driver Configuration](#driver-configuration)
+
+<!-- vim-markdown-toc -->
 
 ## Introspection
 
@@ -37,14 +40,14 @@ Tables and views, including foreign tables and materialized views, are attached 
 
 Database functions and scripts are attached as invocable functions. See [Functions](functions) for more.
 
-Schemas other than `public` (or your configured default) act as namespaces, as do paths in your scripts directory.
+Schemas other than `public` (or your configured database default) act as namespaces, as do paths in your scripts directory.
 
 Most objects can coexist if they wind up in the same namespace. For example, you might have a table named `companies` and a schema named `companies` which contains more tables. In this scenario, `db.companies` will be a table and _also_ a schema, so you might query `db.companies.find(...)` and `db.companies.audit.find(...)` as you need to.
 
 There are a few specific cases in which collisions will result in an error:
 
 * When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script at `mytable/find.sql` cannot be loaded.
-* When a script file has the same path as a database function.
+* When a script file has the same path as a database function, schemas being equivalent to folders.
 
 ### Looking Into the Instance
 
@@ -58,6 +61,18 @@ db.listFunctions();
 
 Each returns an unsorted array of dot-separated paths (including the schema for non-public database entities, and nested directory names for script files). `listTables` includes normal and foreign tables. `listFunctions` includes both database functions and script files.
 
+### Schemas
+
+Massive understands database schemas and treats any schema other than the default `public` (or Postgres configured `search_path`) as a namespace. Objects bound to the `public` schema are attached directly to the database object, while other schemas will be represented by a namespace attached to the database object, with their respective tables and views bound to the namespace.
+
+```javascript
+// query a table on the public schema
+db.tests.find(...).then(...);
+
+// query a table on the auth schema
+db.auth.users.find(...).then(...);
+```
+
 ### Refreshing the API
 
 If you're changing your database's schema on the go by issuing `CREATE`, `ALTER`, and `DROP` statements at runtime, the connected Massive instance will eventually be out of date since it is generated at the time of connection. The `reload` function cleans out your database's API and performs the introspection again, ensuring you can access dynamically instantiated objects.
@@ -66,16 +81,17 @@ If you're changing your database's schema on the go by issuing `CREATE`, `ALTER`
 db.reload().then(refreshedInstance => {...});
 ```
 
-### Schemas
+### Refreshing Materialized Views
 
-Massive understands database schemas and treats any schema other than the default `public` as a namespace. Objects bound to the `public` schema are attached directly to the database object, while other schemas will be represented by a namespace attached to the database object, with their respective tables and views bound to the namespace.
+`refresh` can be used with [materialized views](https://www.postgresql.org/docs/current/static/rules-materializedviews.html), which cache the view query results to sacrifice realtime updates for performance. Materialized views must be refreshed whenever you need to ensure the information in them is up to date.
+
+Materialized views ordinarily block reads while refreshing. To avoid this, invoke the function passing `true` to specify a concurrent refresh.
+
+`refresh` returns an empty query result.
 
 ```javascript
-// query a table on the public schema
-db.tests.find(...).then(...);
-
-// query a table on the auth schema
-db.auth.users.find(...).then(...);
+db.cached_statistics.refresh(true) // concurrently
+  .then(() => {...});
 ```
 
 ## Loader Configuration and Filtering

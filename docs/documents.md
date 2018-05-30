@@ -6,6 +6,21 @@ PostgreSQL's JSONB functionality allows us to blend relational and document appr
 
 The JSONB type is a great solution to this problem, and Massive takes care of the management overhead with a document table API.
 
+<!-- vim-markdown-toc GFM -->
+
+* [Document Tables](#document-tables)
+  * [db.saveDoc](#dbsavedoc)
+* [Querying Documents](#querying-documents)
+  * [A Note About Criteria](#a-note-about-criteria)
+  * [countDoc](#countdoc)
+  * [findDoc](#finddoc)
+  * [searchDoc](#searchdoc)
+* [Persisting Documents](#persisting-documents)
+  * [saveDoc](#savedoc)
+  * [updateDoc](#updatedoc)
+
+<!-- vim-markdown-toc -->
+
 ## Document Tables
 
 Document tables exist for the sole purpose of storing JSONB data. Query them through Massive's API, and you get a JSON document which you can modify and persist, all seamlessly. You don't even need to create them ahead of time until you know you need them.

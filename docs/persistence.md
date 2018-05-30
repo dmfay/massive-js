@@ -4,13 +4,25 @@ Massive's lack of entity modeling means it retrieves your data in the form of pl
 
 The documentation for persistence is written with tables in mind, but you can also persist data through views which meet [certain criteria](https://www.postgresql.org/docs/current/static/sql-createview.html#SQL-CREATEVIEW-UPDATABLE-VIEWS) using the same methods.
 
+<!-- vim-markdown-toc GFM -->
+
+* [save](#save)
+  * [insert](#insert)
+    * [Multiple Records](#multiple-records)
+    * [Deep Insert](#deep-insert)
+    * [Options](#options)
+* [update](#update)
+* [destroy](#destroy)
+
+<!-- vim-markdown-toc -->
+
 ## save
 
 `save` persists a single object to the database. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. The promise `save` returns will resolve to the created or modified record represented as an object.
 
 `save` may not be used with foreign tables or updatable views, since they cannot have primary keys. If you need to persist data to a foreign table or updatable view, use `insert` and `update`.
 
-[Query options](options) for `INSERT` and `UPDATE` statements, and for results processing, may be used with `save` as a second argument. However, most of these are of limited utility.
+[Query options](options) valid for `insert`, and for results processing, may be used with `save` as a second argument. However, most of these are of limited utility.
 
 ```javascript
 db.tests.save({
@@ -59,7 +71,7 @@ db.tests.insert([{
 });
 ```
 
-Records must be consistently formed, having the same fields in the same iteration order. Fields may be omitted if the database default value is intended; however, fields having `NOT NULL` constraints must be included or the insert will fail.
+Fields may be omitted if the database default value is intended; however, fields having `NOT NULL` constraints must be included or the insert will fail.
 
 #### Deep Insert
 
@@ -94,7 +106,7 @@ Deep insert is _only_ supported when inserting single records. Attempting to dee
 
 #### Options
 
-[Query options](options) for `INSERT` statements and results processing may be used with `insert`:
+[Query options](options) for `insert` and results processing may be used:
 
 ```javascript
 db.tests.insert({
@@ -102,7 +114,7 @@ db.tests.insert({
   name: 'homepage',
   version: 1
 }, {
-  onConflictIgnore: true, // do nothing if this row already exists
+  onConflictIgnore: true, // skip if this row already exists
 }).then(test => {
   // the inserted row, or `null` if there was a conflict and
   // nothing was inserted
@@ -126,7 +138,7 @@ db.tests.update({
 });
 ```
 
-`update` can take [query options](options) for `UPDATE` statements and for results processing:
+`update` can use the `only` [query option](options), as well as options affecting results processing:
 
 ```javascript
 db.tests.update({
@@ -142,7 +154,7 @@ db.tests.update({
 
 `destroy` removes data either by primary key or by matching a criteria object. In the former case, it returns a promise for the deleted record object; in the latter, it returns a promise for an array containing all deleted records, even if no or one records were deleted.
 
-[Query options](options) for `DELETE` statements and results processing may be used with `destroy`.
+`destroy` may use the `only` [query option](options), as well as options affecting results processing.
 
 ```javascript
 db.tests.destroy(1).then(test => {

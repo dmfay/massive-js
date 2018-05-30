@@ -4,6 +4,15 @@ Tasks let you reuse the same connection for multiple statements, avoiding the ov
 
 Database transactions are similar to tasks, except they're all-or-nothing: if any individual statement fails to complete, the whole set is rolled back -- as if none of them had ever executed in the first place. Only when the final statement has completed can the transaction be _committed_ into the database. Script files and functions naturally execute in a single transaction, but the Massive API allows complex workflows to be broken apart and processed safely.
 
+<!-- vim-markdown-toc GFM -->
+
+* [Starting a Task or Transaction](#starting-a-task-or-transaction)
+* [Options](#options)
+
+<!-- vim-markdown-toc -->
+
+## Starting a Task or Transaction
+
 Begin a task with the `db.withConnection` method, or a transaction with `db.withTransaction`. Each takes as its first argument a function, presumably involving Massive API calls, which returns a promise. The function will be passed a copy of the `db` object with all your tables, views, functions, and scripts attached, but which routes all database calls through the task or transaction.
 
 ```javascript

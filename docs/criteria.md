@@ -16,6 +16,18 @@ const criteria = {
 };
 ```
 
+<!-- vim-markdown-toc GFM -->
+
+* [Operations](#operations)
+  * [Scalar Comparison](#scalar-comparison)
+  * [Arrays](#arrays)
+  * [Pattern Matching](#pattern-matching)
+  * [Regular Expressions](#regular-expressions)
+* [Casting](#casting)
+* [JSON Traversal](#json-traversal)
+
+<!-- vim-markdown-toc -->
+
 ## Operations
 
 Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. **If no operator is provided, the predicate will test for equality.**
