@@ -61,7 +61,7 @@
   "dependencies": {
     "commander": "~2.15.0",
     "glob": "~7.1.1",
-    "lodash": "~4.17.4",
+    "lodash": "^4.17.10",
     "pg-promise": "~8.4.0",
     "pg-query-stream": "~1.1.1"
   },
@@ -73,7 +73,7 @@
     "eslint": "~4.19.0",
     "jsdoc": "^3.5.4",
     "mocha": "~5.2.0",
-    "nyc": "~11.8.0",
+    "nyc": "~12.0.1",
     "standard-version": "^4.4.0"
   },
   "repository": {
