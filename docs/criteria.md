@@ -1,18 +1,21 @@
 # Criteria Objects
 
-Many Massive functions use criteria objects to build `WHERE` clauses. Although they are principally used in query functions, there are other uses for them. In particular, bulk updates use criteria objects to filter data being modified.
+Many Massive functions use criteria objects to build `WHERE` clauses. Although they are principally used in query functions, there are other uses for them. In particular, bulk updates use criteria objects to filter the records being modified.
 
-A criteria object is a "plain old JavaScript object" where keys represent the fields to search and values are prepared statement parameters.
+A criteria object is a "plain old JavaScript object" where keys represent the fields to search and values are prepared statement parameters. The key `or` is special and takes an array of nested criteria objects, at least one of which must be fully matched for a record to be included in the resultset. `or` may be nested recursively at any depth.
 
 ```javascript
 // this will search for all active records where the name
-// contains 'homepage' and the JSON 'stats' field shows
+// contains 'homepage' or the JSON 'stats' field shows
 // more than 5 runs
 
 const criteria = {
   is_active: true,
-  'name like': '%homepage%',
-  'stats.runs >': 5
+  or: [{
+    'name like': '%homepage%'
+  }, {
+    'stats.runs >': 5
+  }]
 };
 ```
 
@@ -32,7 +35,7 @@ const criteria = {
 
 Keys in a criteria object may contain an operator which is converted to a SQL operator in the `WHERE` clause. **If no operator is provided, the predicate will test for equality.**
 
-Text operators are case-insensitive.
+Text operator keys are case-insensitive.
 
 ### Scalar Comparison
 

@@ -13,9 +13,9 @@ Massive is _not_ an object-relational mapper (ORM)! It doesn't use models, it do
 Here are some of the high points:
 
 * **Dynamic query generation**: Massive's versatile query builder supports a wide variety of operators, all generated from a simple criteria object.
-* **Low overhead**: An API built from your schema means no model classes to maintain, super-simple bulk operations, and writing directly to tables without any need to create or load entity instances beforehand.
+* **Low overhead**: An API built from your schema means no model classes to maintain, super-simple bulk operations, and direct access to your tables without any need to create or load entity instances beforehand.
 * **Document storage**: PostgreSQL's JSONB storage type makes it possible to blend relational and document strategies. Massive offers a robust API to simplify working with documents: objects in, objects out, with document metadata managed for you.
-* **Relational awareness**: Massive does not traverse relationships or build model graphs, but [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/options.html#decomposition-schemas) allows you to map the results of complex views and scripts to nested object trees.
+* **Relational awareness**: Massive does not traverse relationships or build model graphs, but [deep inserts](https://dmfay.github.io/massive-js/persistence.html#deep-insert) can create related entities and junctions transactionally, and the [`decompose` option](https://dmfay.github.io/massive-js/decomposition.html) allows you to map the results of complex views and scripts to nested object trees.
 * **Transactions**: New in v5, use `db.withTransaction` to execute a callback with full Massive API support in a transaction scope, getting a promise which fulfills if it commits or rejects if it rolls back.
 * **Postgres everything**: Commitment to a single RDBMS lets us use it to its full potential. Massive supports array fields and operations, regular expression matching, foreign tables, materialized views, and more features found in PostgreSQL but not in other databases.
 
@@ -33,18 +33,14 @@ Here are some of the high points:
 
 * [Installation](#installation)
 * [Connecting to a Database](#connecting-to-a-database)
-* [Usage](#usage)
-  * [Criteria Objects](#criteria-objects)
-  * [Query Options](#query-options)
-  * [A Brief Example](#a-brief-example)
-    * [Persistence](#persistence)
-    * [Retrieval](#retrieval)
-    * [Deleting](#deleting)
-    * [Functions and Scripts](#functions-and-scripts)
-    * [Views](#views)
-    * [Arbitrary Queries](#arbitrary-queries)
-    * [Documents](#documents)
-  * [Accessing the Driver](#accessing-the-driver)
+* [A Brief Example](#a-brief-example)
+  * [Persistence](#persistence)
+  * [Retrieval](#retrieval)
+  * [Deletion](#deletion)
+  * [Functions and Scripts](#functions-and-scripts)
+  * [Views and Resultset Decomposition](#views-and-resultset-decomposition)
+  * [Documents](#documents)
+  * [Arbitrary Queries](#arbitrary-queries)
 * [REPL](#repl)
 * [Older Versions](#older-versions)
 
@@ -76,90 +72,15 @@ massive({
 }).then(db => {...});
 ```
 
-When you instantiate Massive, it introspects your database to discover the objects you use to store and retrieve data. These objects become an API for your database on the connected Massive instance itself. The following classes of database object are supported:
+The returned `db` object constitutes an API for your schema, with tables, views, functions, and scripts attached. Read on to walk through using them, or [consult the documentation](https://dmfay.github.io/massive-js/) for specifics.
 
-* All tables having primary key constraints
-* Foreign tables
-* Views, including materialized views
-* Functions
-
-Massive understands database schemas and treats any schema other than `public` (or your default configured in Postgres) as a namespace. Objects in the `public` schema are attached directly to the connected instance, while those in other schemas will be attached in a namespace on the instance.
-
-Most objects can coexist if they wind up in the same namespace. For example, you might have a table named `companies` and a schema named `companies` which contains more tables. In this scenario, `db.companies` will be a table and _also_ a schema, so you might query `db.companies.find(...)` and `db.companies.audit.find(...)` as you need to.
-
-There are a few specific cases in which collisions will result in an error:
-
-* When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script file named `mytable/find.sql` cannot be loaded.
-* When a script file has the same path as a database function.
-
-The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; or with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
-
-If you ever need to run the introspection again, use `db.reload()` to get a promise for an up-to-date instance.
-
-## Usage
-
-Consult the [documentation](https://dmfay.github.io/massive-js/) for full usage instructions.
-
-### Criteria Objects
-
-Many functions use criteria objects to build a query WHERE clause. A criteria object is a JavaScript map matching database fields to values. Unless otherwise specified in the field name, the predicate operation is assumed to be equality. Massive's query builder is extremely flexible and accommodates both standard and Postgres-specific predicates, including JSON object traversal and array and regexp operations.
-
-```javascript
-{
-  'field': 'value',               // equality
-  'field <>': 'value',            // inequality
-  'field': [1, 2, 3],             // IN (x, y, z) tests
-  'field >': 1,                   // greater than
-  'field <=': 1,                  // less than or equal
-  'field BETWEEN': [1, 100],      // BETWEEN
-  'field LIKE': 'val%',           // LIKE
-  'field NOT ILIKE': 'Val%',      // NOT LIKE (case-insensitive)
-  'field ~': 'val[ue]+',          // regexp match
-  'field !~*': 'Val[ue]+',        // no regexp match (case-insensitive)
-  'field @>': ['value', 'Value'], // array contains
-  'field.arr[1].item': 'value'    // JSON traversal
-}
-```
-
-There are many more; see [the full documentation](https://dmfay.github.io/massive-js/criteria.html) for the complete list.
-
-### Query Options
-
-Some functions, particularly the query functions (`find`, `findOne`, `findDoc`, `search`, and `searchDoc`) allow usage of an options object as the second argument. Like the criteria object, this is an ordinary JavaScript map; however, the field names are fixed. Any field may be omitted if not needed. The options object may be omitted entirely if not needed.
-
-```javascript
-{
-  build: true,                    // return query text and parameters without executing anything
-  document: true,                 // treat table as a document store (see 'Documents')
-  fields: ['name', 'created_at']  // retrieve only the specified fields (can be used with exprs)
-  exprs: {                        // retrieve the specified expressions (can be used with fields)
-    lowername: 'lower(name)'
-  }
-  order: [{                       // creates an ORDER BY clause to enforce sorting
-    field: 'settings.role',       // JSON fields use . and [] notation
-    direction: 'desc',            // set the sort direction with 'desc' or 'asc' (optional)
-    type: 'int'                   // enforce a cast type (optional)
-  }, {
-    field: 'name'                 // order elements are applied in order
-  }],
-  orderBody: true,                // order applies to document body fields instead of table columns
-  offset: 20,                     // adds an OFFSET to skip the first n rows
-  limit: 10,                      // adds a LIMIT to restrict the number of rows returned
-  single: true,                   // return the first result row as an object instead of all rows
-  stream: true,                   // return results as a readable stream (see below)
-  only: true                      // ignore tables inheriting from the target table
-}
-```
-
-Complete documentation for query options is available [here](https://dmfay.github.io/massive-js/options.html).
-
-### A Brief Example
+## A Brief Example
 
 Let's say we have a database for a software testing application. This database contains a `tests` table and an `issues` table, where one test may have many issues. In a separate `auth` schema, it contains a `users` table referenced by the others to represent a user running a test and discovering issues. There is a `test_stats` view which calculates statistics on aggregate issue information for individual tests, and a `user_tests` view which returns all users with their associated tests; and there is a `copy_tests` function which clones a test for reuse.
 
 Our testing application can leverage the API Massive builds for almost everything it needs to do, but there is one feature that we haven't been able to integrate as a database function yet: the ability to, in one call, clear a test's issues and update its status to signify that it has been restarted. Eventually, we'll get there, but for now it's a SQL script in our application's `/db` directory, `resetTest.sql`.
 
-#### Persistence
+### Persistence
 
 After we initialize and connect Massive, all these entities are available on the instance. First, we need to create a user:
 
@@ -203,7 +124,7 @@ db.auth.users.update({
 }).then(users => {...});
 ```
 
-#### Retrieval
+### Retrieval
 
 Some time later, we want to retrieve that test. But we don't have the object returned from `save`, so we need to go back to the database with the primary key:
 
@@ -217,7 +138,7 @@ In the mean time, Alice has been busy and discovered several problems which are 
 db.issues.count({test_id: 1}).then(total => {...});
 ```
 
-Since Postgres' `count` returns a 64-bit integer and JavaScript only handles up to 53 bits, `total` will actually be a string. But thanks to JavaScript's weak typing this generally doesn't matter. Next, let's actually pull out the issue data:
+Since Postgres' `count` returns a 64-bit integer and JavaScript only handles up to 53 bits, `total` will actually be a string, although thanks to JavaScript's weak typing this generally doesn't matter. Next, let's actually pull out the issue data:
 
 ```javascript
 db.issues.find({
@@ -227,11 +148,13 @@ db.issues.find({
 }).then(issues => {...});
 ```
 
-The second object we passed defines query options; here, we're sorting the issues most recent first. There are many other options which affect query shape and results processing, and the options object can be used with many of the retrieval and persistence functions. The output of our `find` call is the `issues` array, which contains all records in that table matching the criteria we passed to `find`.
+The first argument to `find` is a [criteria object](https://dmfay.github.io/massive-js/criteria.html). Records are matched against each criterion; a key `or` takes an array of nested criteria objects, at least one of which must be fully matched to qualify for inclusion in the resultset.
+
+The second argument defines [options](https://dmfay.github.io/massive-js/options.html) to modify the query behavior; here, we're sorting the issues most recent first. There are many other options which affect query shape and results processing, and the options object can be used with almost all of the retrieval and persistence functions. The output of our `find` call is the `issues` array, which contains all records in that table matching the criteria we passed to `find`.
 
 There are other retrieval functions: `where` allows us to write more complex `WHERE` clauses than those `find` can generate based on the criteria object, and `search` performs a full-text search against multiple fields in a table. [The documentation](https://dmfay.github.io/massive-js/queries.html) has more information on these.
 
-#### Deleting
+### Deletion
 
 After review, it turns out that one of the issues Alice discovered was actually the application working as designed, so she needs to delete the isssue. We can do that with `destroy`:
 
@@ -241,7 +164,7 @@ db.issues.destroy(3).then(issues => {...});
 
 The issue has been deleted, and the record returned -- in an array this time, since `destroy` can be used with a criteria object just like we used `find` to retrieve multiple issues.
 
-#### Functions and Scripts
+### Functions and Scripts
 
 Bob wants to start testing the homepage, but doesn't want to go through the entire setup process. Fortunately, there's a `copy_test` function which will let him build on Alice's work, if he passes in the test id and his userid to assign the clone to himself:
 
@@ -258,7 +181,7 @@ Shortly after Bob starts testing, the application is redeployed underneath him, 
 db.resetTest(test.id).then(tests => {...});
 ```
 
-#### Views
+### Views and Resultset Decomposition
 
 After Alice has finished testing, she wants to see how her results compare to Bob's. We can query the `test_stats` view just like we did the `issues` and `tests` tables, with exactly the same API functions -- the only difference is that, since it's a view, we can't persist data to it.
 
@@ -301,7 +224,7 @@ Databases are limited to working with this kind of information in terms of flat 
 }]
 ```
 
-Massive can transform any view or script result into an object graph with the `decompose` option. The value of `decompose` is a schema which represents the desired output format. To generate the structure above:
+Massive can transform any view or script result into an object graph with the [`decompose` option](https://dmfay.github.io/massive-js/decomposition.html). The value of `decompose` is a schema which represents the desired output format. To generate the structure above:
 
 ```javascript
 db.user_tests.find({}, {
@@ -323,22 +246,7 @@ db.user_tests.find({}, {
 }).then(...)
 ```
 
-See the [options docs](https://dmfay.github.io/massive-js/options.html) for a complete guide to the schema object.
-
-#### Arbitrary Queries
-
-Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a `hash` database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:
-
-```javascript
-db.query(
-  'update users set password = hash(password) where id < $1 returning *',
-  [3]
-).then(users => {...});
-```
-
-The value returned is an array of rows, assuming the query returns anything. `query` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
-
-#### Documents
+### Documents
 
 The `tests` table represents a fairly limited picture of what exactly Alice and Bob are doing. An individual test may have a lot more data associated with it, and this data could be wildly different depending on what precisely is being evaluated, so simply adding more columns to `tests` isn't really an ideal solution. Postgres' JSONB functionality allows for a more free-form approach than relational databases otherwise support. Working with JSONB fields is certainly possible with the suite of standard table functions, but Massive also allows the dynamic creation and usage of dedicated document tables with a separate set of functions based on the relational data persistence and retrieval functionality.
 
@@ -372,7 +280,7 @@ db.test_attributes.count({web: true})
   .then(total => {...});
 ```
 
-Perform a full-text search:
+Perform a full-text search against the values in the document:
 
 ```javascript
 db.test_attributes.searchDoc({
@@ -410,11 +318,20 @@ db.test_attributes.updateDoc({
 }).then(changedAttributesDocs => {...});
 ```
 
-When changing multiple documents, `updateDoc` returns an array containing all updated documents.
+When used with a criteria object, `updateDoc` returns an array containing all updated documents.
 
-### Accessing the Driver
+### Arbitrary Queries
 
-Massive is focused on convenience and simplicity, not completeness. There will always be features we don't cover; that's why there's `db.query` for arbitrary SQL. In the same vein, Massive exposes the [pg-promise] driver (as `db.pgp`) and connected [Database] instance (as `db.instance`) so client code can easily use its lower-level functions when necessary.
+Last but not least: sometimes you just need to write some SQL. Alice's and Bob's passwords are both stored as plain text, because we were originally more focused on getting up and running than we were on doing things right. Now it's time to rectify this, especially since we've started adding new users through a system that hashes and salts passwords with a `hash` database function and our application login expects passwords to be hashed. So we need to ensure that all our users have hashed passwords, which we can do with an ad-hoc query in the REPL:
+
+```javascript
+db.query(
+  'update users set password = hash(password) where id < $1 returning *',
+  [3]
+).then(users => {...});
+```
+
+The value returned is an array of rows, assuming the query returns anything. `query` is most useful for one-offs like this, or for testing when you don't want to have to reload the database API to get changes to a script file. Once the query is ready for regular use, though, it's best to put it in a file in your scripts directory so you have all your scripts in a central location.
 
 ## REPL
 

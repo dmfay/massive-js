@@ -34,20 +34,18 @@ massive({
 
 ## Introspection
 
-On connection, Massive introspects your schema to find tables, views, and functions. Along with script files, these are attached to the instance object and form your database's API.
-
-Tables and views, including foreign tables and materialized views, are attached as objects with a set of standard access and persistence functions. See [Queries](queries) and [Persistence](persistence) for more details.
-
-Database functions and scripts are attached as invocable functions. See [Functions](functions) for more.
-
-Schemas other than `public` (or your configured database default) act as namespaces, as do paths in your scripts directory.
+When you instantiate Massive, it introspects your database to discover tables, views, and functions. If you have a `/db` directory in your project root, SQL script files there are also loaded. Together, all four become an API for your database attached to the connected Massive instance itself. Schemas (and folders in `/db`) organize objects in namespaces.
 
 Most objects can coexist if they wind up in the same namespace. For example, you might have a table named `companies` and a schema named `companies` which contains more tables. In this scenario, `db.companies` will be a table and _also_ a schema, so you might query `db.companies.find(...)` and `db.companies.audit.find(...)` as you need to.
 
-There are a few specific cases in which collisions will result in an error:
+There are two cases in which collisions will result in an error:
 
-* When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script at `mytable/find.sql` cannot be loaded.
-* When a script file has the same path as a database function, schemas being equivalent to folders.
+* When a script file or database function would override a function belonging to a loaded table or view (or vice versa): for example, `db.mytable` already has a `find()` function, so a script file named `mytable/find.sql` cannot be loaded.
+* When a script file has the same path as a database function.
+
+The introspection process is fast, but not instantaneous, and you don't want to be doing it every time you run another query. Massive is designed to be initialized once, with the instance retained and used throughout the rest of your application.  In Express, you can store the connected instance with `app.set` in your entry point and retrieve it with `req.app.get` in your routes; or with koa, using `app.context`. If no such mechanism is available, you can take advantage of Node's module caching to require the object as necessary.
+
+If you ever need to run the introspection again, use `db.reload()` to get a promise for an up-to-date instance.
 
 ### Looking Into the Instance
 
