@@ -36,7 +36,7 @@ rm -r docs
 
 git add .
 
-git commit -m "regenerate documentation for $VERSION ($BRANCH $COMMIT)"
+git commit -m "docs: regenerate documentation for $VERSION ($BRANCH $COMMIT)"
 
 # return to pre-version state
 

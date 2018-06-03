@@ -8,4 +8,4 @@ echo "committing updated API docs"
 
 git add docs/api
 
-git commit -m "regenerate api docs"
+git commit -m "docs: regenerate API docs"
