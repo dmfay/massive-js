@@ -37,25 +37,18 @@ const orderBy = require('./order-by');
  * Represents a SELECT query.
  *
  * @class
- * @param {Queryable} source - Database object to query.
+ * @param {Readable} source - Database object to query.
  * @param {Object|String|UUID|Number} criteria - A criteria object, prebuilt
  * predicate, or primitive pk value.
  * @param {Object} [options] - {@link https://dmfay.github.io/massive-js/options.html|Select options}.
  */
 const Select = function (source, criteria = {}, options = {}) {
   options = _.defaults(options, {
-    exprs: [],
     only: false,
     orderBody: false,
     generator: 'tableGenerator',
     single: false
   });
-
-  if (_.isUndefined(options.order)) {
-    // null options.order indicates ORDER BY should be omitted entirely for
-    // aggregation etc
-    options.order = source.pk ? `"${source.pk.join('", "')}"` : '1';
-  }
 
   this.source = source.delimitedFullName;
   this.only = options.only;
@@ -67,13 +60,22 @@ const Select = function (source, criteria = {}, options = {}) {
   this.generator = options.generator;
   this.single = options.single;
   this.stream = options.stream;
-  this.order = orderBy(options.order, options.orderBody);
 
-  if (options.columns) {
-    this.fields = _.castArray(options.columns);  // TODO deprecated, remove me in v5
-  } else {
-    this.fields = [];
+  switch (options.order) {
+    case null:
+      // null options.order indicates ORDER BY should be omitted entirely for
+      // aggregation etc
+      this.order = '';
+      break;
+    case undefined:
+      this.order = source.pk ? `ORDER BY "${source.pk.join('", "')}"` : 'ORDER BY 1';
+      break;
+    default:
+      this.order = orderBy(options.order, options.orderBody);
+      break;
   }
+
+  this.fields = [];
 
   // add user-defined fields
   this.fields = _.castArray(options.fields || []).reduce((all, field) => {
@@ -91,16 +93,21 @@ const Select = function (source, criteria = {}, options = {}) {
   }, this.fields);
 
   // interpolate unsafe user-defined expressions
-  _.forEach(options.exprs, (expr, name) => {
+  _.forEach(options.exprs || [], (expr, name) => {
     this.fields.push({
       value: expr,
       alias: name
     });
   });
 
-  if (this.fields.length === 0) {
-    // if the user didn't specify anything
-    this.fields = ['*'];
+  if (!this.fields.length) {
+    if (!options.fields &amp;&amp; !options.exprs) {
+      // nothing specified, select all
+      this.fields.push('*');
+    } else {
+      // explicit empty array, error state
+      this.error = 'The fields array cannot be empty';
+    }
   } else if (options.document) {
     // if the user *did* specify something, but we're querying a document table
     // and so require the id field in addition to whatever they're after
@@ -108,7 +115,7 @@ const Select = function (source, criteria = {}, options = {}) {
   }
 
   if (Object.prototype.hasOwnProperty.call(criteria, 'conditions') &amp;&amp; Object.prototype.hasOwnProperty.call(criteria, 'params')) {
-    // pre-built predicates (full-text searches and Queryable.where style calls use this)
+    // pre-built predicates (full-text searches and Readable.where style calls use this)
     this.where = criteria;
   } else if (source.isPkSearch(criteria)) {
     if (_.isPlainObject(criteria)) {
@@ -120,7 +127,7 @@ const Select = function (source, criteria = {}, options = {}) {
       this.single = true;
     }
   } else {
-    // standard case for queryables
+    // standard case for Readables
     this.where = where(criteria, 0, this.generator);
   }
 
@@ -133,6 +140,10 @@ const Select = function (source, criteria = {}, options = {}) {
  * @return {String} A SQL SELECT statement.
  */
 Select.prototype.format = function () {
+  if (this.error) {
+    throw new Error(this.error);
+  }
+
   const selectList = this.fields.map(f => {
     if (_.isPlainObject(f)) {
       // aliased definitions for document fields
@@ -169,13 +180,13 @@ module.exports = Select;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Queryable.html">Queryable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Table.html">Table</a></li><li><a href="Update.html">Update</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 21 2018 20:58:09 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 02 2018 21:59:24 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -6,6 +6,17 @@ The `find`, `findOne`, and `count` functions form a consistent API for data retr
 
 All query functions except `count` may take [options objects](options). Valid options are those for `SELECT` statements and general results processing. One especially useful option with query functions is `stream`, which, when true, will return results as a stream instead of an array. This allows you to start reading and handling data immediately, but the connection will remain open until the stream is terminated.
 
+<!-- vim-markdown-toc GFM -->
+
+* [find](#find)
+* [findOne](#findone)
+* [count](#count)
+* [where](#where)
+* [search](#search)
+* [Raw SQL](#raw-sql)
+
+<!-- vim-markdown-toc -->
+
 ## find
 
 `find` is the workhorse of the query functions. Given criteria and options (both optional, in which case it queries the full table) it returns a Promise for a results array. If no results are found, the array will be empty.
@@ -99,15 +110,40 @@ db.users.search(
 });
 ```
 
-## refresh
+## Raw SQL
 
-`refresh` can be used with [materialized views](https://www.postgresql.org/docs/current/static/rules-materializedviews.html), which cache the view query results to sacrifice realtime updates for performance. Materialized views must be refreshed whenever you need to ensure the information in them is up to date.
+**Important note: `db.run` is deprecated as of version 5.0.0. Update your code to use `db.query` instead.**
 
-Materialized views ordinarily block reads while refreshing. To avoid this, invoke the function passing `true` to specify a concurrent refresh.
-
-`refresh` returns an empty query result.
+Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.query`.
 
 ```javascript
-db.cached_statistics.refresh(true) // concurrently
-  .then(() => {...});
+db.query(
+  'select * from tests where id > $1',
+  [1]
+).then(tests => {
+  // all tests matching the criteria
+});
+```
+
+`query` takes named parameters as well:
+
+```javascript
+db.query(
+  'select * from tests where id > ${something}',
+  {something: 1}
+).then(tests => {
+  // all tests matching the criteria
+});
+```
+
+And [options](options):
+
+```javascript
+db.query(
+  'select * from tests where id > ${something}',
+  {something: 1},
+  {build: true}
+).then(query => {
+  // an object with sql and params
+});
 ```

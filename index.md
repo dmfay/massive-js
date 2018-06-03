@@ -4,130 +4,17 @@
 npm install massive --save
 ```
 
-**Starting with version 3, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
+**Starting with version 3.0.0, Massive requires ES6 support and uses Promises exclusively. If you need a callback-based API or are using a pre-6.x release of Node.js, install massive@2 or download version 2.x from [the Releases page](https://github.com/dmfay/massive-js/releases).**
 
 Examples are presented using the standard `then()` construction for compatibility, but use of ES2017 `async` and `await` or a flow control library such as [co](https://github.com/tj/co) to manage promises is highly recommended.
 
-## Raw SQL
+## REPL
 
-**Important note: `db.run` is deprecated and will be removed in a future release. Update your code to use `db.query` instead.**
+Massive ships with an interactive Read-Evaluate-Print Loop or REPL which lets you connect to a database and query it using JavaScript.
 
-Massive offers a lot of features for interacting with your database objects in abstract terms which makes bridging the JavaScript-Postgres divide much easier and more convenient, but sometimes there's no way around handcrafting a query. If you need a prepared statement, consider using the scripts directory (see below) but if it's a one-off, there's always `db.query`.
+If you have Massive installed globally with the `-g` flag, you can simply `massive`; if you've installed it in a project, `./node_modules/.bin/massive`. Pass `--database mydb` to connect to a local database, or `--connection` to use a connection string.
 
-```javascript
-db.query(
-  'select * from tests where id > $1', [1]
-).then(tests => {
-  // all tests matching the criteria
-});
-```
-
-`query` takes named parameters as well:
-
-```javascript
-db.query(
-  'select * from tests where id > ${something}',
-  {something: 1}
-).then(tests => {
-  // all tests matching the criteria
-});
-```
-
-And options:
-
-```javascript
-db.query(
-  'select * from tests where id > ${something}',
-  {something: 1},
-  {build: true}
-).then(query => {
-  // an object with sql and params
-});
-```
-
-## Koa Example
-
-```
-const Koa = require('koa');
-const Router = require('koa-router');
-const massive = require('massive');
-
-const app = new Koa();
-const router = new Router();
-
-massive({
-  host: '127.0.0.1',
-  port: 5432,
-  database: 'appdb',
-  user: 'appuser',
-  password: 'apppwd'
-}).then(instance => {
-  app.context.db = instance;
-
-  router.get('/', async (ctx) => {
-    ctx.body = await ctx.db.feed_items.find({
-      'rating >': 0
-    }, {
-      order: 'created_at desc'
-    });
-  });
-
-  app
-    .use(router.routes())
-    .use(router.allowedMethods())
-    .listen(3000);
-});
-```
-
-## Express Example
-
-```
-const express = require('express');
-const http = require('http');
-const massive = require('massive');
-
-const app = express();
-
-massive({
-  host: '127.0.0.1',
-  port: 5432,
-  database: 'appdb',
-  user: 'appuser',
-  password: 'apppwd'
-}).then(instance => {
-  app.set('db', instance);
-
-  app.get('/', (req, res) => {
-    req.app.get('db').feed_items.find({
-      'rating >': 0
-    }, {
-      order: 'created_at desc'
-    }).then(items => {
-      res.json(items);
-    });
-  });
-
-  http.createServer(app).listen(3000);
-});
-```
-
-## Driver Configuration
-
-Direct configuration of the pg-promise driver is supported by passing an initialization options object as the third argument when connecting Massive.
-
-```javascript
-massive(connectionInfo, {}, {
-  pgNative: true,
-  capSQL: true
-}).then(instance => {
-  // driver options cannot be modified but are available
-  // as db.driverConfig
-});
-```
-
-For a full accounting of options please see the [pg-promise documentation](https://github.com/vitaly-t/pg-promise#initialization-options). Some especially useful configurations are listed below.
-
-### Changing the Promise Library
+## Changing the Promise Library
 
 Massive uses ES6 promises by default. To use a different promise implementation such as Bluebird to enable long stack traces, pass the `required` promise module in the driver options.
 
@@ -139,9 +26,9 @@ massive(connectionInfo, {}, {
 }).then(instance => {...});
 ```
 
-### Monitoring Queries
+## Monitoring Queries
 
-`pg-monitor` can help diagnose bugs and performance issues by showing all queries Massive emits to the database as they happen in realtime. Note that while the driver options are not required while initializing Massive, `db.driverConfig` still contains the read-only `pg-promise` configuration.
+`pg-monitor` can help diagnose bugs and performance issues by logging all queries Massive emits to the database as they happen in realtime with more granularity than `tail`ing the Postgres logfile. Note that while the driver options are not required while initializing Massive, `db.driverConfig` still contains the read-only `pg-promise` configuration.
 
 ```javascript
 const massive = require('massive');
@@ -156,7 +43,7 @@ massive('postgres://localhost:5432/massive').then(db => {
 });
 ```
 
-### Streaming Results
+## Streaming Results
 
 To improve performance with large result sets, you might want to consider using a stream instead of getting your results in an array all at once. This has the upside of returning _something_ to read right away (which can be a big deal for slow queries too!), but the price is that the connection remains open until you're done. To turn on streaming, add `{stream: true}` to your options object.
 

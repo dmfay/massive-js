@@ -4,9 +4,17 @@ Object-relational mappers tend to ignore functions. For many, the database exist
 
 To be fair, this setup is perfectly sufficient for many use cases. But when it isn't, it _hurts_. With functions, you can perform complex operations on your data at a scope and speed unrivaled by anything else. Why go to the trouble of querying bulk data into another system and manipulating it -- only to put it back where it was with a second trip across the wire? Especially when there's a powerful, flexible language purpose-built for set operations _right there_? You wouldn't work that way, and Massive won't make you: functions are first-class citizens as far as it's concerned.
 
+<!-- vim-markdown-toc GFM -->
+
+* [Database Functions](#database-functions)
+* [The Scripts Directory](#the-scripts-directory)
+* [Invocation](#invocation)
+
+<!-- vim-markdown-toc -->
+
 ## Database Functions
 
-All functions visible to the connecting role are attached to the Massive instance, unless the loader configuration restricts function loading. See the [Connecting](connecting) chapter for more information.
+All functions visible to the connecting role are attached to the Massive instance, unless the [loader configuration](connecting#loader-configuration-and-filtering) restricts function loading.
 
 ## The Scripts Directory
 
@@ -14,7 +22,7 @@ Massive doesn't stop at the functions present in the database itself: on startup
 
 By default, Massive searches the `/db` directory, but this can be customized by setting the `scripts` property in the loader configuration. The scripts directory can contain further subdirectories; like schemas, these are treated as namespaces. Unlike schemas, they can be nested to arbitrary depth.
 
-Like `run`, prepared statements in script files can use named parameters instead of `$1`-style indexed parameters. Named parameters are formatted `${name}`. Other delimiters besides braces are supported; consult the pg-promise documentation for a full accounting.
+Like `db.query`, prepared statements in script files can use named parameters instead of `$1`-style indexed parameters. Named parameters are formatted `${name}`. Other delimiters besides braces are supported; consult the pg-promise documentation for a full accounting.
 
 Prepared statement scripts must consist of one and only one SQL statement. Common table expressions or CTEs can take some of the sting out of this requirement, but if you need to execute multiple statements with arbitrary parameters it's time to turn it into a proper function.
 

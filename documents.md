@@ -6,6 +6,21 @@ PostgreSQL's JSONB functionality allows us to blend relational and document appr
 
 The JSONB type is a great solution to this problem, and Massive takes care of the management overhead with a document table API.
 
+<!-- vim-markdown-toc GFM -->
+
+* [Document Tables](#document-tables)
+  * [db.saveDoc](#dbsavedoc)
+* [Querying Documents](#querying-documents)
+  * [A Note About Criteria](#a-note-about-criteria)
+  * [countDoc](#countdoc)
+  * [findDoc](#finddoc)
+  * [searchDoc](#searchdoc)
+* [Persisting Documents](#persisting-documents)
+  * [saveDoc](#savedoc)
+  * [updateDoc](#updatedoc)
+
+<!-- vim-markdown-toc -->
+
 ## Document Tables
 
 Document tables exist for the sole purpose of storing JSONB data. Query them through Massive's API, and you get a JSON document which you can modify and persist, all seamlessly. You don't even need to create them ahead of time until you know you need them.
@@ -15,6 +30,30 @@ Document tables may be extended with new columns and foreign keys. The `id` type
 Standard table functions still work on document tables, and can be quite useful especially for extended document tables! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body.myField.anArray[1].aField`.
 
 `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
+
+### db.saveDoc
+
+The connected database instance has a `saveDoc` function. Passed a collection name (which can include a non-public schema) and a JavaScript object, this will create the table if it doesn't already exist and write the object to it.
+
+```javascript
+db.saveDoc('reports', {
+  title: 'Week 12 Throughput',
+  lines: [{
+    name: '1 East',
+    numbers: [5, 4, 6, 6, 4]
+  }, {
+    name: '2 East',
+    numbers: [4, 4, 4, 3, 7]
+  }]
+}).then(report => {
+  // the reports table has been created and the initial document
+  // is assigned a primary key value and returned
+});
+```
+
+If the table already exists, you can still use `db.saveDoc`, but you can also invoke `saveDoc` on the table itself.
+
+## Querying Documents
 
 ### A Note About Criteria
 
@@ -53,30 +92,6 @@ db.docs.findDoc({
 
 Be careful with criteria which cannot use the index since they may result in poorly-performing queries with sufficiently large tables.
 
-### db.saveDoc
-
-The connected database instance has a `saveDoc` function. Passed a collection name (which can include a non-public schema) and a JavaScript object, this will create the table if it doesn't already exist and write the object to it.
-
-```javascript
-db.saveDoc('reports', {
-  title: 'Week 12 Throughput',
-  lines: [{
-    name: '1 East',
-    numbers: [5, 4, 6, 6, 4]
-  }, {
-    name: '2 East',
-    numbers: [4, 4, 4, 3, 7]
-  }]
-}).then(report => {
-  // the reports table has been created and the initial document
-  // is assigned a primary key value and returned
-});
-```
-
-If the table already exists, you can still use `db.saveDoc`, but you can also invoke `saveDoc` on the table itself.
-
-## Querying Documents
-
 ### countDoc
 
 Like its counterpart, `countDoc` returns the number of extant documents matching a criteria object. Unlike `count`, `countDoc` does not accept a raw SQL `WHERE` definition.
@@ -107,7 +122,7 @@ db.reports.findDoc({
 
 ### searchDoc
 
-`searchDoc` performs a full-text search on the document body fields.
+`searchDoc` performs a full-text search on the document body. You can specify fields, or omit in order to use the stored search vector to search the entire document.
 
 ```javascript
 db.reports.searchDoc({
@@ -123,7 +138,11 @@ db.reports.searchDoc({
 
 ### saveDoc
 
-`saveDoc` inserts or updates a document. If an `id` field is present in the document, the corresponding record will be updated; otherwise, it's inserted. `saveDoc` will replace the entire document and does not update individual fields; to do that, see `modify`.
+`saveDoc` inserts or updates a document, like `save` inserts or updates records in ordinary tables. If an `id` field is present in the document you pass, the corresponding record will be updated; otherwise, it's inserted.
+
+There is one important distinction in how the two methods operate: `saveDoc` **overwrites the entire document** on updates! If you pass an incomplete document in, that's what gets persisted -- fields you don't specify will be gone. To modify documents without overwriting non-specified fields, see `updateDoc`.
+
+`saveDoc` returns a promise for the updated document.
 
 ```javascript
 db.reports.saveDoc({
@@ -140,28 +159,30 @@ db.reports.saveDoc({
 });
 ```
 
-### modify
+### updateDoc
 
-`modify` adds and updates fields in an existing document or documents _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `modify` takes an ID or criteria object, a changes object, and an optional name for the JSON or JSONB column.
+`updateDoc` adds and updates fields in an existing document or documents _without_ replacing the entire body. Fields not defined in the `changes` object are not modified. `updateDoc` requires an ID or criteria object and a changes object, with optional options.
 
-This function may be used with any JSON or JSONB column, not just with document tables, but the behavior is slightly different. With document tables, criteria objects will be tested against the document body; with other tables, they will be tested against the row. Likewise, the promise returned will be for the updated document with a document table, or for the entire row with another table.
+`updateDoc` may be used to alter values in any JSON or JSONB column, not just with document tables. However, if the JSON column name is overridden by passing `options.body`, there is an important change in behavior. Criteria are normally applied against the document body as with other document methods; however, when a new `body` is specified, criteria will be tested against the row as with other _table_ methods. Likewise, the promise returned will be for the updated document with a document table, or for the entire row when `updateDoc` is invoked against another table.
 
 ```javascript
-db.reports.modify(1, {
+db.reports.updateDoc(1, {
   title: 'Week 11 Throughput'
 }).then(report => {
   // the updated report, with a changed 'title' attribute
 });
 
-db.products.modify({
+db.products.updateDoc({
   type: 'widget'
 }, {
   colors: ['gray', 'purple', 'red']
-}, 'info').then(widgets => {
-  // an array of widgets, now in at least three colors.
-  // since products is not a document table (note the
-  // 'info' field was specified to update), the 'type'
-  // is tested against a column named type rather than
-  // a key in the info JSON or JSONB column.
+}, {
+  body: 'info'
+}).then(widgets => {
+  // an array of widgets, now in at least three colors; since
+  // products is not a document table (note the 'info' field
+  // was specified to update), the 'type' is tested against a
+  // column named type rather than a key in the info JSON or
+  // JSONB column.
 });
 ```
