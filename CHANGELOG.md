@@ -40,13 +40,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### BREAKING CHANGES
 
-* empty options.fields is now recognized as an error
-instead of falling back to '*'
+* empty options.fields is now recognized as an error instead of falling back to '*'
 * db.run is gone; please use db.query instead
 * 'created_at' and 'updated_at' are now reserved keys in documents
 * db.doctable.modify is now db.doctable.updateDoc
-* update() now requires separate criteria and changes, use save() to update record objects
-* field should now be specified with options.body
+* update() now requires separate criteria and changes objects, use save() to update self-contained record objects
+* field for updateDoc() against non-standard json column name should now be specified with options.body
 * deepInsert option must be truthy to enable this behavior
 * unsafe literal {order: 'string asc'} syntax has been removed
 * find, countDoc, etc no longer accept '*' in place of an empty criteria object
