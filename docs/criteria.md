@@ -47,6 +47,7 @@ Text operator keys are case-insensitive.
 | `<=` | `<=` | Less than or equal |
 | `>` | `>` | Greater than |
 | `>=` | `>=` | Greater than or equal |
+| nothing or `=` | `IN` | Test whether value is in an array of scalar expressions |
 | `BETWEEN` | `BETWEEN` | Test whether value is between the `[lower, upper]` bounds of a 2-element array |
 | `IS` | `IS` | Explicit equality test for `NULL` and boolean values |
 | `IS NOT` | `IS NOT` | Explicit inequality test for `NULL` and boolean values |
