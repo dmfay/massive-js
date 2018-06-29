@@ -12,7 +12,8 @@ global.massive = require('../../index');
 global.connectionString = connectionString;
 
 global.loader = {
-  enhancedFunctions: true
+  enhancedFunctions: true,
+  createDocumentTablePkDataType: 'uuid'
 };
 
 global.resetDb = function (schema = 'default') {
