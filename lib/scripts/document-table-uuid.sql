@@ -1,4 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE ${schema~}.${table~}(
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   body jsonb NOT NULL,
