@@ -1,5 +1,5 @@
 CREATE TABLE ${schema~}.${table~}(
-  id serial PRIMARY KEY,
+  id ${pkType~} PRIMARY KEY ${pkDefault^},
   body jsonb NOT NULL,
   search tsvector,
   created_at timestamptz DEFAULT now(),

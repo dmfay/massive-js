@@ -12,8 +12,7 @@ global.massive = require('../../index');
 global.connectionString = connectionString;
 
 global.loader = {
-  enhancedFunctions: true,
-  createDocumentTablePkDataType: 'uuid'
+  enhancedFunctions: true
 };
 
 global.resetDb = function (schema = 'default') {
@@ -25,6 +24,7 @@ global.resetDb = function (schema = 'default') {
         Promise.all(schemata.map(s => db.query(`drop schema ${s.schema_name} cascade`)))
       )
       .then(() => db.schema())
+      .then(() => db.createExtension('uuid-ossp'))
       .then(() => db.reload());
   });
 };
