@@ -45,7 +45,7 @@ describe('createDocumentTable', function () {
 
     it('creates a table with UUID primary key on public schema', function () {
       global.loader.documentPkType = 'uuid';
-      global.loader.uuidVersion = 'uuid_generate_v1mc';
+      global.loader.uuidVersion = 'v1mc';
 
       return db.createDocumentTable(tableName).then(() => {
         assert.isOk(db[tableName]);
@@ -94,7 +94,7 @@ describe('createDocumentTable', function () {
 
     it('creates a table with UUID primary key on the specified schema', function () {
       global.loader.documentPkType = 'uuid';
-      global.loader.uuidVersion = 'uuid_generate_v1mc';
+      global.loader.uuidVersion = 'v1mc';
 
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);

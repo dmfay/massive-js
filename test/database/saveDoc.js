@@ -91,7 +91,7 @@ describe('saveDoc', function () {
       yield db.createExtension('uuid-ossp');
 
       global.loader.documentPkType = 'uuid';
-      global.loader.uuidVersion = 'uuid_generate_v1mc';
+      global.loader.uuidVersion = 'v1mc';
 
       return db.createDocumentTable('docs_uuid');
     });
@@ -173,16 +173,6 @@ describe('saveDoc', function () {
 
       return db.dropExtension('uuid-ossp');
     });
-
-    // after(function () {
-    //   global.loader.documentPkType = 'serial';
-    //   global.loader.uuidVersion = '';
-
-    //   return db.dropTable('docs_uuid', {cascade: true})
-    //     .then(function () {
-    //       return db.dropExtension('uuid-ossp');
-    //     });
-    // });
   });
 
   describe('with an existing table in a schema', function () {
@@ -242,7 +232,7 @@ describe('saveDoc', function () {
       yield db.createExtension('uuid-ossp');
 
       global.loader.documentPkType = 'uuid';
-      global.loader.uuidVersion = 'uuid_generate_v1mc';
+      global.loader.uuidVersion = 'v1mc';
 
       return db.createDocumentTable('myschema.docs_uuid');
     });
@@ -293,16 +283,6 @@ describe('saveDoc', function () {
 
       return db.dropExtension('uuid-ossp');
     });
-
-    // after(function () {
-    //   global.loader.documentPkType = 'serial';
-    //   global.loader.uuidVersion = '';
-
-    //   return db.dropSchema('myschema', {cascade: true})
-    //     .then(function () {
-    //       return db.dropExtension('uuid-ossp');
-    //     });
-    // });
   });
 
   describe('without an existing table', function () {
