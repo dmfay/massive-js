@@ -110,7 +110,7 @@ describe('connecting', function () {
       delete testLoader.scripts;
 
       return massive(connectionString, testLoader).then(db => {
-        assert.lengthOf(db.objects.filter(f => f instanceof Executable), 14);
+        assert.lengthOf(db.objects.filter(f => f instanceof Executable), 4);
         assert.lengthOf(db.objects.filter(f => f.sql instanceof pgp.QueryFile), 0);
 
         return db.instance.$pool.end();
@@ -554,7 +554,7 @@ describe('connecting', function () {
       }, loader);
 
       return massive(connectionString, testLoader).then(db => {
-        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 15);
+        assert.lengthOf(db.objects.filter(o => o instanceof Executable), 5);
         assert.lengthOf(db.objects.filter(o => o instanceof Executable && o.sql instanceof pgp.QueryFile), 1);
 
         return db.instance.$pool.end();
