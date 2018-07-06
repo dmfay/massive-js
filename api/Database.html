@@ -200,6 +200,54 @@ table, view, and function visible to the connection's user.
 
         <tr>
             
+                <td class="name"><code>documentPkType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Override default data type (serial),
+ set for DocumentTable primary key 'id', e.g. 'uuid'</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>uuidVersion</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">If documentPkType is set to 'uuid', set which UUID version to use,
+ e.g. 'uuid_generate_v1', 'uuid_generate_v4', etc. Default is 'uuid_generate_v4'</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>allowedSchemas</code></td>
             
 
@@ -658,7 +706,7 @@ instance.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line74">line 74</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -767,7 +815,7 @@ introspection state.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line176">line 176</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line180">line 180</a>
     </li></ul></dd>
     
 
@@ -903,7 +951,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line464">line 464</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line525">line 525</a>
     </li></ul></dd>
     
 
@@ -931,6 +979,163 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
         
 <div class="param-desc">
     The added table.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createExtension"><span class="type-signature"></span>createExtension<span class="signature">(extensionName)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create an extension.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>extensionName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A valid extension name. Example 'uuid-ossp'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line445">line 445</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise which resolves when the extension has been created.
 </div>
 
 
@@ -1060,7 +1265,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line512">line 512</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line578">line 578</a>
     </li></ul></dd>
     
 
@@ -1217,7 +1422,7 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line166">line 166</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line170">line 170</a>
     </li></ul></dd>
     
 
@@ -1240,6 +1445,163 @@ specified in a qualified path, current schema (usually 'public') is assumed.</td
 
 
 
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="dropExtension"><span class="type-signature"></span>dropExtension<span class="signature">(extensionName)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Drop an extension.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>extensionName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A valid extension name. Example 'uuid-ossp'</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line455">line 455</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise which resolves when the extension has been droped.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1425,7 +1787,7 @@ the schema.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line529">line 529</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line595">line 595</a>
     </li></ul></dd>
     
 
@@ -1657,7 +2019,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line497">line 497</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line563">line 563</a>
     </li></ul></dd>
     
 
@@ -1765,7 +2127,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line298">line 298</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line302">line 302</a>
     </li></ul></dd>
     
 
@@ -1873,7 +2235,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line268">line 268</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line272">line 272</a>
     </li></ul></dd>
     
 
@@ -1981,7 +2343,7 @@ the table.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line283">line 283</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line287">line 287</a>
     </li></ul></dd>
     
 
@@ -2327,7 +2689,7 @@ resultset.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line325">line 325</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line329">line 329</a>
     </li></ul></dd>
     
 
@@ -2437,7 +2799,7 @@ cleared and new objects and files added.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line195">line 195</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line199">line 199</a>
     </li></ul></dd>
     
 
@@ -2618,7 +2980,7 @@ already exist, it will be created.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line443">line 443</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line467">line 467</a>
     </li></ul></dd>
     
 
@@ -2881,7 +3243,7 @@ queries to be made within the task scope.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line404">line 404</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line408">line 408</a>
     </li></ul></dd>
     
 
@@ -3145,7 +3507,7 @@ queries to be made within the transaction scope.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line425">line 425</a>
+        <a href="lib_database.js.html">lib/database.js</a>, <a href="lib_database.js.html#line429">line 429</a>
     </li></ul></dd>
     
 
@@ -3212,13 +3574,13 @@ fulfilled if it succeeds and commits or rejected if it rolls back.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#getDefaultSQLforUUID">getDefaultSQLforUUID</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 02 2018 21:59:24 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 06 2018 17:16:39 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

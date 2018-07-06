@@ -25,11 +25,23 @@ The JSONB type is a great solution to this problem, and Massive takes care of th
 
 Document tables exist for the sole purpose of storing JSONB data. Query them through Massive's API, and you get a JSON document which you can modify and persist, all seamlessly. You don't even need to create them ahead of time until you know you need them.
 
-Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
-
 Standard table functions still work on document tables, and can be quite useful especially for extended document tables! Fields in the document can be searched with regular `find` and criteria object fields using JSON traversal to look for `body.myField.anArray[1].aField`.
 
 `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
+
+### Primary key default data type
+
+The default primary key data type used for all tables including document tables is 'serial', which by default begins at 1 for the first record created and for every new record increments by 1. However, it is possible to change the primary key data type used for new document tables to 'uuid' (Universal Unique Identifier).
+
+A UUID is a string of 32 hexadecimal digits, in five character groups, separated by hyphens and are generally used in a concurrent or distributed environment.
+
+It is also possible to change the default mechanism used to generate UUIDs, between several standard algorithms, from `uuid_generate_v4()` to `uuid_generate_v1()`, `uuid_generate_v1mc()`, `uuid_generate_v3()` or `uuid_generate_v5()`.
+
+Note: The connected database requires the extension 'uuid-ossp', in order to support the 'uuid' primary key data type.
+
+Please see [loader configuration and filtering](connecting#loader-configuration-and-filtering) for help setting these options.
+
+Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` or `uuid_generate_v4()` etc. for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
 
 ### db.saveDoc
 

@@ -55,6 +55,10 @@ const introspectors = {}; // store introspection scripts across reloads
  * table, view, and function visible to the connection's user.
  * @param {String} loader.scripts - Override the Massive script file location
  * (default ./db).
+ * @param {String} loader.documentPkType - Override default data type (serial),
+ *  set for DocumentTable primary key 'id', e.g. 'uuid'
+ * @param {String} loader.uuidVersion - If documentPkType is set to 'uuid', set which UUID version to use,
+ *  e.g. 'uuid_generate_v1', 'uuid_generate_v4', etc. Default is 'uuid_generate_v4'
  * @param {Array|String} loader.allowedSchemas - Table/view schema whitelist.
  * @param {Array|String} loader.whitelist - Table/view name whitelist.
  * @param {Array|String} loader.blacklist - Table/view name blacklist.
@@ -461,6 +465,26 @@ Database.prototype.withTransaction = function (callback, options = {}) {
 };
 
 /**
+ * Create an extension.
+ *
+ * @param {String} extensionName - A valid extension name. Example 'uuid-ossp'
+ * @return {Promise} A promise which resolves when the extension has been created.
+ */
+Database.prototype.createExtension = function (extensionName) {
+  return this.query(`CREATE EXTENSION IF NOT EXISTS "${extensionName}";`);
+};
+
+/**
+ * Drop an extension.
+ *
+ * @param {String} extensionName - A valid extension name. Example 'uuid-ossp'
+ * @return {Promise} A promise which resolves when the extension has been droped.
+ */
+Database.prototype.dropExtension = function (extensionName) {
+  return this.query(`DROP EXTENSION IF EXISTS "${extensionName}";`);
+};
+
+/**
  * Save a document.
  *
  * @param {String} collection - Document table name to save to. If it does not
@@ -483,6 +507,43 @@ Database.prototype.saveDoc = function (collection, doc) {
 };
 
 /**
+ * Generate SQL to define UUID primary key default
+ *
+ * @param {String} pkType - Primary key data type, 'serial' or 'uuid' expected
+ * @param {String} uuidV - The UUID variant/version (default = 'v4'), typically 'v1', 'v1mc' or 'v4'
+ * @return {String} SQL to define primary key default.
+ */
+function getDefaultSQLforUUID (pkType, uuidV) {
+  if (pkType !== 'uuid') {
+    return '';
+  }
+
+  let sqlDefault = '';
+
+  switch (uuidV) {
+    case 'v1':
+      sqlDefault = 'DEFAULT uuid_generate_v1()';
+      break;
+    case 'v1mc':
+      sqlDefault = 'DEFAULT uuid_generate_v1mc()';
+      break;
+    case 'v3':
+      sqlDefault = 'DEFAULT uuid_generate_v3()';
+      break;
+    case 'v4':
+      sqlDefault = 'DEFAULT uuid_generate_v4()';
+      break;
+    case 'v5':
+      sqlDefault = 'DEFAULT uuid_generate_v5()';
+      break;
+    default:
+      sqlDefault = 'DEFAULT uuid_generate_v4()';
+  }
+
+  return sqlDefault;
+}
+
+/**
  * Create a new document table and attach it to the Database for usage.
  *
  * @param {String} location - Name of the table to create. Unless the schema is
@@ -494,11 +555,16 @@ Database.prototype.createDocumentTable = function (location) {
   const tableName = splits.pop();
   const schemaName = splits.pop() || this.currentSchema;
   const indexName = tableName.replace('.', '_');
+  const documentPkType = this.loader.documentPkType || 'serial';
+  const uuidVersion = this.loader.uuidVersion;
+  const sqlDefault = getDefaultSQLforUUID(documentPkType, uuidVersion);
 
   return this.query(this.loader.queryFiles['document-table.sql'], {
     schema: schemaName,
     table: tableName,
-    index: indexName
+    index: indexName,
+    pkType: documentPkType,
+    pkDefault: sqlDefault
   }).then(() =>
     this.attach(new Writable({
       db: this,
@@ -580,13 +646,13 @@ exports = module.exports = Database;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#getDefaultSQLforUUID">getDefaultSQLforUUID</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jun 02 2018 21:59:24 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 06 2018 17:16:39 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
