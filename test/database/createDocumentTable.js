@@ -52,6 +52,16 @@ describe('createDocumentTable', function () {
         assert.instanceOf(db[tableName], Writable);
       });
     });
+
+    it('saves new document to existing collection (table) without a UUID primary key', function () {
+      return db.saveDoc(tableName, {
+        title: 'Create UUID',
+        created_at: '2015-03-04T09:43:41.643Z'
+      }).then(doc => {
+        assert.equal(doc.title, 'Create UUID');
+        assert.match(doc.id, /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, 'valid uuid format');
+      });
+    });
   });
 
   describe('with schema', function () {
@@ -99,6 +109,16 @@ describe('createDocumentTable', function () {
       return db.createDocumentTable(schemaTableName).then(() => {
         assert.isOk(db[schema][tableName]);
         assert.instanceOf(db[schema][tableName], Writable);
+      });
+    });
+
+    it('saves new document to existing collection (table) without a UUID primary key', function () {
+      return db.saveDoc(schemaTableName, {
+        title: 'Create UUID',
+        created_at: '2015-03-04T09:43:41.643Z'
+      }).then(doc => {
+        assert.equal(doc.title, 'Create UUID');
+        assert.match(doc.id, /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, 'valid uuid format');
       });
     });
   });
