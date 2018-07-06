@@ -100,7 +100,7 @@ Blacklists and whitelists may be comma-separated strings or an array of strings 
 
 ### Document table uuid primary key data type
 
-Please see [Primary key default data type](documents.md#primary-key-default-data-type) for more information about what a UUID is and why you may want to use it. However, to use the loader `documentPkType` option, the connected database will need the extension 'uuid-ossp' installed.
+Please see [Primary key default data type](documents#primary-key-default-data-type) for more information about what a UUID is and why you may want to use it. However, to use the loader `documentPkType` option, the connected database will need the extension 'uuid-ossp' installed.
 
 If this extension is not installed, follow these steps, using the 'postgres' account as 'superuser' privileges are required.
 
