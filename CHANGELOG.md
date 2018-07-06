@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.0"></a>
+# [5.1.0](https://github.com/dmfay/massive-js/compare/v5.0.0...v5.1.0) (2018-07-06)
+
+
+### Features
+
+* new loader option for UUID primary keys in document tables ([#614](https://github.com/dmfay/massive-js/issues/614)) ([b8203d4](https://github.com/dmfay/massive-js/commit/b8203d4))
+
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/dmfay/massive-js/compare/v4.8.3...v5.0.0) (2018-06-03)
 
