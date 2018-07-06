@@ -39,7 +39,7 @@ It is also possible to change the default mechanism used to generate UUIDs, betw
 
 Note: The connected database requires the extension 'uuid-ossp', in order to support the 'uuid' primary key data type.
 
-Please see [loader configuration and filtering](connecting.md#loader-configuration-and-filtering) for help setting these options.
+Please see [loader configuration and filtering](connecting#loader-configuration-and-filtering) for help setting these options.
 
 Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` or `uuid_generate_v4()` etc. for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
 
