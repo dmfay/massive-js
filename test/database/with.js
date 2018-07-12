@@ -187,5 +187,40 @@ describe('transactions', function () {
         });
       });
     });
+
+    it('rolls functions back too', function () {
+      let total;
+
+      return db.products.count().then(count => {
+        total = count;
+
+        return db.instance.$config.promise.resolve();
+      }).then(() => {
+        return db.withTransaction(tx => {
+          assert.notStrictEqual(tx.fn.executable, db.fn.executable);
+
+          let promise = tx.fn({single: true});
+
+          promise = promise.then(record => {
+            assert.isOk(record);
+            assert.isTrue(record.id > 0);
+            assert.equal(record.string, 'beta');
+
+            return tx.products.save({id: 'not an int', description: 'test'});
+          });
+
+          return promise;
+        }).then(() => {
+          assert.fail();
+        }).catch(err => {
+          assert.isOk(err);
+          assert.equal(err.code, '22P02');
+
+          return db.products.count().then(count => {
+            assert.equal(count, total);
+          });
+        });
+      });
+    });
   });
 });
