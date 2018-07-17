@@ -7,7 +7,7 @@ describe('Update', function () {
     delimitedFullName: 'testsource',
     pk: ['id'],
     isPkSearch: () => false,
-    columns: ['field1', 'field2', 'string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']
+    columns: ['id', 'field1', 'field2', 'string', 'boolean', 'int', 'number', 'object', 'array', 'emptyArray']
   };
 
   describe('ctor', function () {
@@ -50,6 +50,11 @@ describe('Update', function () {
       assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1, "field2" = $2 WHERE TRUE RETURNING *');
     });
 
+    it('should ignore nonexistent columns', function () {
+      const result = new Update(source, {field1: 'value1', field2: 2, notafield: 3});
+      assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1, "field2" = $2 WHERE TRUE RETURNING *');
+    });
+
     it('should build a WHERE clause with criteria', function () {
       const result = new Update(source, {field1: 'value1'}, {field1: 'value2'});
       assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1 WHERE "field1" = $2 RETURNING *');
@@ -63,6 +68,7 @@ describe('Update', function () {
     it('should build a WHERE clause with a pk criterion and forestall the docGenerator', function () {
       const result = new Update({
         delimitedFullName: 'testsource',
+        columns: ['id', 'field1'],
         isPkSearch: () => true,
         pk: 'id'
       }, {field1: 'value1'}, {id: 1}, {generator: 'docGenerator'});
