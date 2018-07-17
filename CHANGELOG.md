@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.3"></a>
+## [5.1.3](https://github.com/dmfay/massive-js/compare/v5.1.2...v5.1.3) (2018-07-17)
+
+
+### Bug Fixes
+
+* clean unused params from updates ([352969f](https://github.com/dmfay/massive-js/commit/352969f))
+
+
+
 <a name="5.1.2"></a>
 ## [5.1.2](https://github.com/dmfay/massive-js/compare/v5.1.1...v5.1.2) (2018-07-17)
 
