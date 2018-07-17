@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.1.2"></a>
+## [5.1.2](https://github.com/dmfay/massive-js/compare/v5.1.1...v5.1.2) (2018-07-17)
+
+
+### Bug Fixes
+
+* filter out nonexistent columns from update generation ([e913088](https://github.com/dmfay/massive-js/commit/e913088))
+
+
+
 <a name="5.1.1"></a>
 ## [5.1.1](https://github.com/dmfay/massive-js/compare/v5.1.0...v5.1.1) (2018-07-12)
 
