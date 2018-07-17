@@ -43,16 +43,19 @@ describe('Update', function () {
     it('should return a basic update statement for the specified changes', function () {
       const result = new Update(source, {field1: 'value1'});
       assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1 WHERE TRUE RETURNING *');
+      assert.deepEqual(result.params, ['value1']);
     });
 
     it('should accommodate multiple changes', function () {
       const result = new Update(source, {field1: 'value1', field2: 2});
       assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1, "field2" = $2 WHERE TRUE RETURNING *');
+      assert.deepEqual(result.params, ['value1', 2]);
     });
 
     it('should ignore nonexistent columns', function () {
-      const result = new Update(source, {field1: 'value1', field2: 2, notafield: 3});
+      const result = new Update(source, {not_a_field_1: 0, field1: 'value1', field2: 2, not_a_field_2: 3});
       assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1, "field2" = $2 WHERE TRUE RETURNING *');
+      assert.deepEqual(result.params, ['value1', 2]);
     });
 
     it('should build a WHERE clause with criteria', function () {
