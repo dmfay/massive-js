@@ -1,6 +1,6 @@
 # Migrations and Massive
 
-Massive does not include a framework for applying migrations to upgrade a database schema. This is by design: Massive focuses on data _access_, not on schema development.
+Massive does not include a framework for applying migrations to upgrade a database schema. This is by design: Massive focuses on data _access_, not on schema development. 
 
 There are many migration frameworks available, each representing its own variation on the theme of applying a sequence of pending changesets to a database and each having its own advantages and disadvantages. No one framework is clearly best for every possible scenario, so evaluate your circumstances carefully when selecting one.
 
