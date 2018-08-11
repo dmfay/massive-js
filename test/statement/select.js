@@ -112,5 +112,132 @@ describe('Select', function () {
       const result = new Select(source, {}, {offset: 10, limit: 10});
       assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY 1 OFFSET 10 LIMIT 10');
     });
+
+    describe('keyset pagination', function () {
+      it('tests the last values of the sort fields', function () {
+        const result = new Select(source, {}, {
+          pageLength: 10,
+          order: [{
+            field: 'col1',
+            last: 123
+          }, {
+            field: 'col2',
+            last: 456
+          }]
+        });
+
+        assert.equal(result.pageLength, 10);
+        assert.equal(result.pagination, '("col1","col2") > ($1,$2)');
+        assert.equal(result.where.conditions, 'TRUE');
+        assert.isEmpty(result.where.params);
+        assert.deepEqual(result.params, [123, 456]);
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE ("col1","col2") > ($1,$2) AND TRUE ORDER BY "col1" asc,"col2" asc FETCH FIRST 10 ROWS ONLY');
+      });
+
+      it('reverses direction depending on the first field', function () {
+        const result = new Select(source, {}, {
+          pageLength: 10,
+          order: [{
+            field: 'col1',
+            direction: 'desc',
+            last: 123
+          }, {
+            field: 'col2',
+            direction: 'asc',
+            last: 456
+          }]
+        });
+
+        assert.equal(result.pageLength, 10);
+        assert.equal(result.pagination, '("col1","col2") < ($1,$2)');
+        assert.equal(result.where.conditions, 'TRUE');
+        assert.isEmpty(result.where.params);
+        assert.deepEqual(result.params, [123, 456]);
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE ("col1","col2") < ($1,$2) AND TRUE ORDER BY "col1" desc,"col2" asc FETCH FIRST 10 ROWS ONLY');
+      });
+
+      it('starts from the beginning', function () {
+        const result = new Select(source, {}, {
+          pageLength: 10,
+          order: [{
+            field: 'col1'
+          }, {
+            field: 'col2'
+          }]
+        });
+
+        assert.equal(result.pageLength, 10);
+        assert.isUndefined(result.pagination);
+        assert.equal(result.where.conditions, 'TRUE');
+        assert.isEmpty(result.where.params);
+        assert.deepEqual(result.params, []);
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY "col1" asc,"col2" asc FETCH FIRST 10 ROWS ONLY');
+      });
+
+      it('requires a criteria object', function (done) {
+        const result = new Select(source, 2, {
+          pageLength: 10,
+          order: [{
+            field: 'col1'
+          }]
+        });
+
+        try {
+          result.format();
+        } catch (err) {
+          assert.equal(err.message, 'Keyset paging with pageLength requires a criteria object');
+
+          done();
+        }
+      });
+
+      it('requires an order definition', function (done) {
+        const result = new Select(source, {}, {pageLength: 10});
+
+        try {
+          result.format();
+        } catch (err) {
+          assert.equal(err.message, 'Keyset paging with pageLength requires options.order');
+
+          done();
+        }
+      });
+
+      it('does not work with offsets', function (done) {
+        const result = new Select(source, {}, {
+          pageLength: 10,
+          order: [{
+            field: 'col1'
+          }],
+          offset: 10
+        });
+
+        try {
+          result.format();
+        } catch (err) {
+          assert.equal(err.message, 'Keyset paging cannot be used with offset and limit');
+
+          done();
+        }
+      });
+
+      it('does not work with limits', function (done) {
+        const result = new Select(source, {}, {
+          pageLength: 10,
+          order: [{
+            field: 'col1'
+          }],
+          limit: 10
+        });
+
+        try {
+          result.format();
+        } catch (err) {
+          assert.equal(err.message, 'Keyset paging cannot be used with offset and limit');
+
+          done();
+        }
+      });
+    });
   });
 });

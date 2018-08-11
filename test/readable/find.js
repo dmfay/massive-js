@@ -404,6 +404,30 @@ describe('find', function () {
         assert.equal(Object.keys(res).length, 1);
       });
     });
+
+    it('uses keyset pagination', function () {
+      return db.products.find({}, {order: [{field: 'id', direction: 'asc', last: 2}], pageLength: 2}).then(res => {
+        assert.lengthOf(res, 2);
+        assert.equal(res[0].id, 3);
+        assert.equal(res[1].id, 4);
+      });
+    });
+
+    it('uses keyset pagination with descending order', function () {
+      return db.products.find({}, {order: [{field: 'id', direction: 'desc', last: 3}], pageLength: 2}).then(res => {
+        assert.lengthOf(res, 2);
+        assert.equal(res[0].id, 2);
+        assert.equal(res[1].id, 1);
+      });
+    });
+
+    it('combines keyset pagination with existing criteria', function () {
+      return db.products.find({'price >': 20}, {order: [{field: 'id', last: 2}], pageLength: 2}).then(res => {
+        assert.lengthOf(res, 2);
+        assert.equal(res[0].id, 3);
+        assert.equal(res[1].id, 4);
+      });
+    });
   });
 
   describe('casing issues', function () {
