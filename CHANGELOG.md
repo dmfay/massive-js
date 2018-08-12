@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/dmfay/massive-js/compare/v5.1.3...v5.2.0) (2018-08-12)
+
+
+### Bug Fixes
+
+* **package:** update commander to version 2.17.0 ([74a784f](https://github.com/dmfay/massive-js/commit/74a784f))
+* **package:** update commander to version 2.17.1 ([3b60ea9](https://github.com/dmfay/massive-js/commit/3b60ea9))
+
+
+### Features
+
+* keyset pagination on sorted queries ([1ce70c7](https://github.com/dmfay/massive-js/commit/1ce70c7))
+
+
+
 <a name="5.1.3"></a>
 ## [5.1.3](https://github.com/dmfay/massive-js/compare/v5.1.2...v5.1.3) (2018-07-17)
 
