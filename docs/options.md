@@ -29,7 +29,7 @@ db.tests.find({
 
 * [Filtering and Shaping Results](#filtering-and-shaping-results)
   * [Ordering Results](#ordering-results)
-* [Keyset Pagination](#keyset-pagination)
+  * [Keyset Pagination](#keyset-pagination)
 * [Persisting Data](#persisting-data)
 * [Table Inheritance](#table-inheritance)
 * [Results Processing](#results-processing)
@@ -39,16 +39,16 @@ db.tests.find({
 
 ## Filtering and Shaping Results
 
-These options affect data retrieval queries. Some, such as `fields` and `exprs`, are generally applicable to all such calls; others, such as `limit` and `order`, are only useful for methods returning multiple records.
+These options affect data retrieval queries. Some, such as `fields` and `exprs`, are generally applicable to all such calls; others, such as `limit` and `pageLength`, are only useful when multiple records will be returned.
 
-| Option key       | Use in            | Description |
-|------------------|-------------------|-------------|
-| fields           | `find*`, `search` | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |
-| exprs            | `find*`, `search` | Specify a map of aliases to expressions to include in the resultset. **Do not send user input directly into `exprs` unless you understand the risk of SQL injection!** |
-| limit            | `find`, `search`  | Set the number of rows to take. |
-| offset           | `find`, `search`  | Set the number of rows to skip. |
-| order            | `find`, `search`  | An array of [order objects](#ordering-results). |
-| pageLength       | `find`, `search`  | Number of results to return with [keyset pagination](#keyset-pagination). Requires `order`. Incompatible with `search` and `where`. |
+| Option key       | Description |
+|------------------|-------------|
+| fields           | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |
+| exprs            | Specify a map of aliases to expressions to include in the resultset. **Do not send user input directly into `exprs` unless you understand the risk of SQL injection!** |
+| limit            | Set the number of rows to take. |
+| offset           | Set the number of rows to skip. |
+| order            | An array of [order objects](#ordering-results). |
+| pageLength       | Number of results to return with [keyset pagination](#keyset-pagination). Requires `order`. |
 
 **nb. The `exprs` option and the corresponding `expr` key in order objects interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
 
@@ -58,8 +58,9 @@ The `order` option sets an array of order objects which are used to build a SQL 
 
 * `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body.
 * `expr`: A raw SQL expression. Will not be escaped or quoted and **is potentially vulnerable to SQL injection**.
-* `direction`: The sort direction, `ASC` or `DESC`.
+* `direction`: The sort direction, `ASC` (default) or `DESC`.
 * `type`: Define a cast type for values. Useful with JSON fields.
+* `last`: If using [keyset pagination](#keyset-pagination), this attribute's value from the final record on the previous page.
 
 ```javascript
 db.tests.find({
@@ -79,9 +80,11 @@ db.tests.find({
 });
 ```
 
-## Keyset Pagination
+### Keyset Pagination
 
-When query results are meant to be displayed to a user, it's often useful to retrieve and display them one page at a time. This is easily accomplished by setting `limit` to the page length and `offset` to the page length times the current page. However, as result sets grow larger, this method starts to perform poorly. Keyset pagination offers a trade: consistent performance, but you don't know how many pages there are. For more detailed technical information, see [Markus Winand's post on the topic](https://use-the-index-luke.com/sql/partial-results/fetch-next-page).
+When query results are meant to be displayed to a user, it's often useful to retrieve and display them one page at a time. This is easily accomplished by setting `limit` to the page length and `offset` to the page length times the current page (counting from zero). However, as result sets grow larger, this method starts to perform poorly as the first _n_ rows must be retrieved and discarded each time.
+
+Keyset pagination offers a trade: consistent performance, but you don't know how many pages there are. It does require a slightly different user interface metaphor which avoids numbering and jumping to arbitrary pages, but the performance gains can be worth it. For a detailed technical breakdown, see [Markus Winand's post on the topic](https://use-the-index-luke.com/sql/partial-results/fetch-next-page).
 
 Although enabling keyset pagination is a matter of a single field, it does require some setup:
 
