@@ -192,6 +192,25 @@ describe('Select', function () {
         assert.equal(result.format(), 'SELECT * FROM testsource WHERE col2 = $1 AND ("col1") > ($2) ORDER BY "col1" asc FETCH FIRST 10 ROWS ONLY');
       });
 
+      it('applies body and type options', function () {
+        const result = new Select(source, {
+          col2: 'value2'
+        }, {
+          document: true,
+          pageLength: 10,
+          order: [{
+            field: 'col1',
+            type: 'int',
+            last: 5
+          }]
+        });
+
+        assert.equal(result.where.conditions, '"col2" = $1');
+        assert.deepEqual(result.params, ['value2', 5]);
+        assert.equal(result.pagination, '(("col1")::int) > ($2)');
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE "col2" = $1 AND (("col1")::int) > ($2) ORDER BY ("col1")::int asc FETCH FIRST 10 ROWS ONLY');
+      });
+
       it('requires an order definition', function (done) {
         const result = new Select(source, {}, {pageLength: 10});
 
