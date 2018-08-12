@@ -29,6 +29,9 @@ db.tests.find({
 
 * [Filtering and Shaping Results](#filtering-and-shaping-results)
   * [Ordering Results](#ordering-results)
+  * [Keyset Pagination](#keyset-pagination)
+* [Persisting Data](#persisting-data)
+* [Table Inheritance](#table-inheritance)
 * [Results Processing](#results-processing)
 * [Tasks and Transactions](#tasks-and-transactions)
 
@@ -36,19 +39,16 @@ db.tests.find({
 
 ## Filtering and Shaping Results
 
-Certain SQL clauses are used with different types of query. For example, a `LIMIT` clause can only be used with a function which emits a `SELECT` such as `find` or `count`.
+These options affect data retrieval queries. Some, such as `fields` and `exprs`, are generally applicable to all such calls; others, such as `limit` and `pageLength`, are only useful when multiple records will be returned.
 
-| Option key       | Use in            | Description |
-|------------------|-------------------|-------------|
-| fields           | `find*`, `search` | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |
-| exprs            | `find*`, `search` | Specify a map of aliases to expressions to include in the resultset. **Do not send user input directly into `exprs` unless you understand the risk of SQL injection!** |
-| limit            | `find*`, `search` | Set the number of rows to take. |
-| offset           | `find*`, `search` | Set the number of rows to skip. |
-| only             | any               | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
-| order            | `find*`, `search` | An array of [order objects](#ordering-results). |
-| onConflictIgnore | `insert`          | If the inserted data would violate a unique constraint, do nothing. |
-| deepInsert       | `insert`          | Specify `true` to turn on [deep insert](persistence#deep-insert). |
-| body             | `updateDoc`       | Specify in order to override the default `body` field affected by `updateDoc`. |
+| Option key       | Description |
+|------------------|-------------|
+| fields           | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |
+| exprs            | Specify a map of aliases to expressions to include in the resultset. **Do not send user input directly into `exprs` unless you understand the risk of SQL injection!** |
+| limit            | Set the number of rows to take. |
+| offset           | Set the number of rows to skip. |
+| order            | An array of [order objects](#ordering-results). |
+| pageLength       | Number of results to return with [keyset pagination](#keyset-pagination). Requires `order`. |
 
 **nb. The `exprs` option and the corresponding `expr` key in order objects interpolate values into the emitted SQL. Take care with raw strings and ensure that user input is never directly passed in through the options, or you risk opening yourself up to SQL injection attacks.**
 
@@ -58,8 +58,9 @@ The `order` option sets an array of order objects which are used to build a SQL 
 
 * `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body.
 * `expr`: A raw SQL expression. Will not be escaped or quoted and **is potentially vulnerable to SQL injection**.
-* `direction`: The sort direction, `ASC` or `DESC`.
+* `direction`: The sort direction, `ASC` (default) or `DESC`.
 * `type`: Define a cast type for values. Useful with JSON fields.
+* `last`: If using [keyset pagination](#keyset-pagination), this attribute's value from the final record on the previous page.
 
 ```javascript
 db.tests.find({
@@ -78,6 +79,57 @@ db.tests.find({
   // with the lowest
 });
 ```
+
+### Keyset Pagination
+
+When query results are meant to be displayed to a user, it's often useful to retrieve and display them one page at a time. This is easily accomplished by setting `limit` to the page length and `offset` to the page length times the current page (counting from zero). However, as result sets grow larger, this method starts to perform poorly as the first _n_ rows must be retrieved and discarded each time.
+
+Keyset pagination offers a trade: consistent performance, but you don't know how many pages there are. It does require a slightly different user interface metaphor which avoids numbering and jumping to arbitrary pages, but the performance gains can be worth it. For a detailed technical breakdown, see [Markus Winand's post on the topic](https://use-the-index-luke.com/sql/partial-results/fetch-next-page).
+
+Although enabling keyset pagination is a matter of a single field, it does require some setup:
+
+* You may _not_ specify `offset` or `limit`. Massive will return a rejected promise if you do.
+* You _must_ have an `order` array. Massive will return a rejected promise if you do not. Create an index on your `order` columns for further read performance benefits!
+* The `order` array must guarantee deterministic ordering of records; the easiest way to ensure this is to sort on the primary key or a unique column last. Failure may result in records appearing on multiple pages or apparently missing records.
+* The `order` array must use consistent directionality: if one attribute is being sorted in descending order, all attributes must be sorted in descending order. Inconsistent directionality means inconsistent results.
+
+Once these prerequisites are satisfied, set the `pageLength` option to the number of records you want back per page.
+
+**To retrieve subsequent pages**, inspect the last record on the current page. When you make the query for the next page, add a `last` key to each element of the `order` array containing that attribute's value for the final record.
+
+```js
+db.issues.find(
+  {},
+  {
+    order: [{
+      field: 'test_id',
+      last: 1500
+    }, {
+      field: 'issue_id',
+      last: 10256
+    }],
+    pageLength: 25
+  }
+).then(next25Results => ...);
+```
+
+## Persisting Data
+
+These options modify data persistence calls.
+
+| Option key       | Use in            | Description |
+|------------------|-------------------|-------------|
+| onConflictIgnore | `insert`          | If the inserted data would violate a unique constraint, do nothing. |
+| deepInsert       | `insert`          | Specify `true` to turn on [deep insert](persistence#deep-insert). |
+| body             | `updateDoc`       | Specify in order to override the default `body` field affected by `updateDoc`. |
+
+## Table Inheritance
+
+By default, queries against tables having descendant tables affect and/or return records from those descendant tables. Use the `only` option to prevent this, but it's superfluous if the target has no descendant tables.
+
+| Option key       | Use in            | Description |
+|------------------|-------------------|-------------|
+| only             | any               | Set to `true` to restrict the query to the table specified, if any others inherit from it. |
 
 ## Results Processing
 
