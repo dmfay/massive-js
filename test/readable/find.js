@@ -421,6 +421,14 @@ describe('find', function () {
       });
     });
 
+    it('uses keyset pagination with exprs', function () {
+      return db.products.find({}, {order: [{expr: '0 - id', direction: 'desc', last: 3}], pageLength: 2}).then(res => {
+        assert.lengthOf(res, 2);
+        assert.equal(res[0].id, 1);
+        assert.equal(res[1].id, 2);
+      });
+    });
+
     it('combines keyset pagination with existing criteria', function () {
       return db.products.find({'price >': 20}, {order: [{field: 'id', last: 2}], pageLength: 2}).then(res => {
         assert.lengthOf(res, 2);

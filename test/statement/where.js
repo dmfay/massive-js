@@ -44,6 +44,38 @@ describe('WHERE clause generation', function () {
       assert.equal(result.params[1], 'value2');
     });
 
+    it('should accommodate pre-built predicates', function () {
+      const result = where({
+        conditions: '"field2" @@ lower($1)',
+        params: ['value2'],
+        where: {
+          field1: 'value1'
+        },
+        nestedGenerator: 'tableGenerator'
+      });
+
+      assert.equal(result.conditions, '"field2" @@ lower($1) AND "field1" = $2');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value2');
+      assert.equal(result.params[1], 'value1');
+    });
+
+    it('should accommodate pre-built predicates with a different nested generator', function () {
+      const result = where({
+        conditions: '"field2" @@ lower($1)',
+        params: ['value2'],
+        where: {
+          field1: 'value1'
+        },
+        nestedGenerator: 'docGenerator'
+      });
+
+      assert.equal(result.conditions, '"field2" @@ lower($1) AND "body" @> $2');
+      assert.equal(result.params.length, 2);
+      assert.equal(result.params[0], 'value2');
+      assert.equal(result.params[1], JSON.stringify({field1: 'value1'}));
+    });
+
     it('should return conditions and parameters', function () {
       const result = where({field1: 'value1', field2: 'value2'});
 

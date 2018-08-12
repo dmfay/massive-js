@@ -59,8 +59,12 @@ FOR EACH ROW EXECUTE PROCEDURE massive_document_updated();
 
 INSERT INTO uuid_docs(body) VALUES ('{"things": "stuff"}');
 
+ALTER TABLE docs ADD COLUMN is_available BOOLEAN NOT NULL DEFAULT TRUE;
+
 INSERT INTO docs(body)
 VALUES('{"title":"Document 1","price":22,"description":"lorem ipsum etc","is_good":true,"created_at":"2015-03-04T09:43:41.643Z"}'),
 ('{"title":"Document 2","price":18,"description":"Macaroni and Cheese","is_good":true,"created_at":"2015-03-04T15:43:41.643+06:00"}'),
 ('{"title":"Document 3","price":18,"description":"something or other","is_good":true,"created_at":"2015-03-04T06:43:41.643-03:00"}'),
 ('{"title":"Something Else","price":6,"description":"Two buddies fighting crime","is_good":false,"created_at":"1977-03-04T09:43:41.643Z","studios": [{"name" : "Warner"}, {"name" : "Universal"}], "nested": { "id": 1 }}');
+
+UPDATE docs SET is_available = FALSE WHERE id = 3;

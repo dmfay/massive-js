@@ -98,11 +98,17 @@ db.tests.where(
 
 ## search
 
-`search` enables full-text searching across multiple fields. The first argument is a search plan with an array of `fields` and a `term` to search for. The function also takes a query options object as an optional second argument. `search` returns a results array.
+`search` enables full-text searching across multiple fields. The first argument is a search plan with an array of `fields`, a `term` to search for, and an optional `where` criteria object to filter matches further. The function also takes a query options object as an optional second argument. `search` returns a results array.
 
 ```javascript
 db.users.search(
-  {fields: ['email', 'name'], term: 'rob'},
+  {
+    fields: ['email', 'name'],
+    term: 'rob',
+    where: {
+      is_active: true
+    }
+  },
   {stream: true}
 ).then(stream => {
   // a readable stream of users matching the full-text

@@ -85,11 +85,23 @@ describe('searchDoc', function () {
     assert.equal(docs[1].id, docs2[0].id);
   });
 
-  it('returns right elements if filter is specified', function () {
+  it('applies additional filters within the document body', function () {
     return db.docs.searchDoc({
       fields: ['title'],
       term: 'Document',
       where: {'price': 22.00}
+    }, {
+      document: true
+    }).then(docs => {
+      assert.lengthOf(docs, 1);
+    });
+  });
+
+  it('applies additional filters to other columns', function () {
+    return db.docs.searchDoc({
+      fields: ['title'],
+      term: 'Document',
+      where: {is_available: false}
     }).then(docs => {
       assert.lengthOf(docs, 1);
     });

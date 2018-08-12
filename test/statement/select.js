@@ -131,7 +131,7 @@ describe('Select', function () {
         assert.equal(result.where.conditions, 'TRUE');
         assert.isEmpty(result.where.params);
         assert.deepEqual(result.params, [123, 456]);
-        assert.equal(result.format(), 'SELECT * FROM testsource WHERE ("col1","col2") > ($1,$2) AND TRUE ORDER BY "col1" asc,"col2" asc FETCH FIRST 10 ROWS ONLY');
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE AND ("col1","col2") > ($1,$2) ORDER BY "col1" asc,"col2" asc FETCH FIRST 10 ROWS ONLY');
       });
 
       it('reverses direction depending on the first field', function () {
@@ -153,7 +153,7 @@ describe('Select', function () {
         assert.equal(result.where.conditions, 'TRUE');
         assert.isEmpty(result.where.params);
         assert.deepEqual(result.params, [123, 456]);
-        assert.equal(result.format(), 'SELECT * FROM testsource WHERE ("col1","col2") < ($1,$2) AND TRUE ORDER BY "col1" desc,"col2" asc FETCH FIRST 10 ROWS ONLY');
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE AND ("col1","col2") < ($1,$2) ORDER BY "col1" desc,"col2" asc FETCH FIRST 10 ROWS ONLY');
       });
 
       it('starts from the beginning', function () {
@@ -174,21 +174,22 @@ describe('Select', function () {
         assert.equal(result.format(), 'SELECT * FROM testsource WHERE TRUE ORDER BY "col1" asc,"col2" asc FETCH FIRST 10 ROWS ONLY');
       });
 
-      it('requires a criteria object', function (done) {
-        const result = new Select(source, 2, {
+      it('works with pregenerated where specs', function () {
+        const result = new Select(source, {
+          conditions: 'col2 = $1',
+          params: [1]
+        }, {
           pageLength: 10,
           order: [{
-            field: 'col1'
+            field: 'col1',
+            last: 5
           }]
         });
 
-        try {
-          result.format();
-        } catch (err) {
-          assert.equal(err.message, 'Keyset paging with pageLength requires a criteria object');
-
-          done();
-        }
+        assert.equal(result.where.conditions, 'col2 = $1');
+        assert.deepEqual(result.params, [1, 5]);
+        assert.equal(result.pagination, '("col1") > ($2)');
+        assert.equal(result.format(), 'SELECT * FROM testsource WHERE col2 = $1 AND ("col1") > ($2) ORDER BY "col1" asc FETCH FIRST 10 ROWS ONLY');
       });
 
       it('requires an order definition', function (done) {
