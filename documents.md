@@ -9,6 +9,7 @@ The JSONB type is a great solution to this problem, and Massive takes care of th
 <!-- vim-markdown-toc GFM -->
 
 * [Document Tables](#document-tables)
+  * [Primary Key Default Data Type](#primary-key-default-data-type)
   * [db.saveDoc](#dbsavedoc)
 * [Querying Documents](#querying-documents)
   * [A Note About Criteria](#a-note-about-criteria)
@@ -29,7 +30,7 @@ Standard table functions still work on document tables, and can be quite useful 
 
 `findDoc` **is still preferred** to JSON queries if at all possible since it uses the `@>` "contains" operator to leverage indexing on the document body to improve performance.
 
-### Primary key default data type
+### Primary Key Default Data Type
 
 The default primary key data type used for all tables including document tables is 'serial', which by default begins at 1 for the first record created and for every new record increments by 1. However, it is possible to change the primary key data type used for new document tables to 'uuid' (Universal Unique Identifier).
 
