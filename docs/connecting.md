@@ -28,6 +28,7 @@ massive({
   * [Refreshing the API](#refreshing-the-api)
   * [Refreshing Materialized Views](#refreshing-materialized-views)
 * [Loader Configuration and Filtering](#loader-configuration-and-filtering)
+  * [Document Table Primary Key Types](#document-table-primary-key-types)
 * [Driver Configuration](#driver-configuration)
 
 <!-- vim-markdown-toc -->
@@ -98,9 +99,9 @@ If you don't want to load _every_ table, view, or function your user can access,
 
 Blacklists and whitelists may be comma-separated strings or an array of strings (which will be separated by commas). Either type can use SQL `LIKE` (`_` and `%` placeholders) wildcarding. Consistent with PostgreSQL naming, they are case-sensitive.
 
-### Document table uuid primary key data type
+### Document Table Primary Key Types
 
-Please see [Primary key default data type](documents#primary-key-default-data-type) for more information about what a UUID is and why you may want to use it. However, to use the loader `documentPkType` option, the connected database will need the extension 'uuid-ossp' installed.
+Please see the document table documentation's [Primary Key Default Data Type](documents#primary-key-default-data-type) for more information about what a UUID is and why you may want to use it. However, to use the loader `documentPkType` option, the connected database will need the extension 'uuid-ossp' installed.
 
 If this extension is not installed, follow these steps, using the 'postgres' account as 'superuser' privileges are required.
 
@@ -110,7 +111,8 @@ psql (10.4 (Ubuntu 10.4-2.pgdg16.04+1))
 Type "help" for help.
 
 postgres=# \c YOUR_DB_NAME;
-You are now connected to database "YOUR_DB_NAME" as user "postgres".
+You are now connected to database "YOUR_DB_NAME"
+  as user "postgres".
 YOUR_DB_NAME=# CREATE EXTENSION "uuid-ossp";
 CREATE EXTENSION
 YOUR_DB_NAME=# \q
@@ -125,10 +127,12 @@ massive(connectionInfo, {
   // change the scripts directory
   scripts: './myscripts',
 
-  // override default 'serial' data type, used for new document tables id/primary key, i.e. 'serial' or 'uuid'
+  // override default 'serial' data type, used for new document
+  // tables id/primary key, i.e. 'serial' or 'uuid'
   documentPkType: 'serial',
 
-  // applies if documentPkType is set to 'uuid'. Override default 'v4' UUID variation, i.e. 'v1', 'v1mc', 'v3', 'v4' or 'v5'
+  // applies if documentPkType is set to 'uuid'. Override default
+  // 'v4' UUID variation, i.e. 'v1', 'v1mc', 'v3', 'v4' or 'v5'
   uuidVersion: 'v4',
 
   // only load tables, views, and functions in these schemas
