@@ -15,9 +15,14 @@ SELECT * FROM (
     t.table_name AS name,
     parent.relname AS parent,
     array_agg(DISTINCT kc.column_name::text) FILTER (WHERE kc.column_name IS NOT NULL) AS pk,
-    array_agg(DISTINCT c.column_name::text) AS columns,
+    array_agg(DISTINCT c.attname::text) AS columns,
     TRUE AS is_insertable_into
   FROM information_schema.tables t
+  JOIN pg_catalog.pg_namespace nsp
+    ON nsp.nspname = t.table_schema
+  JOIN pg_catalog.pg_class cls
+    ON cls.relnamespace = nsp.oid
+    AND cls.relname = t.table_name
   LEFT OUTER JOIN information_schema.table_constraints tc
     ON tc.table_schema = t.table_schema
     AND tc.table_name = t.table_name
@@ -26,14 +31,9 @@ SELECT * FROM (
     ON kc.constraint_schema = tc.table_schema
     AND kc.table_name = tc.table_name
     AND kc.constraint_name = tc.constraint_name
-  JOIN information_schema.columns c
-    ON c.table_schema = t.table_schema
-    AND c.table_name = t.table_name
-  JOIN pg_catalog.pg_namespace nsp
-    ON nsp.nspname = t.table_schema
-  JOIN pg_catalog.pg_class cls
-    ON cls.relnamespace = nsp.oid
-    AND cls.relname = t.table_name
+  JOIN pg_catalog.pg_attribute c
+    ON c.attrelid = cls.oid
+    AND c.attnum > 0
 
   -- get parent table if there is one
   LEFT OUTER JOIN pg_catalog.pg_inherits inh ON inh.inhrelid = cls.oid
@@ -51,12 +51,17 @@ SELECT * FROM (
     t.table_name AS name,
     NULL AS parent,
     NULL AS pk,
-    array_agg(c.column_name::text) AS columns,
+    array_agg(c.attname::text) AS columns,
     CASE t.is_insertable_into WHEN 'YES' THEN TRUE ELSE FALSE END AS is_insertable_into
   FROM information_schema.tables t
-  JOIN information_schema.columns c
-    ON c.table_schema = t.table_schema
-    AND c.table_name = t.table_name
+  JOIN pg_catalog.pg_namespace nsp
+    ON nsp.nspname = t.table_schema
+  JOIN pg_catalog.pg_class cls
+    ON cls.relnamespace = nsp.oid
+    AND cls.relname = t.table_name
+  JOIN pg_catalog.pg_attribute c
+    ON c.attrelid = cls.oid
+    AND c.attnum > 0
   WHERE t.table_type = 'FOREIGN TABLE'
   GROUP BY t.table_schema, t.table_name, t.is_insertable_into
 ) tables
