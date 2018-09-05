@@ -84,12 +84,12 @@ db.tests.find({
 
 When query results are meant to be displayed to a user, it's often useful to retrieve and display them one page at a time. This is easily accomplished by setting `limit` to the page length and `offset` to the page length times the current page (counting from zero). However, as result sets grow larger, this method starts to perform poorly as the first _n_ rows must be retrieved and discarded each time.
 
-Keyset pagination offers a trade: consistent performance, but you don't know how many pages there are. It does require a slightly different user interface metaphor which avoids numbering and jumping to arbitrary pages, but the performance gains can be worth it. For a detailed technical breakdown, see [Markus Winand's post on the topic](https://use-the-index-luke.com/sql/partial-results/fetch-next-page).
+Keyset pagination offers a trade: consistent performance, but you don't know how many pages there are and can't reliably sort by columns containing null values. It does require a slightly different user interface metaphor which avoids numbering and jumping to arbitrary pages, but the performance gains can be worth it. For a detailed technical breakdown, see [Markus Winand's post on the topic](https://use-the-index-luke.com/sql/partial-results/fetch-next-page).
 
 Although enabling keyset pagination is a matter of a single field, it does require some setup:
 
 * You may _not_ specify `offset` or `limit`. Massive will return a rejected promise if you do.
-* You _must_ have an `order` array. Massive will return a rejected promise if you do not. Create an index on your `order` columns for further read performance benefits!
+* You _must_ have an `order` array. Massive will return a rejected promise if you do not. For additional performance benefits, make sure you have an index covering any columns you are filtering and sorting, if practical.
 * The `order` array must guarantee deterministic ordering of records; the easiest way to ensure this is to sort on the primary key or a unique column last. Failure may result in records appearing on multiple pages or apparently missing records.
 * The `order` array must use consistent directionality: if one attribute is being sorted in descending order, all attributes must be sorted in descending order. Inconsistent directionality means inconsistent results.
 
