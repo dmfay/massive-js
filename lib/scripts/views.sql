@@ -14,7 +14,7 @@ SELECT * FROM (
   SELECT
     v.schemaname AS schema,
     v.viewname AS name,
-    array_agg(DISTINCT c.column_name::text) AS columns,
+    array_agg(DISTINCT c.attname::text) AS columns,
     pg_relation_is_updatable(cls.oid::regclass, true) & 8 >= 8 AS is_insertable_into,
     FALSE AS is_matview
   FROM pg_views v
@@ -23,9 +23,9 @@ SELECT * FROM (
   JOIN pg_catalog.pg_class cls
     ON cls.relnamespace = nsp.oid
     AND cls.relname = v.viewname
-  JOIN information_schema.columns c
-    ON c.table_schema = v.schemaname
-    AND c.table_name = v.viewname
+  JOIN pg_catalog.pg_attribute c
+    ON c.attrelid = cls.oid
+    AND c.attnum > 0
   WHERE schemaname <> 'pg_catalog' AND schemaname <> 'information_schema'
   GROUP BY v.schemaname, v.viewname, cls.oid
 
@@ -43,7 +43,7 @@ SELECT * FROM (
   JOIN pg_catalog.pg_class cls
     ON cls.relnamespace = nsp.oid
     AND cls.relname = v.matviewname
-  JOIN pg_attribute c
+  JOIN pg_catalog.pg_attribute c
     ON c.attrelid = cls.oid
     -- ordinary columns have positive attnum
     AND c.attnum > 0
