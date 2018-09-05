@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.2.1"></a>
+## [5.2.1](https://github.com/dmfay/massive-js/compare/v5.2.0...v5.2.1) (2018-09-05)
+
+
+### Bug Fixes
+
+* **package:** update glob to version 7.1.3 ([f8ec670](https://github.com/dmfay/massive-js/commit/f8ec670))
+* **package:** update pg-promise to version 8.4.6 ([8a885f1](https://github.com/dmfay/massive-js/commit/8a885f1))
+
+
+
 <a name="5.2.0"></a>
 # [5.2.0](https://github.com/dmfay/massive-js/compare/v5.1.3...v5.2.0) (2018-08-12)
 
