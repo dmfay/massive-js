@@ -436,6 +436,13 @@ describe('find', function () {
         assert.equal(res[1].id, 4);
       });
     });
+
+    it('changes null positioning', function () {
+      return db.products.find({}, {order: [{field: 'specs', nulls: 'first'}]}).then(res => {
+        assert.lengthOf(res, 4);
+        assert.isNull(res[0].specs);
+      });
+    });
   });
 
   describe('casing issues', function () {

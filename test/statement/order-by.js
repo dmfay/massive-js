@@ -42,6 +42,20 @@ describe('orderBy', function () {
     ]), `ORDER BY "col1" desc,col1 + col2 asc`);
   });
 
+  it('should apply null positioning', function () {
+    assert.equal(orderBy([
+      {field: 'col1', direction: 'desc', nulls: 'last'},
+      {expr: 'col1 + col2', direction: 'asc', nulls: 'first'}
+    ]), `ORDER BY "col1" desc NULLS LAST,col1 + col2 asc NULLS FIRST`);
+  });
+
+  it('should be case-insensitive about null positioning', function () {
+    assert.equal(orderBy([
+      {field: 'col1', direction: 'DESC', nulls: 'last'},
+      {expr: 'col1 + col2', direction: 'ASC', nulls: 'first'}
+    ]), `ORDER BY "col1" desc NULLS LAST,col1 + col2 asc NULLS FIRST`);
+  });
+
   it('should apply both cast type and direction', function () {
     assert.equal(orderBy([
       {field: 'col1', type: 'int', direction: 'desc'},
