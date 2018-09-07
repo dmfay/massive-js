@@ -56,11 +56,14 @@ These options affect data retrieval queries. Some, such as `fields` and `exprs`,
 
 The `order` option sets an array of order objects which are used to build a SQL `ORDER BY` clause. An order object must contain a `field` or an `expr`; all other properties are optional.
 
-* `field`: The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body.
-* `expr`: A raw SQL expression. Will not be escaped or quoted and **is potentially vulnerable to SQL injection**.
-* `direction`: The sort direction, `ASC` (default) or `DESC`.
-* `type`: Define a cast type for values. Useful with JSON fields.
-* `last`: If using [keyset pagination](#keyset-pagination), this attribute's value from the final record on the previous page.
+| Key       | Description |
+|-----------|-------------|
+| field     | The name of the column being sorted on. May be a JSON path if sorting by an element nested in a JSON field or document table body.
+| expr      | A raw SQL expression. Will not be escaped or quoted and **is potentially vulnerable to SQL injection**.
+| direction | The sort direction, `ASC` (default) or `DESC`.
+| nulls     | Sort null field values `first` or `last`. |
+| type      | Define a cast type for values. Useful with JSON fields.
+| last      | If using [keyset pagination](#keyset-pagination), this attribute's value from the final record on the previous page.
 
 ```javascript
 db.tests.find({
@@ -68,15 +71,17 @@ db.tests.find({
 }, {
   order: [{
     field: 'started_at',
-    direction: 'desc'
+    direction: 'desc',
+    nulls: 'first'
   }, {
     expr: 'passes + failures',
     direction: 'asc'
   }]
 }).then(stream => {
   // all tests, ordered first by most recent start
-  // date, then by pass + failure total beginning
-  // with the lowest
+  // date (nulls first), then by pass + failure
+  // total deferring to the Postgres default null
+  // positioning (last when ascending)
 });
 ```
 
