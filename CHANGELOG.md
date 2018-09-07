@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/dmfay/massive-js/compare/v5.2.1...v5.3.0) (2018-09-07)
+
+
+### Features
+
+* specify null sorting in order by ([149b7b9](https://github.com/dmfay/massive-js/commit/149b7b9))
+
+
+
 <a name="5.2.1"></a>
 ## [5.2.1](https://github.com/dmfay/massive-js/compare/v5.2.0...v5.2.1) (2018-09-05)
 
