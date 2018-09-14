@@ -9,6 +9,7 @@ The JSONB type is a great solution to this problem, and Massive takes care of th
 <!-- vim-markdown-toc GFM -->
 
 * [Document Tables](#document-tables)
+  * [Primary key default data type](#primary-key-default-data-type)
   * [db.saveDoc](#dbsavedoc)
 * [Querying Documents](#querying-documents)
   * [A Note About Criteria](#a-note-about-criteria)
