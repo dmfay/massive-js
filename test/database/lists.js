@@ -28,4 +28,10 @@ describe('list functions', function () {
       assert.sameMembers(db.listFunctions(), ['f1', 'f2', 'one.f1', 'one.f2', 'schema']);
     });
   });
+
+  describe('listSequences', function () {
+    it('lists sequences', function () {
+      assert.sameMembers(db.listSequences(), ['s1', 's2', 'one.s1']);
+    });
+  });
 });
