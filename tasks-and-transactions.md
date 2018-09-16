@@ -52,9 +52,9 @@ Since this example uses `withTransaction`, the transaction will be rolled back i
 
 ## Options
 
-`db.withConnection` and `db.withTransaction` may each take a second `options` argument.
+`db.withConnection` and `db.withTransaction` may each take a second `options` argument. Consult the pg-promise documentation for a complete overview of [task options](https://vitaly-t.github.io/pg-promise/Database.html#task) and [transaction options](https://vitaly-t.github.io/pg-promise/Database.html#tx).
 
-In `withConnection`, the only functional option is `tag`, which allows tracking queries from the task using [pg-monitor](https://github.com/vitaly-t/pg-monitor).
+The `tag` option allows tracking queries from a task or transaction using [pg-monitor](https://github.com/vitaly-t/pg-monitor).
 
 ```javascript
 db.withConnection(callback, {
@@ -62,10 +62,11 @@ db.withConnection(callback, {
 });
 ```
 
-In `withTransaction`, the only functional option is `mode`, which describes a [TransactionMode](https://vitaly-t.github.io/pg-promise/txMode.TransactionMode.html).
+`withTransaction` additionally offers a `mode` option which describes a [TransactionMode](https://vitaly-t.github.io/pg-promise/txMode.TransactionMode.html).
 
 ```javascript
 db.withTransaction(callback, {
+  tag: 'my transaction',
   mode: new db.pgp.txMode.TransactionMode({
     tiLevel: db.pgp.txMode.isolationLevel.serializable
   })

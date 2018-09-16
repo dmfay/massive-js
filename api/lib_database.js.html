@@ -37,6 +37,7 @@ const QueryStream = require('pg-query-stream');
 const Executable = require('./executable');
 const Readable = require('./readable');
 const Writable = require('./writable');
+const Sequence = require('./sequence');
 const Entity = require('./entity');
 const decompose = require('./util/decompose');
 const docify = require('./util/docify');
@@ -260,7 +261,7 @@ Database.prototype.reload = function () {
 
   return this.$p.all(initPromises).then(() => {
     // run introspections and flatten the results into a single list of Entities
-    return this.$p.all(['tables', 'views', 'functions', 'scripts'].map(loader => {
+    return this.$p.all(['tables', 'views', 'functions', 'scripts', 'sequences'].map(loader => {
       // first find and execute the loader function
       const loaderFunc = require(`./loader/${loader}`); // eslint-disable-line global-require
 
@@ -271,6 +272,10 @@ Database.prototype.reload = function () {
           obj.db = this;
           obj.path = !obj.schema || obj.schema === this.currentSchema ? obj.name : [obj.schema, obj.name].join('.');
           obj.loader = loader;
+
+          if (loader === 'sequences') {
+            return new (Function.prototype.bind.apply(Sequence, [null, obj]))();
+          }
 
           if (Object.prototype.hasOwnProperty.call(obj, 'is_insertable_into')) {
             if (obj.is_insertable_into) {
@@ -331,6 +336,21 @@ Database.prototype.listViews = function () {
 Database.prototype.listFunctions = function () {
   return this.objects.reduce((names, obj) => {
     if (obj instanceof Executable) {
+      names.push(obj.path);
+    }
+
+    return names;
+  }, []);
+};
+
+/**
+ * List all the non-pk sequences attached to the connected instance.
+ *
+ * @return {Array} A list of sequence names.
+ */
+Database.prototype.listSequences = function () {
+  return this.objects.reduce((names, obj) => {
+    if (obj.loader === 'sequences') {
       names.push(obj.path);
     }
 
@@ -429,17 +449,18 @@ Database.prototype.query = function (query, params = [], options = {}) {
  *
  * @param {Function} callback - A callback containing Massive API calls and SQL
  * queries to be made within the task scope.
- * @param {Object} [options] - Task options.
- * @param {String} [options.tag] - A tag for tracking the task's queries.
+ * @param {Object} [options] - {@link https://vitaly-t.github.io/pg-promise/Database.html#task|Task options}.
  * @return {Promise} A promise for the completed task, which will be fulfilled
  * if it succeeds and commits or rejected if it rolls back.
  */
 Database.prototype.withConnection = function (callback, options = {}) {
-  return this.instance.task(options, task => {
+  const args = pgp.utils.taskArgs([options, task => {
     const withTask = this.clone(task);
 
     return callback(withTask);
-  });
+  }]);
+
+  return this.instance.task.apply(this, args);
 };
 
 /**
@@ -448,17 +469,18 @@ Database.prototype.withConnection = function (callback, options = {}) {
  *
  * @param {Function} callback - A callback containing Massive API calls and SQL
  * queries to be made within the transaction scope.
- * @param {Object} [options] - Transaction options.
- * @param {TransactionMode} [options.mode] - A pg-promise TransactionMode.
+ * @param {Object} [options] - {@link https://vitaly-t.github.io/pg-promise/Database.html#tx|Transaction options}.
  * @return {Promise} A promise for the completed transaction, which will be
  * fulfilled if it succeeds and commits or rejected if it rolls back.
  */
 Database.prototype.withTransaction = function (callback, options = {}) {
-  return this.instance.tx(options, tx => {
+  const args = pgp.utils.taskArgs([options, tx => {
     const withTx = this.clone(tx);
 
     return callback(withTx);
-  });
+  }]);
+
+  return this.instance.tx.apply(this, args);
 };
 
 /**
@@ -679,13 +701,13 @@ exports = module.exports = Database;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#getDefaultSQLforUUID">getDefaultSQLforUUID</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-massive.html">massive</a></li><li><a href="module-mutators.html">mutators</a></li><li><a href="module-operations.html">operations</a></li><li><a href="module-util_decompose.html">util/decompose</a></li><li><a href="module-util_docify.html">util/docify</a></li><li><a href="module-util_getFilterString.html">util/getFilterString</a></li><li><a href="module-util_parseKey.html">util/parseKey</a></li><li><a href="module-util_prepareParams.html">util/prepareParams</a></li><li><a href="module-where.html">where</a></li></ul><h3>Classes</h3><ul><li><a href="Database.html">Database</a></li><li><a href="Delete.html">Delete</a></li><li><a href="Entity.html">Entity</a></li><li><a href="Executable.html">Executable</a></li><li><a href="Insert.html">Insert</a></li><li><a href="Readable.html">Readable</a></li><li><a href="Select.html">Select</a></li><li><a href="Sequence.html">Sequence</a></li><li><a href="SingleValueStream.html">SingleValueStream</a></li><li><a href="Update.html">Update</a></li><li><a href="Writable.html">Writable</a></li></ul><h3>Global</h3><ul><li><a href="global.html"></a></li><li><a href="global.html#getDefaultSQLforUUID">getDefaultSQLforUUID</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Sep 06 2018 23:16:56 GMT-0400 (Eastern Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Sep 16 2018 18:51:35 GMT-0400 (Eastern Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
