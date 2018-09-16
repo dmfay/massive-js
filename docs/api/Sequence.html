@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Executable</title>
+    <title>JSDoc: Class: Sequence</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Executable</h1>
+    <h1 class="page-title">Class: Sequence</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Executable<span class="signature">(spec)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Sequence<span class="signature">(spec)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="Executable"><span class="type-signature"></span>new Executable<span class="signature">(spec)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Sequence"><span class="type-signature"></span>new Sequence<span class="signature">(spec)</span><span class="type-signature"></span></h4>
     
 
     
@@ -49,7 +49,7 @@
 
 
 <div class="description">
-    An executable function or script.
+    A database sequence.
 </div>
 
 
@@ -101,7 +101,8 @@
 
             
 
-            <td class="description last">An expanded <a href="Entity.html"><code>Entity</code></a> specification:
+            <td class="description last">An <a href="Entity.html"><code>Entity</code></a> specification representing a
+sequence object:
                 <h6>Properties</h6>
                 
 
@@ -166,7 +167,7 @@
 
             
 
-            <td class="description last">The table or view's name.</td>
+            <td class="description last">The sequence's name.</td>
         </tr>
 
     
@@ -189,154 +190,7 @@
 
             
 
-            <td class="description last">The name of the schema owning the table or</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sql</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-|
-
-<span class="param-type">QueryFile</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A function invocation statement or a
-pg-promise QueryFile.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>paramCount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Number of parameters the executable
-expects.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>isVariadic</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Whether a database function accepts
-variable-length argument lists as the last parameter.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>enhancedFunctions</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">True to enable single row/value
-results processing.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>singleRow</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">If true, return the first result row as an
-object (with enhancedFunctions).</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>singleValue</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">If true, return results as a primitive
-or primitives (with enhancedFunctions).</td>
+            <td class="description last">The name of the schema owning the sequence.</td>
         </tr>
 
     
@@ -384,7 +238,7 @@ or primitives (with enhancedFunctions).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_executable.js.html">lib/executable.js</a>, <a href="lib_executable.js.html#line31">line 31</a>
+        <a href="lib_sequence.js.html">lib/sequence.js</a>, <a href="lib_sequence.js.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -449,7 +303,7 @@ or primitives (with enhancedFunctions).</td>
     
 
     
-    <h4 class="name" id="invoke"><span class="type-signature"></span>invoke<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="lastValue"><span class="type-signature"></span>lastValue<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
     
 
     
@@ -457,7 +311,223 @@ or primitives (with enhancedFunctions).</td>
 
 
 <div class="description">
-    Invoke the function or script.
+    Get the last value the sequence returned.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_sequence.js.html">lib/sequence.js</a>, <a href="lib_sequence.js.html#line29">line 29</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The last sequence value.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="nextValue"><span class="type-signature"></span>nextValue<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Increment the sequence counter and return the next value.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_sequence.js.html">lib/sequence.js</a>, <a href="lib_sequence.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The next sequence value.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="reset"><span class="type-signature"></span>reset<span class="signature">(initialValue<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Reset the sequence.
 </div>
 
 
@@ -495,13 +565,13 @@ or primitives (with enhancedFunctions).</td>
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>initialValue</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">Number</span>
 
 
             
@@ -521,7 +591,8 @@ or primitives (with enhancedFunctions).</td>
 
             
 
-            <td class="description last"><a href="https://dmfay.github.io/massive-js/options.html">Result processing options</a>.</td>
+            <td class="description last">The new value with which to seed the
+sequence (default 1).</td>
         </tr>
 
     
@@ -562,7 +633,7 @@ or primitives (with enhancedFunctions).</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_executable.js.html">lib/executable.js</a>, <a href="lib_executable.js.html#line52">line 52</a>
+        <a href="lib_sequence.js.html">lib/sequence.js</a>, <a href="lib_sequence.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -589,9 +660,7 @@ or primitives (with enhancedFunctions).</td>
 
         
 <div class="param-desc">
-    Execution results as an array, unless options.single is
-toggled or enhanced functions are enabled and the function returns a single
-value.
+    Nothing.
 </div>
 
 
