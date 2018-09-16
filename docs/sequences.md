@@ -7,6 +7,8 @@ Massive only loads independent sequences and ignores those which back table prim
 <!-- vim-markdown-toc GFM -->
 
 * [lastValue](#lastvalue)
+* [nextValue](#nextvalue)
+* [reset](#reset)
 
 <!-- vim-markdown-toc -->
 
@@ -17,5 +19,26 @@ Massive only loads independent sequences and ignores those which back table prim
 ```javascript
 db.mysequence.lastValue().then(val => {
   // val is a number
+});
+```
+
+## nextValue
+
+`nextValue` increments the sequence counter and returns the latest value.
+
+```javascript
+db.mysequence.nextValue().then(val => {
+  // val is a number
+});
+```
+
+## reset
+
+`reset` starts the sequence over at 1 (if called without arguments) or a value of your choosing.
+
+```javascript
+db.mysequence.reset(123).then(() => {
+  // reset does not return a value, but the next value
+  // acquired from the sequence will be 123.
 });
 ```
