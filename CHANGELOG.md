@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.4.0"></a>
+# [5.4.0](https://github.com/dmfay/massive-js/compare/v5.3.0...v5.4.0) (2018-09-16)
+
+
+### Bug Fixes
+
+* **package:** update commander to version 2.18.0 ([c2209ee](https://github.com/dmfay/massive-js/commit/c2209ee))
+* **package:** update lodash to version 4.17.11 ([8863a10](https://github.com/dmfay/massive-js/commit/8863a10))
+* correct where generation logic from bad merge ([5891b00](https://github.com/dmfay/massive-js/commit/5891b00))
+
+
+### Features
+
+* load non-pk sequences and get current value ([a2912b2](https://github.com/dmfay/massive-js/commit/a2912b2))
+* reset and increment sequences ([3796b27](https://github.com/dmfay/massive-js/commit/3796b27))
+* restrict returned fields from persistence queries ([8a10110](https://github.com/dmfay/massive-js/commit/8a10110))
+
+
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/dmfay/massive-js/compare/v5.2.1...v5.3.0) (2018-09-07)
 
