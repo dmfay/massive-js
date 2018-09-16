@@ -27,7 +27,8 @@ describe('Delete', function () {
         document: true,
         only: true,
         single: true,
-        stream: true
+        stream: true,
+        fields: ['field1', 'field2']
       });
 
       assert.equal(query.source.delimitedFullName, 'testsource');
@@ -36,6 +37,7 @@ describe('Delete', function () {
       assert.isTrue(query.document);
       assert.isTrue(query.only);
       assert.isTrue(query.stream);
+      assert.sameMembers(query.fields, ['"field1"', '"field2"']);
     });
   });
 
@@ -62,6 +64,11 @@ describe('Delete', function () {
     it('should set ONLY', function () {
       const result = new Delete(source, {field1: 'value1'}, {only: true});
       assert.equal(result.format(), 'DELETE FROM ONLY testsource WHERE "field1" = $1 RETURNING *');
+    });
+
+    it('should restrict returned fields', function () {
+      const result = new Delete(source, {field1: 'value1'}, {fields: ['field1', 'field2']});
+      assert.equal(result.format(), 'DELETE FROM testsource WHERE "field1" = $1 RETURNING "field1", "field2"');
     });
   });
 });

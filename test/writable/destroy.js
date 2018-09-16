@@ -84,4 +84,12 @@ describe('destroy', function () {
       });
     });
   });
+
+  it('restricts returned fields', function* () {
+    const product = yield db.products.insert({string: 'six'});
+    const res = yield db.products.destroy({id: product.id}, {fields: ['id']});
+
+    assert.lengthOf(Object.keys(res[0]), 1);
+    assert.equal(res[0].id, product.id);
+  });
 });

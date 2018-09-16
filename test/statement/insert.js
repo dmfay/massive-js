@@ -24,7 +24,8 @@ describe('Insert', function () {
         document: true,
         only: true,
         stream: true,
-        onConflictIgnore: true
+        onConflictIgnore: true,
+        fields: ['string', 'number']
       });
 
       assert.equal(query.source.delimitedFullName, '"testsource"');
@@ -34,6 +35,7 @@ describe('Insert', function () {
       assert.isTrue(query.only);
       assert.isTrue(query.stream);
       assert.isTrue(query.onConflictIgnore);
+      assert.sameMembers(query.fields, ['"string"', '"number"']);
     });
 
     it('should process columns and parameters', function () {
@@ -88,6 +90,12 @@ describe('Insert', function () {
     it('should handle onConflictIgnore option', function () {
       const result = new Insert(source, {field1: 'value1'}, {onConflictIgnore: true});
       assert.equal(result.format(), 'INSERT INTO "testsource" ("field1") VALUES ($1) ON CONFLICT DO NOTHING RETURNING *');
+      assert.deepEqual(result.params, ['value1']);
+    });
+
+    it('should restrict returned fields', function () {
+      const result = new Insert(source, {field1: 'value1'}, {fields: ['field1', 'field2']});
+      assert.equal(result.format(), 'INSERT INTO "testsource" ("field1") VALUES ($1) RETURNING "field1", "field2"');
       assert.deepEqual(result.params, ['value1']);
     });
 

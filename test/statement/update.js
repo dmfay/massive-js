@@ -27,7 +27,8 @@ describe('Update', function () {
         document: true,
         only: true,
         single: true,
-        stream: true
+        stream: true,
+        fields: ['field1', 'field2']
       });
 
       assert.equal(query.source.delimitedFullName, 'testsource');
@@ -36,6 +37,7 @@ describe('Update', function () {
       assert.isTrue(query.document);
       assert.isTrue(query.only);
       assert.isTrue(query.stream);
+      assert.sameMembers(query.fields, ['"field1"', '"field2"']);
     });
   });
 
@@ -81,6 +83,12 @@ describe('Update', function () {
     it('should set ONLY', function () {
       const result = new Update(source, {field1: 'value1'}, {}, {only: true});
       assert.equal(result.format(), 'UPDATE ONLY testsource SET "field1" = $1 WHERE TRUE RETURNING *');
+    });
+
+    it('should restrict returned fields', function () {
+      const result = new Update(source, {field1: 'value1'}, {field1: 'value2'}, {fields: ['field1', 'field2']});
+      assert.equal(result.format(), 'UPDATE testsource SET "field1" = $1 WHERE "field1" = $2 RETURNING "field1", "field2"');
+      assert.deepEqual(result.params, ['value1', 'value2']);
     });
   });
 });

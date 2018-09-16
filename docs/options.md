@@ -41,6 +41,8 @@ db.tests.find({
 
 These options affect data retrieval queries. Some, such as `fields` and `exprs`, are generally applicable to all such calls; others, such as `limit` and `pageLength`, are only useful when multiple records will be returned.
 
+The `fields` option may be used with persistence queries to restrict the returned results. This can be useful in the case of column security where the Postgres user does not have permissions on the full table.
+
 | Option key       | Description |
 |------------------|-------------|
 | fields           | Specify an array of column names to include in the resultset. The names will be quoted; use `exprs` to invoke functions or operate on columns. |

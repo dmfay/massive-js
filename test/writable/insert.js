@@ -119,6 +119,13 @@ describe('insert', function () {
     });
   });
 
+  it('restricts returned fields', function () {
+    return db.normal_pk.insert({field1: 'epsilon'}, {fields: ['field2']}).then(res => {
+      assert.isUndefined(res.field1);
+      assert.isNull(res.field2);
+    });
+  });
+
   it('rejects if not insertable', function* () {
     let caught = false;
 

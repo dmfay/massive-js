@@ -80,6 +80,13 @@ describe('update', function () {
     });
   });
 
+  it('restricts returned fields', function () {
+    return db.normal_pk.update({id: [1, 2]}, {field1: 'iota'}, {fields: ['field2']}).then(res => {
+      assert.isUndefined(res[0].field1);
+      assert.isNull(res[0].field2);
+    });
+  });
+
   it('updates a writable view', function* () {
     yield db.normal_pk.insert({field1: 'alfalfa'});
 
