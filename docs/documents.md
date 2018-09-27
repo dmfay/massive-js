@@ -10,6 +10,7 @@ The JSONB type is a great solution to this problem, and Massive takes care of th
 
 * [Document Tables](#document-tables)
   * [Primary Key Default Data Type](#primary-key-default-data-type)
+  * [Customizing Document Table Columns](#customizing-document-table-columns)
   * [db.saveDoc](#dbsavedoc)
 * [Querying Documents](#querying-documents)
   * [A Note About Criteria](#a-note-about-criteria)
@@ -42,7 +43,19 @@ Note: The connected database requires the extension 'uuid-ossp', in order to sup
 
 Please see [loader configuration and filtering](connecting#loader-configuration-and-filtering) for help setting these options.
 
+### Customizing Document Table Columns
+
 Document tables may be extended with new columns and foreign keys. The `id` type can be changed as well (so long as a default is set such as `uuid_generate_v1mc()` or `uuid_generate_v4()` etc. for UUID types) without impeding usage of document table functions. Just don't _remove_ any columns or change their names, since Massive depends on those.
+
+If you use a migration framework or just want to generate your schema ahead of time, it's easiest to just copy the DDL out of [the document table script](https://github.com/dmfay/massive-js/blob/master/lib/scripts/document-table.sql). Fill in the placeholder tokens:
+
+| Name      | Value |
+|-----------|-------|
+| schema    | Name of the schema owning the document table. |
+| table     | Name of the document table. |
+| index     | Document tables created through Massive use schema_table, but you can fill in anything you like. |
+| pkType    | Either `SERIAL` or `UUID`. |
+| pkDefault | (Omit if `SERIAL` pkType) one of the [UUID generating functions](#primary-key-default-data-type). |
 
 ### db.saveDoc
 
