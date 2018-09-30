@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.0"></a>
+# [5.5.0](https://github.com/dmfay/massive-js/compare/v5.4.0...v5.5.0) (2018-09-30)
+
+
+### Features
+
+* introspect and load enums as static db.enums ([095266f](https://github.com/dmfay/massive-js/commit/095266f))
+
+
+
 <a name="5.4.0"></a>
 # [5.4.0](https://github.com/dmfay/massive-js/compare/v5.3.0...v5.4.0) (2018-09-16)
 
