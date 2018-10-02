@@ -16,7 +16,7 @@ If you're using Massive with a framework not already here, [feel free to submit 
 
 ## Koa
 
-```
+```javascript
 const Koa = require('koa');
 const Router = require('koa-router');
 const massive = require('massive');
@@ -50,7 +50,7 @@ massive({
 
 ## Express
 
-```
+```javascript
 const express = require('express');
 const http = require('http');
 const massive = require('massive');
