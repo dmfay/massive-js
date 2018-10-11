@@ -60,6 +60,13 @@ describe('insert', function () {
     });
   });
 
+  it('inserts array fields with literals', function () {
+    return db.normal_pk.insert({field1: 'kappa', array_field: '{one,two}'}).then(res => {
+      assert.equal(res.field1, 'kappa');
+      assert.deepEqual(res.array_field, ['one', 'two']);
+    });
+  });
+
   it('inserts empty array fields with a literal {}', function () {
     return db.normal_pk.insert({field1: 'lambda', array_field: '{}'}).then(res => {
       assert.equal(res.field1, 'lambda');
@@ -71,6 +78,41 @@ describe('insert', function () {
     return db.normal_pk.insert({field1: 'mu', array_field: []}).then(res => {
       assert.equal(res.field1, 'mu');
       assert.deepEqual(res.array_field, []);
+    });
+  });
+
+  it('inserts json/jsonb arrays using custom type formatting', function () {
+    return db.normal_pk.insert({
+      field1: 'nu',
+      json_field: {
+        data: ['one', 'two', 'three'],
+        rawType: true,
+        toPostgres: (p) => {
+          return db.pgp.as.format('$1::jsonb', [JSON.stringify(p.data)]);
+        }
+      }
+    }).then(res => {
+      assert.equal(res.field1, 'nu');
+      assert.deepEqual(res.json_field, ['one', 'two', 'three']);
+    });
+  });
+
+  it('inserts arrays of json/jsonb using custom type formatting', function () {
+    return db.normal_pk.insert({
+      field1: 'xi',
+      array_of_json: {
+        data: [{val: 'one'}, {val: 'two', nested: {val: 'three'}}],
+        rawType: true,
+        toPostgres: (p) => {
+          return db.pgp.as.format('$1::jsonb[]', [p.data]);
+        }
+      }
+    }).then(res => {
+      assert.equal(res.field1, 'xi');
+      assert.deepEqual(res.array_of_json, [
+        {val: 'one'},
+        {val: 'two', nested: {val: 'three'}}
+      ]);
     });
   });
 

@@ -6,7 +6,9 @@ CREATE TABLE normal_pk (
   id SERIAL NOT NULL PRIMARY KEY,
   field1 TEXT NOT NULL,
   field2 TEXT,
-  array_field TEXT[]
+  json_field JSONB,
+  array_field TEXT[],
+  array_of_json JSON[]
 );
 
 CREATE TABLE uuid_pk (
