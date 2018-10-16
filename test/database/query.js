@@ -24,6 +24,30 @@ describe('query', function () {
     return db.query('select $1 as val', ['hi']).then(result => assert.equal(result[0].val, 'hi'));
   });
 
+  it('runs a prepared statement without parameters', function () {
+    return db.query('select 1 as val').then(result => assert.equal(result[0].val, 1));
+  });
+
+  it('runs a prepared statement with empty parameters', function () {
+    return db.query('select 1 as val', []).then(result => assert.equal(result[0].val, 1));
+  });
+
+  it('runs a prepared statement with undefined parameters', function () {
+    return db.query('select 1 as val', undefined).then(result => assert.equal(result[0].val, 1));
+  });
+
+  it('runs a parameterized prepared statement with an undefined parameter', function () {
+    return db.query('select $1 as val', [undefined]).then(result => assert.isNull(result[0].val));
+  });
+
+  it('fails to run a parameterized prepared statement with empty parameters', function () {
+    return db.query('select $1 as val', []).then(() => assert.fail()).catch(() => {});
+  });
+
+  it('fails to run a parameterized prepared statement with an undefined parameter', function () {
+    return db.query('select $1 as val', undefined).then(() => assert.fail()).catch(() => {});
+  });
+
   it('runs a prepared statement using named parameters', function () {
     return db.query('select * from products where id=${id}', {id: 1}).then(res => {
       assert.equal(1, res[0].id);
