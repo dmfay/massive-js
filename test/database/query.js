@@ -44,8 +44,8 @@ describe('query', function () {
     return db.query('select $1 as val', []).then(() => assert.fail()).catch(() => {});
   });
 
-  it('fails to run a parameterized prepared statement with an undefined parameter', function () {
-    return db.query('select $1 as val', undefined).then(() => assert.fail()).catch(() => {});
+  it('does not apply formatting when not required', function () {
+    return db.query('select \'$1\' as val').then(result => assert.equal(result[0].val, '$1'));
   });
 
   it('runs a prepared statement using named parameters', function () {
