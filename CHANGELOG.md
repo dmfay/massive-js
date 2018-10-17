@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.1"></a>
+## [5.5.1](https://github.com/dmfay/massive-js/compare/v5.5.0...v5.5.1) (2018-10-17)
+
+
+### Bug Fixes
+
+* **package:** update commander to version 2.19.0 ([68d72e3](https://github.com/dmfay/massive-js/commit/68d72e3))
+* correct param defaults for Database.query ([49e6af3](https://github.com/dmfay/massive-js/commit/49e6af3))
+* **package:** update pg-promise and pg-query-stream to the latest version 🚀 ([#641](https://github.com/dmfay/massive-js/issues/641)) ([8de72f8](https://github.com/dmfay/massive-js/commit/8de72f8))
+
+
+
 <a name="5.5.0"></a>
 # [5.5.0](https://github.com/dmfay/massive-js/compare/v5.4.0...v5.5.0) (2018-09-30)
 
