@@ -4,6 +4,7 @@ node_js:
   - 8
   - 7
   - 6
+  - 10
 addons:
   postgresql: '9.5'
 services:
