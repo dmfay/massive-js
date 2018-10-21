@@ -202,10 +202,12 @@ describe('invoke', function () {
         const result = [];
 
         stream.on('readable', function () {
-          const res = stream.read();
+          let res;
 
-          if (res) {
-            result.push(res);
+          while (res = stream.read()) { // eslint-disable-line no-cond-assign
+            if (res) {
+              result.push(res);
+            }
           }
         });
 
@@ -226,10 +228,12 @@ describe('invoke', function () {
         const result = [];
 
         stream.on('readable', function () {
-          const res = stream.read();
+          let res;
 
-          if (res) {
-            result.push(res);
+          while (res = stream.read()) { // eslint-disable-line no-cond-assign
+            if (res) {
+              result.push(res);
+            }
           }
         });
 
