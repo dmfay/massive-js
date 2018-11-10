@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.2"></a>
+## [5.5.2](https://github.com/dmfay/massive-js/compare/v5.5.1...v5.5.2) (2018-11-10)
+
+
+### Bug Fixes
+
+* pass undefined args to query() for scripts without parameters (fixes [#649](https://github.com/dmfay/massive-js/issues/649)) ([c5f1894](https://github.com/dmfay/massive-js/commit/c5f1894))
+
+
+
 <a name="5.5.1"></a>
 ## [5.5.1](https://github.com/dmfay/massive-js/compare/v5.5.0...v5.5.1) (2018-10-17)
 
