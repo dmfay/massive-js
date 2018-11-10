@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.5.3"></a>
+## [5.5.3](https://github.com/dmfay/massive-js/compare/v5.5.1...v5.5.3) (2018-11-10)
+
+
+### Bug Fixes
+
+* pass undefined args to query() for scripts without parameters (fixes [#649](https://github.com/dmfay/massive-js/issues/649)) ([1a1c0a6](https://github.com/dmfay/massive-js/commit/1a1c0a6))
+* **package:** update pg-promise to version 8.5.2 ([cc7afc3](https://github.com/dmfay/massive-js/commit/cc7afc3))
+
+
+
 <a name="5.5.2"></a>
 ## [5.5.2](https://github.com/dmfay/massive-js/compare/v5.5.1...v5.5.2) (2018-11-10)
 
