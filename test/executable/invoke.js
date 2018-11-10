@@ -48,21 +48,55 @@ describe('invoke', function () {
       });
     });
 
-    it('invokes a script function with no parameters', function () {
+    it('invokes a script with no parameters', function () {
       return db.noParam().then(res => {
         assert.deepEqual(res, [{'?column?': 1}]);
       });
     });
 
-    it('invokes a script function with no parameters in an empty array', function () {
+    it('invokes a script with no parameters in an empty array', function () {
       return db.noParam([]).then(res => {
         assert.deepEqual(res, [{'?column?': 1}]);
       });
     });
 
-    it('invokes a script function with named parameters', function () {
+    it('invokes a script with prepared statement parameters', function () {
+      return db.psParams(1, 2).then(res => {
+        assert.equal(res[0][Object.keys(res[0])[0]], 3);
+      });
+    });
+
+    it('invokes a script with prepared statement parameters in an array', function () {
+      return db.psParams([1, 2]).then(res => {
+        assert.equal(res[0][Object.keys(res[0])[0]], 3);
+      });
+    });
+
+    it('invokes a script with something that looks like a parameter', function () {
+      return db.falseParam().then(res => {
+        assert.equal(res[0][Object.keys(res[0])[0]], '$123');
+      });
+    });
+
+    it('fails to invoke a script with too few prepared statement parameters', function () {
+      return db.psParams(1).then(() => {
+        assert.fail();
+      }).catch(e => {
+        assert.isOk(e);
+      });
+    });
+
+    it('invokes a script with named parameters', function () {
       return db.namedParam({value: 2}).then(res => {
         assert.equal(res[0][Object.keys(res[0])[0]], 3);
+      });
+    });
+
+    it('fails to invoke a script with too few named parameters', function () {
+      return db.namedParam({}).then(() => {
+        assert.fail();
+      }).catch(e => {
+        assert.isOk(e);
       });
     });
 
