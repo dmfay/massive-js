@@ -151,7 +151,7 @@ describe('WHERE clause generation', function () {
         assert.equal(result.params[3], 'value4');
       });
 
-      it("should encapsulate and AND together 'and' subgroups", function () {
+      it('should encapsulate and AND together inner conjunction subgroups', function () {
         const result = where({
           and: [{
             field1: 'value1'
