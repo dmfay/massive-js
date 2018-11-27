@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.6.0"></a>
+# [5.6.0](https://github.com/dmfay/massive-js/compare/v5.5.3...v5.6.0) (2018-11-27)
+
+
+### Features
+
+* nested conjunctions in criteria objects with 'and' key ([#651](https://github.com/dmfay/massive-js/issues/651)) ([7aebccc](https://github.com/dmfay/massive-js/commit/7aebccc))
+
+
+
 <a name="5.5.3"></a>
 ## [5.5.3](https://github.com/dmfay/massive-js/compare/v5.5.1...v5.5.3) (2018-11-10)
 
