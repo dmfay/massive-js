@@ -131,7 +131,7 @@ describe('WHERE clause generation', function () {
       });
     });
 
-    describe('with subgroups', function () {
+    describe('with disjunction subgroups', function () {
       it('should encapsulate and OR together subgroups', function () {
         const result = where({
           or: [{
@@ -188,6 +188,72 @@ describe('WHERE clause generation', function () {
         });
 
         assert.equal(result.conditions, '(("field1" = $1 AND (("field2" = $2) OR ("field3" = $3))) OR ("field2" = $4 AND "field3" = $5))');
+        assert.equal(result.params.length, 5);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value4');
+        assert.equal(result.params[2], 'value5');
+        assert.equal(result.params[3], 'value2');
+        assert.equal(result.params[4], 'value3');
+      });
+    });
+
+    describe('with nested conjunction subgroups', function () {
+      it('should encapsulate and AND together subgroups', function () {
+        const result = where({
+          and: [{
+            field1: 'value1'
+          }, {
+            field2: 'value2', field3: 'value3'
+          }, {
+            field4: 'value4'
+          }]
+        });
+
+        assert.equal(result.conditions, '(("field1" = $1) AND ("field2" = $2 AND "field3" = $3) AND ("field4" = $4))');
+        assert.equal(result.params.length, 4);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+        assert.equal(result.params[3], 'value4');
+      });
+
+      it('should not pollute other fields', function () {
+        const result = where({
+          and: [{field1: 'value1'}, {field2: 'value2'}],
+          field3: 'value3'
+        });
+
+        assert.equal(result.conditions, '(("field1" = $1) AND ("field2" = $2)) AND "field3" = $3');
+        assert.equal(result.params.length, 3);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+      });
+
+      it('should return a usable predicate if only given one subgroup', function () {
+        const result = where({and: [{field1: 'value1'}]});
+
+        assert.equal(result.conditions, '(("field1" = $1))');
+        assert.equal(result.params.length, 1);
+        assert.equal(result.params[0], 'value1');
+      });
+
+      it('recurses', function () {
+        const result = where({
+          or: [{
+            field1: 'value1',
+            and: [{
+              field2: 'value4'
+            }, {
+              field3: 'value5'
+            }]
+          }, {
+            field2: 'value2',
+            field3: 'value3'
+          }]
+        });
+
+        assert.equal(result.conditions, '(("field1" = $1 AND (("field2" = $2) AND ("field3" = $3))) OR ("field2" = $4 AND "field3" = $5))');
         assert.equal(result.params.length, 5);
         assert.equal(result.params[0], 'value1');
         assert.equal(result.params[1], 'value4');
