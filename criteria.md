@@ -2,12 +2,12 @@
 
 Many Massive functions use criteria objects to build `WHERE` clauses. Although they are principally used in query functions, there are other uses for them. In particular, bulk updates use criteria objects to filter the records being modified.
 
-A criteria object is a "plain old JavaScript object" where keys represent the fields to search and values are prepared statement parameters. The key `or` is special and takes an array of nested criteria objects, at least one of which must be fully matched for a record to be included in the resultset. `or` may be nested recursively at any depth.
+A criteria object is a "plain old JavaScript object" where keys represent the fields to search and values are prepared statement parameters. The keys `or` and `and` are special and take an array of nested criteria objects. At least one of the nested criteria must be fully matched for a record to be included in the resultset with the former, and all for the latter. `or` and `and` may be nested recursively at any depth.
 
 ```javascript
-// this will search for all active records where the name
-// contains 'homepage' or the JSON 'stats' field shows
-// more than 5 runs
+// this will search for all active records where the
+// name contains 'homepage' or the JSON 'stats' field
+// shows more than 5 runs
 
 const criteria = {
   is_active: true,
