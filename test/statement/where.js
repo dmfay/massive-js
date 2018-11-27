@@ -151,6 +151,25 @@ describe('WHERE clause generation', function () {
         assert.equal(result.params[3], 'value4');
       });
 
+      it("should encapsulate and AND together 'and' subgroups", function () {
+        const result = where({
+          and: [{
+            field1: 'value1'
+          }, {
+            field2: 'value2', field3: 'value3'
+          }, {
+            field4: 'value4'
+          }]
+        });
+
+        assert.equal(result.conditions, '(("field1" = $1) AND ("field2" = $2 AND "field3" = $3) AND ("field4" = $4))');
+        assert.equal(result.params.length, 4);
+        assert.equal(result.params[0], 'value1');
+        assert.equal(result.params[1], 'value2');
+        assert.equal(result.params[2], 'value3');
+        assert.equal(result.params[3], 'value4');
+      });
+
       it('should not pollute other fields', function () {
         const result = where({
           or: [{field1: 'value1'}, {field2: 'value2'}],
