@@ -79,6 +79,15 @@ db.saveDoc('reports', {
 
 If the table already exists, you can still use `db.saveDoc`, but you can also invoke `saveDoc` on the table itself.
 
+`saveDocs` can be used for saving multiple documents.
+
+```javascript
+db.saveDocs('books', [
+  {title: 'The Grapes of Wrath'},
+  {title: 'The Jungle'}
+]).then(console.log);
+```
+
 ## Querying Documents
 
 ### A Note About Criteria
