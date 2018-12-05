@@ -79,6 +79,15 @@ db.saveDoc('reports', {
 
 If the table already exists, you can still use `db.saveDoc`, but you can also invoke `saveDoc` on the table itself.
 
+`saveDocs` can be used for saving multiple documents. The documents being saved must be all new, or all existing.
+
+```javascript
+db.saveDocs('books', [
+  {title: 'The Grapes of Wrath'},
+  {title: 'The Jungle'}
+]).then(console.log);
+```
+
 ## Querying Documents
 
 ### A Note About Criteria
@@ -184,6 +193,23 @@ db.reports.saveDoc({
   // the newly created report
 });
 ```
+
+### saveDocs
+
+`saveDocs` inserts or updates a list of documents (must be all new or all existing).
+
+db.books.saveDocs([
+  {
+    title: 'The Grapes of Wrath',
+    author: 'John Steinbeck'
+  } , {
+
+    title: 'The Jungle',
+    author: 'Upton Sinclair'
+  }
+]).then(books => {
+  // handle the list of saved books
+});
 
 ### updateDoc
 
