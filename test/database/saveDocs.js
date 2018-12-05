@@ -11,6 +11,24 @@ describe('saveDocs', function () {
     return db.instance.$pool.end();
   });
 
+  describe('invalid inputs', function () {
+    before(function () {
+      return db.createDocumentTable('doctable');
+    });
+
+    it('should return a rejected promise for passing in a non array object', function* () {
+      try {
+        yield db.saveDocs('doctable', {foo: 'bar'});
+      } catch (e) {
+        assert.equal(e, 'Please pass in the documents as an array of objects.');
+      }
+    });
+
+    after(function () {
+      return db.query('DROP TABLE doctable;');
+    });
+  });
+
   describe('with an existing table', function () {
     before(function () {
       return db.createDocumentTable('docs');
@@ -185,13 +203,8 @@ describe('saveDocs', function () {
       updated.map(doc => doc.created_at).every(assert.isOk);
       updated.map(doc => doc.updated_at).every(assert.isOk);
 
-      const retrieved = [
-        yield db.docs.findDoc(docIds[0]),
-        yield db.docs.findDoc(docIds[1])
-      ];
-
-      assert.equal(retrieved[0].title, 'Together!');
-      assert.equal(retrieved[1].title, 'Anytime chilli for two');
+      assert.equal((yield db.docs.findDoc(docIds[0])).title, 'Together!');
+      assert.equal((yield db.docs.findDoc(docIds[1])).title, 'Anytime chilli for two');
     });
 
     after(function () {
