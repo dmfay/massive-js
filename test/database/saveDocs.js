@@ -203,8 +203,8 @@ describe('saveDocs', function () {
       updated.map(doc => doc.created_at).every(assert.isOk);
       updated.map(doc => doc.updated_at).every(assert.isOk);
 
-      assert.equal((yield db.docs.findDoc(docIds[0])).title, 'Together!');
-      assert.equal((yield db.docs.findDoc(docIds[1])).title, 'Anytime chilli for two');
+      assert.equal((yield db.myschema.docs.findDoc(docIds[0])).title, 'Together!');
+      assert.equal((yield db.myschema.docs.findDoc(docIds[1])).title, 'Anytime chilli for two');
     });
 
     after(function () {
