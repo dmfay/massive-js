@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.0"></a>
+# [5.7.0](https://github.com/dmfay/massive-js/compare/v5.6.0...v5.7.0) (2018-12-05)
+
+
+### Bug Fixes
+
+* **package:** update pg-promise to version 8.5.3 ([2b938f9](https://github.com/dmfay/massive-js/commit/2b938f9))
+
+
+### Features
+
+* add saveDocs method for multiple docs (resolves [#318](https://github.com/dmfay/massive-js/issues/318)) ([#653](https://github.com/dmfay/massive-js/issues/653)) ([6452bb1](https://github.com/dmfay/massive-js/commit/6452bb1))
+
+
+
 <a name="5.6.0"></a>
 # [5.6.0](https://github.com/dmfay/massive-js/compare/v5.5.3...v5.6.0) (2018-11-27)
 
