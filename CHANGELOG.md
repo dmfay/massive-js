@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.1"></a>
+## [5.7.1](https://github.com/dmfay/massive-js/compare/v5.7.0...v5.7.1) (2018-12-12)
+
+
+### Bug Fixes
+
+* use cached promise implementation to cover transaction resolve/reject edge cases ([d319ca4](https://github.com/dmfay/massive-js/commit/d319ca4))
+
+
+
 <a name="5.7.0"></a>
 # [5.7.0](https://github.com/dmfay/massive-js/compare/v5.6.0...v5.7.0) (2018-12-05)
 
