@@ -222,5 +222,15 @@ describe('transactions', function () {
         });
       });
     });
+
+    it('rejects with expected errors', function () {
+      return db.withTransaction(tx => {
+        tx.products.save([])
+          .then(() => { assert.fail(); })
+          .catch(err => {
+            assert.equal(err.message, 'Must provide an object with all fields being modified and the primary key if updating');
+          });
+      });
+    });
   });
 });
