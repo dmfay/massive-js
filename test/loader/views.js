@@ -14,13 +14,13 @@ describe('views', function () {
   });
 
   it('should query for a list of views', function* () {
-    const config = _.defaults({
+    db.loader = _.defaults({
       allowedSchemas: '',
       blacklist: '',
       exceptions: ''
     }, db.loader);
 
-    const views = yield loader(db, config);
+    const views = yield loader(db);
 
     assert.isArray(views);
     assert.lengthOf(views, 2);
@@ -33,14 +33,14 @@ describe('views', function () {
   });
 
   it('should exclude materialized views', function* () {
-    const config = _.defaults({
+    db.loader = _.defaults({
       allowedSchemas: '',
       blacklist: '',
       exceptions: '',
       excludeMatViews: true
     }, db.loader);
 
-    const views = yield loader(db, config);
+    const views = yield loader(db);
 
     assert.isArray(views);
     assert.lengthOf(views, 1);

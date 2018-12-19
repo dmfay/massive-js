@@ -14,8 +14,8 @@ describe('tables', function () {
   });
 
   it('should query for a list of tables', function* () {
-    const config = _.defaults({allowedSchemas: '', blacklist: '', exceptions: ''}, db.loader);
-    const tables = yield loader(db, config);
+    db.loader = _.defaults({allowedSchemas: '', blacklist: '', exceptions: ''}, db.loader);
+    const tables = yield loader(db);
 
     assert.isArray(tables);
     assert.lengthOf(tables, 5);
@@ -26,8 +26,8 @@ describe('tables', function () {
   });
 
   it('should ignore null keys in the pk property', function* () {
-    const config = _.defaults({whitelist: 'no_pk'}, db.loader);
-    const tables = yield loader(db, config);
+    db.loader = _.defaults({whitelist: 'no_pk'}, db.loader);
+    const tables = yield loader(db);
 
     assert.lengthOf(tables, 1);
 

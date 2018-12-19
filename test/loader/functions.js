@@ -14,7 +14,7 @@ describe('functions', function () {
   });
 
   it('should query for a list of functions', function* () {
-    const functions = yield loader(db, db.loader);
+    const functions = yield loader(db);
 
     assert.isArray(functions);
     assert.isTrue(functions.length > 0);
