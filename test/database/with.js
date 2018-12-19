@@ -1,5 +1,7 @@
 'use strict';
 
+const co = require('co');
+
 describe('transactions', function () {
   let db;
 
@@ -153,6 +155,46 @@ describe('transactions', function () {
           assert.isOk(persisted);
         });
       });
+    });
+
+    it('reloads and applies DDL', function () {
+      return db.withTransaction(co.wrap(function* (tx) {
+        yield tx.query('create table test1 (id serial not null primary key, val text not null)');
+
+        tx = yield tx.reload();
+
+        const record = yield tx.test1.insert({val: 'hi!'});
+
+        assert.isOk(record);
+        assert.isTrue(record.id > 0);
+        assert.equal(record.val, 'hi!');
+      }, {
+        mode: new db.pgp.txMode.TransactionMode({
+          tiLevel: db.pgp.txMode.isolationLevel.serializable
+        })
+      }));
+    });
+
+    it('rolls back DDL', function () {
+      return db.withTransaction(co.wrap(function* (tx) {
+        yield tx.query('create table test2 (id serial not null primary key, val text not null)');
+
+        tx = yield tx.reload();
+
+        yield tx.test2.insert({val: null});
+      }, {
+        mode: new db.pgp.txMode.TransactionMode({
+          tiLevel: db.pgp.txMode.isolationLevel.serializable
+        })
+      }))
+        .then(() => { assert.fail(); })
+        .catch(co.wrap(function* (err) {
+          assert.isOk(err);
+
+          db = yield db.reload();
+
+          assert.notInclude(db.listTables(), 'test2');
+        }));
     });
 
     it('rolls back if anything rejects', function () {
