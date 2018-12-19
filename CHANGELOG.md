@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.2"></a>
+## [5.7.2](https://github.com/dmfay/massive-js/compare/v5.7.1...v5.7.2) (2018-12-19)
+
+
+### Bug Fixes
+
+* cast date parameter values to timestamptz ([#658](https://github.com/dmfay/massive-js/issues/658)) ([231e944](https://github.com/dmfay/massive-js/commit/231e944))
+* used cached promise implementation in executable error path ([50ba7c5](https://github.com/dmfay/massive-js/commit/50ba7c5))
+
+
+
 <a name="5.7.1"></a>
 ## [5.7.1](https://github.com/dmfay/massive-js/compare/v5.7.0...v5.7.1) (2018-12-12)
 
