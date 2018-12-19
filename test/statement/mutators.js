@@ -24,7 +24,7 @@ describe('mutators', function () {
       const date2 = new Date();
       const condition = mutators.buildBetween({
         offset: 1,
-          value: [date1, date2],
+        value: [date1, date2],
         params: []
       });
 
@@ -237,7 +237,7 @@ describe('mutators', function () {
       });
     });
 
-    it("typecasts timestamps if it's not an array", function () {
+    it('typecasts timestamps if not in an array', function () {
       const date1 = new Date();
       const condition = {
         offset: 1,
