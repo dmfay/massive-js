@@ -18,6 +18,22 @@ describe('mutators', function () {
         value: '$1 AND $2'
       });
     });
+
+    it('typecasts timestamps', function () {
+      const date1 = new Date();
+      const date2 = new Date();
+      const condition = mutators.buildBetween({
+        offset: 1,
+        value: [date1, date2],
+        params: []
+      });
+
+      assert.deepEqual(condition, {
+        offset: 3,
+        params: [date1, date2],
+        value: '$1::timestamptz AND $2::timestamptz'
+      });
+    });
   });
 
   describe('buildIn', function () {
@@ -47,6 +63,22 @@ describe('mutators', function () {
       assert.equal(condition.offset, 4);
       assert.deepEqual(condition.params, [1, 2, 3]);
       assert.equal(condition.value, '($1,$2,$3)');
+    });
+
+    it('typecasts timestamps', function () {
+      const date1 = new Date();
+      const date2 = new Date();
+      const condition = mutators.buildIn({
+        appended: ops('='),
+        offset: 1,
+        value: [date1, date2],
+        params: []
+      });
+
+      assert.equal(condition.appended.operator, 'IN');
+      assert.equal(condition.offset, 3);
+      assert.deepEqual(condition.params, [date1, date2]);
+      assert.equal(condition.value, '($1::timestamptz,$2::timestamptz)');
     });
   });
 
@@ -131,6 +163,21 @@ describe('mutators', function () {
       assert.deepEqual(condition.params, [123]);
       assert.equal(condition.value, '$1');
     });
+
+    it('typecasts timestamps', function () {
+      const date1 = new Date();
+      const condition = mutators.equality({
+        appended: ops('='),
+        offset: 1,
+        value: date1,
+        params: []
+      });
+
+      assert.equal(condition.appended.operator, '=');
+      assert.equal(condition.offset, 1);
+      assert.deepEqual(condition.params, [date1]);
+      assert.equal(condition.value, '$1::timestamptz');
+    });
   });
 
   describe('literalizeArray', function () {
@@ -187,6 +234,21 @@ describe('mutators', function () {
         offset: 1,
         params: ['{1,true,null,1.5}'],
         value: '$1'
+      });
+    });
+
+    it('typecasts timestamps if not in an array', function () {
+      const date1 = new Date();
+      const condition = {
+        offset: 1,
+        value: date1,
+        params: []
+      };
+
+      assert.deepEqual(mutators.literalizeArray(condition), {
+        offset: 1,
+        params: [date1],
+        value: '$1::timestamptz'
       });
     });
   });
