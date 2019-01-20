@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.3"></a>
+## [5.7.3](https://github.com/dmfay/massive-js/compare/v5.7.2...v5.7.3) (2019-01-20)
+
+
+### Bug Fixes
+
+* document queries include only the relevant key-value pair in criteria when matching nested arrays (fixes [#662](https://github.com/dmfay/massive-js/issues/662)) ([545aae1](https://github.com/dmfay/massive-js/commit/545aae1))
+* **package:** update pg-promise to version 8.5.4 ([7e08207](https://github.com/dmfay/massive-js/commit/7e08207))
+* **package:** update pg-query-stream to version 2.0.0 ([dbde097](https://github.com/dmfay/massive-js/commit/dbde097))
+
+
+
 <a name="5.7.2"></a>
 ## [5.7.2](https://github.com/dmfay/massive-js/compare/v5.7.1...v5.7.2) (2018-12-19)
 
