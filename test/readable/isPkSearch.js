@@ -11,10 +11,6 @@ describe('isPkSearch', function () {
     return db.instance.$pool.end();
   });
 
-  it('should assume a default options object', function () {
-    assert.isTrue(db.products.isPkSearch(1));
-  });
-
   it('should pass integers', function () {
     assert.isTrue(db.products.isPkSearch(1));
   });
@@ -27,8 +23,8 @@ describe('isPkSearch', function () {
     assert.isTrue(db.products.isPkSearch('a2a072cc-7a41-4fd6-bd16-ae1677166c05'));
   });
 
-  it('should reject integers in strings', function () {
-    assert.isFalse(db.products.isPkSearch('1'));
+  it('should pass stringified integers', function () {
+    assert.isTrue(db.products.isPkSearch('1'));
   });
 
   it('should reject badly versioned uuids', function () {
