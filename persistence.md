@@ -7,10 +7,12 @@ The documentation for persistence is written with tables in mind, but you can al
 <!-- vim-markdown-toc GFM -->
 
 * [save](#save)
+  * [Restrictions](#restrictions)
+  * [Options](#options)
 * [insert](#insert)
   * [Multiple Records](#multiple-records)
   * [Deep Insert](#deep-insert)
-  * [Options](#options)
+  * [Options](#options-1)
 * [update](#update)
 * [destroy](#destroy)
 
@@ -18,9 +20,14 @@ The documentation for persistence is written with tables in mind, but you can al
 
 ## save
 
-`save` persists a single object to the database. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. The promise `save` returns will resolve to the created or modified record represented as an object.
+`save` persists a single object to the database. On initialization, Massive records your tables' primary key information and uses this to determine whether the object passed to `save` represents a new or an existing row and invokes `insert` or `update` appropriately. **This means it is not a true upsert, and that some care must be taken with its use in certain situations!** The promise `save` returns will resolve to the created or modified record represented as an object.
 
-`save` may not be used with foreign tables or updatable views, since they cannot have primary keys. If you need to persist data to a foreign table or updatable view, use `insert` and `update`.
+### Restrictions
+
+* `save` may not be used with foreign tables or updatable views, since they cannot have primary keys. If you need to persist data to a foreign table or updatable view, use `insert` and `update`.
+* `save` should generally be avoided if your table's primary key does not include at least one column sourced from a sequence or function (eg an auto-incrementing integer or one of the UUID-generating functions). If you are trying to create a record and your table definition requires you to specify values for all primary key columns, you _must_ use `insert`; `save` is effectively an `update` in this scenario.
+
+### Options
 
 [Query options](options) valid for `insert`, and for results processing, may be used with `save` as a second argument. However, most of these are of limited utility.
 
