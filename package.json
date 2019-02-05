@@ -73,7 +73,7 @@
     "eslint": "5.0.1",
     "jsdoc": "3.5.5",
     "mocha": "5.2.0",
-    "nyc": "12.0.2",
+    "nyc": "13.2.0",
     "standard-version": "4.4.0"
   },
   "repository": {
