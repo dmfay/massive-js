@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.7.5"></a>
+## [5.7.5](https://github.com/dmfay/massive-js/compare/v5.7.4...v5.7.5) (2019-02-06)
+
+
+### Bug Fixes
+
+* cache and restore custom pg-promise receive option ([#665](https://github.com/dmfay/massive-js/issues/665)) ([f70847f](https://github.com/dmfay/massive-js/commit/f70847f))
+* **package:** update pg-promise to version 8.5.5 ([489f443](https://github.com/dmfay/massive-js/commit/489f443))
+
+
+
 <a name="5.7.4"></a>
 ## [5.7.4](https://github.com/dmfay/massive-js/compare/v5.7.3...v5.7.4) (2019-01-25)
 
