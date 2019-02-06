@@ -41,6 +41,39 @@ describe('connecting', function () {
     });
   });
 
+  it('accepts a receive event option on driver config', function () {
+    // eslint-disable-next-line require-jsdoc
+    function camelizeColumns (data) {
+      const tmp = data[0];
+      for (const prop in tmp) {
+        const camel = pgp.utils.camelize(prop);
+        if (!(camel in tmp)) {
+          for (let i = 0; i < data.length; i++) {
+            const d = data[i];
+            d[camel] = d[prop];
+            delete d[prop];
+          }
+        }
+      }
+    }
+
+    const driverConfig = {
+      receive: data => {
+        camelizeColumns(data);
+      }
+    };
+
+    return massive({connectionString}, loader, driverConfig).then(db => {
+      assert.isOk(db);
+      assert.isOk(db.loader);
+      assert.isOk(db.driverConfig);
+      assert.isTrue(db.objects.length > 0);
+      assert.isOk(db.t1);
+
+      return db.instance.$pool.end();
+    });
+  });
+
   describe('variations', function () {
     it('connects with a connectionString property', function () {
       return massive({connectionString}, loader).then(db => {
