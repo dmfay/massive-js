@@ -131,7 +131,7 @@ db.query(
 });
 ```
 
-`query` takes named parameters as well:
+`query` takes named parameters as well accepting `$*name*` with `*` being any of the following pairs `{}` `[]` `()` `\\` `<>` :
 
 ```javascript
 db.query(
