@@ -131,7 +131,7 @@ db.query(
 });
 ```
 
-`query` takes named parameters as well:
+`query` accepts SQL statements with named parameters in the pg-promise format `$*name*`, where the `*`s represent any of the following pairs: `{}`, `[]`, `()`, `//`, or `<>`.
 
 ```javascript
 db.query(
