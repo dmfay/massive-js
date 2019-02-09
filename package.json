@@ -66,11 +66,11 @@
     "pg-query-stream": "2.0.0"
   },
   "devDependencies": {
-    "chai": "4.1.2",
+    "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "co-mocha": "1.2.2",
     "coveralls": "3.0.2",
-    "eslint": "5.0.1",
+    "eslint": "5.13.0",
     "jsdoc": "3.5.5",
     "mocha": "5.2.0",
     "nyc": "13.2.0",
