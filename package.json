@@ -70,7 +70,7 @@
     "chai-as-promised": "7.1.1",
     "co-mocha": "1.2.2",
     "coveralls": "3.0.2",
-    "eslint": "5.13.0",
+    "eslint": "5.14.0",
     "jsdoc": "3.5.5",
     "mocha": "5.2.0",
     "nyc": "13.2.0",
