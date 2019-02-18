@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.7.6](https://github.com/dmfay/massive-js/compare/v5.7.5...v5.7.6) (2019-02-18)
+
+
+### Bug Fixes
+
+* simplify executable clone to improve performance in tasks/transactions (fixes [#673](https://github.com/dmfay/massive-js/issues/673)) ([#674](https://github.com/dmfay/massive-js/issues/674)) ([bf1c5df](https://github.com/dmfay/massive-js/commit/bf1c5df))
+
+
+
 <a name="5.7.5"></a>
 ## [5.7.5](https://github.com/dmfay/massive-js/compare/v5.7.4...v5.7.5) (2019-02-06)
 
