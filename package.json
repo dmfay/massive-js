@@ -72,7 +72,7 @@
     "coveralls": "3.0.2",
     "eslint": "5.14.0",
     "jsdoc": "3.5.5",
-    "mocha": "5.2.0",
+    "mocha": "6.0.1",
     "nyc": "13.3.0",
     "standard-version": "5.0.0"
   },
