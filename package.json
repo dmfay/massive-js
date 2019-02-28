@@ -26,8 +26,6 @@
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha",
     "lint": "eslint '.'",
-    "docs": "rm -rf ./docs/api && jsdoc -d ./docs/api -c ./.jsdoc.json -r",
-    "docserver": "npm run docs && cd docs && bundle exec jekyll serve",
     "posttest": "npm run lint",
     "release": "standard-version",
     "preversion": "sh build/apidocs.sh",
@@ -71,7 +69,6 @@
     "co-mocha": "1.2.2",
     "coveralls": "3.0.2",
     "eslint": "5.14.0",
-    "jsdoc": "3.5.5",
     "mocha": "5.2.0",
     "nyc": "13.3.0",
     "standard-version": "5.0.0"
