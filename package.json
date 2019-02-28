@@ -28,8 +28,6 @@
     "lint": "eslint '.'",
     "posttest": "npm run lint",
     "release": "standard-version",
-    "preversion": "sh build/apidocs.sh",
-    "postversion": "sh build/update-gh-pages.sh",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
@@ -50,12 +48,6 @@
     "Rob Conery <robconery@gmail.com>"
   ],
   "license": "BSD-3-Clause",
-  "standard-version": {
-    "scripts": {
-      "prerelease": "sh build/apidocs.sh",
-      "posttag": "sh build/update-gh-pages.sh"
-    }
-  },
   "dependencies": {
     "commander": "2.19.0",
     "glob": "7.1.3",
