@@ -1,0 +1,16 @@
+image: node:latest
+
+variables:
+  POSTGRES_HOST: postgres
+  POSTGRES_DB: arachne
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: ""
+
+services:
+  - postgres:latest
+
+test:
+  stage: test
+  script:
+    - npm i
+    - npm test
