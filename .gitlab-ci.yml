@@ -2,7 +2,7 @@ image: node:latest
 
 variables:
   POSTGRES_HOST: postgres
-  POSTGRES_DB: arachne
+  POSTGRES_DB: massive
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: ""
 

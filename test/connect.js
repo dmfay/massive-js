@@ -94,7 +94,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({host: 'localhost', database: 'massive', user: 'postgres'}, loader).then(db => {
+      return massive({host: global.host, database: 'massive', user: 'postgres'}, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
