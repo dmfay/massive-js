@@ -27,7 +27,7 @@ npm i massive --save
 
 ## Documentation
 
-Documentation and API docs are at [MassiveJS.org](https://massivejs.org/docs).
+Documentation and API docs are at [MassiveJS.org](https://massivejs.org).
 
 ## Contributing
 
