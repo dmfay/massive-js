@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.7.7](https://gitlab.com/dmfay/massive-js/compare/v5.7.6...v5.7.7) (2019-03-01)
+
+
+### Bug Fixes
+
+* query files can use streaming as long as they don't have named parameters ([58e413c](https://gitlab.com/dmfay/massive-js/commit/58e413c))
+
+
+
 ## [5.7.6](https://github.com/dmfay/massive-js/compare/v5.7.5...v5.7.6) (2019-02-18)
 
 

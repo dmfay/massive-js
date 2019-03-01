@@ -1,6 +1,6 @@
 {
   "name": "massive",
-  "version": "5.7.6",
+  "version": "5.7.7",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
   "homepage": "https://massivejs.org",
   "bugs": "https://gitlab.com/dmfay/massive-js/issues",
