@@ -2,8 +2,8 @@
   "name": "massive",
   "version": "5.7.6",
   "description": "A small query tool for Postgres that embraces json and makes life simpler",
-  "homepage": "https://dmfay.github.io/massive-js/",
-  "bugs": "https://github.com/dmfay/massive-js/issues",
+  "homepage": "https://massivejs.org",
+  "bugs": "https://gitlab.com/dmfay/massive-js/issues",
   "main": "index.js",
   "bin": {
     "massive": "bin/massive.js"
@@ -67,6 +67,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dmfay/massive-js.git"
+    "url": "https://gitlab.com/dmfay/massive-js"
   }
 }
