@@ -257,6 +257,58 @@ describe('invoke', function () {
       });
     });
 
+    it('streams a query file with no parameters', function (done) {
+      db.noParam({stream: true}).then(stream => {
+        const result = [];
+
+        stream.on('readable', function () {
+          let res;
+
+          while (res = stream.read()) { // eslint-disable-line no-cond-assign
+            if (res) {
+              result.push(res);
+            }
+          }
+        });
+
+        stream.on('end', function () {
+          assert.deepEqual(result, [{'?column?': 1}]);
+
+          done();
+        });
+      });
+    });
+
+    it('streams a query file with indexed parameters', function (done) {
+      db.psParams([1, 2], {stream: true}).then(stream => {
+        const result = [];
+
+        stream.on('readable', function () {
+          let res;
+
+          while (res = stream.read()) { // eslint-disable-line no-cond-assign
+            if (res) {
+              result.push(res);
+            }
+          }
+        });
+
+        stream.on('end', function () {
+          assert.deepEqual(result, [{'?column?': 3}]);
+
+          done();
+        });
+      });
+    });
+
+    it('cannot stream a query file with named parameters', function () {
+      return db.namedParam({value: 1}, {stream: true}).then(() => {
+        assert.fail();
+      }).catch(err => {
+        assert.equal(err.message, 'Named parameters are not supported when streaming QueryFiles');
+      });
+    });
+
     it('pipes a single-valued function through SingleValueStream', function (done) {
       db.regexp_matches('aaaaaaaaaaaaaaaaaaaa', 'a', 'g', {stream: true}).then(stream => {
         const result = [];

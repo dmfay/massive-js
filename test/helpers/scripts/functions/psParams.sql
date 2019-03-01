@@ -1,1 +1,1 @@
-SELECT $1 + $2;
+SELECT $1::INT + $2::INT;
