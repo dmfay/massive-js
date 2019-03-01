@@ -3,7 +3,6 @@
 [![node](https://img.shields.io/node/v/massive.svg)](https://npmjs.org/package/massive)
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
 [![Coverage Status](https://coveralls.io/repos/gitlab/dmfay/massive-js/badge.svg)](https://coveralls.io/gitlab/dmfay/massive-js)
-[![Greenkeeper badge](https://badges.greenkeeper.io/dmfay/massive-js.svg)](https://greenkeeper.io/)
 [![npm](https://img.shields.io/npm/dw/massive.svg)](https://npmjs.org/package/massive)
 
 Massive.js is a data mapper for Node.js that goes all in on PostgreSQL and fully embraces the power and flexibility of the SQL language and relational metaphors. Providing minimal abstractions for the interfaces and tools you already use, its goal is to do just enough to make working with your data as easy and intuitive as possible, then get out of your way.
