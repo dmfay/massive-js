@@ -94,7 +94,7 @@ describe('connecting', function () {
     });
 
     it('connects with a property map', function () {
-      return massive({host: global.host, database: 'massive', user: 'postgres'}, loader).then(db => {
+      return massive({host, database: 'massive', user: 'postgres'}, loader).then(db => {
         assert.isOk(db);
         assert.isOk(db.t1);
 
@@ -103,7 +103,7 @@ describe('connecting', function () {
     });
 
     it('rejects with connection errors', function () {
-      return massive({database: 'doesntexist', user: 'postgres'}, loader).then(
+      return massive({host, database: 'doesntexist', user: 'postgres'}, loader).then(
         () => { assert.fail(); },
         err => {
           assert.equal(err.code, '3D000');
@@ -111,7 +111,7 @@ describe('connecting', function () {
       );
     });
 
-    it('connects with undefined connections using default configuration', function () {
+    it.skip('connects with undefined connections using default configuration', function () {
       return massive().then(db => {
         assert.isOk(db);
 
@@ -119,7 +119,7 @@ describe('connecting', function () {
       });
     });
 
-    it('connects with empty connection block using default configuration', function () {
+    it.skip('connects with empty connection block using default configuration', function () {
       return massive({}).then(db => {
         assert.isOk(db);
 
@@ -127,7 +127,7 @@ describe('connecting', function () {
       });
     });
 
-    it('connects with empty connection strings using default configuration', function () {
+    it.skip('connects with empty connection strings using default configuration', function () {
       return massive('').then(db => {
         assert.isOk(db);
 

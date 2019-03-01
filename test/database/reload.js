@@ -7,7 +7,12 @@ describe('reload', function () {
     const initDb = yield resetDb('multi-schema');
 
     // reconnect with a pool size of 1 to make it easier to change runtime settings on all connections
-    db = yield massive({user: 'postgres', database: 'massive', poolSize: 1}, massive.loader);
+    db = yield massive({
+      host: global.host,
+      user: 'postgres',
+      database: 'massive',
+      poolSize: 1
+    }, massive.loader);
 
     // close original connection
     yield initDb.instance.$pool.end();

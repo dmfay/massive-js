@@ -5,6 +5,7 @@
     "assert": true,
     "massive": true,
     "connectionString": true,
+    "host": true,
     "init": true,
     "resetDb": true
   }
