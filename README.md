@@ -2,7 +2,7 @@
 
 [![node](https://img.shields.io/node/v/massive.svg)](https://npmjs.org/package/massive)
 [![Build Status](https://travis-ci.org/dmfay/massive-js.svg?branch=master)](https://travis-ci.org/dmfay/massive-js)
-[![Coverage Status](https://coveralls.io/repos/github/dmfay/massive-js/badge.svg)](https://coveralls.io/github/dmfay/massive-js)
+[![Coverage Status](https://coveralls.io/repos/gitlab/dmfay/massive-js/badge.svg)](https://coveralls.io/gitlab/dmfay/massive-js)
 [![Greenkeeper badge](https://badges.greenkeeper.io/dmfay/massive-js.svg)](https://greenkeeper.io/)
 [![npm](https://img.shields.io/npm/dw/massive.svg)](https://npmjs.org/package/massive)
 

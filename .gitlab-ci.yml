@@ -14,3 +14,4 @@ test:
   script:
     - npm i
     - npm test
+    - npm run coverage
