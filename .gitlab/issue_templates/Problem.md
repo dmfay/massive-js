@@ -1,9 +1,3 @@
----
-name: Report a problem
-about: If something isn't working the way you expect it to
-
----
-
 ## Summary
 A clear and concise description of the bug or unexpected behavior you're encountering.
 
