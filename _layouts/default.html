@@ -6,50 +6,13 @@
     <title>{{ site.title | default: site.github.repository_name }} by {{ site.github.owner_name }}</title>
 
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-    <link rel="stylesheet" href="/assets/css/custom.css">
     <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1><a href="{{ site.baseurl }}">{{ site.title | default: site.github.repository_name }}</a></h1>
-        <p>{{ site.description | default: site.github.project_tagline }}</p>
-
-        {% if site.github.is_project_page %}
-          <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ github_name }}</small></a></p>
-        {% endif %}
-
-        <h2>Contents</h2>
-        <ul class="toc">
-          <li><a href="{{ site.baseurl }}/connecting.html">Connecting</a></li>
-          <li><a href="{{ site.baseurl }}/frameworks.html">Framework Examples</a></li>
-          <li><a href="{{ site.baseurl }}/criteria.html">Criteria Objects</a></li>
-          <li><a href="{{ site.baseurl }}/options.html">Options</a></li>
-          <li><a href="{{ site.baseurl }}/queries.html">Queries</a></li>
-          <li><a href="{{ site.baseurl }}/persistence.html">Persistence</a></li>
-          <li><a href="{{ site.baseurl }}/functions.html">Functions and Scripts</a></li>
-          <li><a href="{{ site.baseurl }}/documents.html">Working with Documents</a></li>
-          <li><a href="{{ site.baseurl }}/decomposition.html">Resultset Decomposition</a></li>
-          <li><a href="{{ site.baseurl }}/structures.html">Database Structures</a></li>
-          <li><a href="{{ site.baseurl }}/tasks-and-transactions.html">Tasks and Transactions</a></li>
-          <li><a href="{{ site.baseurl }}/migrations.html">Migrations and Massive</a></li>
-          <li><a href="{{ site.baseurl }}/api/index.html">API Docs</a></li>
-        </ul>
-
-        {% if site.github.is_project_page %}
-        <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </header>
-      <section>
-
-      {{ content }}
-
-      </section>
-    </div>
+    {{ content }}
     <script src="{{ '/assets/js/scale.fix.js' | relative_url }}"></script>
 
 
